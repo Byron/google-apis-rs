@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -82,7 +87,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -112,37 +117,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Replicapoolupdater<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Replicapoolupdater<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Replicapoolupdater<> {}
+impl<'a, S> client::Hub for Replicapoolupdater<S> {}
 
-impl<'a, > Replicapoolupdater<> {
+impl<'a, S> Replicapoolupdater<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Replicapoolupdater<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Replicapoolupdater<S> {
         Replicapoolupdater {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn rolling_updates(&'a self) -> RollingUpdateMethods<'a> {
+    pub fn rolling_updates(&'a self) -> RollingUpdateMethods<'a, S> {
         RollingUpdateMethods { hub: &self }
     }
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, S> {
         ZoneOperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -605,22 +610,22 @@ impl client::Part for RollingUpdatePolicy {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `get(...)`, `insert(...)`, `list(...)`, `list_instance_updates(...)`, `pause(...)`, `resume(...)` and `rollback(...)`
 /// // to build up your call.
 /// let rb = hub.rolling_updates();
 /// # }
 /// ```
-pub struct RollingUpdateMethods<'a>
-    where  {
+pub struct RollingUpdateMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
 }
 
-impl<'a> client::MethodsBuilder for RollingUpdateMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RollingUpdateMethods<'a, S> {}
 
-impl<'a> RollingUpdateMethods<'a> {
+impl<'a, S> RollingUpdateMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -631,7 +636,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn cancel(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateCancelCall<'a> {
+    pub fn cancel(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateCancelCall<'a, S> {
         RollingUpdateCancelCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -652,7 +657,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn get(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateGetCall<'a> {
+    pub fn get(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateGetCall<'a, S> {
         RollingUpdateGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -673,7 +678,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
-    pub fn insert(&self, request: RollingUpdate, project: &str, zone: &str) -> RollingUpdateInsertCall<'a> {
+    pub fn insert(&self, request: RollingUpdate, project: &str, zone: &str) -> RollingUpdateInsertCall<'a, S> {
         RollingUpdateInsertCall {
             hub: self.hub,
             _request: request,
@@ -693,7 +698,7 @@ impl<'a> RollingUpdateMethods<'a> {
     ///
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
-    pub fn list(&self, project: &str, zone: &str) -> RollingUpdateListCall<'a> {
+    pub fn list(&self, project: &str, zone: &str) -> RollingUpdateListCall<'a, S> {
         RollingUpdateListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -716,7 +721,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn list_instance_updates(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn list_instance_updates(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         RollingUpdateListInstanceUpdateCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -740,7 +745,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn pause(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdatePauseCall<'a> {
+    pub fn pause(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdatePauseCall<'a, S> {
         RollingUpdatePauseCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -761,7 +766,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn resume(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateResumeCall<'a> {
+    pub fn resume(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateResumeCall<'a, S> {
         RollingUpdateResumeCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -782,7 +787,7 @@ impl<'a> RollingUpdateMethods<'a> {
     /// * `project` - The Google Developers Console project name.
     /// * `zone` - The name of the zone in which the update's target resides.
     /// * `rollingUpdate` - The name of the update.
-    pub fn rollback(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateRollbackCall<'a> {
+    pub fn rollback(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateRollbackCall<'a, S> {
         RollingUpdateRollbackCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -818,22 +823,22 @@ impl<'a> RollingUpdateMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a>
-    where  {
+pub struct ZoneOperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
 }
 
-impl<'a> client::MethodsBuilder for ZoneOperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ZoneOperationMethods<'a, S> {}
 
-impl<'a> ZoneOperationMethods<'a> {
+impl<'a, S> ZoneOperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -844,7 +849,7 @@ impl<'a> ZoneOperationMethods<'a> {
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
     /// * `operation` - Name of the operation resource to return.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, S> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -864,7 +869,7 @@ impl<'a> ZoneOperationMethods<'a> {
     ///
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, S> {
         ZoneOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -909,7 +914,7 @@ impl<'a> ZoneOperationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -917,10 +922,10 @@ impl<'a> ZoneOperationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateCancelCall<'a>
-    where  {
+pub struct RollingUpdateCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -929,9 +934,15 @@ pub struct RollingUpdateCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateCancelCall<'a, S> {}
 
-impl<'a> RollingUpdateCancelCall<'a> {
+impl<'a, S> RollingUpdateCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1076,7 +1087,7 @@ impl<'a> RollingUpdateCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateCancelCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1086,7 +1097,7 @@ impl<'a> RollingUpdateCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateCancelCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -1096,7 +1107,7 @@ impl<'a> RollingUpdateCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateCancelCall<'a> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, S> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -1106,7 +1117,7 @@ impl<'a> RollingUpdateCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1127,7 +1138,7 @@ impl<'a> RollingUpdateCancelCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1147,9 +1158,9 @@ impl<'a> RollingUpdateCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1181,7 +1192,7 @@ impl<'a> RollingUpdateCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1189,10 +1200,10 @@ impl<'a> RollingUpdateCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateGetCall<'a>
-    where  {
+pub struct RollingUpdateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -1201,9 +1212,15 @@ pub struct RollingUpdateGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateGetCall<'a, S> {}
 
-impl<'a> RollingUpdateGetCall<'a> {
+impl<'a, S> RollingUpdateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1348,7 +1365,7 @@ impl<'a> RollingUpdateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1358,7 +1375,7 @@ impl<'a> RollingUpdateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -1368,7 +1385,7 @@ impl<'a> RollingUpdateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateGetCall<'a> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateGetCall<'a, S> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -1378,7 +1395,7 @@ impl<'a> RollingUpdateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1399,7 +1416,7 @@ impl<'a> RollingUpdateGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1419,9 +1436,9 @@ impl<'a> RollingUpdateGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1454,7 +1471,7 @@ impl<'a> RollingUpdateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1467,10 +1484,10 @@ impl<'a> RollingUpdateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateInsertCall<'a>
-    where  {
+pub struct RollingUpdateInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _request: RollingUpdate,
     _project: String,
     _zone: String,
@@ -1479,9 +1496,15 @@ pub struct RollingUpdateInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateInsertCall<'a, S> {}
 
-impl<'a> RollingUpdateInsertCall<'a> {
+impl<'a, S> RollingUpdateInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1638,7 +1661,7 @@ impl<'a> RollingUpdateInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RollingUpdate) -> RollingUpdateInsertCall<'a> {
+    pub fn request(mut self, new_value: RollingUpdate) -> RollingUpdateInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1648,7 +1671,7 @@ impl<'a> RollingUpdateInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1658,7 +1681,7 @@ impl<'a> RollingUpdateInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateInsertCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -1668,7 +1691,7 @@ impl<'a> RollingUpdateInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1689,7 +1712,7 @@ impl<'a> RollingUpdateInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1709,9 +1732,9 @@ impl<'a> RollingUpdateInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1743,7 +1766,7 @@ impl<'a> RollingUpdateInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1754,10 +1777,10 @@ impl<'a> RollingUpdateInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateListCall<'a>
-    where  {
+pub struct RollingUpdateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -1768,9 +1791,15 @@ pub struct RollingUpdateListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateListCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateListCall<'a, S> {}
 
-impl<'a> RollingUpdateListCall<'a> {
+impl<'a, S> RollingUpdateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1923,7 +1952,7 @@ impl<'a> RollingUpdateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1933,28 +1962,28 @@ impl<'a> RollingUpdateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Optional. Filter expression for filtering listed resources.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> RollingUpdateListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> RollingUpdateListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1964,7 +1993,7 @@ impl<'a> RollingUpdateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1985,7 +2014,7 @@ impl<'a> RollingUpdateListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2005,9 +2034,9 @@ impl<'a> RollingUpdateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2039,7 +2068,7 @@ impl<'a> RollingUpdateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2050,10 +2079,10 @@ impl<'a> RollingUpdateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateListInstanceUpdateCall<'a>
-    where  {
+pub struct RollingUpdateListInstanceUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -2065,9 +2094,15 @@ pub struct RollingUpdateListInstanceUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateListInstanceUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateListInstanceUpdateCall<'a, S> {}
 
-impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
+impl<'a, S> RollingUpdateListInstanceUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2221,7 +2256,7 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2231,7 +2266,7 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -2241,28 +2276,28 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._rolling_update = new_value.to_string();
         self
     }
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Optional. Filter expression for filtering listed resources.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2272,7 +2307,7 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateListInstanceUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateListInstanceUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2293,7 +2328,7 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListInstanceUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListInstanceUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2313,9 +2348,9 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateListInstanceUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateListInstanceUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2347,7 +2382,7 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2355,10 +2390,10 @@ impl<'a> RollingUpdateListInstanceUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdatePauseCall<'a>
-    where  {
+pub struct RollingUpdatePauseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -2367,9 +2402,15 @@ pub struct RollingUpdatePauseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdatePauseCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdatePauseCall<'a, S> {}
 
-impl<'a> RollingUpdatePauseCall<'a> {
+impl<'a, S> RollingUpdatePauseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2514,7 +2555,7 @@ impl<'a> RollingUpdatePauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdatePauseCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2524,7 +2565,7 @@ impl<'a> RollingUpdatePauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdatePauseCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -2534,7 +2575,7 @@ impl<'a> RollingUpdatePauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdatePauseCall<'a> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, S> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -2544,7 +2585,7 @@ impl<'a> RollingUpdatePauseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdatePauseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdatePauseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2565,7 +2606,7 @@ impl<'a> RollingUpdatePauseCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdatePauseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdatePauseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2585,9 +2626,9 @@ impl<'a> RollingUpdatePauseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdatePauseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdatePauseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2619,7 +2660,7 @@ impl<'a> RollingUpdatePauseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2627,10 +2668,10 @@ impl<'a> RollingUpdatePauseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateResumeCall<'a>
-    where  {
+pub struct RollingUpdateResumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -2639,9 +2680,15 @@ pub struct RollingUpdateResumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateResumeCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateResumeCall<'a, S> {}
 
-impl<'a> RollingUpdateResumeCall<'a> {
+impl<'a, S> RollingUpdateResumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2786,7 +2833,7 @@ impl<'a> RollingUpdateResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateResumeCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2796,7 +2843,7 @@ impl<'a> RollingUpdateResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateResumeCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -2806,7 +2853,7 @@ impl<'a> RollingUpdateResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateResumeCall<'a> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, S> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -2816,7 +2863,7 @@ impl<'a> RollingUpdateResumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateResumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateResumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2837,7 +2884,7 @@ impl<'a> RollingUpdateResumeCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateResumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateResumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2857,9 +2904,9 @@ impl<'a> RollingUpdateResumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateResumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateResumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2891,7 +2938,7 @@ impl<'a> RollingUpdateResumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2899,10 +2946,10 @@ impl<'a> RollingUpdateResumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RollingUpdateRollbackCall<'a>
-    where  {
+pub struct RollingUpdateRollbackCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _rolling_update: String,
@@ -2911,9 +2958,15 @@ pub struct RollingUpdateRollbackCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RollingUpdateRollbackCall<'a> {}
+impl<'a, S> client::CallBuilder for RollingUpdateRollbackCall<'a, S> {}
 
-impl<'a> RollingUpdateRollbackCall<'a> {
+impl<'a, S> RollingUpdateRollbackCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3058,7 +3111,7 @@ impl<'a> RollingUpdateRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a> {
+    pub fn project(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3068,7 +3121,7 @@ impl<'a> RollingUpdateRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -3078,7 +3131,7 @@ impl<'a> RollingUpdateRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a> {
+    pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, S> {
         self._rolling_update = new_value.to_string();
         self
     }
@@ -3088,7 +3141,7 @@ impl<'a> RollingUpdateRollbackCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateRollbackCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RollingUpdateRollbackCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3109,7 +3162,7 @@ impl<'a> RollingUpdateRollbackCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateRollbackCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateRollbackCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3129,9 +3182,9 @@ impl<'a> RollingUpdateRollbackCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RollingUpdateRollbackCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RollingUpdateRollbackCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3163,7 +3216,7 @@ impl<'a> RollingUpdateRollbackCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3171,10 +3224,10 @@ impl<'a> RollingUpdateRollbackCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a>
-    where  {
+pub struct ZoneOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -3183,9 +3236,15 @@ pub struct ZoneOperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneOperationGetCall<'a, S> {}
 
-impl<'a> ZoneOperationGetCall<'a> {
+impl<'a, S> ZoneOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3330,7 +3389,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3340,7 +3399,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -3350,7 +3409,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, S> {
         self._operation = new_value.to_string();
         self
     }
@@ -3360,7 +3419,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3381,7 +3440,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3401,9 +3460,9 @@ impl<'a> ZoneOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3435,7 +3494,7 @@ impl<'a> ZoneOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Replicapoolupdater::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3446,10 +3505,10 @@ impl<'a> ZoneOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationListCall<'a>
-    where  {
+pub struct ZoneOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Replicapoolupdater<>,
+    hub: &'a Replicapoolupdater<S>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -3460,9 +3519,15 @@ pub struct ZoneOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneOperationListCall<'a, S> {}
 
-impl<'a> ZoneOperationListCall<'a> {
+impl<'a, S> ZoneOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3615,7 +3680,7 @@ impl<'a> ZoneOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3625,28 +3690,28 @@ impl<'a> ZoneOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Optional. Filter expression for filtering listed resources.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3656,7 +3721,7 @@ impl<'a> ZoneOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3677,7 +3742,7 @@ impl<'a> ZoneOperationListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3697,9 +3762,9 @@ impl<'a> ZoneOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

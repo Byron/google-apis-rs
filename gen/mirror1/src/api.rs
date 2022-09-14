@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,49 +112,49 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Mirror<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Mirror<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Mirror<> {}
+impl<'a, S> client::Hub for Mirror<S> {}
 
-impl<'a, > Mirror<> {
+impl<'a, S> Mirror<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Mirror<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Mirror<S> {
         Mirror {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/mirror/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn contacts(&'a self) -> ContactMethods<'a> {
+    pub fn contacts(&'a self) -> ContactMethods<'a, S> {
         ContactMethods { hub: &self }
     }
-    pub fn locations(&'a self) -> LocationMethods<'a> {
+    pub fn locations(&'a self) -> LocationMethods<'a, S> {
         LocationMethods { hub: &self }
     }
-    pub fn settings(&'a self) -> SettingMethods<'a> {
+    pub fn settings(&'a self) -> SettingMethods<'a, S> {
         SettingMethods { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a> {
+    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, S> {
         SubscriptionMethods { hub: &self }
     }
-    pub fn timeline(&'a self) -> TimelineMethods<'a> {
+    pub fn timeline(&'a self) -> TimelineMethods<'a, S> {
         TimelineMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -828,22 +833,22 @@ impl client::Part for UserData {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -855,7 +860,7 @@ impl<'a> AccountMethods<'a> {
     /// * `userToken` - The ID for the user.
     /// * `accountType` - Account type to be passed to Android Account Manager.
     /// * `accountName` - The name of the account to be passed to the Android Account Manager.
-    pub fn insert(&self, request: Account, user_token: &str, account_type: &str, account_name: &str) -> AccountInsertCall<'a> {
+    pub fn insert(&self, request: Account, user_token: &str, account_type: &str, account_name: &str) -> AccountInsertCall<'a, S> {
         AccountInsertCall {
             hub: self.hub,
             _request: request,
@@ -891,22 +896,22 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.contacts();
 /// # }
 /// ```
-pub struct ContactMethods<'a>
-    where  {
+pub struct ContactMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
 }
 
-impl<'a> client::MethodsBuilder for ContactMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ContactMethods<'a, S> {}
 
-impl<'a> ContactMethods<'a> {
+impl<'a, S> ContactMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -915,7 +920,7 @@ impl<'a> ContactMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the contact.
-    pub fn delete(&self, id: &str) -> ContactDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> ContactDeleteCall<'a, S> {
         ContactDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -932,7 +937,7 @@ impl<'a> ContactMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the contact.
-    pub fn get(&self, id: &str) -> ContactGetCall<'a> {
+    pub fn get(&self, id: &str) -> ContactGetCall<'a, S> {
         ContactGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -949,7 +954,7 @@ impl<'a> ContactMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Contact) -> ContactInsertCall<'a> {
+    pub fn insert(&self, request: Contact) -> ContactInsertCall<'a, S> {
         ContactInsertCall {
             hub: self.hub,
             _request: request,
@@ -962,7 +967,7 @@ impl<'a> ContactMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of contacts for the authenticated user.
-    pub fn list(&self) -> ContactListCall<'a> {
+    pub fn list(&self) -> ContactListCall<'a, S> {
         ContactListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -979,7 +984,7 @@ impl<'a> ContactMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the contact.
-    pub fn patch(&self, request: Contact, id: &str) -> ContactPatchCall<'a> {
+    pub fn patch(&self, request: Contact, id: &str) -> ContactPatchCall<'a, S> {
         ContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -998,7 +1003,7 @@ impl<'a> ContactMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the contact.
-    pub fn update(&self, request: Contact, id: &str) -> ContactUpdateCall<'a> {
+    pub fn update(&self, request: Contact, id: &str) -> ContactUpdateCall<'a, S> {
         ContactUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1033,22 +1038,22 @@ impl<'a> ContactMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.locations();
 /// # }
 /// ```
-pub struct LocationMethods<'a>
-    where  {
+pub struct LocationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
 }
 
-impl<'a> client::MethodsBuilder for LocationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LocationMethods<'a, S> {}
 
-impl<'a> LocationMethods<'a> {
+impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1057,7 +1062,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the location or latest for the last known location.
-    pub fn get(&self, id: &str) -> LocationGetCall<'a> {
+    pub fn get(&self, id: &str) -> LocationGetCall<'a, S> {
         LocationGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -1070,7 +1075,7 @@ impl<'a> LocationMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of locations for the user.
-    pub fn list(&self) -> LocationListCall<'a> {
+    pub fn list(&self) -> LocationListCall<'a, S> {
         LocationListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1103,22 +1108,22 @@ impl<'a> LocationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.settings();
 /// # }
 /// ```
-pub struct SettingMethods<'a>
-    where  {
+pub struct SettingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
 }
 
-impl<'a> client::MethodsBuilder for SettingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SettingMethods<'a, S> {}
 
-impl<'a> SettingMethods<'a> {
+impl<'a, S> SettingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1129,7 +1134,7 @@ impl<'a> SettingMethods<'a> {
     /// * `id` - The ID of the setting. The following IDs are valid: 
     ///          - locale - The key to the user’s language/locale (BCP 47 identifier) that Glassware should use to render localized content. 
     ///          - timezone - The key to the user’s current time zone region as defined in the tz database. Example: America/Los_Angeles.
-    pub fn get(&self, id: &str) -> SettingGetCall<'a> {
+    pub fn get(&self, id: &str) -> SettingGetCall<'a, S> {
         SettingGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -1163,22 +1168,22 @@ impl<'a> SettingMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionMethods<'a>
-    where  {
+pub struct SubscriptionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
 }
 
-impl<'a> client::MethodsBuilder for SubscriptionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SubscriptionMethods<'a, S> {}
 
-impl<'a> SubscriptionMethods<'a> {
+impl<'a, S> SubscriptionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1187,7 +1192,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the subscription.
-    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a, S> {
         SubscriptionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -1204,7 +1209,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Subscription) -> SubscriptionInsertCall<'a> {
+    pub fn insert(&self, request: Subscription) -> SubscriptionInsertCall<'a, S> {
         SubscriptionInsertCall {
             hub: self.hub,
             _request: request,
@@ -1217,7 +1222,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of subscriptions for the authenticated user and service.
-    pub fn list(&self) -> SubscriptionListCall<'a> {
+    pub fn list(&self) -> SubscriptionListCall<'a, S> {
         SubscriptionListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1234,7 +1239,7 @@ impl<'a> SubscriptionMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the subscription.
-    pub fn update(&self, request: Subscription, id: &str) -> SubscriptionUpdateCall<'a> {
+    pub fn update(&self, request: Subscription, id: &str) -> SubscriptionUpdateCall<'a, S> {
         SubscriptionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1269,22 +1274,22 @@ impl<'a> SubscriptionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `attachments_delete(...)`, `attachments_get(...)`, `attachments_insert(...)`, `attachments_list(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.timeline();
 /// # }
 /// ```
-pub struct TimelineMethods<'a>
-    where  {
+pub struct TimelineMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
 }
 
-impl<'a> client::MethodsBuilder for TimelineMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TimelineMethods<'a, S> {}
 
-impl<'a> TimelineMethods<'a> {
+impl<'a, S> TimelineMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1294,7 +1299,7 @@ impl<'a> TimelineMethods<'a> {
     ///
     /// * `itemId` - The ID of the timeline item the attachment belongs to.
     /// * `attachmentId` - The ID of the attachment.
-    pub fn attachments_delete(&self, item_id: &str, attachment_id: &str) -> TimelineAttachmentDeleteCall<'a> {
+    pub fn attachments_delete(&self, item_id: &str, attachment_id: &str) -> TimelineAttachmentDeleteCall<'a, S> {
         TimelineAttachmentDeleteCall {
             hub: self.hub,
             _item_id: item_id.to_string(),
@@ -1313,7 +1318,7 @@ impl<'a> TimelineMethods<'a> {
     ///
     /// * `itemId` - The ID of the timeline item the attachment belongs to.
     /// * `attachmentId` - The ID of the attachment.
-    pub fn attachments_get(&self, item_id: &str, attachment_id: &str) -> TimelineAttachmentGetCall<'a> {
+    pub fn attachments_get(&self, item_id: &str, attachment_id: &str) -> TimelineAttachmentGetCall<'a, S> {
         TimelineAttachmentGetCall {
             hub: self.hub,
             _item_id: item_id.to_string(),
@@ -1331,7 +1336,7 @@ impl<'a> TimelineMethods<'a> {
     /// # Arguments
     ///
     /// * `itemId` - The ID of the timeline item the attachment belongs to.
-    pub fn attachments_insert(&self, item_id: &str) -> TimelineAttachmentInsertCall<'a> {
+    pub fn attachments_insert(&self, item_id: &str) -> TimelineAttachmentInsertCall<'a, S> {
         TimelineAttachmentInsertCall {
             hub: self.hub,
             _item_id: item_id.to_string(),
@@ -1348,7 +1353,7 @@ impl<'a> TimelineMethods<'a> {
     /// # Arguments
     ///
     /// * `itemId` - The ID of the timeline item whose attachments should be listed.
-    pub fn attachments_list(&self, item_id: &str) -> TimelineAttachmentListCall<'a> {
+    pub fn attachments_list(&self, item_id: &str) -> TimelineAttachmentListCall<'a, S> {
         TimelineAttachmentListCall {
             hub: self.hub,
             _item_id: item_id.to_string(),
@@ -1365,7 +1370,7 @@ impl<'a> TimelineMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the timeline item.
-    pub fn delete(&self, id: &str) -> TimelineDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> TimelineDeleteCall<'a, S> {
         TimelineDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -1382,7 +1387,7 @@ impl<'a> TimelineMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the timeline item.
-    pub fn get(&self, id: &str) -> TimelineGetCall<'a> {
+    pub fn get(&self, id: &str) -> TimelineGetCall<'a, S> {
         TimelineGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -1399,7 +1404,7 @@ impl<'a> TimelineMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: TimelineItem) -> TimelineInsertCall<'a> {
+    pub fn insert(&self, request: TimelineItem) -> TimelineInsertCall<'a, S> {
         TimelineInsertCall {
             hub: self.hub,
             _request: request,
@@ -1412,7 +1417,7 @@ impl<'a> TimelineMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of timeline items for the authenticated user.
-    pub fn list(&self) -> TimelineListCall<'a> {
+    pub fn list(&self) -> TimelineListCall<'a, S> {
         TimelineListCall {
             hub: self.hub,
             _source_item_id: Default::default(),
@@ -1436,7 +1441,7 @@ impl<'a> TimelineMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the timeline item.
-    pub fn patch(&self, request: TimelineItem, id: &str) -> TimelinePatchCall<'a> {
+    pub fn patch(&self, request: TimelineItem, id: &str) -> TimelinePatchCall<'a, S> {
         TimelinePatchCall {
             hub: self.hub,
             _request: request,
@@ -1455,7 +1460,7 @@ impl<'a> TimelineMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the timeline item.
-    pub fn update(&self, request: TimelineItem, id: &str) -> TimelineUpdateCall<'a> {
+    pub fn update(&self, request: TimelineItem, id: &str) -> TimelineUpdateCall<'a, S> {
         TimelineUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1498,7 +1503,7 @@ impl<'a> TimelineMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1511,10 +1516,10 @@ impl<'a> TimelineMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInsertCall<'a>
-    where  {
+pub struct AccountInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: Account,
     _user_token: String,
     _account_type: String,
@@ -1523,9 +1528,15 @@ pub struct AccountInsertCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountInsertCall<'a, S> {}
 
-impl<'a> AccountInsertCall<'a> {
+impl<'a, S> AccountInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1677,7 +1688,7 @@ impl<'a> AccountInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountInsertCall<'a> {
+    pub fn request(mut self, new_value: Account) -> AccountInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1687,7 +1698,7 @@ impl<'a> AccountInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_token(mut self, new_value: &str) -> AccountInsertCall<'a> {
+    pub fn user_token(mut self, new_value: &str) -> AccountInsertCall<'a, S> {
         self._user_token = new_value.to_string();
         self
     }
@@ -1697,7 +1708,7 @@ impl<'a> AccountInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_type(mut self, new_value: &str) -> AccountInsertCall<'a> {
+    pub fn account_type(mut self, new_value: &str) -> AccountInsertCall<'a, S> {
         self._account_type = new_value.to_string();
         self
     }
@@ -1707,7 +1718,7 @@ impl<'a> AccountInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_name(mut self, new_value: &str) -> AccountInsertCall<'a> {
+    pub fn account_name(mut self, new_value: &str) -> AccountInsertCall<'a, S> {
         self._account_name = new_value.to_string();
         self
     }
@@ -1717,7 +1728,7 @@ impl<'a> AccountInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1738,7 +1749,7 @@ impl<'a> AccountInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1769,7 +1780,7 @@ impl<'a> AccountInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1777,19 +1788,25 @@ impl<'a> AccountInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactDeleteCall<'a>
-    where  {
+pub struct ContactDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactDeleteCall<'a, S> {}
 
-impl<'a> ContactDeleteCall<'a> {
+impl<'a, S> ContactDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1921,7 +1938,7 @@ impl<'a> ContactDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ContactDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> ContactDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -1931,7 +1948,7 @@ impl<'a> ContactDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1952,7 +1969,7 @@ impl<'a> ContactDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ContactDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1972,9 +1989,9 @@ impl<'a> ContactDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2006,7 +2023,7 @@ impl<'a> ContactDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2014,19 +2031,25 @@ impl<'a> ContactDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGetCall<'a>
-    where  {
+pub struct ContactGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGetCall<'a, S> {}
 
-impl<'a> ContactGetCall<'a> {
+impl<'a, S> ContactGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2169,7 +2192,7 @@ impl<'a> ContactGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ContactGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> ContactGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -2179,7 +2202,7 @@ impl<'a> ContactGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2200,7 +2223,7 @@ impl<'a> ContactGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2220,9 +2243,9 @@ impl<'a> ContactGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2255,7 +2278,7 @@ impl<'a> ContactGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2268,19 +2291,25 @@ impl<'a> ContactGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactInsertCall<'a>
-    where  {
+pub struct ContactInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: Contact,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactInsertCall<'a, S> {}
 
-impl<'a> ContactInsertCall<'a> {
+impl<'a, S> ContactInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2414,7 +2443,7 @@ impl<'a> ContactInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Contact) -> ContactInsertCall<'a> {
+    pub fn request(mut self, new_value: Contact) -> ContactInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2424,7 +2453,7 @@ impl<'a> ContactInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2445,7 +2474,7 @@ impl<'a> ContactInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ContactInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2465,9 +2494,9 @@ impl<'a> ContactInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2499,7 +2528,7 @@ impl<'a> ContactInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2507,18 +2536,24 @@ impl<'a> ContactInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactListCall<'a>
-    where  {
+pub struct ContactListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactListCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactListCall<'a, S> {}
 
-impl<'a> ContactListCall<'a> {
+impl<'a, S> ContactListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2639,7 +2674,7 @@ impl<'a> ContactListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2660,7 +2695,7 @@ impl<'a> ContactListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ContactListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2680,9 +2715,9 @@ impl<'a> ContactListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2715,7 +2750,7 @@ impl<'a> ContactListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2728,10 +2763,10 @@ impl<'a> ContactListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactPatchCall<'a>
-    where  {
+pub struct ContactPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: Contact,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2739,9 +2774,15 @@ pub struct ContactPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactPatchCall<'a, S> {}
 
-impl<'a> ContactPatchCall<'a> {
+impl<'a, S> ContactPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2897,7 +2938,7 @@ impl<'a> ContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Contact) -> ContactPatchCall<'a> {
+    pub fn request(mut self, new_value: Contact) -> ContactPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2907,7 +2948,7 @@ impl<'a> ContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ContactPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> ContactPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -2917,7 +2958,7 @@ impl<'a> ContactPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2938,7 +2979,7 @@ impl<'a> ContactPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ContactPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2958,9 +2999,9 @@ impl<'a> ContactPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2993,7 +3034,7 @@ impl<'a> ContactPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3006,10 +3047,10 @@ impl<'a> ContactPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactUpdateCall<'a>
-    where  {
+pub struct ContactUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: Contact,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3017,9 +3058,15 @@ pub struct ContactUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactUpdateCall<'a, S> {}
 
-impl<'a> ContactUpdateCall<'a> {
+impl<'a, S> ContactUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3175,7 +3222,7 @@ impl<'a> ContactUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Contact) -> ContactUpdateCall<'a> {
+    pub fn request(mut self, new_value: Contact) -> ContactUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3185,7 +3232,7 @@ impl<'a> ContactUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ContactUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> ContactUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -3195,7 +3242,7 @@ impl<'a> ContactUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3216,7 +3263,7 @@ impl<'a> ContactUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ContactUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3236,9 +3283,9 @@ impl<'a> ContactUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3270,7 +3317,7 @@ impl<'a> ContactUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3278,19 +3325,25 @@ impl<'a> ContactUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationGetCall<'a>
-    where  {
+pub struct LocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationGetCall<'a, S> {}
 
-impl<'a> LocationGetCall<'a> {
+impl<'a, S> LocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3433,7 +3486,7 @@ impl<'a> LocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LocationGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LocationGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -3443,7 +3496,7 @@ impl<'a> LocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3464,7 +3517,7 @@ impl<'a> LocationGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> LocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3484,9 +3537,9 @@ impl<'a> LocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3518,7 +3571,7 @@ impl<'a> LocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3526,18 +3579,24 @@ impl<'a> LocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationListCall<'a>
-    where  {
+pub struct LocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationListCall<'a, S> {}
 
-impl<'a> LocationListCall<'a> {
+impl<'a, S> LocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3658,7 +3717,7 @@ impl<'a> LocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3679,7 +3738,7 @@ impl<'a> LocationListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> LocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3699,9 +3758,9 @@ impl<'a> LocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3733,7 +3792,7 @@ impl<'a> LocationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3741,19 +3800,25 @@ impl<'a> LocationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingGetCall<'a>
-    where  {
+pub struct SettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SettingGetCall<'a, S> {}
 
-impl<'a> SettingGetCall<'a> {
+impl<'a, S> SettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3898,7 +3963,7 @@ impl<'a> SettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> SettingGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> SettingGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -3908,7 +3973,7 @@ impl<'a> SettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3929,7 +3994,7 @@ impl<'a> SettingGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3949,9 +4014,9 @@ impl<'a> SettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3983,7 +4048,7 @@ impl<'a> SettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3991,19 +4056,25 @@ impl<'a> SettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionDeleteCall<'a>
-    where  {
+pub struct SubscriptionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionDeleteCall<'a, S> {}
 
-impl<'a> SubscriptionDeleteCall<'a> {
+impl<'a, S> SubscriptionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4135,7 +4206,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -4145,7 +4216,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4166,7 +4237,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4186,9 +4257,9 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4221,7 +4292,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4234,19 +4305,25 @@ impl<'a> SubscriptionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionInsertCall<'a>
-    where  {
+pub struct SubscriptionInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: Subscription,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionInsertCall<'a, S> {}
 
-impl<'a> SubscriptionInsertCall<'a> {
+impl<'a, S> SubscriptionInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4380,7 +4457,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a> {
+    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4390,7 +4467,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4411,7 +4488,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4431,9 +4508,9 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4465,7 +4542,7 @@ impl<'a> SubscriptionInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4473,18 +4550,24 @@ impl<'a> SubscriptionInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionListCall<'a>
-    where  {
+pub struct SubscriptionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionListCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionListCall<'a, S> {}
 
-impl<'a> SubscriptionListCall<'a> {
+impl<'a, S> SubscriptionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4605,7 +4688,7 @@ impl<'a> SubscriptionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4626,7 +4709,7 @@ impl<'a> SubscriptionListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4646,9 +4729,9 @@ impl<'a> SubscriptionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4681,7 +4764,7 @@ impl<'a> SubscriptionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4694,10 +4777,10 @@ impl<'a> SubscriptionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionUpdateCall<'a>
-    where  {
+pub struct SubscriptionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: Subscription,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4705,9 +4788,15 @@ pub struct SubscriptionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionUpdateCall<'a, S> {}
 
-impl<'a> SubscriptionUpdateCall<'a> {
+impl<'a, S> SubscriptionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4863,7 +4952,7 @@ impl<'a> SubscriptionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> SubscriptionUpdateCall<'a> {
+    pub fn request(mut self, new_value: Subscription) -> SubscriptionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4873,7 +4962,7 @@ impl<'a> SubscriptionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> SubscriptionUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> SubscriptionUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -4883,7 +4972,7 @@ impl<'a> SubscriptionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4904,7 +4993,7 @@ impl<'a> SubscriptionUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4924,9 +5013,9 @@ impl<'a> SubscriptionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4958,7 +5047,7 @@ impl<'a> SubscriptionUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4966,10 +5055,10 @@ impl<'a> SubscriptionUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelineAttachmentDeleteCall<'a>
-    where  {
+pub struct TimelineAttachmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _item_id: String,
     _attachment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4977,9 +5066,15 @@ pub struct TimelineAttachmentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineAttachmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineAttachmentDeleteCall<'a, S> {}
 
-impl<'a> TimelineAttachmentDeleteCall<'a> {
+impl<'a, S> TimelineAttachmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5112,7 +5207,7 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a> {
+    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a, S> {
         self._item_id = new_value.to_string();
         self
     }
@@ -5122,7 +5217,7 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a> {
+    pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a, S> {
         self._attachment_id = new_value.to_string();
         self
     }
@@ -5132,7 +5227,7 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5153,7 +5248,7 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5173,9 +5268,9 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineAttachmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineAttachmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5212,7 +5307,7 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5220,10 +5315,10 @@ impl<'a> TimelineAttachmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelineAttachmentGetCall<'a>
-    where  {
+pub struct TimelineAttachmentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _item_id: String,
     _attachment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5231,9 +5326,15 @@ pub struct TimelineAttachmentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineAttachmentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineAttachmentGetCall<'a, S> {}
 
-impl<'a> TimelineAttachmentGetCall<'a> {
+impl<'a, S> TimelineAttachmentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5393,7 +5494,7 @@ impl<'a> TimelineAttachmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a> {
+    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a, S> {
         self._item_id = new_value.to_string();
         self
     }
@@ -5403,7 +5504,7 @@ impl<'a> TimelineAttachmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a> {
+    pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a, S> {
         self._attachment_id = new_value.to_string();
         self
     }
@@ -5413,7 +5514,7 @@ impl<'a> TimelineAttachmentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5434,7 +5535,7 @@ impl<'a> TimelineAttachmentGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5454,9 +5555,9 @@ impl<'a> TimelineAttachmentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineAttachmentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineAttachmentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5489,7 +5590,7 @@ impl<'a> TimelineAttachmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -5497,19 +5598,25 @@ impl<'a> TimelineAttachmentGetCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct TimelineAttachmentInsertCall<'a>
-    where  {
+pub struct TimelineAttachmentInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _item_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineAttachmentInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineAttachmentInsertCall<'a, S> {}
 
-impl<'a> TimelineAttachmentInsertCall<'a> {
+impl<'a, S> TimelineAttachmentInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5760,7 +5867,7 @@ impl<'a> TimelineAttachmentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentInsertCall<'a> {
+    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentInsertCall<'a, S> {
         self._item_id = new_value.to_string();
         self
     }
@@ -5770,7 +5877,7 @@ impl<'a> TimelineAttachmentInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5791,7 +5898,7 @@ impl<'a> TimelineAttachmentInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5811,9 +5918,9 @@ impl<'a> TimelineAttachmentInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineAttachmentInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineAttachmentInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5845,7 +5952,7 @@ impl<'a> TimelineAttachmentInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5853,19 +5960,25 @@ impl<'a> TimelineAttachmentInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelineAttachmentListCall<'a>
-    where  {
+pub struct TimelineAttachmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _item_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineAttachmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineAttachmentListCall<'a, S> {}
 
-impl<'a> TimelineAttachmentListCall<'a> {
+impl<'a, S> TimelineAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6008,7 +6121,7 @@ impl<'a> TimelineAttachmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentListCall<'a> {
+    pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentListCall<'a, S> {
         self._item_id = new_value.to_string();
         self
     }
@@ -6018,7 +6131,7 @@ impl<'a> TimelineAttachmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineAttachmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6039,7 +6152,7 @@ impl<'a> TimelineAttachmentListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineAttachmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6059,9 +6172,9 @@ impl<'a> TimelineAttachmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineAttachmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineAttachmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6093,7 +6206,7 @@ impl<'a> TimelineAttachmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6101,19 +6214,25 @@ impl<'a> TimelineAttachmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelineDeleteCall<'a>
-    where  {
+pub struct TimelineDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineDeleteCall<'a, S> {}
 
-impl<'a> TimelineDeleteCall<'a> {
+impl<'a, S> TimelineDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6245,7 +6364,7 @@ impl<'a> TimelineDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TimelineDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> TimelineDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -6255,7 +6374,7 @@ impl<'a> TimelineDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6276,7 +6395,7 @@ impl<'a> TimelineDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6296,9 +6415,9 @@ impl<'a> TimelineDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6330,7 +6449,7 @@ impl<'a> TimelineDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6338,19 +6457,25 @@ impl<'a> TimelineDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelineGetCall<'a>
-    where  {
+pub struct TimelineGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineGetCall<'a, S> {}
 
-impl<'a> TimelineGetCall<'a> {
+impl<'a, S> TimelineGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6493,7 +6618,7 @@ impl<'a> TimelineGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TimelineGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> TimelineGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -6503,7 +6628,7 @@ impl<'a> TimelineGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6524,7 +6649,7 @@ impl<'a> TimelineGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6544,9 +6669,9 @@ impl<'a> TimelineGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6580,7 +6705,7 @@ impl<'a> TimelineGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6593,19 +6718,25 @@ impl<'a> TimelineGetCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct TimelineInsertCall<'a>
-    where  {
+pub struct TimelineInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: TimelineItem,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineInsertCall<'a, S> {}
 
-impl<'a> TimelineInsertCall<'a> {
+impl<'a, S> TimelineInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6852,7 +6983,7 @@ impl<'a> TimelineInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TimelineItem) -> TimelineInsertCall<'a> {
+    pub fn request(mut self, new_value: TimelineItem) -> TimelineInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6862,7 +6993,7 @@ impl<'a> TimelineInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6883,7 +7014,7 @@ impl<'a> TimelineInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6903,9 +7034,9 @@ impl<'a> TimelineInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6937,7 +7068,7 @@ impl<'a> TimelineInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6952,10 +7083,10 @@ impl<'a> TimelineInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelineListCall<'a>
-    where  {
+pub struct TimelineListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _source_item_id: Option<String>,
     _pinned_only: Option<bool>,
     _page_token: Option<String>,
@@ -6968,9 +7099,15 @@ pub struct TimelineListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineListCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineListCall<'a, S> {}
 
-impl<'a> TimelineListCall<'a> {
+impl<'a, S> TimelineListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7109,49 +7246,49 @@ impl<'a> TimelineListCall<'a> {
     /// If provided, only items with the given sourceItemId will be returned.
     ///
     /// Sets the *source item id* query property to the given value.
-    pub fn source_item_id(mut self, new_value: &str) -> TimelineListCall<'a> {
+    pub fn source_item_id(mut self, new_value: &str) -> TimelineListCall<'a, S> {
         self._source_item_id = Some(new_value.to_string());
         self
     }
     /// If true, only pinned items will be returned.
     ///
     /// Sets the *pinned only* query property to the given value.
-    pub fn pinned_only(mut self, new_value: bool) -> TimelineListCall<'a> {
+    pub fn pinned_only(mut self, new_value: bool) -> TimelineListCall<'a, S> {
         self._pinned_only = Some(new_value);
         self
     }
     /// Token for the page of results to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TimelineListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TimelineListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Controls the order in which timeline items are returned.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> TimelineListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> TimelineListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to include in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TimelineListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TimelineListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// If true, tombstone records for deleted items will be returned.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> TimelineListCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> TimelineListCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
     /// If provided, only items with the given bundleId will be returned.
     ///
     /// Sets the *bundle id* query property to the given value.
-    pub fn bundle_id(mut self, new_value: &str) -> TimelineListCall<'a> {
+    pub fn bundle_id(mut self, new_value: &str) -> TimelineListCall<'a, S> {
         self._bundle_id = Some(new_value.to_string());
         self
     }
@@ -7161,7 +7298,7 @@ impl<'a> TimelineListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7182,7 +7319,7 @@ impl<'a> TimelineListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7202,9 +7339,9 @@ impl<'a> TimelineListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7237,7 +7374,7 @@ impl<'a> TimelineListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7250,10 +7387,10 @@ impl<'a> TimelineListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimelinePatchCall<'a>
-    where  {
+pub struct TimelinePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: TimelineItem,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7261,9 +7398,15 @@ pub struct TimelinePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelinePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelinePatchCall<'a, S> {}
 
-impl<'a> TimelinePatchCall<'a> {
+impl<'a, S> TimelinePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7419,7 +7562,7 @@ impl<'a> TimelinePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TimelineItem) -> TimelinePatchCall<'a> {
+    pub fn request(mut self, new_value: TimelineItem) -> TimelinePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7429,7 +7572,7 @@ impl<'a> TimelinePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TimelinePatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> TimelinePatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7439,7 +7582,7 @@ impl<'a> TimelinePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelinePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelinePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7460,7 +7603,7 @@ impl<'a> TimelinePatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelinePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelinePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7480,9 +7623,9 @@ impl<'a> TimelinePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelinePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelinePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7516,7 +7659,7 @@ impl<'a> TimelinePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Mirror::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7529,10 +7672,10 @@ impl<'a> TimelinePatchCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct TimelineUpdateCall<'a>
-    where  {
+pub struct TimelineUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Mirror<>,
+    hub: &'a Mirror<S>,
     _request: TimelineItem,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7540,9 +7683,15 @@ pub struct TimelineUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimelineUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TimelineUpdateCall<'a, S> {}
 
-impl<'a> TimelineUpdateCall<'a> {
+impl<'a, S> TimelineUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7811,7 +7960,7 @@ impl<'a> TimelineUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TimelineItem) -> TimelineUpdateCall<'a> {
+    pub fn request(mut self, new_value: TimelineItem) -> TimelineUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7821,7 +7970,7 @@ impl<'a> TimelineUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TimelineUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> TimelineUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7831,7 +7980,7 @@ impl<'a> TimelineUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimelineUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7852,7 +8001,7 @@ impl<'a> TimelineUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TimelineUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimelineUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7872,9 +8021,9 @@ impl<'a> TimelineUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimelineUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimelineUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

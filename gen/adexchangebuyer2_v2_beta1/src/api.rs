@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,37 +108,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AdExchangeBuyerII<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AdExchangeBuyerII<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AdExchangeBuyerII<> {}
+impl<'a, S> client::Hub for AdExchangeBuyerII<S> {}
 
-impl<'a, > AdExchangeBuyerII<> {
+impl<'a, S> AdExchangeBuyerII<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AdExchangeBuyerII<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AdExchangeBuyerII<S> {
         AdExchangeBuyerII {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://adexchangebuyer.googleapis.com/".to_string(),
             _root_url: "https://adexchangebuyer.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn bidders(&'a self) -> BidderMethods<'a> {
+    pub fn bidders(&'a self) -> BidderMethods<'a, S> {
         BidderMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2663,22 +2668,22 @@ impl client::RequestValue for WatchCreativeRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `clients_create(...)`, `clients_get(...)`, `clients_invitations_create(...)`, `clients_invitations_get(...)`, `clients_invitations_list(...)`, `clients_list(...)`, `clients_update(...)`, `clients_users_get(...)`, `clients_users_list(...)`, `clients_users_update(...)`, `creatives_create(...)`, `creatives_deal_associations_add(...)`, `creatives_deal_associations_list(...)`, `creatives_deal_associations_remove(...)`, `creatives_get(...)`, `creatives_list(...)`, `creatives_stop_watching(...)`, `creatives_update(...)`, `creatives_watch(...)`, `finalized_proposals_list(...)`, `finalized_proposals_pause(...)`, `finalized_proposals_resume(...)`, `products_get(...)`, `products_list(...)`, `proposals_accept(...)`, `proposals_add_note(...)`, `proposals_cancel_negotiation(...)`, `proposals_complete_setup(...)`, `proposals_create(...)`, `proposals_get(...)`, `proposals_list(...)`, `proposals_pause(...)`, `proposals_resume(...)`, `proposals_update(...)`, `publisher_profiles_get(...)` and `publisher_profiles_list(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2689,7 +2694,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
     /// * `clientAccountId` - Numerical account ID of the client buyer that the user should be associated with. (required)
-    pub fn clients_invitations_create(&self, request: ClientUserInvitation, account_id: &str, client_account_id: &str) -> AccountClientInvitationCreateCall<'a> {
+    pub fn clients_invitations_create(&self, request: ClientUserInvitation, account_id: &str, client_account_id: &str) -> AccountClientInvitationCreateCall<'a, S> {
         AccountClientInvitationCreateCall {
             hub: self.hub,
             _request: request,
@@ -2710,7 +2715,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
     /// * `clientAccountId` - Numerical account ID of the client buyer that the user invitation to be retrieved is associated with. (required)
     /// * `invitationId` - Numerical identifier of the user invitation to retrieve. (required)
-    pub fn clients_invitations_get(&self, account_id: &str, client_account_id: &str, invitation_id: &str) -> AccountClientInvitationGetCall<'a> {
+    pub fn clients_invitations_get(&self, account_id: &str, client_account_id: &str, invitation_id: &str) -> AccountClientInvitationGetCall<'a, S> {
         AccountClientInvitationGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2730,7 +2735,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
     /// * `clientAccountId` - Numerical account ID of the client buyer to list invitations for. (required) You must either specify a string representation of a numerical account identifier or the `-` character to list all the invitations for all the clients of a given sponsor buyer.
-    pub fn clients_invitations_list(&self, account_id: &str, client_account_id: &str) -> AccountClientInvitationListCall<'a> {
+    pub fn clients_invitations_list(&self, account_id: &str, client_account_id: &str) -> AccountClientInvitationListCall<'a, S> {
         AccountClientInvitationListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2752,7 +2757,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
     /// * `clientAccountId` - Numerical account ID of the client buyer that the user to be retrieved is associated with. (required)
     /// * `userId` - Numerical identifier of the user to retrieve. (required)
-    pub fn clients_users_get(&self, account_id: &str, client_account_id: &str, user_id: &str) -> AccountClientUserGetCall<'a> {
+    pub fn clients_users_get(&self, account_id: &str, client_account_id: &str, user_id: &str) -> AccountClientUserGetCall<'a, S> {
         AccountClientUserGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2772,7 +2777,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Numerical account ID of the sponsor buyer of the client to list users for. (required)
     /// * `clientAccountId` - The account ID of the client buyer to list users for. (required) You must specify either a string representation of a numerical account identifier or the `-` character to list all the client users for all the clients of a given sponsor buyer.
-    pub fn clients_users_list(&self, account_id: &str, client_account_id: &str) -> AccountClientUserListCall<'a> {
+    pub fn clients_users_list(&self, account_id: &str, client_account_id: &str) -> AccountClientUserListCall<'a, S> {
         AccountClientUserListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2795,7 +2800,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
     /// * `clientAccountId` - Numerical account ID of the client buyer that the user to be retrieved is associated with. (required)
     /// * `userId` - Numerical identifier of the user to retrieve. (required)
-    pub fn clients_users_update(&self, request: ClientUser, account_id: &str, client_account_id: &str, user_id: &str) -> AccountClientUserUpdateCall<'a> {
+    pub fn clients_users_update(&self, request: ClientUser, account_id: &str, client_account_id: &str, user_id: &str) -> AccountClientUserUpdateCall<'a, S> {
         AccountClientUserUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2816,7 +2821,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - Unique numerical account ID for the buyer of which the client buyer is a customer; the sponsor buyer to create a client for. (required)
-    pub fn clients_create(&self, request: Client, account_id: &str) -> AccountClientCreateCall<'a> {
+    pub fn clients_create(&self, request: Client, account_id: &str) -> AccountClientCreateCall<'a, S> {
         AccountClientCreateCall {
             hub: self.hub,
             _request: request,
@@ -2835,7 +2840,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Numerical account ID of the client's sponsor buyer. (required)
     /// * `clientAccountId` - Numerical account ID of the client buyer to retrieve. (required)
-    pub fn clients_get(&self, account_id: &str, client_account_id: &str) -> AccountClientGetCall<'a> {
+    pub fn clients_get(&self, account_id: &str, client_account_id: &str) -> AccountClientGetCall<'a, S> {
         AccountClientGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2853,7 +2858,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Unique numerical account ID of the sponsor buyer to list the clients for.
-    pub fn clients_list(&self, account_id: &str) -> AccountClientListCall<'a> {
+    pub fn clients_list(&self, account_id: &str) -> AccountClientListCall<'a, S> {
         AccountClientListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2875,7 +2880,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Unique numerical account ID for the buyer of which the client buyer is a customer; the sponsor buyer to update a client for. (required)
     /// * `clientAccountId` - Unique numerical account ID of the client to update. (required)
-    pub fn clients_update(&self, request: Client, account_id: &str, client_account_id: &str) -> AccountClientUpdateCall<'a> {
+    pub fn clients_update(&self, request: Client, account_id: &str, client_account_id: &str) -> AccountClientUpdateCall<'a, S> {
         AccountClientUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2896,7 +2901,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The account the creative belongs to.
     /// * `creativeId` - The ID of the creative associated with the deal.
-    pub fn creatives_deal_associations_add(&self, request: AddDealAssociationRequest, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationAddCall<'a> {
+    pub fn creatives_deal_associations_add(&self, request: AddDealAssociationRequest, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationAddCall<'a, S> {
         AccountCreativeDealAssociationAddCall {
             hub: self.hub,
             _request: request,
@@ -2916,7 +2921,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The account to list the associations from. Specify "-" to list all creatives the current user has access to.
     /// * `creativeId` - The creative ID to list the associations from. Specify "-" to list all creatives under the above account.
-    pub fn creatives_deal_associations_list(&self, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn creatives_deal_associations_list(&self, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationListCall<'a, S> {
         AccountCreativeDealAssociationListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2939,7 +2944,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The account the creative belongs to.
     /// * `creativeId` - The ID of the creative associated with the deal.
-    pub fn creatives_deal_associations_remove(&self, request: RemoveDealAssociationRequest, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationRemoveCall<'a> {
+    pub fn creatives_deal_associations_remove(&self, request: RemoveDealAssociationRequest, account_id: &str, creative_id: &str) -> AccountCreativeDealAssociationRemoveCall<'a, S> {
         AccountCreativeDealAssociationRemoveCall {
             hub: self.hub,
             _request: request,
@@ -2959,7 +2964,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The account that this creative belongs to. Can be used to filter the response of the creatives.list method.
-    pub fn creatives_create(&self, request: Creative, account_id: &str) -> AccountCreativeCreateCall<'a> {
+    pub fn creatives_create(&self, request: Creative, account_id: &str) -> AccountCreativeCreateCall<'a, S> {
         AccountCreativeCreateCall {
             hub: self.hub,
             _request: request,
@@ -2979,7 +2984,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The account the creative belongs to.
     /// * `creativeId` - The ID of the creative to retrieve.
-    pub fn creatives_get(&self, account_id: &str, creative_id: &str) -> AccountCreativeGetCall<'a> {
+    pub fn creatives_get(&self, account_id: &str, creative_id: &str) -> AccountCreativeGetCall<'a, S> {
         AccountCreativeGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2997,7 +3002,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - The account to list the creatives from. Specify "-" to list all creatives the current user has access to.
-    pub fn creatives_list(&self, account_id: &str) -> AccountCreativeListCall<'a> {
+    pub fn creatives_list(&self, account_id: &str) -> AccountCreativeListCall<'a, S> {
         AccountCreativeListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3019,7 +3024,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The account of the creative to stop notifications for.
     /// * `creativeId` - The creative ID of the creative to stop notifications for. Specify "-" to specify stopping account level notifications.
-    pub fn creatives_stop_watching(&self, request: StopWatchingCreativeRequest, account_id: &str, creative_id: &str) -> AccountCreativeStopWatchingCall<'a> {
+    pub fn creatives_stop_watching(&self, request: StopWatchingCreativeRequest, account_id: &str, creative_id: &str) -> AccountCreativeStopWatchingCall<'a, S> {
         AccountCreativeStopWatchingCall {
             hub: self.hub,
             _request: request,
@@ -3040,7 +3045,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The account that this creative belongs to. Can be used to filter the response of the creatives.list method.
     /// * `creativeId` - The buyer-defined creative ID of this creative. Can be used to filter the response of the creatives.list method.
-    pub fn creatives_update(&self, request: Creative, account_id: &str, creative_id: &str) -> AccountCreativeUpdateCall<'a> {
+    pub fn creatives_update(&self, request: Creative, account_id: &str, creative_id: &str) -> AccountCreativeUpdateCall<'a, S> {
         AccountCreativeUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3061,7 +3066,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The account of the creative to watch.
     /// * `creativeId` - The creative ID to watch for status changes. Specify "-" to watch all creatives under the above account. If both creative-level and account-level notifications are sent, only a single notification will be sent to the creative-level notification topic.
-    pub fn creatives_watch(&self, request: WatchCreativeRequest, account_id: &str, creative_id: &str) -> AccountCreativeWatchCall<'a> {
+    pub fn creatives_watch(&self, request: WatchCreativeRequest, account_id: &str, creative_id: &str) -> AccountCreativeWatchCall<'a, S> {
         AccountCreativeWatchCall {
             hub: self.hub,
             _request: request,
@@ -3080,7 +3085,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID of the buyer.
-    pub fn finalized_proposals_list(&self, account_id: &str) -> AccountFinalizedProposalListCall<'a> {
+    pub fn finalized_proposals_list(&self, account_id: &str) -> AccountFinalizedProposalListCall<'a, S> {
         AccountFinalizedProposalListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3103,7 +3108,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The proposal_id of the proposal containing the deals.
-    pub fn finalized_proposals_pause(&self, request: PauseProposalDealsRequest, account_id: &str, proposal_id: &str) -> AccountFinalizedProposalPauseCall<'a> {
+    pub fn finalized_proposals_pause(&self, request: PauseProposalDealsRequest, account_id: &str, proposal_id: &str) -> AccountFinalizedProposalPauseCall<'a, S> {
         AccountFinalizedProposalPauseCall {
             hub: self.hub,
             _request: request,
@@ -3124,7 +3129,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The proposal_id of the proposal containing the deals.
-    pub fn finalized_proposals_resume(&self, request: ResumeProposalDealsRequest, account_id: &str, proposal_id: &str) -> AccountFinalizedProposalResumeCall<'a> {
+    pub fn finalized_proposals_resume(&self, request: ResumeProposalDealsRequest, account_id: &str, proposal_id: &str) -> AccountFinalizedProposalResumeCall<'a, S> {
         AccountFinalizedProposalResumeCall {
             hub: self.hub,
             _request: request,
@@ -3144,7 +3149,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Account ID of the buyer.
     /// * `productId` - The ID for the product to get the head revision for.
-    pub fn products_get(&self, account_id: &str, product_id: &str) -> AccountProductGetCall<'a> {
+    pub fn products_get(&self, account_id: &str, product_id: &str) -> AccountProductGetCall<'a, S> {
         AccountProductGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3162,7 +3167,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID of the buyer.
-    pub fn products_list(&self, account_id: &str) -> AccountProductListCall<'a> {
+    pub fn products_list(&self, account_id: &str) -> AccountProductListCall<'a, S> {
         AccountProductListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3184,7 +3189,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The ID of the proposal to accept.
-    pub fn proposals_accept(&self, request: AcceptProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalAcceptCall<'a> {
+    pub fn proposals_accept(&self, request: AcceptProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalAcceptCall<'a, S> {
         AccountProposalAcceptCall {
             hub: self.hub,
             _request: request,
@@ -3205,7 +3210,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The ID of the proposal to attach the note to.
-    pub fn proposals_add_note(&self, request: AddNoteRequest, account_id: &str, proposal_id: &str) -> AccountProposalAddNoteCall<'a> {
+    pub fn proposals_add_note(&self, request: AddNoteRequest, account_id: &str, proposal_id: &str) -> AccountProposalAddNoteCall<'a, S> {
         AccountProposalAddNoteCall {
             hub: self.hub,
             _request: request,
@@ -3226,7 +3231,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The ID of the proposal to cancel negotiation for.
-    pub fn proposals_cancel_negotiation(&self, request: CancelNegotiationRequest, account_id: &str, proposal_id: &str) -> AccountProposalCancelNegotiationCall<'a> {
+    pub fn proposals_cancel_negotiation(&self, request: CancelNegotiationRequest, account_id: &str, proposal_id: &str) -> AccountProposalCancelNegotiationCall<'a, S> {
         AccountProposalCancelNegotiationCall {
             hub: self.hub,
             _request: request,
@@ -3247,7 +3252,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The ID of the proposal to mark as setup completed.
-    pub fn proposals_complete_setup(&self, request: CompleteSetupRequest, account_id: &str, proposal_id: &str) -> AccountProposalCompleteSetupCall<'a> {
+    pub fn proposals_complete_setup(&self, request: CompleteSetupRequest, account_id: &str, proposal_id: &str) -> AccountProposalCompleteSetupCall<'a, S> {
         AccountProposalCompleteSetupCall {
             hub: self.hub,
             _request: request,
@@ -3267,7 +3272,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
-    pub fn proposals_create(&self, request: Proposal, account_id: &str) -> AccountProposalCreateCall<'a> {
+    pub fn proposals_create(&self, request: Proposal, account_id: &str) -> AccountProposalCreateCall<'a, S> {
         AccountProposalCreateCall {
             hub: self.hub,
             _request: request,
@@ -3286,7 +3291,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The unique ID of the proposal
-    pub fn proposals_get(&self, account_id: &str, proposal_id: &str) -> AccountProposalGetCall<'a> {
+    pub fn proposals_get(&self, account_id: &str, proposal_id: &str) -> AccountProposalGetCall<'a, S> {
         AccountProposalGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3304,7 +3309,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID of the buyer.
-    pub fn proposals_list(&self, account_id: &str) -> AccountProposalListCall<'a> {
+    pub fn proposals_list(&self, account_id: &str) -> AccountProposalListCall<'a, S> {
         AccountProposalListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3327,7 +3332,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The ID of the proposal to pause.
-    pub fn proposals_pause(&self, request: PauseProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalPauseCall<'a> {
+    pub fn proposals_pause(&self, request: PauseProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalPauseCall<'a, S> {
         AccountProposalPauseCall {
             hub: self.hub,
             _request: request,
@@ -3348,7 +3353,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The ID of the proposal to resume.
-    pub fn proposals_resume(&self, request: ResumeProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalResumeCall<'a> {
+    pub fn proposals_resume(&self, request: ResumeProposalRequest, account_id: &str, proposal_id: &str) -> AccountProposalResumeCall<'a, S> {
         AccountProposalResumeCall {
             hub: self.hub,
             _request: request,
@@ -3369,7 +3374,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account ID of the buyer.
     /// * `proposalId` - The unique ID of the proposal.
-    pub fn proposals_update(&self, request: Proposal, account_id: &str, proposal_id: &str) -> AccountProposalUpdateCall<'a> {
+    pub fn proposals_update(&self, request: Proposal, account_id: &str, proposal_id: &str) -> AccountProposalUpdateCall<'a, S> {
         AccountProposalUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3389,7 +3394,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Account ID of the buyer.
     /// * `publisherProfileId` - The id for the publisher profile to get.
-    pub fn publisher_profiles_get(&self, account_id: &str, publisher_profile_id: &str) -> AccountPublisherProfileGetCall<'a> {
+    pub fn publisher_profiles_get(&self, account_id: &str, publisher_profile_id: &str) -> AccountPublisherProfileGetCall<'a, S> {
         AccountPublisherProfileGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3407,7 +3412,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Account ID of the buyer.
-    pub fn publisher_profiles_list(&self, account_id: &str) -> AccountPublisherProfileListCall<'a> {
+    pub fn publisher_profiles_list(&self, account_id: &str) -> AccountPublisherProfileListCall<'a, S> {
         AccountPublisherProfileListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -3443,22 +3448,22 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `accounts_filter_sets_bid_metrics_list(...)`, `accounts_filter_sets_bid_response_errors_list(...)`, `accounts_filter_sets_bid_responses_without_bids_list(...)`, `accounts_filter_sets_create(...)`, `accounts_filter_sets_delete(...)`, `accounts_filter_sets_filtered_bid_requests_list(...)`, `accounts_filter_sets_filtered_bids_creatives_list(...)`, `accounts_filter_sets_filtered_bids_details_list(...)`, `accounts_filter_sets_filtered_bids_list(...)`, `accounts_filter_sets_get(...)`, `accounts_filter_sets_impression_metrics_list(...)`, `accounts_filter_sets_list(...)`, `accounts_filter_sets_losing_bids_list(...)`, `accounts_filter_sets_non_billable_winning_bids_list(...)`, `filter_sets_bid_metrics_list(...)`, `filter_sets_bid_response_errors_list(...)`, `filter_sets_bid_responses_without_bids_list(...)`, `filter_sets_create(...)`, `filter_sets_delete(...)`, `filter_sets_filtered_bid_requests_list(...)`, `filter_sets_filtered_bids_creatives_list(...)`, `filter_sets_filtered_bids_details_list(...)`, `filter_sets_filtered_bids_list(...)`, `filter_sets_get(...)`, `filter_sets_impression_metrics_list(...)`, `filter_sets_list(...)`, `filter_sets_losing_bids_list(...)` and `filter_sets_non_billable_winning_bids_list(...)`
 /// // to build up your call.
 /// let rb = hub.bidders();
 /// # }
 /// ```
-pub struct BidderMethods<'a>
-    where  {
+pub struct BidderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
 }
 
-impl<'a> client::MethodsBuilder for BidderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BidderMethods<'a, S> {}
 
-impl<'a> BidderMethods<'a> {
+impl<'a, S> BidderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3467,7 +3472,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_bid_metrics_list(&self, filter_set_name: &str) -> BidderAccountFilterSetBidMetricListCall<'a> {
+    pub fn accounts_filter_sets_bid_metrics_list(&self, filter_set_name: &str) -> BidderAccountFilterSetBidMetricListCall<'a, S> {
         BidderAccountFilterSetBidMetricListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3486,7 +3491,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_bid_response_errors_list(&self, filter_set_name: &str) -> BidderAccountFilterSetBidResponseErrorListCall<'a> {
+    pub fn accounts_filter_sets_bid_response_errors_list(&self, filter_set_name: &str) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S> {
         BidderAccountFilterSetBidResponseErrorListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3505,7 +3510,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_bid_responses_without_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn accounts_filter_sets_bid_responses_without_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S> {
         BidderAccountFilterSetBidResponsesWithoutBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3524,7 +3529,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_filtered_bid_requests_list(&self, filter_set_name: &str) -> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
+    pub fn accounts_filter_sets_filtered_bid_requests_list(&self, filter_set_name: &str) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S> {
         BidderAccountFilterSetFilteredBidRequestListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3544,7 +3549,7 @@ impl<'a> BidderMethods<'a> {
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
     /// * `creativeStatusId` - The ID of the creative status for which to retrieve a breakdown by creative. See [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
-    pub fn accounts_filter_sets_filtered_bids_creatives_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn accounts_filter_sets_filtered_bids_creatives_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {
         BidderAccountFilterSetFilteredBidCreativeListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3565,7 +3570,7 @@ impl<'a> BidderMethods<'a> {
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
     /// * `creativeStatusId` - The ID of the creative status for which to retrieve a breakdown by detail. See [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes). Details are only available for statuses 10, 14, 15, 17, 18, 19, 86, and 87.
-    pub fn accounts_filter_sets_filtered_bids_details_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+    pub fn accounts_filter_sets_filtered_bids_details_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {
         BidderAccountFilterSetFilteredBidDetailListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3585,7 +3590,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_filtered_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetFilteredBidListCall<'a> {
+    pub fn accounts_filter_sets_filtered_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetFilteredBidListCall<'a, S> {
         BidderAccountFilterSetFilteredBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3604,7 +3609,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_impression_metrics_list(&self, filter_set_name: &str) -> BidderAccountFilterSetImpressionMetricListCall<'a> {
+    pub fn accounts_filter_sets_impression_metrics_list(&self, filter_set_name: &str) -> BidderAccountFilterSetImpressionMetricListCall<'a, S> {
         BidderAccountFilterSetImpressionMetricListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3623,7 +3628,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_losing_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetLosingBidListCall<'a> {
+    pub fn accounts_filter_sets_losing_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetLosingBidListCall<'a, S> {
         BidderAccountFilterSetLosingBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3642,7 +3647,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_non_billable_winning_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn accounts_filter_sets_non_billable_winning_bids_list(&self, filter_set_name: &str) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S> {
         BidderAccountFilterSetNonBillableWinningBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3662,7 +3667,7 @@ impl<'a> BidderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `ownerName` - Name of the owner (bidder or account) of the filter set to be created. For example: - For a bidder-level filter set for bidder 123: `bidders/123` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456`
-    pub fn accounts_filter_sets_create(&self, request: FilterSet, owner_name: &str) -> BidderAccountFilterSetCreateCall<'a> {
+    pub fn accounts_filter_sets_create(&self, request: FilterSet, owner_name: &str) -> BidderAccountFilterSetCreateCall<'a, S> {
         BidderAccountFilterSetCreateCall {
             hub: self.hub,
             _request: request,
@@ -3681,7 +3686,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Full name of the resource to delete. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_delete(&self, name: &str) -> BidderAccountFilterSetDeleteCall<'a> {
+    pub fn accounts_filter_sets_delete(&self, name: &str) -> BidderAccountFilterSetDeleteCall<'a, S> {
         BidderAccountFilterSetDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3698,7 +3703,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Full name of the resource being requested. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn accounts_filter_sets_get(&self, name: &str) -> BidderAccountFilterSetGetCall<'a> {
+    pub fn accounts_filter_sets_get(&self, name: &str) -> BidderAccountFilterSetGetCall<'a, S> {
         BidderAccountFilterSetGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3715,7 +3720,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `ownerName` - Name of the owner (bidder or account) of the filter sets to be listed. For example: - For a bidder-level filter set for bidder 123: `bidders/123` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456`
-    pub fn accounts_filter_sets_list(&self, owner_name: &str) -> BidderAccountFilterSetListCall<'a> {
+    pub fn accounts_filter_sets_list(&self, owner_name: &str) -> BidderAccountFilterSetListCall<'a, S> {
         BidderAccountFilterSetListCall {
             hub: self.hub,
             _owner_name: owner_name.to_string(),
@@ -3734,7 +3739,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_bid_metrics_list(&self, filter_set_name: &str) -> BidderFilterSetBidMetricListCall<'a> {
+    pub fn filter_sets_bid_metrics_list(&self, filter_set_name: &str) -> BidderFilterSetBidMetricListCall<'a, S> {
         BidderFilterSetBidMetricListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3753,7 +3758,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_bid_response_errors_list(&self, filter_set_name: &str) -> BidderFilterSetBidResponseErrorListCall<'a> {
+    pub fn filter_sets_bid_response_errors_list(&self, filter_set_name: &str) -> BidderFilterSetBidResponseErrorListCall<'a, S> {
         BidderFilterSetBidResponseErrorListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3772,7 +3777,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_bid_responses_without_bids_list(&self, filter_set_name: &str) -> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn filter_sets_bid_responses_without_bids_list(&self, filter_set_name: &str) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S> {
         BidderFilterSetBidResponsesWithoutBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3791,7 +3796,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_filtered_bid_requests_list(&self, filter_set_name: &str) -> BidderFilterSetFilteredBidRequestListCall<'a> {
+    pub fn filter_sets_filtered_bid_requests_list(&self, filter_set_name: &str) -> BidderFilterSetFilteredBidRequestListCall<'a, S> {
         BidderFilterSetFilteredBidRequestListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3811,7 +3816,7 @@ impl<'a> BidderMethods<'a> {
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
     /// * `creativeStatusId` - The ID of the creative status for which to retrieve a breakdown by creative. See [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
-    pub fn filter_sets_filtered_bids_creatives_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn filter_sets_filtered_bids_creatives_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderFilterSetFilteredBidCreativeListCall<'a, S> {
         BidderFilterSetFilteredBidCreativeListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3832,7 +3837,7 @@ impl<'a> BidderMethods<'a> {
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
     /// * `creativeStatusId` - The ID of the creative status for which to retrieve a breakdown by detail. See [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes). Details are only available for statuses 10, 14, 15, 17, 18, 19, 86, and 87.
-    pub fn filter_sets_filtered_bids_details_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderFilterSetFilteredBidDetailListCall<'a> {
+    pub fn filter_sets_filtered_bids_details_list(&self, filter_set_name: &str, creative_status_id: i32) -> BidderFilterSetFilteredBidDetailListCall<'a, S> {
         BidderFilterSetFilteredBidDetailListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3852,7 +3857,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_filtered_bids_list(&self, filter_set_name: &str) -> BidderFilterSetFilteredBidListCall<'a> {
+    pub fn filter_sets_filtered_bids_list(&self, filter_set_name: &str) -> BidderFilterSetFilteredBidListCall<'a, S> {
         BidderFilterSetFilteredBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3871,7 +3876,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_impression_metrics_list(&self, filter_set_name: &str) -> BidderFilterSetImpressionMetricListCall<'a> {
+    pub fn filter_sets_impression_metrics_list(&self, filter_set_name: &str) -> BidderFilterSetImpressionMetricListCall<'a, S> {
         BidderFilterSetImpressionMetricListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3890,7 +3895,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_losing_bids_list(&self, filter_set_name: &str) -> BidderFilterSetLosingBidListCall<'a> {
+    pub fn filter_sets_losing_bids_list(&self, filter_set_name: &str) -> BidderFilterSetLosingBidListCall<'a, S> {
         BidderFilterSetLosingBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3909,7 +3914,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `filterSetName` - Name of the filter set that should be applied to the requested metrics. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_non_billable_winning_bids_list(&self, filter_set_name: &str) -> BidderFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn filter_sets_non_billable_winning_bids_list(&self, filter_set_name: &str) -> BidderFilterSetNonBillableWinningBidListCall<'a, S> {
         BidderFilterSetNonBillableWinningBidListCall {
             hub: self.hub,
             _filter_set_name: filter_set_name.to_string(),
@@ -3929,7 +3934,7 @@ impl<'a> BidderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `ownerName` - Name of the owner (bidder or account) of the filter set to be created. For example: - For a bidder-level filter set for bidder 123: `bidders/123` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456`
-    pub fn filter_sets_create(&self, request: FilterSet, owner_name: &str) -> BidderFilterSetCreateCall<'a> {
+    pub fn filter_sets_create(&self, request: FilterSet, owner_name: &str) -> BidderFilterSetCreateCall<'a, S> {
         BidderFilterSetCreateCall {
             hub: self.hub,
             _request: request,
@@ -3948,7 +3953,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Full name of the resource to delete. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_delete(&self, name: &str) -> BidderFilterSetDeleteCall<'a> {
+    pub fn filter_sets_delete(&self, name: &str) -> BidderFilterSetDeleteCall<'a, S> {
         BidderFilterSetDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3965,7 +3970,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Full name of the resource being requested. For example: - For a bidder-level filter set for bidder 123: `bidders/123/filterSets/abc` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123/filterSets/abc` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456/filterSets/abc`
-    pub fn filter_sets_get(&self, name: &str) -> BidderFilterSetGetCall<'a> {
+    pub fn filter_sets_get(&self, name: &str) -> BidderFilterSetGetCall<'a, S> {
         BidderFilterSetGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3982,7 +3987,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `ownerName` - Name of the owner (bidder or account) of the filter sets to be listed. For example: - For a bidder-level filter set for bidder 123: `bidders/123` - For an account-level filter set for the buyer account representing bidder 123: `bidders/123/accounts/123` - For an account-level filter set for the child seat buyer account 456 whose bidder is 123: `bidders/123/accounts/456`
-    pub fn filter_sets_list(&self, owner_name: &str) -> BidderFilterSetListCall<'a> {
+    pub fn filter_sets_list(&self, owner_name: &str) -> BidderFilterSetListCall<'a, S> {
         BidderFilterSetListCall {
             hub: self.hub,
             _owner_name: owner_name.to_string(),
@@ -4026,7 +4031,7 @@ impl<'a> BidderMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4039,10 +4044,10 @@ impl<'a> BidderMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientInvitationCreateCall<'a>
-    where  {
+pub struct AccountClientInvitationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: ClientUserInvitation,
     _account_id: String,
     _client_account_id: String,
@@ -4051,9 +4056,15 @@ pub struct AccountClientInvitationCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientInvitationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientInvitationCreateCall<'a, S> {}
 
-impl<'a> AccountClientInvitationCreateCall<'a> {
+impl<'a, S> AccountClientInvitationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4210,7 +4221,7 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClientUserInvitation) -> AccountClientInvitationCreateCall<'a> {
+    pub fn request(mut self, new_value: ClientUserInvitation) -> AccountClientInvitationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4220,7 +4231,7 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4230,7 +4241,7 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationCreateCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
@@ -4240,7 +4251,7 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientInvitationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientInvitationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4265,7 +4276,7 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4285,9 +4296,9 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientInvitationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientInvitationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4319,7 +4330,7 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4327,10 +4338,10 @@ impl<'a> AccountClientInvitationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientInvitationGetCall<'a>
-    where  {
+pub struct AccountClientInvitationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _client_account_id: String,
     _invitation_id: String,
@@ -4339,9 +4350,15 @@ pub struct AccountClientInvitationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientInvitationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientInvitationGetCall<'a, S> {}
 
-impl<'a> AccountClientInvitationGetCall<'a> {
+impl<'a, S> AccountClientInvitationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4486,7 +4503,7 @@ impl<'a> AccountClientInvitationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4496,7 +4513,7 @@ impl<'a> AccountClientInvitationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationGetCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationGetCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
@@ -4506,7 +4523,7 @@ impl<'a> AccountClientInvitationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn invitation_id(mut self, new_value: &str) -> AccountClientInvitationGetCall<'a> {
+    pub fn invitation_id(mut self, new_value: &str) -> AccountClientInvitationGetCall<'a, S> {
         self._invitation_id = new_value.to_string();
         self
     }
@@ -4516,7 +4533,7 @@ impl<'a> AccountClientInvitationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientInvitationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientInvitationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4541,7 +4558,7 @@ impl<'a> AccountClientInvitationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4561,9 +4578,9 @@ impl<'a> AccountClientInvitationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientInvitationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientInvitationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4595,7 +4612,7 @@ impl<'a> AccountClientInvitationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4605,10 +4622,10 @@ impl<'a> AccountClientInvitationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientInvitationListCall<'a>
-    where  {
+pub struct AccountClientInvitationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _client_account_id: String,
     _page_token: Option<String>,
@@ -4618,9 +4635,15 @@ pub struct AccountClientInvitationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientInvitationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientInvitationListCall<'a, S> {}
 
-impl<'a> AccountClientInvitationListCall<'a> {
+impl<'a, S> AccountClientInvitationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4770,7 +4793,7 @@ impl<'a> AccountClientInvitationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientInvitationListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4780,21 +4803,21 @@ impl<'a> AccountClientInvitationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationListCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientInvitationListCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListClientUserInvitationsResponse.nextPageToken returned from the previous call to the clients.invitations.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountClientInvitationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountClientInvitationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer clients than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountClientInvitationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountClientInvitationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4804,7 +4827,7 @@ impl<'a> AccountClientInvitationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientInvitationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientInvitationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4829,7 +4852,7 @@ impl<'a> AccountClientInvitationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientInvitationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4849,9 +4872,9 @@ impl<'a> AccountClientInvitationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientInvitationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientInvitationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4883,7 +4906,7 @@ impl<'a> AccountClientInvitationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4891,10 +4914,10 @@ impl<'a> AccountClientInvitationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientUserGetCall<'a>
-    where  {
+pub struct AccountClientUserGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _client_account_id: String,
     _user_id: String,
@@ -4903,9 +4926,15 @@ pub struct AccountClientUserGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientUserGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientUserGetCall<'a, S> {}
 
-impl<'a> AccountClientUserGetCall<'a> {
+impl<'a, S> AccountClientUserGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5050,7 +5079,7 @@ impl<'a> AccountClientUserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientUserGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientUserGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5060,7 +5089,7 @@ impl<'a> AccountClientUserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUserGetCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUserGetCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
@@ -5070,7 +5099,7 @@ impl<'a> AccountClientUserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> AccountClientUserGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> AccountClientUserGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5080,7 +5109,7 @@ impl<'a> AccountClientUserGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUserGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUserGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5105,7 +5134,7 @@ impl<'a> AccountClientUserGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUserGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUserGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5125,9 +5154,9 @@ impl<'a> AccountClientUserGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientUserGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientUserGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5159,7 +5188,7 @@ impl<'a> AccountClientUserGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5169,10 +5198,10 @@ impl<'a> AccountClientUserGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientUserListCall<'a>
-    where  {
+pub struct AccountClientUserListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _client_account_id: String,
     _page_token: Option<String>,
@@ -5182,9 +5211,15 @@ pub struct AccountClientUserListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientUserListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientUserListCall<'a, S> {}
 
-impl<'a> AccountClientUserListCall<'a> {
+impl<'a, S> AccountClientUserListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5334,7 +5369,7 @@ impl<'a> AccountClientUserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientUserListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientUserListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5344,21 +5379,21 @@ impl<'a> AccountClientUserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUserListCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUserListCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListClientUsersResponse.nextPageToken returned from the previous call to the accounts.clients.users.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountClientUserListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountClientUserListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer clients than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountClientUserListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountClientUserListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5368,7 +5403,7 @@ impl<'a> AccountClientUserListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUserListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUserListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5393,7 +5428,7 @@ impl<'a> AccountClientUserListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUserListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUserListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5413,9 +5448,9 @@ impl<'a> AccountClientUserListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientUserListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientUserListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5448,7 +5483,7 @@ impl<'a> AccountClientUserListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5461,10 +5496,10 @@ impl<'a> AccountClientUserListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientUserUpdateCall<'a>
-    where  {
+pub struct AccountClientUserUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: ClientUser,
     _account_id: String,
     _client_account_id: String,
@@ -5474,9 +5509,15 @@ pub struct AccountClientUserUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientUserUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientUserUpdateCall<'a, S> {}
 
-impl<'a> AccountClientUserUpdateCall<'a> {
+impl<'a, S> AccountClientUserUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5634,7 +5675,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClientUser) -> AccountClientUserUpdateCall<'a> {
+    pub fn request(mut self, new_value: ClientUser) -> AccountClientUserUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5644,7 +5685,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientUserUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientUserUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5654,7 +5695,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUserUpdateCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUserUpdateCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
@@ -5664,7 +5705,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> AccountClientUserUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> AccountClientUserUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5674,7 +5715,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUserUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUserUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5699,7 +5740,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUserUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUserUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5719,9 +5760,9 @@ impl<'a> AccountClientUserUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientUserUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientUserUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5754,7 +5795,7 @@ impl<'a> AccountClientUserUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5767,10 +5808,10 @@ impl<'a> AccountClientUserUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientCreateCall<'a>
-    where  {
+pub struct AccountClientCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: Client,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5778,9 +5819,15 @@ pub struct AccountClientCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientCreateCall<'a, S> {}
 
-impl<'a> AccountClientCreateCall<'a> {
+impl<'a, S> AccountClientCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5936,7 +5983,7 @@ impl<'a> AccountClientCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Client) -> AccountClientCreateCall<'a> {
+    pub fn request(mut self, new_value: Client) -> AccountClientCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5946,7 +5993,7 @@ impl<'a> AccountClientCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5956,7 +6003,7 @@ impl<'a> AccountClientCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5981,7 +6028,7 @@ impl<'a> AccountClientCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6001,9 +6048,9 @@ impl<'a> AccountClientCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6035,7 +6082,7 @@ impl<'a> AccountClientCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6043,10 +6090,10 @@ impl<'a> AccountClientCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientGetCall<'a>
-    where  {
+pub struct AccountClientGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _client_account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6054,9 +6101,15 @@ pub struct AccountClientGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientGetCall<'a, S> {}
 
-impl<'a> AccountClientGetCall<'a> {
+impl<'a, S> AccountClientGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6200,7 +6253,7 @@ impl<'a> AccountClientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6210,7 +6263,7 @@ impl<'a> AccountClientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientGetCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientGetCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
@@ -6220,7 +6273,7 @@ impl<'a> AccountClientGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6245,7 +6298,7 @@ impl<'a> AccountClientGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6265,9 +6318,9 @@ impl<'a> AccountClientGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6299,7 +6352,7 @@ impl<'a> AccountClientGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6310,10 +6363,10 @@ impl<'a> AccountClientGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientListCall<'a>
-    where  {
+pub struct AccountClientListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _partner_client_id: Option<String>,
     _page_token: Option<String>,
@@ -6323,9 +6376,15 @@ pub struct AccountClientListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientListCall<'a, S> {}
 
-impl<'a> AccountClientListCall<'a> {
+impl<'a, S> AccountClientListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6477,28 +6536,28 @@ impl<'a> AccountClientListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Optional unique identifier (from the standpoint of an Ad Exchange sponsor buyer partner) of the client to return. If specified, at most one client will be returned in the response.
     ///
     /// Sets the *partner client id* query property to the given value.
-    pub fn partner_client_id(mut self, new_value: &str) -> AccountClientListCall<'a> {
+    pub fn partner_client_id(mut self, new_value: &str) -> AccountClientListCall<'a, S> {
         self._partner_client_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListClientsResponse.nextPageToken returned from the previous call to the accounts.clients.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountClientListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountClientListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer clients than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountClientListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountClientListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6508,7 +6567,7 @@ impl<'a> AccountClientListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6533,7 +6592,7 @@ impl<'a> AccountClientListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6553,9 +6612,9 @@ impl<'a> AccountClientListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6588,7 +6647,7 @@ impl<'a> AccountClientListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6601,10 +6660,10 @@ impl<'a> AccountClientListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClientUpdateCall<'a>
-    where  {
+pub struct AccountClientUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: Client,
     _account_id: String,
     _client_account_id: String,
@@ -6613,9 +6672,15 @@ pub struct AccountClientUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClientUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClientUpdateCall<'a, S> {}
 
-impl<'a> AccountClientUpdateCall<'a> {
+impl<'a, S> AccountClientUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6772,7 +6837,7 @@ impl<'a> AccountClientUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Client) -> AccountClientUpdateCall<'a> {
+    pub fn request(mut self, new_value: Client) -> AccountClientUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6782,7 +6847,7 @@ impl<'a> AccountClientUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClientUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClientUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6792,7 +6857,7 @@ impl<'a> AccountClientUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUpdateCall<'a> {
+    pub fn client_account_id(mut self, new_value: &str) -> AccountClientUpdateCall<'a, S> {
         self._client_account_id = new_value.to_string();
         self
     }
@@ -6802,7 +6867,7 @@ impl<'a> AccountClientUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClientUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6827,7 +6892,7 @@ impl<'a> AccountClientUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClientUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6847,9 +6912,9 @@ impl<'a> AccountClientUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClientUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClientUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6882,7 +6947,7 @@ impl<'a> AccountClientUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6895,10 +6960,10 @@ impl<'a> AccountClientUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeDealAssociationAddCall<'a>
-    where  {
+pub struct AccountCreativeDealAssociationAddCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: AddDealAssociationRequest,
     _account_id: String,
     _creative_id: String,
@@ -6907,9 +6972,15 @@ pub struct AccountCreativeDealAssociationAddCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeDealAssociationAddCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeDealAssociationAddCall<'a, S> {}
 
-impl<'a> AccountCreativeDealAssociationAddCall<'a> {
+impl<'a, S> AccountCreativeDealAssociationAddCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7066,7 +7137,7 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddDealAssociationRequest) -> AccountCreativeDealAssociationAddCall<'a> {
+    pub fn request(mut self, new_value: AddDealAssociationRequest) -> AccountCreativeDealAssociationAddCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7076,7 +7147,7 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7086,7 +7157,7 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationAddCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -7096,7 +7167,7 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeDealAssociationAddCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeDealAssociationAddCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7121,7 +7192,7 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationAddCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationAddCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7141,9 +7212,9 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationAddCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeDealAssociationAddCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7175,7 +7246,7 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7186,10 +7257,10 @@ impl<'a> AccountCreativeDealAssociationAddCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeDealAssociationListCall<'a>
-    where  {
+pub struct AccountCreativeDealAssociationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _creative_id: String,
     _query: Option<String>,
@@ -7200,9 +7271,15 @@ pub struct AccountCreativeDealAssociationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeDealAssociationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeDealAssociationListCall<'a, S> {}
 
-impl<'a> AccountCreativeDealAssociationListCall<'a> {
+impl<'a, S> AccountCreativeDealAssociationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7355,7 +7432,7 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7365,28 +7442,28 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
     /// An optional query string to filter deal associations. If no filter is specified, all associations will be returned. Supported queries are: - accountId=*account_id_string* - creativeId=*creative_id_string* - dealsId=*deals_id_string* - dealsStatus:{approved, conditionally_approved, disapproved, not_checked} - openAuctionStatus:{approved, conditionally_approved, disapproved, not_checked} Example: 'dealsId=12345 AND dealsStatus:disapproved'
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn query(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListDealAssociationsResponse.next_page_token returned from the previous call to 'ListDealAssociations' method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCreativeDealAssociationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer associations than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountCreativeDealAssociationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7396,7 +7473,7 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeDealAssociationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeDealAssociationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7421,7 +7498,7 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7441,9 +7518,9 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeDealAssociationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7476,7 +7553,7 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7489,10 +7566,10 @@ impl<'a> AccountCreativeDealAssociationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeDealAssociationRemoveCall<'a>
-    where  {
+pub struct AccountCreativeDealAssociationRemoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: RemoveDealAssociationRequest,
     _account_id: String,
     _creative_id: String,
@@ -7501,9 +7578,15 @@ pub struct AccountCreativeDealAssociationRemoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeDealAssociationRemoveCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeDealAssociationRemoveCall<'a, S> {}
 
-impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
+impl<'a, S> AccountCreativeDealAssociationRemoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7660,7 +7743,7 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveDealAssociationRequest) -> AccountCreativeDealAssociationRemoveCall<'a> {
+    pub fn request(mut self, new_value: RemoveDealAssociationRequest) -> AccountCreativeDealAssociationRemoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7670,7 +7753,7 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationRemoveCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeDealAssociationRemoveCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7680,7 +7763,7 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationRemoveCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeDealAssociationRemoveCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -7690,7 +7773,7 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeDealAssociationRemoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeDealAssociationRemoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7715,7 +7798,7 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationRemoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeDealAssociationRemoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7735,9 +7818,9 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeDealAssociationRemoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeDealAssociationRemoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7770,7 +7853,7 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7784,10 +7867,10 @@ impl<'a> AccountCreativeDealAssociationRemoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeCreateCall<'a>
-    where  {
+pub struct AccountCreativeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: Creative,
     _account_id: String,
     _duplicate_id_mode: Option<String>,
@@ -7796,9 +7879,15 @@ pub struct AccountCreativeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeCreateCall<'a, S> {}
 
-impl<'a> AccountCreativeCreateCall<'a> {
+impl<'a, S> AccountCreativeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7957,7 +8046,7 @@ impl<'a> AccountCreativeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Creative) -> AccountCreativeCreateCall<'a> {
+    pub fn request(mut self, new_value: Creative) -> AccountCreativeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7967,14 +8056,14 @@ impl<'a> AccountCreativeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Indicates if multiple creatives can share an ID or not. Default is NO_DUPLICATES (one ID per creative).
     ///
     /// Sets the *duplicate id mode* query property to the given value.
-    pub fn duplicate_id_mode(mut self, new_value: &str) -> AccountCreativeCreateCall<'a> {
+    pub fn duplicate_id_mode(mut self, new_value: &str) -> AccountCreativeCreateCall<'a, S> {
         self._duplicate_id_mode = Some(new_value.to_string());
         self
     }
@@ -7984,7 +8073,7 @@ impl<'a> AccountCreativeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8009,7 +8098,7 @@ impl<'a> AccountCreativeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8029,9 +8118,9 @@ impl<'a> AccountCreativeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8063,7 +8152,7 @@ impl<'a> AccountCreativeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8071,10 +8160,10 @@ impl<'a> AccountCreativeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeGetCall<'a>
-    where  {
+pub struct AccountCreativeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _creative_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8082,9 +8171,15 @@ pub struct AccountCreativeGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeGetCall<'a, S> {}
 
-impl<'a> AccountCreativeGetCall<'a> {
+impl<'a, S> AccountCreativeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8228,7 +8323,7 @@ impl<'a> AccountCreativeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8238,7 +8333,7 @@ impl<'a> AccountCreativeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeGetCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -8248,7 +8343,7 @@ impl<'a> AccountCreativeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8273,7 +8368,7 @@ impl<'a> AccountCreativeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8293,9 +8388,9 @@ impl<'a> AccountCreativeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8327,7 +8422,7 @@ impl<'a> AccountCreativeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8338,10 +8433,10 @@ impl<'a> AccountCreativeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeListCall<'a>
-    where  {
+pub struct AccountCreativeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -8351,9 +8446,15 @@ pub struct AccountCreativeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeListCall<'a, S> {}
 
-impl<'a> AccountCreativeListCall<'a> {
+impl<'a, S> AccountCreativeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8505,28 +8606,28 @@ impl<'a> AccountCreativeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// An optional query string to filter creatives. If no filter is specified, all active creatives will be returned. Supported queries are: - accountId=*account_id_string* - creativeId=*creative_id_string* - dealsStatus: {approved, conditionally_approved, disapproved, not_checked} - openAuctionStatus: {approved, conditionally_approved, disapproved, not_checked} - attribute: {a numeric attribute from the list of attributes} - disapprovalReason: {a reason from DisapprovalReason} Example: 'accountId=12345 AND (dealsStatus:disapproved AND disapprovalReason:unacceptable_content) OR attribute:47'
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> AccountCreativeListCall<'a> {
+    pub fn query(mut self, new_value: &str) -> AccountCreativeListCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativesResponse.next_page_token returned from the previous call to 'ListCreatives' method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCreativeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCreativeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer creatives than requested (due to timeout constraint) even if more are available via another call. If unspecified, server will pick an appropriate default. Acceptable values are 1 to 1000, inclusive.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCreativeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountCreativeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -8536,7 +8637,7 @@ impl<'a> AccountCreativeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8561,7 +8662,7 @@ impl<'a> AccountCreativeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8581,9 +8682,9 @@ impl<'a> AccountCreativeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8616,7 +8717,7 @@ impl<'a> AccountCreativeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8629,10 +8730,10 @@ impl<'a> AccountCreativeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeStopWatchingCall<'a>
-    where  {
+pub struct AccountCreativeStopWatchingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: StopWatchingCreativeRequest,
     _account_id: String,
     _creative_id: String,
@@ -8641,9 +8742,15 @@ pub struct AccountCreativeStopWatchingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeStopWatchingCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeStopWatchingCall<'a, S> {}
 
-impl<'a> AccountCreativeStopWatchingCall<'a> {
+impl<'a, S> AccountCreativeStopWatchingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8800,7 +8907,7 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StopWatchingCreativeRequest) -> AccountCreativeStopWatchingCall<'a> {
+    pub fn request(mut self, new_value: StopWatchingCreativeRequest) -> AccountCreativeStopWatchingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8810,7 +8917,7 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeStopWatchingCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeStopWatchingCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8820,7 +8927,7 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeStopWatchingCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeStopWatchingCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -8830,7 +8937,7 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeStopWatchingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeStopWatchingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8855,7 +8962,7 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeStopWatchingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeStopWatchingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8875,9 +8982,9 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeStopWatchingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeStopWatchingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8910,7 +9017,7 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8923,10 +9030,10 @@ impl<'a> AccountCreativeStopWatchingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeUpdateCall<'a>
-    where  {
+pub struct AccountCreativeUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: Creative,
     _account_id: String,
     _creative_id: String,
@@ -8935,9 +9042,15 @@ pub struct AccountCreativeUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeUpdateCall<'a, S> {}
 
-impl<'a> AccountCreativeUpdateCall<'a> {
+impl<'a, S> AccountCreativeUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9094,7 +9207,7 @@ impl<'a> AccountCreativeUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Creative) -> AccountCreativeUpdateCall<'a> {
+    pub fn request(mut self, new_value: Creative) -> AccountCreativeUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9104,7 +9217,7 @@ impl<'a> AccountCreativeUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9114,7 +9227,7 @@ impl<'a> AccountCreativeUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeUpdateCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeUpdateCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -9124,7 +9237,7 @@ impl<'a> AccountCreativeUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9149,7 +9262,7 @@ impl<'a> AccountCreativeUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9169,9 +9282,9 @@ impl<'a> AccountCreativeUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9204,7 +9317,7 @@ impl<'a> AccountCreativeUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9217,10 +9330,10 @@ impl<'a> AccountCreativeUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreativeWatchCall<'a>
-    where  {
+pub struct AccountCreativeWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: WatchCreativeRequest,
     _account_id: String,
     _creative_id: String,
@@ -9229,9 +9342,15 @@ pub struct AccountCreativeWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCreativeWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreativeWatchCall<'a, S> {}
 
-impl<'a> AccountCreativeWatchCall<'a> {
+impl<'a, S> AccountCreativeWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9388,7 +9507,7 @@ impl<'a> AccountCreativeWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WatchCreativeRequest) -> AccountCreativeWatchCall<'a> {
+    pub fn request(mut self, new_value: WatchCreativeRequest) -> AccountCreativeWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9398,7 +9517,7 @@ impl<'a> AccountCreativeWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountCreativeWatchCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountCreativeWatchCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9408,7 +9527,7 @@ impl<'a> AccountCreativeWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeWatchCall<'a> {
+    pub fn creative_id(mut self, new_value: &str) -> AccountCreativeWatchCall<'a, S> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -9418,7 +9537,7 @@ impl<'a> AccountCreativeWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreativeWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9443,7 +9562,7 @@ impl<'a> AccountCreativeWatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreativeWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9463,9 +9582,9 @@ impl<'a> AccountCreativeWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCreativeWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCreativeWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9497,7 +9616,7 @@ impl<'a> AccountCreativeWatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9509,10 +9628,10 @@ impl<'a> AccountCreativeWatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountFinalizedProposalListCall<'a>
-    where  {
+pub struct AccountFinalizedProposalListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9523,9 +9642,15 @@ pub struct AccountFinalizedProposalListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountFinalizedProposalListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountFinalizedProposalListCall<'a, S> {}
 
-impl<'a> AccountFinalizedProposalListCall<'a> {
+impl<'a, S> AccountFinalizedProposalListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9680,35 +9805,35 @@ impl<'a> AccountFinalizedProposalListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// The page token as returned from ListProposalsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountFinalizedProposalListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountFinalizedProposalListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Syntax the filter is written in. Current implementation defaults to PQL but in the future it will be LIST_FILTER.
     ///
     /// Sets the *filter syntax* query property to the given value.
-    pub fn filter_syntax(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a> {
+    pub fn filter_syntax(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, S> {
         self._filter_syntax = Some(new_value.to_string());
         self
     }
     /// An optional PQL filter query used to query for proposals. Nested repeated fields, such as proposal.deals.targetingCriterion, cannot be filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountFinalizedProposalListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9718,7 +9843,7 @@ impl<'a> AccountFinalizedProposalListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountFinalizedProposalListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountFinalizedProposalListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9743,7 +9868,7 @@ impl<'a> AccountFinalizedProposalListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9763,9 +9888,9 @@ impl<'a> AccountFinalizedProposalListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountFinalizedProposalListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountFinalizedProposalListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9798,7 +9923,7 @@ impl<'a> AccountFinalizedProposalListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9811,10 +9936,10 @@ impl<'a> AccountFinalizedProposalListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountFinalizedProposalPauseCall<'a>
-    where  {
+pub struct AccountFinalizedProposalPauseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: PauseProposalDealsRequest,
     _account_id: String,
     _proposal_id: String,
@@ -9823,9 +9948,15 @@ pub struct AccountFinalizedProposalPauseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountFinalizedProposalPauseCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountFinalizedProposalPauseCall<'a, S> {}
 
-impl<'a> AccountFinalizedProposalPauseCall<'a> {
+impl<'a, S> AccountFinalizedProposalPauseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9982,7 +10113,7 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PauseProposalDealsRequest) -> AccountFinalizedProposalPauseCall<'a> {
+    pub fn request(mut self, new_value: PauseProposalDealsRequest) -> AccountFinalizedProposalPauseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9992,7 +10123,7 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalPauseCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalPauseCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10002,7 +10133,7 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountFinalizedProposalPauseCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountFinalizedProposalPauseCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -10012,7 +10143,7 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountFinalizedProposalPauseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountFinalizedProposalPauseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10037,7 +10168,7 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalPauseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalPauseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10057,9 +10188,9 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountFinalizedProposalPauseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountFinalizedProposalPauseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10092,7 +10223,7 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10105,10 +10236,10 @@ impl<'a> AccountFinalizedProposalPauseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountFinalizedProposalResumeCall<'a>
-    where  {
+pub struct AccountFinalizedProposalResumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: ResumeProposalDealsRequest,
     _account_id: String,
     _proposal_id: String,
@@ -10117,9 +10248,15 @@ pub struct AccountFinalizedProposalResumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountFinalizedProposalResumeCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountFinalizedProposalResumeCall<'a, S> {}
 
-impl<'a> AccountFinalizedProposalResumeCall<'a> {
+impl<'a, S> AccountFinalizedProposalResumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10276,7 +10413,7 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResumeProposalDealsRequest) -> AccountFinalizedProposalResumeCall<'a> {
+    pub fn request(mut self, new_value: ResumeProposalDealsRequest) -> AccountFinalizedProposalResumeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10286,7 +10423,7 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalResumeCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountFinalizedProposalResumeCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10296,7 +10433,7 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountFinalizedProposalResumeCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountFinalizedProposalResumeCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -10306,7 +10443,7 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountFinalizedProposalResumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountFinalizedProposalResumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10331,7 +10468,7 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalResumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountFinalizedProposalResumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10351,9 +10488,9 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountFinalizedProposalResumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountFinalizedProposalResumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10385,7 +10522,7 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10393,10 +10530,10 @@ impl<'a> AccountFinalizedProposalResumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProductGetCall<'a>
-    where  {
+pub struct AccountProductGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _product_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10404,9 +10541,15 @@ pub struct AccountProductGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProductGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProductGetCall<'a, S> {}
 
-impl<'a> AccountProductGetCall<'a> {
+impl<'a, S> AccountProductGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10550,7 +10693,7 @@ impl<'a> AccountProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProductGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProductGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10560,7 +10703,7 @@ impl<'a> AccountProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> AccountProductGetCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> AccountProductGetCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -10570,7 +10713,7 @@ impl<'a> AccountProductGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10595,7 +10738,7 @@ impl<'a> AccountProductGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10615,9 +10758,9 @@ impl<'a> AccountProductGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProductGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10649,7 +10792,7 @@ impl<'a> AccountProductGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10660,10 +10803,10 @@ impl<'a> AccountProductGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProductListCall<'a>
-    where  {
+pub struct AccountProductListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10673,9 +10816,15 @@ pub struct AccountProductListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProductListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProductListCall<'a, S> {}
 
-impl<'a> AccountProductListCall<'a> {
+impl<'a, S> AccountProductListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10827,28 +10976,28 @@ impl<'a> AccountProductListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProductListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// The page token as returned from ListProductsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountProductListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountProductListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountProductListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An optional PQL query used to query for products. See https://developers.google.com/ad-manager/docs/pqlreference for documentation about PQL and examples. Nested repeated fields, such as product.targetingCriterion.inclusions, cannot be filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountProductListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10858,7 +11007,7 @@ impl<'a> AccountProductListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10883,7 +11032,7 @@ impl<'a> AccountProductListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10903,9 +11052,9 @@ impl<'a> AccountProductListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProductListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10938,7 +11087,7 @@ impl<'a> AccountProductListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10951,10 +11100,10 @@ impl<'a> AccountProductListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalAcceptCall<'a>
-    where  {
+pub struct AccountProposalAcceptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: AcceptProposalRequest,
     _account_id: String,
     _proposal_id: String,
@@ -10963,9 +11112,15 @@ pub struct AccountProposalAcceptCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalAcceptCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalAcceptCall<'a, S> {}
 
-impl<'a> AccountProposalAcceptCall<'a> {
+impl<'a, S> AccountProposalAcceptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11122,7 +11277,7 @@ impl<'a> AccountProposalAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AcceptProposalRequest) -> AccountProposalAcceptCall<'a> {
+    pub fn request(mut self, new_value: AcceptProposalRequest) -> AccountProposalAcceptCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11132,7 +11287,7 @@ impl<'a> AccountProposalAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalAcceptCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalAcceptCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11142,7 +11297,7 @@ impl<'a> AccountProposalAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalAcceptCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalAcceptCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -11152,7 +11307,7 @@ impl<'a> AccountProposalAcceptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalAcceptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalAcceptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11177,7 +11332,7 @@ impl<'a> AccountProposalAcceptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalAcceptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalAcceptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11197,9 +11352,9 @@ impl<'a> AccountProposalAcceptCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalAcceptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalAcceptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11232,7 +11387,7 @@ impl<'a> AccountProposalAcceptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11245,10 +11400,10 @@ impl<'a> AccountProposalAcceptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalAddNoteCall<'a>
-    where  {
+pub struct AccountProposalAddNoteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: AddNoteRequest,
     _account_id: String,
     _proposal_id: String,
@@ -11257,9 +11412,15 @@ pub struct AccountProposalAddNoteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalAddNoteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalAddNoteCall<'a, S> {}
 
-impl<'a> AccountProposalAddNoteCall<'a> {
+impl<'a, S> AccountProposalAddNoteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11416,7 +11577,7 @@ impl<'a> AccountProposalAddNoteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddNoteRequest) -> AccountProposalAddNoteCall<'a> {
+    pub fn request(mut self, new_value: AddNoteRequest) -> AccountProposalAddNoteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11426,7 +11587,7 @@ impl<'a> AccountProposalAddNoteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11436,7 +11597,7 @@ impl<'a> AccountProposalAddNoteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalAddNoteCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -11446,7 +11607,7 @@ impl<'a> AccountProposalAddNoteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalAddNoteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalAddNoteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11471,7 +11632,7 @@ impl<'a> AccountProposalAddNoteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalAddNoteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalAddNoteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11491,9 +11652,9 @@ impl<'a> AccountProposalAddNoteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalAddNoteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalAddNoteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11526,7 +11687,7 @@ impl<'a> AccountProposalAddNoteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11539,10 +11700,10 @@ impl<'a> AccountProposalAddNoteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalCancelNegotiationCall<'a>
-    where  {
+pub struct AccountProposalCancelNegotiationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: CancelNegotiationRequest,
     _account_id: String,
     _proposal_id: String,
@@ -11551,9 +11712,15 @@ pub struct AccountProposalCancelNegotiationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalCancelNegotiationCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalCancelNegotiationCall<'a, S> {}
 
-impl<'a> AccountProposalCancelNegotiationCall<'a> {
+impl<'a, S> AccountProposalCancelNegotiationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11710,7 +11877,7 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelNegotiationRequest) -> AccountProposalCancelNegotiationCall<'a> {
+    pub fn request(mut self, new_value: CancelNegotiationRequest) -> AccountProposalCancelNegotiationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11720,7 +11887,7 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalCancelNegotiationCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalCancelNegotiationCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11730,7 +11897,7 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalCancelNegotiationCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalCancelNegotiationCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -11740,7 +11907,7 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalCancelNegotiationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalCancelNegotiationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11765,7 +11932,7 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCancelNegotiationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCancelNegotiationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11785,9 +11952,9 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalCancelNegotiationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalCancelNegotiationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11820,7 +11987,7 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11833,10 +12000,10 @@ impl<'a> AccountProposalCancelNegotiationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalCompleteSetupCall<'a>
-    where  {
+pub struct AccountProposalCompleteSetupCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: CompleteSetupRequest,
     _account_id: String,
     _proposal_id: String,
@@ -11845,9 +12012,15 @@ pub struct AccountProposalCompleteSetupCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalCompleteSetupCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalCompleteSetupCall<'a, S> {}
 
-impl<'a> AccountProposalCompleteSetupCall<'a> {
+impl<'a, S> AccountProposalCompleteSetupCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12004,7 +12177,7 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompleteSetupRequest) -> AccountProposalCompleteSetupCall<'a> {
+    pub fn request(mut self, new_value: CompleteSetupRequest) -> AccountProposalCompleteSetupCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12014,7 +12187,7 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12024,7 +12197,7 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalCompleteSetupCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -12034,7 +12207,7 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalCompleteSetupCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalCompleteSetupCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12059,7 +12232,7 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCompleteSetupCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCompleteSetupCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12079,9 +12252,9 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalCompleteSetupCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalCompleteSetupCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12114,7 +12287,7 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12127,10 +12300,10 @@ impl<'a> AccountProposalCompleteSetupCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalCreateCall<'a>
-    where  {
+pub struct AccountProposalCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: Proposal,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12138,9 +12311,15 @@ pub struct AccountProposalCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalCreateCall<'a, S> {}
 
-impl<'a> AccountProposalCreateCall<'a> {
+impl<'a, S> AccountProposalCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12296,7 +12475,7 @@ impl<'a> AccountProposalCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Proposal) -> AccountProposalCreateCall<'a> {
+    pub fn request(mut self, new_value: Proposal) -> AccountProposalCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12306,7 +12485,7 @@ impl<'a> AccountProposalCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12316,7 +12495,7 @@ impl<'a> AccountProposalCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12341,7 +12520,7 @@ impl<'a> AccountProposalCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12361,9 +12540,9 @@ impl<'a> AccountProposalCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12395,7 +12574,7 @@ impl<'a> AccountProposalCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12403,10 +12582,10 @@ impl<'a> AccountProposalCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalGetCall<'a>
-    where  {
+pub struct AccountProposalGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _proposal_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12414,9 +12593,15 @@ pub struct AccountProposalGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalGetCall<'a, S> {}
 
-impl<'a> AccountProposalGetCall<'a> {
+impl<'a, S> AccountProposalGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12560,7 +12745,7 @@ impl<'a> AccountProposalGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12570,7 +12755,7 @@ impl<'a> AccountProposalGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalGetCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalGetCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -12580,7 +12765,7 @@ impl<'a> AccountProposalGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12605,7 +12790,7 @@ impl<'a> AccountProposalGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12625,9 +12810,9 @@ impl<'a> AccountProposalGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12659,7 +12844,7 @@ impl<'a> AccountProposalGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12671,10 +12856,10 @@ impl<'a> AccountProposalGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalListCall<'a>
-    where  {
+pub struct AccountProposalListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12685,9 +12870,15 @@ pub struct AccountProposalListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalListCall<'a, S> {}
 
-impl<'a> AccountProposalListCall<'a> {
+impl<'a, S> AccountProposalListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12842,35 +13033,35 @@ impl<'a> AccountProposalListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// The page token as returned from ListProposalsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountProposalListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountProposalListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountProposalListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountProposalListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Syntax the filter is written in. Current implementation defaults to PQL but in the future it will be LIST_FILTER.
     ///
     /// Sets the *filter syntax* query property to the given value.
-    pub fn filter_syntax(mut self, new_value: &str) -> AccountProposalListCall<'a> {
+    pub fn filter_syntax(mut self, new_value: &str) -> AccountProposalListCall<'a, S> {
         self._filter_syntax = Some(new_value.to_string());
         self
     }
     /// An optional PQL filter query used to query for proposals. Nested repeated fields, such as proposal.deals.targetingCriterion, cannot be filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountProposalListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountProposalListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12880,7 +13071,7 @@ impl<'a> AccountProposalListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12905,7 +13096,7 @@ impl<'a> AccountProposalListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12925,9 +13116,9 @@ impl<'a> AccountProposalListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12960,7 +13151,7 @@ impl<'a> AccountProposalListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12973,10 +13164,10 @@ impl<'a> AccountProposalListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalPauseCall<'a>
-    where  {
+pub struct AccountProposalPauseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: PauseProposalRequest,
     _account_id: String,
     _proposal_id: String,
@@ -12985,9 +13176,15 @@ pub struct AccountProposalPauseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalPauseCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalPauseCall<'a, S> {}
 
-impl<'a> AccountProposalPauseCall<'a> {
+impl<'a, S> AccountProposalPauseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13144,7 +13341,7 @@ impl<'a> AccountProposalPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PauseProposalRequest) -> AccountProposalPauseCall<'a> {
+    pub fn request(mut self, new_value: PauseProposalRequest) -> AccountProposalPauseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13154,7 +13351,7 @@ impl<'a> AccountProposalPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalPauseCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalPauseCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13164,7 +13361,7 @@ impl<'a> AccountProposalPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalPauseCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalPauseCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -13174,7 +13371,7 @@ impl<'a> AccountProposalPauseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalPauseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalPauseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13199,7 +13396,7 @@ impl<'a> AccountProposalPauseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalPauseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalPauseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13219,9 +13416,9 @@ impl<'a> AccountProposalPauseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalPauseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalPauseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13254,7 +13451,7 @@ impl<'a> AccountProposalPauseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13267,10 +13464,10 @@ impl<'a> AccountProposalPauseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalResumeCall<'a>
-    where  {
+pub struct AccountProposalResumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: ResumeProposalRequest,
     _account_id: String,
     _proposal_id: String,
@@ -13279,9 +13476,15 @@ pub struct AccountProposalResumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalResumeCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalResumeCall<'a, S> {}
 
-impl<'a> AccountProposalResumeCall<'a> {
+impl<'a, S> AccountProposalResumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13438,7 +13641,7 @@ impl<'a> AccountProposalResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResumeProposalRequest) -> AccountProposalResumeCall<'a> {
+    pub fn request(mut self, new_value: ResumeProposalRequest) -> AccountProposalResumeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13448,7 +13651,7 @@ impl<'a> AccountProposalResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalResumeCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalResumeCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13458,7 +13661,7 @@ impl<'a> AccountProposalResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalResumeCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalResumeCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -13468,7 +13671,7 @@ impl<'a> AccountProposalResumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalResumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalResumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13493,7 +13696,7 @@ impl<'a> AccountProposalResumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalResumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalResumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13513,9 +13716,9 @@ impl<'a> AccountProposalResumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalResumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalResumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13548,7 +13751,7 @@ impl<'a> AccountProposalResumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13561,10 +13764,10 @@ impl<'a> AccountProposalResumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProposalUpdateCall<'a>
-    where  {
+pub struct AccountProposalUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: Proposal,
     _account_id: String,
     _proposal_id: String,
@@ -13573,9 +13776,15 @@ pub struct AccountProposalUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProposalUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProposalUpdateCall<'a, S> {}
 
-impl<'a> AccountProposalUpdateCall<'a> {
+impl<'a, S> AccountProposalUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13732,7 +13941,7 @@ impl<'a> AccountProposalUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Proposal) -> AccountProposalUpdateCall<'a> {
+    pub fn request(mut self, new_value: Proposal) -> AccountProposalUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13742,7 +13951,7 @@ impl<'a> AccountProposalUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountProposalUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountProposalUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13752,7 +13961,7 @@ impl<'a> AccountProposalUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalUpdateCall<'a> {
+    pub fn proposal_id(mut self, new_value: &str) -> AccountProposalUpdateCall<'a, S> {
         self._proposal_id = new_value.to_string();
         self
     }
@@ -13762,7 +13971,7 @@ impl<'a> AccountProposalUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProposalUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13787,7 +13996,7 @@ impl<'a> AccountProposalUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProposalUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13807,9 +14016,9 @@ impl<'a> AccountProposalUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProposalUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProposalUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13841,7 +14050,7 @@ impl<'a> AccountProposalUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13849,10 +14058,10 @@ impl<'a> AccountProposalUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPublisherProfileGetCall<'a>
-    where  {
+pub struct AccountPublisherProfileGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _publisher_profile_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13860,9 +14069,15 @@ pub struct AccountPublisherProfileGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPublisherProfileGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPublisherProfileGetCall<'a, S> {}
 
-impl<'a> AccountPublisherProfileGetCall<'a> {
+impl<'a, S> AccountPublisherProfileGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14006,7 +14221,7 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPublisherProfileGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPublisherProfileGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14016,7 +14231,7 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn publisher_profile_id(mut self, new_value: &str) -> AccountPublisherProfileGetCall<'a> {
+    pub fn publisher_profile_id(mut self, new_value: &str) -> AccountPublisherProfileGetCall<'a, S> {
         self._publisher_profile_id = new_value.to_string();
         self
     }
@@ -14026,7 +14241,7 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPublisherProfileGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPublisherProfileGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14051,7 +14266,7 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPublisherProfileGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPublisherProfileGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14071,9 +14286,9 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPublisherProfileGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPublisherProfileGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14105,7 +14320,7 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14115,10 +14330,10 @@ impl<'a> AccountPublisherProfileGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPublisherProfileListCall<'a>
-    where  {
+pub struct AccountPublisherProfileListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _account_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14127,9 +14342,15 @@ pub struct AccountPublisherProfileListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPublisherProfileListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPublisherProfileListCall<'a, S> {}
 
-impl<'a> AccountPublisherProfileListCall<'a> {
+impl<'a, S> AccountPublisherProfileListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14278,21 +14499,21 @@ impl<'a> AccountPublisherProfileListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPublisherProfileListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPublisherProfileListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// The page token as return from ListPublisherProfilesResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountPublisherProfileListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountPublisherProfileListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Specify the number of results to include per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountPublisherProfileListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountPublisherProfileListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14302,7 +14523,7 @@ impl<'a> AccountPublisherProfileListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPublisherProfileListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPublisherProfileListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14327,7 +14548,7 @@ impl<'a> AccountPublisherProfileListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPublisherProfileListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPublisherProfileListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14347,9 +14568,9 @@ impl<'a> AccountPublisherProfileListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPublisherProfileListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPublisherProfileListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14381,7 +14602,7 @@ impl<'a> AccountPublisherProfileListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14391,10 +14612,10 @@ impl<'a> AccountPublisherProfileListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetBidMetricListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetBidMetricListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14403,9 +14624,15 @@ pub struct BidderAccountFilterSetBidMetricListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetBidMetricListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetBidMetricListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
+impl<'a, S> BidderAccountFilterSetBidMetricListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14558,21 +14785,21 @@ impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetBidMetricListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetBidMetricListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBidMetricsResponse.nextPageToken returned from the previous call to the bidMetrics.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetBidMetricListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetBidMetricListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetBidMetricListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetBidMetricListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14582,7 +14809,7 @@ impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetBidMetricListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetBidMetricListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14607,7 +14834,7 @@ impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetBidMetricListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetBidMetricListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14627,9 +14854,9 @@ impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetBidMetricListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetBidMetricListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14661,7 +14888,7 @@ impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14671,10 +14898,10 @@ impl<'a> BidderAccountFilterSetBidMetricListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetBidResponseErrorListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetBidResponseErrorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14683,9 +14910,15 @@ pub struct BidderAccountFilterSetBidResponseErrorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetBidResponseErrorListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetBidResponseErrorListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
+impl<'a, S> BidderAccountFilterSetBidResponseErrorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14838,21 +15071,21 @@ impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetBidResponseErrorListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBidResponseErrorsResponse.nextPageToken returned from the previous call to the bidResponseErrors.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetBidResponseErrorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetBidResponseErrorListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14862,7 +15095,7 @@ impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetBidResponseErrorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14887,7 +15120,7 @@ impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetBidResponseErrorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14907,9 +15140,9 @@ impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetBidResponseErrorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetBidResponseErrorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14941,7 +15174,7 @@ impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14951,10 +15184,10 @@ impl<'a> BidderAccountFilterSetBidResponseErrorListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetBidResponsesWithoutBidListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14963,9 +15196,15 @@ pub struct BidderAccountFilterSetBidResponsesWithoutBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
+impl<'a, S> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15118,21 +15357,21 @@ impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBidResponsesWithoutBidsResponse.nextPageToken returned from the previous call to the bidResponsesWithoutBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -15142,7 +15381,7 @@ impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15167,7 +15406,7 @@ impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15187,9 +15426,9 @@ impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15221,7 +15460,7 @@ impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15231,10 +15470,10 @@ impl<'a> BidderAccountFilterSetBidResponsesWithoutBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetFilteredBidRequestListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetFilteredBidRequestListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15243,9 +15482,15 @@ pub struct BidderAccountFilterSetFilteredBidRequestListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetFilteredBidRequestListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetFilteredBidRequestListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
+impl<'a, S> BidderAccountFilterSetFilteredBidRequestListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15398,21 +15643,21 @@ impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListFilteredBidRequestsResponse.nextPageToken returned from the previous call to the filteredBidRequests.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -15422,7 +15667,7 @@ impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15447,7 +15692,7 @@ impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidRequestListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15467,9 +15712,9 @@ impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidRequestListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidRequestListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15501,7 +15746,7 @@ impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15511,10 +15756,10 @@ impl<'a> BidderAccountFilterSetFilteredBidRequestListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetFilteredBidCreativeListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetFilteredBidCreativeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _creative_status_id: i32,
     _page_token: Option<String>,
@@ -15524,9 +15769,15 @@ pub struct BidderAccountFilterSetFilteredBidCreativeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetFilteredBidCreativeListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+impl<'a, S> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15680,7 +15931,7 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
@@ -15690,21 +15941,21 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_status_id(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn creative_status_id(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {
         self._creative_status_id = new_value;
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativeStatusBreakdownByCreativeResponse.nextPageToken returned from the previous call to the filteredBids.creatives.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -15714,7 +15965,7 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15739,7 +15990,7 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15759,9 +16010,9 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidCreativeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15793,7 +16044,7 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15803,10 +16054,10 @@ impl<'a> BidderAccountFilterSetFilteredBidCreativeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetFilteredBidDetailListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetFilteredBidDetailListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _creative_status_id: i32,
     _page_token: Option<String>,
@@ -15816,9 +16067,15 @@ pub struct BidderAccountFilterSetFilteredBidDetailListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetFilteredBidDetailListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+impl<'a, S> BidderAccountFilterSetFilteredBidDetailListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15972,7 +16229,7 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
@@ -15982,21 +16239,21 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_status_id(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+    pub fn creative_status_id(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {
         self._creative_status_id = new_value;
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativeStatusBreakdownByDetailResponse.nextPageToken returned from the previous call to the filteredBids.details.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16006,7 +16263,7 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16031,7 +16288,7 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidDetailListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16051,9 +16308,9 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidDetailListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidDetailListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16085,7 +16342,7 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16095,10 +16352,10 @@ impl<'a> BidderAccountFilterSetFilteredBidDetailListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetFilteredBidListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetFilteredBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16107,9 +16364,15 @@ pub struct BidderAccountFilterSetFilteredBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetFilteredBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetFilteredBidListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
+impl<'a, S> BidderAccountFilterSetFilteredBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16262,21 +16525,21 @@ impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListFilteredBidsResponse.nextPageToken returned from the previous call to the filteredBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetFilteredBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetFilteredBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16286,7 +16549,7 @@ impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetFilteredBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16311,7 +16574,7 @@ impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetFilteredBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16331,9 +16594,9 @@ impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetFilteredBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16365,7 +16628,7 @@ impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16375,10 +16638,10 @@ impl<'a> BidderAccountFilterSetFilteredBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetImpressionMetricListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetImpressionMetricListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16387,9 +16650,15 @@ pub struct BidderAccountFilterSetImpressionMetricListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetImpressionMetricListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetImpressionMetricListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
+impl<'a, S> BidderAccountFilterSetImpressionMetricListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16542,21 +16811,21 @@ impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetImpressionMetricListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetImpressionMetricListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListImpressionMetricsResponse.nextPageToken returned from the previous call to the impressionMetrics.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetImpressionMetricListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetImpressionMetricListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetImpressionMetricListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetImpressionMetricListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16566,7 +16835,7 @@ impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetImpressionMetricListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetImpressionMetricListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16591,7 +16860,7 @@ impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetImpressionMetricListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetImpressionMetricListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16611,9 +16880,9 @@ impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetImpressionMetricListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetImpressionMetricListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16645,7 +16914,7 @@ impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16655,10 +16924,10 @@ impl<'a> BidderAccountFilterSetImpressionMetricListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetLosingBidListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetLosingBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16667,9 +16936,15 @@ pub struct BidderAccountFilterSetLosingBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetLosingBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetLosingBidListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
+impl<'a, S> BidderAccountFilterSetLosingBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16822,21 +17097,21 @@ impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetLosingBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetLosingBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListLosingBidsResponse.nextPageToken returned from the previous call to the losingBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetLosingBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetLosingBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetLosingBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetLosingBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16846,7 +17121,7 @@ impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetLosingBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetLosingBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16871,7 +17146,7 @@ impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetLosingBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetLosingBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16891,9 +17166,9 @@ impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetLosingBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetLosingBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16925,7 +17200,7 @@ impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16935,10 +17210,10 @@ impl<'a> BidderAccountFilterSetLosingBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetNonBillableWinningBidListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetNonBillableWinningBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16947,9 +17222,15 @@ pub struct BidderAccountFilterSetNonBillableWinningBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetNonBillableWinningBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetNonBillableWinningBidListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
+impl<'a, S> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17102,21 +17383,21 @@ impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListNonBillableWinningBidsResponse.nextPageToken returned from the previous call to the nonBillableWinningBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -17126,7 +17407,7 @@ impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17151,7 +17432,7 @@ impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17171,9 +17452,9 @@ impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetNonBillableWinningBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17206,7 +17487,7 @@ impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17220,10 +17501,10 @@ impl<'a> BidderAccountFilterSetNonBillableWinningBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetCreateCall<'a>
-    where  {
+pub struct BidderAccountFilterSetCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: FilterSet,
     _owner_name: String,
     _is_transient: Option<bool>,
@@ -17232,9 +17513,15 @@ pub struct BidderAccountFilterSetCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetCreateCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetCreateCall<'a> {
+impl<'a, S> BidderAccountFilterSetCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17397,7 +17684,7 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FilterSet) -> BidderAccountFilterSetCreateCall<'a> {
+    pub fn request(mut self, new_value: FilterSet) -> BidderAccountFilterSetCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17407,14 +17694,14 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn owner_name(mut self, new_value: &str) -> BidderAccountFilterSetCreateCall<'a> {
+    pub fn owner_name(mut self, new_value: &str) -> BidderAccountFilterSetCreateCall<'a, S> {
         self._owner_name = new_value.to_string();
         self
     }
     /// Whether the filter set is transient, or should be persisted indefinitely. By default, filter sets are not transient. If transient, it will be available for at least 1 hour after creation.
     ///
     /// Sets the *is transient* query property to the given value.
-    pub fn is_transient(mut self, new_value: bool) -> BidderAccountFilterSetCreateCall<'a> {
+    pub fn is_transient(mut self, new_value: bool) -> BidderAccountFilterSetCreateCall<'a, S> {
         self._is_transient = Some(new_value);
         self
     }
@@ -17424,7 +17711,7 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17449,7 +17736,7 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17469,9 +17756,9 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17503,7 +17790,7 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17511,19 +17798,25 @@ impl<'a> BidderAccountFilterSetCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetDeleteCall<'a>
-    where  {
+pub struct BidderAccountFilterSetDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetDeleteCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetDeleteCall<'a> {
+impl<'a, S> BidderAccountFilterSetDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17670,7 +17963,7 @@ impl<'a> BidderAccountFilterSetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BidderAccountFilterSetDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BidderAccountFilterSetDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17680,7 +17973,7 @@ impl<'a> BidderAccountFilterSetDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17705,7 +17998,7 @@ impl<'a> BidderAccountFilterSetDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17725,9 +18018,9 @@ impl<'a> BidderAccountFilterSetDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17759,7 +18052,7 @@ impl<'a> BidderAccountFilterSetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17767,19 +18060,25 @@ impl<'a> BidderAccountFilterSetDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetGetCall<'a>
-    where  {
+pub struct BidderAccountFilterSetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetGetCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetGetCall<'a> {
+impl<'a, S> BidderAccountFilterSetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17926,7 +18225,7 @@ impl<'a> BidderAccountFilterSetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BidderAccountFilterSetGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BidderAccountFilterSetGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17936,7 +18235,7 @@ impl<'a> BidderAccountFilterSetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17961,7 +18260,7 @@ impl<'a> BidderAccountFilterSetGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17981,9 +18280,9 @@ impl<'a> BidderAccountFilterSetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18015,7 +18314,7 @@ impl<'a> BidderAccountFilterSetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18025,10 +18324,10 @@ impl<'a> BidderAccountFilterSetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderAccountFilterSetListCall<'a>
-    where  {
+pub struct BidderAccountFilterSetListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _owner_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18037,9 +18336,15 @@ pub struct BidderAccountFilterSetListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderAccountFilterSetListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderAccountFilterSetListCall<'a, S> {}
 
-impl<'a> BidderAccountFilterSetListCall<'a> {
+impl<'a, S> BidderAccountFilterSetListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18192,21 +18497,21 @@ impl<'a> BidderAccountFilterSetListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn owner_name(mut self, new_value: &str) -> BidderAccountFilterSetListCall<'a> {
+    pub fn owner_name(mut self, new_value: &str) -> BidderAccountFilterSetListCall<'a, S> {
         self._owner_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListFilterSetsResponse.nextPageToken returned from the previous call to the accounts.filterSets.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderAccountFilterSetListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderAccountFilterSetListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -18216,7 +18521,7 @@ impl<'a> BidderAccountFilterSetListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderAccountFilterSetListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18241,7 +18546,7 @@ impl<'a> BidderAccountFilterSetListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderAccountFilterSetListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18261,9 +18566,9 @@ impl<'a> BidderAccountFilterSetListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderAccountFilterSetListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderAccountFilterSetListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18295,7 +18600,7 @@ impl<'a> BidderAccountFilterSetListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18305,10 +18610,10 @@ impl<'a> BidderAccountFilterSetListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetBidMetricListCall<'a>
-    where  {
+pub struct BidderFilterSetBidMetricListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18317,9 +18622,15 @@ pub struct BidderFilterSetBidMetricListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetBidMetricListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetBidMetricListCall<'a, S> {}
 
-impl<'a> BidderFilterSetBidMetricListCall<'a> {
+impl<'a, S> BidderFilterSetBidMetricListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18472,21 +18783,21 @@ impl<'a> BidderFilterSetBidMetricListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetBidMetricListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetBidMetricListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBidMetricsResponse.nextPageToken returned from the previous call to the bidMetrics.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetBidMetricListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetBidMetricListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetBidMetricListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetBidMetricListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -18496,7 +18807,7 @@ impl<'a> BidderFilterSetBidMetricListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetBidMetricListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetBidMetricListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18521,7 +18832,7 @@ impl<'a> BidderFilterSetBidMetricListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetBidMetricListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetBidMetricListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18541,9 +18852,9 @@ impl<'a> BidderFilterSetBidMetricListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetBidMetricListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetBidMetricListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18575,7 +18886,7 @@ impl<'a> BidderFilterSetBidMetricListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18585,10 +18896,10 @@ impl<'a> BidderFilterSetBidMetricListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetBidResponseErrorListCall<'a>
-    where  {
+pub struct BidderFilterSetBidResponseErrorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18597,9 +18908,15 @@ pub struct BidderFilterSetBidResponseErrorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetBidResponseErrorListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetBidResponseErrorListCall<'a, S> {}
 
-impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
+impl<'a, S> BidderFilterSetBidResponseErrorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18752,21 +19069,21 @@ impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetBidResponseErrorListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetBidResponseErrorListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBidResponseErrorsResponse.nextPageToken returned from the previous call to the bidResponseErrors.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetBidResponseErrorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetBidResponseErrorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetBidResponseErrorListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetBidResponseErrorListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -18776,7 +19093,7 @@ impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetBidResponseErrorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetBidResponseErrorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18801,7 +19118,7 @@ impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetBidResponseErrorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetBidResponseErrorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18821,9 +19138,9 @@ impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetBidResponseErrorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetBidResponseErrorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18855,7 +19172,7 @@ impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18865,10 +19182,10 @@ impl<'a> BidderFilterSetBidResponseErrorListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetBidResponsesWithoutBidListCall<'a>
-    where  {
+pub struct BidderFilterSetBidResponsesWithoutBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18877,9 +19194,15 @@ pub struct BidderFilterSetBidResponsesWithoutBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetBidResponsesWithoutBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetBidResponsesWithoutBidListCall<'a, S> {}
 
-impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
+impl<'a, S> BidderFilterSetBidResponsesWithoutBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19032,21 +19355,21 @@ impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBidResponsesWithoutBidsResponse.nextPageToken returned from the previous call to the bidResponsesWithoutBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -19056,7 +19379,7 @@ impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19081,7 +19404,7 @@ impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetBidResponsesWithoutBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19101,9 +19424,9 @@ impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetBidResponsesWithoutBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetBidResponsesWithoutBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19135,7 +19458,7 @@ impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19145,10 +19468,10 @@ impl<'a> BidderFilterSetBidResponsesWithoutBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetFilteredBidRequestListCall<'a>
-    where  {
+pub struct BidderFilterSetFilteredBidRequestListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -19157,9 +19480,15 @@ pub struct BidderFilterSetFilteredBidRequestListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetFilteredBidRequestListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetFilteredBidRequestListCall<'a, S> {}
 
-impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
+impl<'a, S> BidderFilterSetFilteredBidRequestListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19312,21 +19641,21 @@ impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidRequestListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidRequestListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListFilteredBidRequestsResponse.nextPageToken returned from the previous call to the filteredBidRequests.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidRequestListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidRequestListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidRequestListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidRequestListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -19336,7 +19665,7 @@ impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidRequestListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidRequestListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19361,7 +19690,7 @@ impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidRequestListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidRequestListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19381,9 +19710,9 @@ impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetFilteredBidRequestListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetFilteredBidRequestListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19415,7 +19744,7 @@ impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19425,10 +19754,10 @@ impl<'a> BidderFilterSetFilteredBidRequestListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetFilteredBidCreativeListCall<'a>
-    where  {
+pub struct BidderFilterSetFilteredBidCreativeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _creative_status_id: i32,
     _page_token: Option<String>,
@@ -19438,9 +19767,15 @@ pub struct BidderFilterSetFilteredBidCreativeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetFilteredBidCreativeListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetFilteredBidCreativeListCall<'a, S> {}
 
-impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
+impl<'a, S> BidderFilterSetFilteredBidCreativeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19594,7 +19929,7 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidCreativeListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
@@ -19604,21 +19939,21 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_status_id(mut self, new_value: i32) -> BidderFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn creative_status_id(mut self, new_value: i32) -> BidderFilterSetFilteredBidCreativeListCall<'a, S> {
         self._creative_status_id = new_value;
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativeStatusBreakdownByCreativeResponse.nextPageToken returned from the previous call to the filteredBids.creatives.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidCreativeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidCreativeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -19628,7 +19963,7 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidCreativeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidCreativeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19653,7 +19988,7 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidCreativeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidCreativeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19673,9 +20008,9 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetFilteredBidCreativeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetFilteredBidCreativeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19707,7 +20042,7 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19717,10 +20052,10 @@ impl<'a> BidderFilterSetFilteredBidCreativeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetFilteredBidDetailListCall<'a>
-    where  {
+pub struct BidderFilterSetFilteredBidDetailListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _creative_status_id: i32,
     _page_token: Option<String>,
@@ -19730,9 +20065,15 @@ pub struct BidderFilterSetFilteredBidDetailListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetFilteredBidDetailListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetFilteredBidDetailListCall<'a, S> {}
 
-impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
+impl<'a, S> BidderFilterSetFilteredBidDetailListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19886,7 +20227,7 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidDetailListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidDetailListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
@@ -19896,21 +20237,21 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_status_id(mut self, new_value: i32) -> BidderFilterSetFilteredBidDetailListCall<'a> {
+    pub fn creative_status_id(mut self, new_value: i32) -> BidderFilterSetFilteredBidDetailListCall<'a, S> {
         self._creative_status_id = new_value;
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListCreativeStatusBreakdownByDetailResponse.nextPageToken returned from the previous call to the filteredBids.details.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidDetailListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidDetailListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidDetailListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidDetailListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -19920,7 +20261,7 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidDetailListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidDetailListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19945,7 +20286,7 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidDetailListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidDetailListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19965,9 +20306,9 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetFilteredBidDetailListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetFilteredBidDetailListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19999,7 +20340,7 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20009,10 +20350,10 @@ impl<'a> BidderFilterSetFilteredBidDetailListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetFilteredBidListCall<'a>
-    where  {
+pub struct BidderFilterSetFilteredBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20021,9 +20362,15 @@ pub struct BidderFilterSetFilteredBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetFilteredBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetFilteredBidListCall<'a, S> {}
 
-impl<'a> BidderFilterSetFilteredBidListCall<'a> {
+impl<'a, S> BidderFilterSetFilteredBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20176,21 +20523,21 @@ impl<'a> BidderFilterSetFilteredBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetFilteredBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListFilteredBidsResponse.nextPageToken returned from the previous call to the filteredBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetFilteredBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetFilteredBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -20200,7 +20547,7 @@ impl<'a> BidderFilterSetFilteredBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetFilteredBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20225,7 +20572,7 @@ impl<'a> BidderFilterSetFilteredBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetFilteredBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20245,9 +20592,9 @@ impl<'a> BidderFilterSetFilteredBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetFilteredBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetFilteredBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20279,7 +20626,7 @@ impl<'a> BidderFilterSetFilteredBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20289,10 +20636,10 @@ impl<'a> BidderFilterSetFilteredBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetImpressionMetricListCall<'a>
-    where  {
+pub struct BidderFilterSetImpressionMetricListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20301,9 +20648,15 @@ pub struct BidderFilterSetImpressionMetricListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetImpressionMetricListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetImpressionMetricListCall<'a, S> {}
 
-impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
+impl<'a, S> BidderFilterSetImpressionMetricListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20456,21 +20809,21 @@ impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetImpressionMetricListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetImpressionMetricListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListImpressionMetricsResponse.nextPageToken returned from the previous call to the impressionMetrics.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetImpressionMetricListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetImpressionMetricListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetImpressionMetricListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetImpressionMetricListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -20480,7 +20833,7 @@ impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetImpressionMetricListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetImpressionMetricListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20505,7 +20858,7 @@ impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetImpressionMetricListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetImpressionMetricListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20525,9 +20878,9 @@ impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetImpressionMetricListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetImpressionMetricListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20559,7 +20912,7 @@ impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20569,10 +20922,10 @@ impl<'a> BidderFilterSetImpressionMetricListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetLosingBidListCall<'a>
-    where  {
+pub struct BidderFilterSetLosingBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20581,9 +20934,15 @@ pub struct BidderFilterSetLosingBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetLosingBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetLosingBidListCall<'a, S> {}
 
-impl<'a> BidderFilterSetLosingBidListCall<'a> {
+impl<'a, S> BidderFilterSetLosingBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20736,21 +21095,21 @@ impl<'a> BidderFilterSetLosingBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetLosingBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetLosingBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListLosingBidsResponse.nextPageToken returned from the previous call to the losingBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetLosingBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetLosingBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetLosingBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetLosingBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -20760,7 +21119,7 @@ impl<'a> BidderFilterSetLosingBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetLosingBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetLosingBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20785,7 +21144,7 @@ impl<'a> BidderFilterSetLosingBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetLosingBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetLosingBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20805,9 +21164,9 @@ impl<'a> BidderFilterSetLosingBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetLosingBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetLosingBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20839,7 +21198,7 @@ impl<'a> BidderFilterSetLosingBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20849,10 +21208,10 @@ impl<'a> BidderFilterSetLosingBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetNonBillableWinningBidListCall<'a>
-    where  {
+pub struct BidderFilterSetNonBillableWinningBidListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _filter_set_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20861,9 +21220,15 @@ pub struct BidderFilterSetNonBillableWinningBidListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetNonBillableWinningBidListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetNonBillableWinningBidListCall<'a, S> {}
 
-impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
+impl<'a, S> BidderFilterSetNonBillableWinningBidListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21016,21 +21381,21 @@ impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn filter_set_name(mut self, new_value: &str) -> BidderFilterSetNonBillableWinningBidListCall<'a, S> {
         self._filter_set_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListNonBillableWinningBidsResponse.nextPageToken returned from the previous call to the nonBillableWinningBids.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetNonBillableWinningBidListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetNonBillableWinningBidListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -21040,7 +21405,7 @@ impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetNonBillableWinningBidListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetNonBillableWinningBidListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21065,7 +21430,7 @@ impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetNonBillableWinningBidListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetNonBillableWinningBidListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21085,9 +21450,9 @@ impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetNonBillableWinningBidListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetNonBillableWinningBidListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21120,7 +21485,7 @@ impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21134,10 +21499,10 @@ impl<'a> BidderFilterSetNonBillableWinningBidListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetCreateCall<'a>
-    where  {
+pub struct BidderFilterSetCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _request: FilterSet,
     _owner_name: String,
     _is_transient: Option<bool>,
@@ -21146,9 +21511,15 @@ pub struct BidderFilterSetCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetCreateCall<'a, S> {}
 
-impl<'a> BidderFilterSetCreateCall<'a> {
+impl<'a, S> BidderFilterSetCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21311,7 +21682,7 @@ impl<'a> BidderFilterSetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FilterSet) -> BidderFilterSetCreateCall<'a> {
+    pub fn request(mut self, new_value: FilterSet) -> BidderFilterSetCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21321,14 +21692,14 @@ impl<'a> BidderFilterSetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn owner_name(mut self, new_value: &str) -> BidderFilterSetCreateCall<'a> {
+    pub fn owner_name(mut self, new_value: &str) -> BidderFilterSetCreateCall<'a, S> {
         self._owner_name = new_value.to_string();
         self
     }
     /// Whether the filter set is transient, or should be persisted indefinitely. By default, filter sets are not transient. If transient, it will be available for at least 1 hour after creation.
     ///
     /// Sets the *is transient* query property to the given value.
-    pub fn is_transient(mut self, new_value: bool) -> BidderFilterSetCreateCall<'a> {
+    pub fn is_transient(mut self, new_value: bool) -> BidderFilterSetCreateCall<'a, S> {
         self._is_transient = Some(new_value);
         self
     }
@@ -21338,7 +21709,7 @@ impl<'a> BidderFilterSetCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21363,7 +21734,7 @@ impl<'a> BidderFilterSetCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21383,9 +21754,9 @@ impl<'a> BidderFilterSetCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21417,7 +21788,7 @@ impl<'a> BidderFilterSetCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21425,19 +21796,25 @@ impl<'a> BidderFilterSetCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetDeleteCall<'a>
-    where  {
+pub struct BidderFilterSetDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetDeleteCall<'a, S> {}
 
-impl<'a> BidderFilterSetDeleteCall<'a> {
+impl<'a, S> BidderFilterSetDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21584,7 +21961,7 @@ impl<'a> BidderFilterSetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BidderFilterSetDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BidderFilterSetDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -21594,7 +21971,7 @@ impl<'a> BidderFilterSetDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21619,7 +21996,7 @@ impl<'a> BidderFilterSetDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21639,9 +22016,9 @@ impl<'a> BidderFilterSetDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21673,7 +22050,7 @@ impl<'a> BidderFilterSetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21681,19 +22058,25 @@ impl<'a> BidderFilterSetDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetGetCall<'a>
-    where  {
+pub struct BidderFilterSetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetGetCall<'a, S> {}
 
-impl<'a> BidderFilterSetGetCall<'a> {
+impl<'a, S> BidderFilterSetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21840,7 +22223,7 @@ impl<'a> BidderFilterSetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BidderFilterSetGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BidderFilterSetGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -21850,7 +22233,7 @@ impl<'a> BidderFilterSetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21875,7 +22258,7 @@ impl<'a> BidderFilterSetGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21895,9 +22278,9 @@ impl<'a> BidderFilterSetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21929,7 +22312,7 @@ impl<'a> BidderFilterSetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExchangeBuyerII::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21939,10 +22322,10 @@ impl<'a> BidderFilterSetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFilterSetListCall<'a>
-    where  {
+pub struct BidderFilterSetListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExchangeBuyerII<>,
+    hub: &'a AdExchangeBuyerII<S>,
     _owner_name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -21951,9 +22334,15 @@ pub struct BidderFilterSetListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFilterSetListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFilterSetListCall<'a, S> {}
 
-impl<'a> BidderFilterSetListCall<'a> {
+impl<'a, S> BidderFilterSetListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22106,21 +22495,21 @@ impl<'a> BidderFilterSetListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn owner_name(mut self, new_value: &str) -> BidderFilterSetListCall<'a> {
+    pub fn owner_name(mut self, new_value: &str) -> BidderFilterSetListCall<'a, S> {
         self._owner_name = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListFilterSetsResponse.nextPageToken returned from the previous call to the accounts.filterSets.list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFilterSetListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFilterSetListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -22130,7 +22519,7 @@ impl<'a> BidderFilterSetListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFilterSetListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22155,7 +22544,7 @@ impl<'a> BidderFilterSetListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFilterSetListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22175,9 +22564,9 @@ impl<'a> BidderFilterSetListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFilterSetListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFilterSetListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,37 +109,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Keep<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Keep<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Keep<> {}
+impl<'a, S> client::Hub for Keep<S> {}
 
-impl<'a, > Keep<> {
+impl<'a, S> Keep<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Keep<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Keep<S> {
         Keep {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://keep.googleapis.com/".to_string(),
             _root_url: "https://keep.googleapis.com/".to_string(),
         }
     }
 
-    pub fn media(&'a self) -> MediaMethods<'a> {
+    pub fn media(&'a self) -> MediaMethods<'a, S> {
         MediaMethods { hub: &self }
     }
-    pub fn notes(&'a self) -> NoteMethods<'a> {
+    pub fn notes(&'a self) -> NoteMethods<'a, S> {
         NoteMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -480,22 +485,22 @@ impl client::Part for User {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `download(...)`
 /// // to build up your call.
 /// let rb = hub.media();
 /// # }
 /// ```
-pub struct MediaMethods<'a>
-    where  {
+pub struct MediaMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
 }
 
-impl<'a> client::MethodsBuilder for MediaMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MediaMethods<'a, S> {}
 
-impl<'a> MediaMethods<'a> {
+impl<'a, S> MediaMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -504,7 +509,7 @@ impl<'a> MediaMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the attachment.
-    pub fn download(&self, name: &str) -> MediaDownloadCall<'a> {
+    pub fn download(&self, name: &str) -> MediaDownloadCall<'a, S> {
         MediaDownloadCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -539,22 +544,22 @@ impl<'a> MediaMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `permissions_batch_create(...)` and `permissions_batch_delete(...)`
 /// // to build up your call.
 /// let rb = hub.notes();
 /// # }
 /// ```
-pub struct NoteMethods<'a>
-    where  {
+pub struct NoteMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
 }
 
-impl<'a> client::MethodsBuilder for NoteMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for NoteMethods<'a, S> {}
 
-impl<'a> NoteMethods<'a> {
+impl<'a, S> NoteMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -564,7 +569,7 @@ impl<'a> NoteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent resource shared by all Permissions being created. Format: `notes/{note}` If this is set, the parent field in the CreatePermission messages must either be empty or match this field.
-    pub fn permissions_batch_create(&self, request: BatchCreatePermissionsRequest, parent: &str) -> NotePermissionBatchCreateCall<'a> {
+    pub fn permissions_batch_create(&self, request: BatchCreatePermissionsRequest, parent: &str) -> NotePermissionBatchCreateCall<'a, S> {
         NotePermissionBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -583,7 +588,7 @@ impl<'a> NoteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent resource shared by all permissions being deleted. Format: `notes/{note}` If this is set, the parent of all of the permissions specified in the DeletePermissionRequest messages must match this field.
-    pub fn permissions_batch_delete(&self, request: BatchDeletePermissionsRequest, parent: &str) -> NotePermissionBatchDeleteCall<'a> {
+    pub fn permissions_batch_delete(&self, request: BatchDeletePermissionsRequest, parent: &str) -> NotePermissionBatchDeleteCall<'a, S> {
         NotePermissionBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -601,7 +606,7 @@ impl<'a> NoteMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Note) -> NoteCreateCall<'a> {
+    pub fn create(&self, request: Note) -> NoteCreateCall<'a, S> {
         NoteCreateCall {
             hub: self.hub,
             _request: request,
@@ -618,7 +623,7 @@ impl<'a> NoteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the note to delete.
-    pub fn delete(&self, name: &str) -> NoteDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> NoteDeleteCall<'a, S> {
         NoteDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -635,7 +640,7 @@ impl<'a> NoteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the resource.
-    pub fn get(&self, name: &str) -> NoteGetCall<'a> {
+    pub fn get(&self, name: &str) -> NoteGetCall<'a, S> {
         NoteGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -648,7 +653,7 @@ impl<'a> NoteMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists notes. Every list call returns a page of results with `page_size` as the upper bound of returned items. A `page_size` of zero allows the server to choose the upper bound. The ListNotesResponse contains at most `page_size` entries. If there are more things left to list, it provides a `next_page_token` value. (Page tokens are opaque values.) To get the next page of results, copy the result's `next_page_token` into the next request's `page_token`. Repeat until the `next_page_token` returned with a page of results is empty. ListNotes return consistent results in the face of concurrent changes, or signals that it cannot with an ABORTED error.
-    pub fn list(&self) -> NoteListCall<'a> {
+    pub fn list(&self) -> NoteListCall<'a, S> {
         NoteListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -696,7 +701,7 @@ impl<'a> NoteMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -705,10 +710,10 @@ impl<'a> NoteMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaDownloadCall<'a>
-    where  {
+pub struct MediaDownloadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _name: String,
     _mime_type: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -716,9 +721,15 @@ pub struct MediaDownloadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaDownloadCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaDownloadCall<'a, S> {}
 
-impl<'a> MediaDownloadCall<'a> {
+impl<'a, S> MediaDownloadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -884,14 +895,14 @@ impl<'a> MediaDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> MediaDownloadCall<'a> {
+    pub fn name(mut self, new_value: &str) -> MediaDownloadCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The IANA MIME type format requested. The requested MIME type must be one specified in the attachment.mime_type. Required when downloading attachment media and ignored otherwise.
     ///
     /// Sets the *mime type* query property to the given value.
-    pub fn mime_type(mut self, new_value: &str) -> MediaDownloadCall<'a> {
+    pub fn mime_type(mut self, new_value: &str) -> MediaDownloadCall<'a, S> {
         self._mime_type = Some(new_value.to_string());
         self
     }
@@ -901,7 +912,7 @@ impl<'a> MediaDownloadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -926,7 +937,7 @@ impl<'a> MediaDownloadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -946,9 +957,9 @@ impl<'a> MediaDownloadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaDownloadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaDownloadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -981,7 +992,7 @@ impl<'a> MediaDownloadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -994,10 +1005,10 @@ impl<'a> MediaDownloadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotePermissionBatchCreateCall<'a>
-    where  {
+pub struct NotePermissionBatchCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _request: BatchCreatePermissionsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1005,9 +1016,15 @@ pub struct NotePermissionBatchCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotePermissionBatchCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NotePermissionBatchCreateCall<'a, S> {}
 
-impl<'a> NotePermissionBatchCreateCall<'a> {
+impl<'a, S> NotePermissionBatchCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1167,7 +1184,7 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchCreatePermissionsRequest) -> NotePermissionBatchCreateCall<'a> {
+    pub fn request(mut self, new_value: BatchCreatePermissionsRequest) -> NotePermissionBatchCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1177,7 +1194,7 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NotePermissionBatchCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NotePermissionBatchCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1187,7 +1204,7 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotePermissionBatchCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotePermissionBatchCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1212,7 +1229,7 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NotePermissionBatchCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotePermissionBatchCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1232,9 +1249,9 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotePermissionBatchCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotePermissionBatchCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1267,7 +1284,7 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1280,10 +1297,10 @@ impl<'a> NotePermissionBatchCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotePermissionBatchDeleteCall<'a>
-    where  {
+pub struct NotePermissionBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _request: BatchDeletePermissionsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1291,9 +1308,15 @@ pub struct NotePermissionBatchDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotePermissionBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for NotePermissionBatchDeleteCall<'a, S> {}
 
-impl<'a> NotePermissionBatchDeleteCall<'a> {
+impl<'a, S> NotePermissionBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1453,7 +1476,7 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeletePermissionsRequest) -> NotePermissionBatchDeleteCall<'a> {
+    pub fn request(mut self, new_value: BatchDeletePermissionsRequest) -> NotePermissionBatchDeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1463,7 +1486,7 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NotePermissionBatchDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NotePermissionBatchDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1473,7 +1496,7 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotePermissionBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotePermissionBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1498,7 +1521,7 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NotePermissionBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotePermissionBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1518,9 +1541,9 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotePermissionBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotePermissionBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1553,7 +1576,7 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1566,19 +1589,25 @@ impl<'a> NotePermissionBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NoteCreateCall<'a>
-    where  {
+pub struct NoteCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _request: Note,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NoteCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NoteCreateCall<'a, S> {}
 
-impl<'a> NoteCreateCall<'a> {
+impl<'a, S> NoteCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1712,7 +1741,7 @@ impl<'a> NoteCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Note) -> NoteCreateCall<'a> {
+    pub fn request(mut self, new_value: Note) -> NoteCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1722,7 +1751,7 @@ impl<'a> NoteCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1747,7 +1776,7 @@ impl<'a> NoteCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NoteCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NoteCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1767,9 +1796,9 @@ impl<'a> NoteCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NoteCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NoteCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1801,7 +1830,7 @@ impl<'a> NoteCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1809,19 +1838,25 @@ impl<'a> NoteCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NoteDeleteCall<'a>
-    where  {
+pub struct NoteDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NoteDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for NoteDeleteCall<'a, S> {}
 
-impl<'a> NoteDeleteCall<'a> {
+impl<'a, S> NoteDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1968,7 +2003,7 @@ impl<'a> NoteDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NoteDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NoteDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1978,7 +2013,7 @@ impl<'a> NoteDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2003,7 +2038,7 @@ impl<'a> NoteDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NoteDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NoteDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2023,9 +2058,9 @@ impl<'a> NoteDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NoteDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NoteDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2057,7 +2092,7 @@ impl<'a> NoteDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2065,19 +2100,25 @@ impl<'a> NoteDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NoteGetCall<'a>
-    where  {
+pub struct NoteGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NoteGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NoteGetCall<'a, S> {}
 
-impl<'a> NoteGetCall<'a> {
+impl<'a, S> NoteGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2224,7 +2265,7 @@ impl<'a> NoteGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NoteGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NoteGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2234,7 +2275,7 @@ impl<'a> NoteGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2259,7 +2300,7 @@ impl<'a> NoteGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NoteGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NoteGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2279,9 +2320,9 @@ impl<'a> NoteGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NoteGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NoteGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2313,7 +2354,7 @@ impl<'a> NoteGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Keep::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2324,10 +2365,10 @@ impl<'a> NoteGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NoteListCall<'a>
-    where  {
+pub struct NoteListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Keep<>,
+    hub: &'a Keep<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -2336,9 +2377,15 @@ pub struct NoteListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NoteListCall<'a> {}
+impl<'a, S> client::CallBuilder for NoteListCall<'a, S> {}
 
-impl<'a> NoteListCall<'a> {
+impl<'a, S> NoteListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2465,21 +2512,21 @@ impl<'a> NoteListCall<'a> {
     /// The previous page's `next_page_token` field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NoteListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NoteListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NoteListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NoteListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Filter for list results. If no filter is supplied, the `trashed` filter is applied by default. Valid fields to filter by are: `create_time`, `update_time`, `trash_time`, and `trashed`. Filter syntax follows the [Google AIP filtering spec](https://aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NoteListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NoteListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2489,7 +2536,7 @@ impl<'a> NoteListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NoteListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2514,7 +2561,7 @@ impl<'a> NoteListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NoteListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NoteListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2534,9 +2581,9 @@ impl<'a> NoteListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NoteListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NoteListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

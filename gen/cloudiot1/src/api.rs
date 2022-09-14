@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,34 +112,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudIot<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudIot<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudIot<> {}
+impl<'a, S> client::Hub for CloudIot<S> {}
 
-impl<'a, > CloudIot<> {
+impl<'a, S> CloudIot<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudIot<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudIot<S> {
         CloudIot {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudiot.googleapis.com/".to_string(),
             _root_url: "https://cloudiot.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -906,22 +911,22 @@ impl client::Part for X509CertificateDetails {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_registries_bind_device_to_gateway(...)`, `locations_registries_create(...)`, `locations_registries_delete(...)`, `locations_registries_devices_config_versions_list(...)`, `locations_registries_devices_create(...)`, `locations_registries_devices_delete(...)`, `locations_registries_devices_get(...)`, `locations_registries_devices_list(...)`, `locations_registries_devices_modify_cloud_to_device_config(...)`, `locations_registries_devices_patch(...)`, `locations_registries_devices_send_command_to_device(...)`, `locations_registries_devices_states_list(...)`, `locations_registries_get(...)`, `locations_registries_get_iam_policy(...)`, `locations_registries_groups_devices_list(...)`, `locations_registries_groups_get_iam_policy(...)`, `locations_registries_groups_set_iam_policy(...)`, `locations_registries_groups_test_iam_permissions(...)`, `locations_registries_list(...)`, `locations_registries_patch(...)`, `locations_registries_set_iam_policy(...)`, `locations_registries_test_iam_permissions(...)` and `locations_registries_unbind_device_from_gateway(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -930,7 +935,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
-    pub fn locations_registries_devices_config_versions_list(&self, name: &str) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
+    pub fn locations_registries_devices_config_versions_list(&self, name: &str) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S> {
         ProjectLocationRegistryDeviceConfigVersionListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -948,7 +953,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
-    pub fn locations_registries_devices_states_list(&self, name: &str) -> ProjectLocationRegistryDeviceStateListCall<'a> {
+    pub fn locations_registries_devices_states_list(&self, name: &str) -> ProjectLocationRegistryDeviceStateListCall<'a, S> {
         ProjectLocationRegistryDeviceStateListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -967,7 +972,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the device registry where this device should be created. For example, `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_devices_create(&self, request: Device, parent: &str) -> ProjectLocationRegistryDeviceCreateCall<'a> {
+    pub fn locations_registries_devices_create(&self, request: Device, parent: &str) -> ProjectLocationRegistryDeviceCreateCall<'a, S> {
         ProjectLocationRegistryDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -985,7 +990,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
-    pub fn locations_registries_devices_delete(&self, name: &str) -> ProjectLocationRegistryDeviceDeleteCall<'a> {
+    pub fn locations_registries_devices_delete(&self, name: &str) -> ProjectLocationRegistryDeviceDeleteCall<'a, S> {
         ProjectLocationRegistryDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1002,7 +1007,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
-    pub fn locations_registries_devices_get(&self, name: &str) -> ProjectLocationRegistryDeviceGetCall<'a> {
+    pub fn locations_registries_devices_get(&self, name: &str) -> ProjectLocationRegistryDeviceGetCall<'a, S> {
         ProjectLocationRegistryDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1020,7 +1025,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The device registry path. Required. For example, `projects/my-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_devices_list(&self, parent: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn locations_registries_devices_list(&self, parent: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         ProjectLocationRegistryDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1046,7 +1051,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
-    pub fn locations_registries_devices_modify_cloud_to_device_config(&self, request: ModifyCloudToDeviceConfigRequest, name: &str) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
+    pub fn locations_registries_devices_modify_cloud_to_device_config(&self, request: ModifyCloudToDeviceConfigRequest, name: &str) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S> {
         ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall {
             hub: self.hub,
             _request: request,
@@ -1065,7 +1070,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource path name. For example, `projects/p1/locations/us-central1/registries/registry0/devices/dev0` or `projects/p1/locations/us-central1/registries/registry0/devices/{num_id}`. When `name` is populated as a response from the service, it always ends in the device numeric ID.
-    pub fn locations_registries_devices_patch(&self, request: Device, name: &str) -> ProjectLocationRegistryDevicePatchCall<'a> {
+    pub fn locations_registries_devices_patch(&self, request: Device, name: &str) -> ProjectLocationRegistryDevicePatchCall<'a, S> {
         ProjectLocationRegistryDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -1085,7 +1090,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device. For example, `projects/p0/locations/us-central1/registries/registry0/devices/device0` or `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`.
-    pub fn locations_registries_devices_send_command_to_device(&self, request: SendCommandToDeviceRequest, name: &str) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
+    pub fn locations_registries_devices_send_command_to_device(&self, request: SendCommandToDeviceRequest, name: &str) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S> {
         ProjectLocationRegistryDeviceSendCommandToDeviceCall {
             hub: self.hub,
             _request: request,
@@ -1103,7 +1108,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The device registry path. Required. For example, `projects/my-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_groups_devices_list(&self, parent: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn locations_registries_groups_devices_list(&self, parent: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         ProjectLocationRegistryGroupDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1129,7 +1134,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_registries_groups_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
+    pub fn locations_registries_groups_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S> {
         ProjectLocationRegistryGroupGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1148,7 +1153,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_registries_groups_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
+    pub fn locations_registries_groups_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S> {
         ProjectLocationRegistryGroupSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1167,7 +1172,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_registries_groups_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
+    pub fn locations_registries_groups_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S> {
         ProjectLocationRegistryGroupTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1186,7 +1191,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_bind_device_to_gateway(&self, request: BindDeviceToGatewayRequest, parent: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
+    pub fn locations_registries_bind_device_to_gateway(&self, request: BindDeviceToGatewayRequest, parent: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S> {
         ProjectLocationRegistryBindDeviceToGatewayCall {
             hub: self.hub,
             _request: request,
@@ -1205,7 +1210,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The project and cloud region where this device registry must be created. For example, `projects/example-project/locations/us-central1`.
-    pub fn locations_registries_create(&self, request: DeviceRegistry, parent: &str) -> ProjectLocationRegistryCreateCall<'a> {
+    pub fn locations_registries_create(&self, request: DeviceRegistry, parent: &str) -> ProjectLocationRegistryCreateCall<'a, S> {
         ProjectLocationRegistryCreateCall {
             hub: self.hub,
             _request: request,
@@ -1223,7 +1228,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_delete(&self, name: &str) -> ProjectLocationRegistryDeleteCall<'a> {
+    pub fn locations_registries_delete(&self, name: &str) -> ProjectLocationRegistryDeleteCall<'a, S> {
         ProjectLocationRegistryDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1240,7 +1245,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_get(&self, name: &str) -> ProjectLocationRegistryGetCall<'a> {
+    pub fn locations_registries_get(&self, name: &str) -> ProjectLocationRegistryGetCall<'a, S> {
         ProjectLocationRegistryGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1258,7 +1263,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_registries_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationRegistryGetIamPolicyCall<'a> {
+    pub fn locations_registries_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationRegistryGetIamPolicyCall<'a, S> {
         ProjectLocationRegistryGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1276,7 +1281,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The project and cloud region path. For example, `projects/example-project/locations/us-central1`.
-    pub fn locations_registries_list(&self, parent: &str) -> ProjectLocationRegistryListCall<'a> {
+    pub fn locations_registries_list(&self, parent: &str) -> ProjectLocationRegistryListCall<'a, S> {
         ProjectLocationRegistryListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1296,7 +1301,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource path name. For example, `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_patch(&self, request: DeviceRegistry, name: &str) -> ProjectLocationRegistryPatchCall<'a> {
+    pub fn locations_registries_patch(&self, request: DeviceRegistry, name: &str) -> ProjectLocationRegistryPatchCall<'a, S> {
         ProjectLocationRegistryPatchCall {
             hub: self.hub,
             _request: request,
@@ -1316,7 +1321,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_registries_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationRegistrySetIamPolicyCall<'a> {
+    pub fn locations_registries_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationRegistrySetIamPolicyCall<'a, S> {
         ProjectLocationRegistrySetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1335,7 +1340,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_registries_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationRegistryTestIamPermissionCall<'a> {
+    pub fn locations_registries_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationRegistryTestIamPermissionCall<'a, S> {
         ProjectLocationRegistryTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1354,7 +1359,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the registry. For example, `projects/example-project/locations/us-central1/registries/my-registry`.
-    pub fn locations_registries_unbind_device_from_gateway(&self, request: UnbindDeviceFromGatewayRequest, parent: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
+    pub fn locations_registries_unbind_device_from_gateway(&self, request: UnbindDeviceFromGatewayRequest, parent: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S> {
         ProjectLocationRegistryUnbindDeviceFromGatewayCall {
             hub: self.hub,
             _request: request,
@@ -1396,7 +1401,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1405,10 +1410,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceConfigVersionListCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceConfigVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _name: String,
     _num_versions: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1416,9 +1421,15 @@ pub struct ProjectLocationRegistryDeviceConfigVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceConfigVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceConfigVersionListCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1568,14 +1579,14 @@ impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The number of versions to list. Versions are listed in decreasing order of the version number. The maximum number of versions retained is 10. If this value is zero, it will return all the versions available.
     ///
     /// Sets the *num versions* query property to the given value.
-    pub fn num_versions(mut self, new_value: i32) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
+    pub fn num_versions(mut self, new_value: i32) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S> {
         self._num_versions = Some(new_value);
         self
     }
@@ -1585,7 +1596,7 @@ impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1610,7 +1621,7 @@ impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1630,9 +1641,9 @@ impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceConfigVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1664,7 +1675,7 @@ impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1673,10 +1684,10 @@ impl<'a> ProjectLocationRegistryDeviceConfigVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceStateListCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceStateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _name: String,
     _num_states: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1684,9 +1695,15 @@ pub struct ProjectLocationRegistryDeviceStateListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceStateListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceStateListCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceStateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1836,14 +1853,14 @@ impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceStateListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceStateListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The number of states to list. States are listed in descending order of update time. The maximum number of states retained is 10. If this value is zero, it will return all the states available.
     ///
     /// Sets the *num states* query property to the given value.
-    pub fn num_states(mut self, new_value: i32) -> ProjectLocationRegistryDeviceStateListCall<'a> {
+    pub fn num_states(mut self, new_value: i32) -> ProjectLocationRegistryDeviceStateListCall<'a, S> {
         self._num_states = Some(new_value);
         self
     }
@@ -1853,7 +1870,7 @@ impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceStateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceStateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1878,7 +1895,7 @@ impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceStateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceStateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1898,9 +1915,9 @@ impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceStateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceStateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1933,7 +1950,7 @@ impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1946,10 +1963,10 @@ impl<'a> ProjectLocationRegistryDeviceStateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceCreateCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: Device,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1957,9 +1974,15 @@ pub struct ProjectLocationRegistryDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2119,7 +2142,7 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Device) -> ProjectLocationRegistryDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: Device) -> ProjectLocationRegistryDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2129,7 +2152,7 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2139,7 +2162,7 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2164,7 +2187,7 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2184,9 +2207,9 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2218,7 +2241,7 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2226,19 +2249,25 @@ impl<'a> ProjectLocationRegistryDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceDeleteCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2385,7 +2414,7 @@ impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2395,7 +2424,7 @@ impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2420,7 +2449,7 @@ impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2440,9 +2469,9 @@ impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2474,7 +2503,7 @@ impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2483,10 +2512,10 @@ impl<'a> ProjectLocationRegistryDeviceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceGetCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _name: String,
     _field_mask: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2494,9 +2523,15 @@ pub struct ProjectLocationRegistryDeviceGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceGetCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2646,14 +2681,14 @@ impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The fields of the `Device` resource to be returned in the response. If the field mask is unset or empty, all fields are returned. Fields have to be provided in snake_case format, for example: `last_heartbeat_time`.
     ///
     /// Sets the *field mask* query property to the given value.
-    pub fn field_mask(mut self, new_value: &str) -> ProjectLocationRegistryDeviceGetCall<'a> {
+    pub fn field_mask(mut self, new_value: &str) -> ProjectLocationRegistryDeviceGetCall<'a, S> {
         self._field_mask = Some(new_value.to_string());
         self
     }
@@ -2663,7 +2698,7 @@ impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2688,7 +2723,7 @@ impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2708,9 +2743,9 @@ impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2742,7 +2777,7 @@ impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2758,10 +2793,10 @@ impl<'a> ProjectLocationRegistryDeviceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceListCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2776,9 +2811,15 @@ pub struct ProjectLocationRegistryDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceListCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2953,49 +2994,49 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The value returned by the last `ListDevicesResponse`; indicates that this is a continuation of a prior `ListDevices` call and the system should return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If this value is zero, the service will select a default size. A call may return fewer objects than requested. A non-empty `next_page_token` in the response indicates that more data is available.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// If `GATEWAY` is specified, only gateways are returned. If `NON_GATEWAY` is specified, only non-gateway devices are returned. If `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
     ///
     /// Sets the *gateway list options.gateway type* query property to the given value.
-    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._gateway_list_options_gateway_type = Some(new_value.to_string());
         self
     }
     /// If set, only devices associated with the specified gateway are returned. The gateway ID can be numeric (`num_id`) or the user-defined string (`id`). For example, if `123` is specified, only devices bound to the gateway with `num_id` 123 are returned.
     ///
     /// Sets the *gateway list options.associations gateway id* query property to the given value.
-    pub fn gateway_list_options_associations_gateway_id(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn gateway_list_options_associations_gateway_id(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._gateway_list_options_associations_gateway_id = Some(new_value.to_string());
         self
     }
     /// If set, returns only the gateways with which the specified device is associated. The device ID can be numeric (`num_id`) or the user-defined string (`id`). For example, if `456` is specified, returns only the gateways to which the device with `num_id` 456 is bound.
     ///
     /// Sets the *gateway list options.associations device id* query property to the given value.
-    pub fn gateway_list_options_associations_device_id(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn gateway_list_options_associations_device_id(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._gateway_list_options_associations_device_id = Some(new_value.to_string());
         self
     }
     /// The fields of the `Device` resource to be returned in the response. The fields `id` and `num_id` are always returned, along with any other fields specified in snake_case format, for example: `last_heartbeat_time`.
     ///
     /// Sets the *field mask* query property to the given value.
-    pub fn field_mask(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn field_mask(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._field_mask = Some(new_value.to_string());
         self
     }
@@ -3003,7 +3044,7 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
     ///
     /// Append the given value to the *device num ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_device_num_ids(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn add_device_num_ids(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._device_num_ids.push(new_value.to_string());
         self
     }
@@ -3011,7 +3052,7 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
     ///
     /// Append the given value to the *device ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_device_ids(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn add_device_ids(mut self, new_value: &str) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._device_ids.push(new_value.to_string());
         self
     }
@@ -3021,7 +3062,7 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3046,7 +3087,7 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3066,9 +3107,9 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3101,7 +3142,7 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3114,10 +3155,10 @@ impl<'a> ProjectLocationRegistryDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: ModifyCloudToDeviceConfigRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3125,9 +3166,15 @@ pub struct ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3287,7 +3334,7 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyCloudToDeviceConfigRequest) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
+    pub fn request(mut self, new_value: ModifyCloudToDeviceConfigRequest) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3297,7 +3344,7 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3307,7 +3354,7 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3332,7 +3379,7 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3352,9 +3399,9 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3387,7 +3434,7 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3401,10 +3448,10 @@ impl<'a> ProjectLocationRegistryDeviceModifyCloudToDeviceConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDevicePatchCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDevicePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: Device,
     _name: String,
     _update_mask: Option<String>,
@@ -3413,9 +3460,15 @@ pub struct ProjectLocationRegistryDevicePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDevicePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDevicePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
+impl<'a, S> ProjectLocationRegistryDevicePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3578,7 +3631,7 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Device) -> ProjectLocationRegistryDevicePatchCall<'a> {
+    pub fn request(mut self, new_value: Device) -> ProjectLocationRegistryDevicePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3588,14 +3641,14 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDevicePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDevicePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Only updates the `device` fields indicated by this mask. The field mask must not be empty, and it must not contain fields that are immutable or only set by the server. Mutable top-level fields: `credentials`, `blocked`, and `metadata`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRegistryDevicePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRegistryDevicePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3605,7 +3658,7 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDevicePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDevicePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3630,7 +3683,7 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDevicePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDevicePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3650,9 +3703,9 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDevicePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDevicePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3685,7 +3738,7 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3698,10 +3751,10 @@ impl<'a> ProjectLocationRegistryDevicePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: SendCommandToDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3709,9 +3762,15 @@ pub struct ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3871,7 +3930,7 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SendCommandToDeviceRequest) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
+    pub fn request(mut self, new_value: SendCommandToDeviceRequest) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3881,7 +3940,7 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3891,7 +3950,7 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3916,7 +3975,7 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3936,9 +3995,9 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3970,7 +4029,7 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3986,10 +4045,10 @@ impl<'a> ProjectLocationRegistryDeviceSendCommandToDeviceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryGroupDeviceListCall<'a>
-    where  {
+pub struct ProjectLocationRegistryGroupDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4004,9 +4063,15 @@ pub struct ProjectLocationRegistryGroupDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryGroupDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryGroupDeviceListCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
+impl<'a, S> ProjectLocationRegistryGroupDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4181,49 +4246,49 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The value returned by the last `ListDevicesResponse`; indicates that this is a continuation of a prior `ListDevices` call and the system should return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If this value is zero, the service will select a default size. A call may return fewer objects than requested. A non-empty `next_page_token` in the response indicates that more data is available.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// If `GATEWAY` is specified, only gateways are returned. If `NON_GATEWAY` is specified, only non-gateway devices are returned. If `GATEWAY_TYPE_UNSPECIFIED` is specified, all devices are returned.
     ///
     /// Sets the *gateway list options.gateway type* query property to the given value.
-    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn gateway_list_options_gateway_type(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._gateway_list_options_gateway_type = Some(new_value.to_string());
         self
     }
     /// If set, only devices associated with the specified gateway are returned. The gateway ID can be numeric (`num_id`) or the user-defined string (`id`). For example, if `123` is specified, only devices bound to the gateway with `num_id` 123 are returned.
     ///
     /// Sets the *gateway list options.associations gateway id* query property to the given value.
-    pub fn gateway_list_options_associations_gateway_id(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn gateway_list_options_associations_gateway_id(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._gateway_list_options_associations_gateway_id = Some(new_value.to_string());
         self
     }
     /// If set, returns only the gateways with which the specified device is associated. The device ID can be numeric (`num_id`) or the user-defined string (`id`). For example, if `456` is specified, returns only the gateways to which the device with `num_id` 456 is bound.
     ///
     /// Sets the *gateway list options.associations device id* query property to the given value.
-    pub fn gateway_list_options_associations_device_id(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn gateway_list_options_associations_device_id(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._gateway_list_options_associations_device_id = Some(new_value.to_string());
         self
     }
     /// The fields of the `Device` resource to be returned in the response. The fields `id` and `num_id` are always returned, along with any other fields specified in snake_case format, for example: `last_heartbeat_time`.
     ///
     /// Sets the *field mask* query property to the given value.
-    pub fn field_mask(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn field_mask(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._field_mask = Some(new_value.to_string());
         self
     }
@@ -4231,7 +4296,7 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
     ///
     /// Append the given value to the *device num ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_device_num_ids(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn add_device_num_ids(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._device_num_ids.push(new_value.to_string());
         self
     }
@@ -4239,7 +4304,7 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
     ///
     /// Append the given value to the *device ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_device_ids(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn add_device_ids(mut self, new_value: &str) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._device_ids.push(new_value.to_string());
         self
     }
@@ -4249,7 +4314,7 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4274,7 +4339,7 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4294,9 +4359,9 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryGroupDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4329,7 +4394,7 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4342,10 +4407,10 @@ impl<'a> ProjectLocationRegistryGroupDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryGroupGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationRegistryGroupGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4353,9 +4418,15 @@ pub struct ProjectLocationRegistryGroupGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryGroupGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryGroupGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4515,7 +4586,7 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4525,7 +4596,7 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4535,7 +4606,7 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4560,7 +4631,7 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4580,9 +4651,9 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryGroupGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4615,7 +4686,7 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4628,10 +4699,10 @@ impl<'a> ProjectLocationRegistryGroupGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryGroupSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationRegistryGroupSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4639,9 +4710,15 @@ pub struct ProjectLocationRegistryGroupSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryGroupSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryGroupSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4801,7 +4878,7 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4811,7 +4888,7 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4821,7 +4898,7 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4846,7 +4923,7 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4866,9 +4943,9 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryGroupSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4901,7 +4978,7 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4914,10 +4991,10 @@ impl<'a> ProjectLocationRegistryGroupSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryGroupTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationRegistryGroupTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4925,9 +5002,15 @@ pub struct ProjectLocationRegistryGroupTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryGroupTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryGroupTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5087,7 +5170,7 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5097,7 +5180,7 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -5107,7 +5190,7 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5132,7 +5215,7 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5152,9 +5235,9 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryGroupTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5187,7 +5270,7 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5200,10 +5283,10 @@ impl<'a> ProjectLocationRegistryGroupTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryBindDeviceToGatewayCall<'a>
-    where  {
+pub struct ProjectLocationRegistryBindDeviceToGatewayCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: BindDeviceToGatewayRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5211,9 +5294,15 @@ pub struct ProjectLocationRegistryBindDeviceToGatewayCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryBindDeviceToGatewayCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryBindDeviceToGatewayCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
+impl<'a, S> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5373,7 +5462,7 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BindDeviceToGatewayRequest) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
+    pub fn request(mut self, new_value: BindDeviceToGatewayRequest) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5383,7 +5472,7 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5393,7 +5482,7 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5418,7 +5507,7 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5438,9 +5527,9 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryBindDeviceToGatewayCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5473,7 +5562,7 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5486,10 +5575,10 @@ impl<'a> ProjectLocationRegistryBindDeviceToGatewayCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryCreateCall<'a>
-    where  {
+pub struct ProjectLocationRegistryCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: DeviceRegistry,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5497,9 +5586,15 @@ pub struct ProjectLocationRegistryCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryCreateCall<'a> {
+impl<'a, S> ProjectLocationRegistryCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5659,7 +5754,7 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeviceRegistry) -> ProjectLocationRegistryCreateCall<'a> {
+    pub fn request(mut self, new_value: DeviceRegistry) -> ProjectLocationRegistryCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5669,7 +5764,7 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5679,7 +5774,7 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5704,7 +5799,7 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5724,9 +5819,9 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5758,7 +5853,7 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5766,19 +5861,25 @@ impl<'a> ProjectLocationRegistryCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryDeleteCall<'a>
-    where  {
+pub struct ProjectLocationRegistryDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryDeleteCall<'a> {
+impl<'a, S> ProjectLocationRegistryDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5925,7 +6026,7 @@ impl<'a> ProjectLocationRegistryDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5935,7 +6036,7 @@ impl<'a> ProjectLocationRegistryDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5960,7 +6061,7 @@ impl<'a> ProjectLocationRegistryDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5980,9 +6081,9 @@ impl<'a> ProjectLocationRegistryDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6014,7 +6115,7 @@ impl<'a> ProjectLocationRegistryDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6022,19 +6123,25 @@ impl<'a> ProjectLocationRegistryDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryGetCall<'a>
-    where  {
+pub struct ProjectLocationRegistryGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryGetCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryGetCall<'a> {
+impl<'a, S> ProjectLocationRegistryGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6181,7 +6288,7 @@ impl<'a> ProjectLocationRegistryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6191,7 +6298,7 @@ impl<'a> ProjectLocationRegistryGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6216,7 +6323,7 @@ impl<'a> ProjectLocationRegistryGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6236,9 +6343,9 @@ impl<'a> ProjectLocationRegistryGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6271,7 +6378,7 @@ impl<'a> ProjectLocationRegistryGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6284,10 +6391,10 @@ impl<'a> ProjectLocationRegistryGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationRegistryGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6295,9 +6402,15 @@ pub struct ProjectLocationRegistryGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationRegistryGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6457,7 +6570,7 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationRegistryGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationRegistryGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6467,7 +6580,7 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -6477,7 +6590,7 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6502,7 +6615,7 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6522,9 +6635,9 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6556,7 +6669,7 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6566,10 +6679,10 @@ impl<'a> ProjectLocationRegistryGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryListCall<'a>
-    where  {
+pub struct ProjectLocationRegistryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6578,9 +6691,15 @@ pub struct ProjectLocationRegistryListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryListCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryListCall<'a> {
+impl<'a, S> ProjectLocationRegistryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6733,21 +6852,21 @@ impl<'a> ProjectLocationRegistryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The value returned by the last `ListDeviceRegistriesResponse`; indicates that this is a continuation of a prior `ListDeviceRegistries` call and the system should return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegistryListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegistryListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of registries to return in the response. If this value is zero, the service will select a default size. A call may return fewer objects than requested. A non-empty `next_page_token` in the response indicates that more data is available.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegistryListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegistryListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6757,7 +6876,7 @@ impl<'a> ProjectLocationRegistryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6782,7 +6901,7 @@ impl<'a> ProjectLocationRegistryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6802,9 +6921,9 @@ impl<'a> ProjectLocationRegistryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6837,7 +6956,7 @@ impl<'a> ProjectLocationRegistryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6851,10 +6970,10 @@ impl<'a> ProjectLocationRegistryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryPatchCall<'a>
-    where  {
+pub struct ProjectLocationRegistryPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: DeviceRegistry,
     _name: String,
     _update_mask: Option<String>,
@@ -6863,9 +6982,15 @@ pub struct ProjectLocationRegistryPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryPatchCall<'a> {
+impl<'a, S> ProjectLocationRegistryPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7028,7 +7153,7 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeviceRegistry) -> ProjectLocationRegistryPatchCall<'a> {
+    pub fn request(mut self, new_value: DeviceRegistry) -> ProjectLocationRegistryPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7038,14 +7163,14 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegistryPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Only updates the `device_registry` fields indicated by this mask. The field mask must not be empty, and it must not contain fields that are immutable or only set by the server. Mutable top-level fields: `event_notification_config`, `http_config`, `mqtt_config`, and `state_notification_config`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRegistryPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRegistryPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7055,7 +7180,7 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7080,7 +7205,7 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7100,9 +7225,9 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7135,7 +7260,7 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7148,10 +7273,10 @@ impl<'a> ProjectLocationRegistryPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistrySetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationRegistrySetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7159,9 +7284,15 @@ pub struct ProjectLocationRegistrySetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistrySetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistrySetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationRegistrySetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7321,7 +7452,7 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationRegistrySetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationRegistrySetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7331,7 +7462,7 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistrySetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistrySetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -7341,7 +7472,7 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistrySetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistrySetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7366,7 +7497,7 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistrySetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistrySetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7386,9 +7517,9 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistrySetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistrySetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7421,7 +7552,7 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7434,10 +7565,10 @@ impl<'a> ProjectLocationRegistrySetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationRegistryTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7445,9 +7576,15 @@ pub struct ProjectLocationRegistryTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationRegistryTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7607,7 +7744,7 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationRegistryTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationRegistryTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7617,7 +7754,7 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationRegistryTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -7627,7 +7764,7 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7652,7 +7789,7 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7672,9 +7809,9 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7707,7 +7844,7 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIot::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7720,10 +7857,10 @@ impl<'a> ProjectLocationRegistryTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a>
-    where  {
+pub struct ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIot<>,
+    hub: &'a CloudIot<S>,
     _request: UnbindDeviceFromGatewayRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7731,9 +7868,15 @@ pub struct ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S> {}
 
-impl<'a> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
+impl<'a, S> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7893,7 +8036,7 @@ impl<'a> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnbindDeviceFromGatewayRequest) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
+    pub fn request(mut self, new_value: UnbindDeviceFromGatewayRequest) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7903,7 +8046,7 @@ impl<'a> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -7913,7 +8056,7 @@ impl<'a> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7938,7 +8081,7 @@ impl<'a> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7958,9 +8101,9 @@ impl<'a> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRegistryUnbindDeviceFromGatewayCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

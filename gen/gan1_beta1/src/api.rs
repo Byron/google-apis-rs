@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -88,49 +93,49 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Gan<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Gan<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Gan<> {}
+impl<'a, S> client::Hub for Gan<S> {}
 
-impl<'a, > Gan<> {
+impl<'a, S> Gan<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Gan<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Gan<S> {
         Gan {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/gan/v1beta1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn advertisers(&'a self) -> AdvertiserMethods<'a> {
+    pub fn advertisers(&'a self) -> AdvertiserMethods<'a, S> {
         AdvertiserMethods { hub: &self }
     }
-    pub fn cc_offers(&'a self) -> CcOfferMethods<'a> {
+    pub fn cc_offers(&'a self) -> CcOfferMethods<'a, S> {
         CcOfferMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a> {
+    pub fn events(&'a self) -> EventMethods<'a, S> {
         EventMethods { hub: &self }
     }
-    pub fn links(&'a self) -> LinkMethods<'a> {
+    pub fn links(&'a self) -> LinkMethods<'a, S> {
         LinkMethods { hub: &self }
     }
-    pub fn publishers(&'a self) -> PublisherMethods<'a> {
+    pub fn publishers(&'a self) -> PublisherMethods<'a, S> {
         PublisherMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a> {
+    pub fn reports(&'a self) -> ReportMethods<'a, S> {
         ReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -945,22 +950,22 @@ impl client::Part for LinkSpecialOffers {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.advertisers();
 /// # }
 /// ```
-pub struct AdvertiserMethods<'a>
-    where  {
+pub struct AdvertiserMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
 }
 
-impl<'a> client::MethodsBuilder for AdvertiserMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AdvertiserMethods<'a, S> {}
 
-impl<'a> AdvertiserMethods<'a> {
+impl<'a, S> AdvertiserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -970,7 +975,7 @@ impl<'a> AdvertiserMethods<'a> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn get(&self, role: &str, role_id: &str) -> AdvertiserGetCall<'a> {
+    pub fn get(&self, role: &str, role_id: &str) -> AdvertiserGetCall<'a, S> {
         AdvertiserGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -989,7 +994,7 @@ impl<'a> AdvertiserMethods<'a> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> AdvertiserListCall<'a> {
+    pub fn list(&self, role: &str, role_id: &str) -> AdvertiserListCall<'a, S> {
         AdvertiserListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1030,22 +1035,22 @@ impl<'a> AdvertiserMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.cc_offers();
 /// # }
 /// ```
-pub struct CcOfferMethods<'a>
-    where  {
+pub struct CcOfferMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
 }
 
-impl<'a> client::MethodsBuilder for CcOfferMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CcOfferMethods<'a, S> {}
 
-impl<'a> CcOfferMethods<'a> {
+impl<'a, S> CcOfferMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1054,7 +1059,7 @@ impl<'a> CcOfferMethods<'a> {
     /// # Arguments
     ///
     /// * `publisher` - The ID of the publisher in question.
-    pub fn list(&self, publisher: &str) -> CcOfferListCall<'a> {
+    pub fn list(&self, publisher: &str) -> CcOfferListCall<'a, S> {
         CcOfferListCall {
             hub: self.hub,
             _publisher: publisher.to_string(),
@@ -1089,22 +1094,22 @@ impl<'a> CcOfferMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a>
-    where  {
+pub struct EventMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
 }
 
-impl<'a> client::MethodsBuilder for EventMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EventMethods<'a, S> {}
 
-impl<'a> EventMethods<'a> {
+impl<'a, S> EventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1114,7 +1119,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> EventListCall<'a> {
+    pub fn list(&self, role: &str, role_id: &str) -> EventListCall<'a, S> {
         EventListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1164,22 +1169,22 @@ impl<'a> EventMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.links();
 /// # }
 /// ```
-pub struct LinkMethods<'a>
-    where  {
+pub struct LinkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
 }
 
-impl<'a> client::MethodsBuilder for LinkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LinkMethods<'a, S> {}
 
-impl<'a> LinkMethods<'a> {
+impl<'a, S> LinkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1190,7 +1195,7 @@ impl<'a> LinkMethods<'a> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `linkId` - The ID of the link to look up.
-    pub fn get(&self, role: &str, role_id: &str, link_id: &str) -> LinkGetCall<'a> {
+    pub fn get(&self, role: &str, role_id: &str, link_id: &str) -> LinkGetCall<'a, S> {
         LinkGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1210,7 +1215,7 @@ impl<'a> LinkMethods<'a> {
     /// * `request` - No description provided.
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn insert(&self, request: Link, role: &str, role_id: &str) -> LinkInsertCall<'a> {
+    pub fn insert(&self, request: Link, role: &str, role_id: &str) -> LinkInsertCall<'a, S> {
         LinkInsertCall {
             hub: self.hub,
             _request: request,
@@ -1229,7 +1234,7 @@ impl<'a> LinkMethods<'a> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> LinkListCall<'a> {
+    pub fn list(&self, role: &str, role_id: &str) -> LinkListCall<'a, S> {
         LinkListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1276,22 +1281,22 @@ impl<'a> LinkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.publishers();
 /// # }
 /// ```
-pub struct PublisherMethods<'a>
-    where  {
+pub struct PublisherMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
 }
 
-impl<'a> client::MethodsBuilder for PublisherMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PublisherMethods<'a, S> {}
 
-impl<'a> PublisherMethods<'a> {
+impl<'a, S> PublisherMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1301,7 +1306,7 @@ impl<'a> PublisherMethods<'a> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn get(&self, role: &str, role_id: &str) -> PublisherGetCall<'a> {
+    pub fn get(&self, role: &str, role_id: &str) -> PublisherGetCall<'a, S> {
         PublisherGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1320,7 +1325,7 @@ impl<'a> PublisherMethods<'a> {
     ///
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
-    pub fn list(&self, role: &str, role_id: &str) -> PublisherListCall<'a> {
+    pub fn list(&self, role: &str, role_id: &str) -> PublisherListCall<'a, S> {
         PublisherListCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1361,22 +1366,22 @@ impl<'a> PublisherMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a>
-    where  {
+pub struct ReportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
 }
 
-impl<'a> client::MethodsBuilder for ReportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ReportMethods<'a, S> {}
 
-impl<'a> ReportMethods<'a> {
+impl<'a, S> ReportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1387,7 +1392,7 @@ impl<'a> ReportMethods<'a> {
     /// * `role` - The role of the requester. Valid values: 'advertisers' or 'publishers'.
     /// * `roleId` - The ID of the requesting advertiser or publisher.
     /// * `reportType` - The type of report being requested. Valid values: 'order_delta'. Required.
-    pub fn get(&self, role: &str, role_id: &str, report_type: &str) -> ReportGetCall<'a> {
+    pub fn get(&self, role: &str, role_id: &str, report_type: &str) -> ReportGetCall<'a, S> {
         ReportGetCall {
             hub: self.hub,
             _role: role.to_string(),
@@ -1440,7 +1445,7 @@ impl<'a> ReportMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1449,10 +1454,10 @@ impl<'a> ReportMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserGetCall<'a>
-    where  {
+pub struct AdvertiserGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _advertiser_id: Option<String>,
@@ -1460,9 +1465,15 @@ pub struct AdvertiserGetCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AdvertiserGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AdvertiserGetCall<'a, S> {}
 
-impl<'a> AdvertiserGetCall<'a> {
+impl<'a, S> AdvertiserGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1603,7 +1614,7 @@ impl<'a> AdvertiserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> AdvertiserGetCall<'a> {
+    pub fn role(mut self, new_value: &str) -> AdvertiserGetCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -1613,14 +1624,14 @@ impl<'a> AdvertiserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> AdvertiserGetCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
     /// The ID of the advertiser to look up. Optional.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, S> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -1630,7 +1641,7 @@ impl<'a> AdvertiserGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1651,7 +1662,7 @@ impl<'a> AdvertiserGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1682,7 +1693,7 @@ impl<'a> AdvertiserGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1697,10 +1708,10 @@ impl<'a> AdvertiserGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserListCall<'a>
-    where  {
+pub struct AdvertiserListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _relationship_status: Option<String>,
@@ -1714,9 +1725,15 @@ pub struct AdvertiserListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AdvertiserListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdvertiserListCall<'a, S> {}
 
-impl<'a> AdvertiserListCall<'a> {
+impl<'a, S> AdvertiserListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1875,7 +1892,7 @@ impl<'a> AdvertiserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> AdvertiserListCall<'a> {
+    pub fn role(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -1885,56 +1902,56 @@ impl<'a> AdvertiserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> AdvertiserListCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
     /// Filters out all advertisers for which do not have the given relationship status with the requesting publisher.
     ///
     /// Sets the *relationship status* query property to the given value.
-    pub fn relationship_status(mut self, new_value: &str) -> AdvertiserListCall<'a> {
+    pub fn relationship_status(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
     /// The value of 'nextPageToken' from the previous page. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Filters out all advertisers that have a seven day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
     ///
     /// Sets the *min seven day epc* query property to the given value.
-    pub fn min_seven_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a> {
+    pub fn min_seven_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, S> {
         self._min_seven_day_epc = Some(new_value);
         self
     }
     /// A value between 1 and 4, where 1 represents the quartile of advertisers with the lowest ranks and 4 represents the quartile of advertisers with the highest ranks. Filters out all advertisers with a lower rank than the given quartile. For example if a 2 was given only advertisers with a payout rank of 25 or higher would be included. Optional.
     ///
     /// Sets the *min payout rank* query property to the given value.
-    pub fn min_payout_rank(mut self, new_value: i32) -> AdvertiserListCall<'a> {
+    pub fn min_payout_rank(mut self, new_value: i32) -> AdvertiserListCall<'a, S> {
         self._min_payout_rank = Some(new_value);
         self
     }
     /// Filters out all advertisers that have a ninety day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
     ///
     /// Sets the *min ninety day epc* query property to the given value.
-    pub fn min_ninety_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a> {
+    pub fn min_ninety_day_epc(mut self, new_value: f64) -> AdvertiserListCall<'a, S> {
         self._min_ninety_day_epc = Some(new_value);
         self
     }
     /// Max number of items to return in this page. Optional. Defaults to 20.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AdvertiserListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AdvertiserListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Caret(^) delimted list of advertiser categories. Valid categories are defined here: http://www.google.com/support/affiliatenetwork/advertiser/bin/answer.py?hl=en&answer=107581. Filters out all advertisers not in one of the given advertiser categories. Optional.
     ///
     /// Sets the *advertiser category* query property to the given value.
-    pub fn advertiser_category(mut self, new_value: &str) -> AdvertiserListCall<'a> {
+    pub fn advertiser_category(mut self, new_value: &str) -> AdvertiserListCall<'a, S> {
         self._advertiser_category = Some(new_value.to_string());
         self
     }
@@ -1944,7 +1961,7 @@ impl<'a> AdvertiserListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1965,7 +1982,7 @@ impl<'a> AdvertiserListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1996,7 +2013,7 @@ impl<'a> AdvertiserListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2006,10 +2023,10 @@ impl<'a> AdvertiserListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CcOfferListCall<'a>
-    where  {
+pub struct CcOfferListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _publisher: String,
     _projection: Option<String>,
     _advertiser: Vec<String>,
@@ -2017,9 +2034,15 @@ pub struct CcOfferListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for CcOfferListCall<'a> {}
+impl<'a, S> client::CallBuilder for CcOfferListCall<'a, S> {}
 
-impl<'a> CcOfferListCall<'a> {
+impl<'a, S> CcOfferListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2164,14 +2187,14 @@ impl<'a> CcOfferListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn publisher(mut self, new_value: &str) -> CcOfferListCall<'a> {
+    pub fn publisher(mut self, new_value: &str) -> CcOfferListCall<'a, S> {
         self._publisher = new_value.to_string();
         self
     }
     /// The set of fields to return.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> CcOfferListCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> CcOfferListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -2179,7 +2202,7 @@ impl<'a> CcOfferListCall<'a> {
     ///
     /// Append the given value to the *advertiser* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_advertiser(mut self, new_value: &str) -> CcOfferListCall<'a> {
+    pub fn add_advertiser(mut self, new_value: &str) -> CcOfferListCall<'a, S> {
         self._advertiser.push(new_value.to_string());
         self
     }
@@ -2189,7 +2212,7 @@ impl<'a> CcOfferListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CcOfferListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CcOfferListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2210,7 +2233,7 @@ impl<'a> CcOfferListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> CcOfferListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CcOfferListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2241,7 +2264,7 @@ impl<'a> CcOfferListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2265,10 +2288,10 @@ impl<'a> CcOfferListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventListCall<'a>
-    where  {
+pub struct EventListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _type_: Option<String>,
@@ -2291,9 +2314,15 @@ pub struct EventListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for EventListCall<'a> {}
+impl<'a, S> client::CallBuilder for EventListCall<'a, S> {}
 
-impl<'a> EventListCall<'a> {
+impl<'a, S> EventListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2479,7 +2508,7 @@ impl<'a> EventListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn role(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -2489,119 +2518,119 @@ impl<'a> EventListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', 'charge'. Optional.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._type_ = Some(new_value.to_string());
         self
     }
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled'. Optional.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn status(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._status = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimited list of SKUs. Filters out all events that do not reference one of the given SKU. Optional.
     ///
     /// Sets the *sku* query property to the given value.
-    pub fn sku(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn sku(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._sku = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimited list of publisher IDs. Filters out all events that do not reference one of the given publishers IDs. Only used when under advertiser role. Optional.
     ///
     /// Sets the *publisher id* query property to the given value.
-    pub fn publisher_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn publisher_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._publisher_id = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimited list of product categories. Filters out all events that do not reference a product in one of the given product categories. Optional.
     ///
     /// Sets the *product category* query property to the given value.
-    pub fn product_category(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn product_category(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._product_category = Some(new_value.to_string());
         self
     }
     /// The value of 'nextPageToken' from the previous page. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimited list of order IDs. Filters out all events that do not reference one of the given order IDs. Optional.
     ///
     /// Sets the *order id* query property to the given value.
-    pub fn order_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._order_id = Some(new_value.to_string());
         self
     }
     /// Filters out all events modified earlier than given date. Optional. Defaults to 24 hours before the current modifyDateMax, if modifyDateMax is explicitly set.
     ///
     /// Sets the *modify date min* query property to the given value.
-    pub fn modify_date_min(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn modify_date_min(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._modify_date_min = Some(new_value.to_string());
         self
     }
     /// Filters out all events modified later than given date. Optional. Defaults to 24 hours after modifyDateMin, if modifyDateMin is explicitly set.
     ///
     /// Sets the *modify date max* query property to the given value.
-    pub fn modify_date_max(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn modify_date_max(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._modify_date_max = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimited list of member IDs. Filters out all events that do not reference one of the given member IDs. Optional.
     ///
     /// Sets the *member id* query property to the given value.
-    pub fn member_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn member_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._member_id = Some(new_value.to_string());
         self
     }
     /// Max number of offers to return in this page. Optional. Defaults to 20.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> EventListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> EventListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Caret(^) delimited list of link IDs. Filters out all events that do not reference one of the given link IDs. Optional.
     ///
     /// Sets the *link id* query property to the given value.
-    pub fn link_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn link_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._link_id = Some(new_value.to_string());
         self
     }
     /// Filters out all events earlier than given date. Optional. Defaults to 24 hours from current date/time.
     ///
     /// Sets the *event date min* query property to the given value.
-    pub fn event_date_min(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn event_date_min(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._event_date_min = Some(new_value.to_string());
         self
     }
     /// Filters out all events later than given date. Optional. Defaults to 24 hours after eventMin.
     ///
     /// Sets the *event date max* query property to the given value.
-    pub fn event_date_max(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn event_date_max(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._event_date_max = Some(new_value.to_string());
         self
     }
     /// Filters out all charge events that are not of the given charge type. Valid values: 'other', 'slotting_fee', 'monthly_minimum', 'tier_bonus', 'credit', 'debit'. Optional.
     ///
     /// Sets the *charge type* query property to the given value.
-    pub fn charge_type(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn charge_type(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._charge_type = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimited list of advertiser IDs. Filters out all events that do not reference one of the given advertiser IDs. Only used when under publishers role. Optional.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn advertiser_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -2611,7 +2640,7 @@ impl<'a> EventListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2632,7 +2661,7 @@ impl<'a> EventListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2663,7 +2692,7 @@ impl<'a> EventListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2671,10 +2700,10 @@ impl<'a> EventListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LinkGetCall<'a>
-    where  {
+pub struct LinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _link_id: String,
@@ -2682,9 +2711,15 @@ pub struct LinkGetCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LinkGetCall<'a, S> {}
 
-impl<'a> LinkGetCall<'a> {
+impl<'a, S> LinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2823,7 +2858,7 @@ impl<'a> LinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> LinkGetCall<'a> {
+    pub fn role(mut self, new_value: &str) -> LinkGetCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -2833,7 +2868,7 @@ impl<'a> LinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> LinkGetCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> LinkGetCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
@@ -2843,7 +2878,7 @@ impl<'a> LinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn link_id(mut self, new_value: &str) -> LinkGetCall<'a> {
+    pub fn link_id(mut self, new_value: &str) -> LinkGetCall<'a, S> {
         self._link_id = new_value.to_string();
         self
     }
@@ -2853,7 +2888,7 @@ impl<'a> LinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2874,7 +2909,7 @@ impl<'a> LinkGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> LinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2906,7 +2941,7 @@ impl<'a> LinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2919,10 +2954,10 @@ impl<'a> LinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LinkInsertCall<'a>
-    where  {
+pub struct LinkInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _request: Link,
     _role: String,
     _role_id: String,
@@ -2930,9 +2965,15 @@ pub struct LinkInsertCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LinkInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LinkInsertCall<'a, S> {}
 
-impl<'a> LinkInsertCall<'a> {
+impl<'a, S> LinkInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3083,7 +3124,7 @@ impl<'a> LinkInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Link) -> LinkInsertCall<'a> {
+    pub fn request(mut self, new_value: Link) -> LinkInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3093,7 +3134,7 @@ impl<'a> LinkInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> LinkInsertCall<'a> {
+    pub fn role(mut self, new_value: &str) -> LinkInsertCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -3103,7 +3144,7 @@ impl<'a> LinkInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> LinkInsertCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> LinkInsertCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
@@ -3113,7 +3154,7 @@ impl<'a> LinkInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3134,7 +3175,7 @@ impl<'a> LinkInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> LinkInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LinkInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3165,7 +3206,7 @@ impl<'a> LinkInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3186,10 +3227,10 @@ impl<'a> LinkInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LinkListCall<'a>
-    where  {
+pub struct LinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _start_date_min: Option<String>,
@@ -3209,9 +3250,15 @@ pub struct LinkListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for LinkListCall<'a, S> {}
 
-impl<'a> LinkListCall<'a> {
+impl<'a, S> LinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3394,7 +3441,7 @@ impl<'a> LinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn role(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -3404,35 +3451,35 @@ impl<'a> LinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
     /// The beginning of the start date range.
     ///
     /// Sets the *start date min* query property to the given value.
-    pub fn start_date_min(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn start_date_min(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._start_date_min = Some(new_value.to_string());
         self
     }
     /// The end of the start date range.
     ///
     /// Sets the *start date max* query property to the given value.
-    pub fn start_date_max(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn start_date_max(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._start_date_max = Some(new_value.to_string());
         self
     }
     /// Field for full text search across title and merchandising text, supports link id search.
     ///
     /// Sets the *search text* query property to the given value.
-    pub fn search_text(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn search_text(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._search_text = Some(new_value.to_string());
         self
     }
     /// The status of the relationship.
     ///
     /// Sets the *relationship status* query property to the given value.
-    pub fn relationship_status(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn relationship_status(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
@@ -3440,49 +3487,49 @@ impl<'a> LinkListCall<'a> {
     ///
     /// Append the given value to the *promotion type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_promotion_type(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn add_promotion_type(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._promotion_type.push(new_value.to_string());
         self
     }
     /// The value of 'nextPageToken' from the previous page. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Max number of items to return in this page. Optional. Defaults to 20.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LinkListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LinkListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The type of the link.
     ///
     /// Sets the *link type* query property to the given value.
-    pub fn link_type(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn link_type(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._link_type = Some(new_value.to_string());
         self
     }
     /// The beginning of the create date range.
     ///
     /// Sets the *create date min* query property to the given value.
-    pub fn create_date_min(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn create_date_min(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._create_date_min = Some(new_value.to_string());
         self
     }
     /// The end of the create date range.
     ///
     /// Sets the *create date max* query property to the given value.
-    pub fn create_date_max(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn create_date_max(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._create_date_max = Some(new_value.to_string());
         self
     }
     /// The role of the author of the link.
     ///
     /// Sets the *authorship* query property to the given value.
-    pub fn authorship(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn authorship(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._authorship = Some(new_value.to_string());
         self
     }
@@ -3490,7 +3537,7 @@ impl<'a> LinkListCall<'a> {
     ///
     /// Append the given value to the *asset size* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_asset_size(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn add_asset_size(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._asset_size.push(new_value.to_string());
         self
     }
@@ -3498,7 +3545,7 @@ impl<'a> LinkListCall<'a> {
     ///
     /// Append the given value to the *advertiser id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_advertiser_id(mut self, new_value: &str) -> LinkListCall<'a> {
+    pub fn add_advertiser_id(mut self, new_value: &str) -> LinkListCall<'a, S> {
         self._advertiser_id.push(new_value.to_string());
         self
     }
@@ -3508,7 +3555,7 @@ impl<'a> LinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3529,7 +3576,7 @@ impl<'a> LinkListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> LinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3560,7 +3607,7 @@ impl<'a> LinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3569,10 +3616,10 @@ impl<'a> LinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PublisherGetCall<'a>
-    where  {
+pub struct PublisherGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _publisher_id: Option<String>,
@@ -3580,9 +3627,15 @@ pub struct PublisherGetCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PublisherGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PublisherGetCall<'a, S> {}
 
-impl<'a> PublisherGetCall<'a> {
+impl<'a, S> PublisherGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3723,7 +3776,7 @@ impl<'a> PublisherGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> PublisherGetCall<'a> {
+    pub fn role(mut self, new_value: &str) -> PublisherGetCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -3733,14 +3786,14 @@ impl<'a> PublisherGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> PublisherGetCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> PublisherGetCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
     /// The ID of the publisher to look up. Optional.
     ///
     /// Sets the *publisher id* query property to the given value.
-    pub fn publisher_id(mut self, new_value: &str) -> PublisherGetCall<'a> {
+    pub fn publisher_id(mut self, new_value: &str) -> PublisherGetCall<'a, S> {
         self._publisher_id = Some(new_value.to_string());
         self
     }
@@ -3750,7 +3803,7 @@ impl<'a> PublisherGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PublisherGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PublisherGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3771,7 +3824,7 @@ impl<'a> PublisherGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PublisherGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PublisherGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3802,7 +3855,7 @@ impl<'a> PublisherGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3817,10 +3870,10 @@ impl<'a> PublisherGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PublisherListCall<'a>
-    where  {
+pub struct PublisherListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _relationship_status: Option<String>,
@@ -3834,9 +3887,15 @@ pub struct PublisherListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PublisherListCall<'a> {}
+impl<'a, S> client::CallBuilder for PublisherListCall<'a, S> {}
 
-impl<'a> PublisherListCall<'a> {
+impl<'a, S> PublisherListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3995,7 +4054,7 @@ impl<'a> PublisherListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> PublisherListCall<'a> {
+    pub fn role(mut self, new_value: &str) -> PublisherListCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -4005,56 +4064,56 @@ impl<'a> PublisherListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> PublisherListCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> PublisherListCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
     /// Filters out all publishers for which do not have the given relationship status with the requesting publisher.
     ///
     /// Sets the *relationship status* query property to the given value.
-    pub fn relationship_status(mut self, new_value: &str) -> PublisherListCall<'a> {
+    pub fn relationship_status(mut self, new_value: &str) -> PublisherListCall<'a, S> {
         self._relationship_status = Some(new_value.to_string());
         self
     }
     /// Caret(^) delimted list of publisher categories. Valid categories: (unclassified|community_and_content|shopping_and_promotion|loyalty_and_rewards|network|search_specialist|comparison_shopping|email). Filters out all publishers not in one of the given advertiser categories. Optional.
     ///
     /// Sets the *publisher category* query property to the given value.
-    pub fn publisher_category(mut self, new_value: &str) -> PublisherListCall<'a> {
+    pub fn publisher_category(mut self, new_value: &str) -> PublisherListCall<'a, S> {
         self._publisher_category = Some(new_value.to_string());
         self
     }
     /// The value of 'nextPageToken' from the previous page. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PublisherListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PublisherListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Filters out all publishers that have a seven day EPC average lower than the given value (inclusive). Min value 0.0. Optional.
     ///
     /// Sets the *min seven day epc* query property to the given value.
-    pub fn min_seven_day_epc(mut self, new_value: f64) -> PublisherListCall<'a> {
+    pub fn min_seven_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, S> {
         self._min_seven_day_epc = Some(new_value);
         self
     }
     /// A value between 1 and 4, where 1 represents the quartile of publishers with the lowest ranks and 4 represents the quartile of publishers with the highest ranks. Filters out all publishers with a lower rank than the given quartile. For example if a 2 was given only publishers with a payout rank of 25 or higher would be included. Optional.
     ///
     /// Sets the *min payout rank* query property to the given value.
-    pub fn min_payout_rank(mut self, new_value: i32) -> PublisherListCall<'a> {
+    pub fn min_payout_rank(mut self, new_value: i32) -> PublisherListCall<'a, S> {
         self._min_payout_rank = Some(new_value);
         self
     }
     /// Filters out all publishers that have a ninety day EPC average lower than the given value (inclusive). Min value: 0.0. Optional.
     ///
     /// Sets the *min ninety day epc* query property to the given value.
-    pub fn min_ninety_day_epc(mut self, new_value: f64) -> PublisherListCall<'a> {
+    pub fn min_ninety_day_epc(mut self, new_value: f64) -> PublisherListCall<'a, S> {
         self._min_ninety_day_epc = Some(new_value);
         self
     }
     /// Max number of items to return in this page. Optional. Defaults to 20.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PublisherListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PublisherListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4064,7 +4123,7 @@ impl<'a> PublisherListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PublisherListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PublisherListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4085,7 +4144,7 @@ impl<'a> PublisherListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PublisherListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PublisherListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4116,7 +4175,7 @@ impl<'a> PublisherListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gan::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4135,10 +4194,10 @@ impl<'a> PublisherListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReportGetCall<'a>
-    where  {
+pub struct ReportGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gan<>,
+    hub: &'a Gan<S>,
     _role: String,
     _role_id: String,
     _report_type: String,
@@ -4157,9 +4216,15 @@ pub struct ReportGetCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ReportGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ReportGetCall<'a, S> {}
 
-impl<'a> ReportGetCall<'a> {
+impl<'a, S> ReportGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4339,7 +4404,7 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn role(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._role = new_value.to_string();
         self
     }
@@ -4349,7 +4414,7 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn role_id(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn role_id(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._role_id = new_value.to_string();
         self
     }
@@ -4359,28 +4424,28 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn report_type(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn report_type(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._report_type = new_value.to_string();
         self
     }
     /// Filters out all events that do not have the given status. Valid values: 'active', 'canceled', or 'invalid'. Optional.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn status(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._status = Some(new_value.to_string());
         self
     }
     /// Offset on which to return results when paging. Optional.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> ReportGetCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> ReportGetCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// The start date (inclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day before endDate, if that is given, or yesterday. Optional.
     ///
     /// Sets the *start date* query property to the given value.
-    pub fn start_date(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._start_date = Some(new_value.to_string());
         self
     }
@@ -4388,7 +4453,7 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Append the given value to the *publisher id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_publisher_id(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn add_publisher_id(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._publisher_id.push(new_value.to_string());
         self
     }
@@ -4396,14 +4461,14 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Append the given value to the *order id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_order_id(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn add_order_id(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._order_id.push(new_value.to_string());
         self
     }
     /// Max number of items to return in this page. Optional. Defaults to return all results.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ReportGetCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ReportGetCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4411,28 +4476,28 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Append the given value to the *link id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_link_id(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn add_link_id(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._link_id.push(new_value.to_string());
         self
     }
     /// Filters out all events that are not of the given type. Valid values: 'action', 'transaction', or 'charge'. Optional.
     ///
     /// Sets the *event type* query property to the given value.
-    pub fn event_type(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn event_type(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._event_type = Some(new_value.to_string());
         self
     }
     /// The end date (exclusive), in RFC 3339 format, for the report data to be returned. Defaults to one day after startDate, if that is given, or today. Optional.
     ///
     /// Sets the *end date* query property to the given value.
-    pub fn end_date(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._end_date = Some(new_value.to_string());
         self
     }
     /// Whether or not to calculate totals rows. Optional.
     ///
     /// Sets the *calculate totals* query property to the given value.
-    pub fn calculate_totals(mut self, new_value: bool) -> ReportGetCall<'a> {
+    pub fn calculate_totals(mut self, new_value: bool) -> ReportGetCall<'a, S> {
         self._calculate_totals = Some(new_value);
         self
     }
@@ -4440,7 +4505,7 @@ impl<'a> ReportGetCall<'a> {
     ///
     /// Append the given value to the *advertiser id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_advertiser_id(mut self, new_value: &str) -> ReportGetCall<'a> {
+    pub fn add_advertiser_id(mut self, new_value: &str) -> ReportGetCall<'a, S> {
         self._advertiser_id.push(new_value.to_string());
         self
     }
@@ -4450,7 +4515,7 @@ impl<'a> ReportGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4471,7 +4536,7 @@ impl<'a> ReportGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

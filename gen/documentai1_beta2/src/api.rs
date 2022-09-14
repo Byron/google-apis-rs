@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Document<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Document<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Document<> {}
+impl<'a, S> client::Hub for Document<S> {}
 
-impl<'a, > Document<> {
+impl<'a, S> Document<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Document<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Document<S> {
         Document {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://documentai.googleapis.com/".to_string(),
             _root_url: "https://documentai.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1405,22 +1410,22 @@ impl client::Part for GoogleTypeTimeZone {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `documents_batch_process(...)`, `documents_process(...)`, `locations_documents_batch_process(...)`, `locations_documents_process(...)`, `locations_operations_get(...)` and `operations_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1430,7 +1435,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically.
-    pub fn documents_batch_process(&self, request: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest, parent: &str) -> ProjectDocumentBatchProcesCall<'a> {
+    pub fn documents_batch_process(&self, request: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest, parent: &str) -> ProjectDocumentBatchProcesCall<'a, S> {
         ProjectDocumentBatchProcesCall {
             hub: self.hub,
             _request: request,
@@ -1449,7 +1454,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically. This field is only populated when used in ProcessDocument method.
-    pub fn documents_process(&self, request: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest, parent: &str) -> ProjectDocumentProcesCall<'a> {
+    pub fn documents_process(&self, request: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest, parent: &str) -> ProjectDocumentProcesCall<'a, S> {
         ProjectDocumentProcesCall {
             hub: self.hub,
             _request: request,
@@ -1468,7 +1473,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically.
-    pub fn locations_documents_batch_process(&self, request: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest, parent: &str) -> ProjectLocationDocumentBatchProcesCall<'a> {
+    pub fn locations_documents_batch_process(&self, request: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest, parent: &str) -> ProjectLocationDocumentBatchProcesCall<'a, S> {
         ProjectLocationDocumentBatchProcesCall {
             hub: self.hub,
             _request: request,
@@ -1487,7 +1492,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Target project and location to make a call. Format: `projects/{project-id}/locations/{location-id}`. If no location is specified, a region will be chosen automatically. This field is only populated when used in ProcessDocument method.
-    pub fn locations_documents_process(&self, request: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest, parent: &str) -> ProjectLocationDocumentProcesCall<'a> {
+    pub fn locations_documents_process(&self, request: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest, parent: &str) -> ProjectLocationDocumentProcesCall<'a, S> {
         ProjectLocationDocumentProcesCall {
             hub: self.hub,
             _request: request,
@@ -1505,7 +1510,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, S> {
         ProjectLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1522,7 +1527,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, S> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1564,7 +1569,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1577,10 +1582,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectDocumentBatchProcesCall<'a>
-    where  {
+pub struct ProjectDocumentBatchProcesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
     _request: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1588,9 +1593,15 @@ pub struct ProjectDocumentBatchProcesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectDocumentBatchProcesCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectDocumentBatchProcesCall<'a, S> {}
 
-impl<'a> ProjectDocumentBatchProcesCall<'a> {
+impl<'a, S> ProjectDocumentBatchProcesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1750,7 +1761,7 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest) -> ProjectDocumentBatchProcesCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest) -> ProjectDocumentBatchProcesCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1760,7 +1771,7 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectDocumentBatchProcesCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectDocumentBatchProcesCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1770,7 +1781,7 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDocumentBatchProcesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDocumentBatchProcesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1795,7 +1806,7 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectDocumentBatchProcesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDocumentBatchProcesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1815,9 +1826,9 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDocumentBatchProcesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectDocumentBatchProcesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1850,7 +1861,7 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1863,10 +1874,10 @@ impl<'a> ProjectDocumentBatchProcesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectDocumentProcesCall<'a>
-    where  {
+pub struct ProjectDocumentProcesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
     _request: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1874,9 +1885,15 @@ pub struct ProjectDocumentProcesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectDocumentProcesCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectDocumentProcesCall<'a, S> {}
 
-impl<'a> ProjectDocumentProcesCall<'a> {
+impl<'a, S> ProjectDocumentProcesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2036,7 +2053,7 @@ impl<'a> ProjectDocumentProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest) -> ProjectDocumentProcesCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest) -> ProjectDocumentProcesCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2046,7 +2063,7 @@ impl<'a> ProjectDocumentProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectDocumentProcesCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectDocumentProcesCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2056,7 +2073,7 @@ impl<'a> ProjectDocumentProcesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDocumentProcesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDocumentProcesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2081,7 +2098,7 @@ impl<'a> ProjectDocumentProcesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectDocumentProcesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDocumentProcesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2101,9 +2118,9 @@ impl<'a> ProjectDocumentProcesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDocumentProcesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectDocumentProcesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2136,7 +2153,7 @@ impl<'a> ProjectDocumentProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2149,10 +2166,10 @@ impl<'a> ProjectDocumentProcesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDocumentBatchProcesCall<'a>
-    where  {
+pub struct ProjectLocationDocumentBatchProcesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
     _request: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2160,9 +2177,15 @@ pub struct ProjectLocationDocumentBatchProcesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDocumentBatchProcesCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDocumentBatchProcesCall<'a, S> {}
 
-impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
+impl<'a, S> ProjectLocationDocumentBatchProcesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2322,7 +2345,7 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest) -> ProjectLocationDocumentBatchProcesCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2BatchProcessDocumentsRequest) -> ProjectLocationDocumentBatchProcesCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2332,7 +2355,7 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDocumentBatchProcesCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDocumentBatchProcesCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2342,7 +2365,7 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDocumentBatchProcesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDocumentBatchProcesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2367,7 +2390,7 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDocumentBatchProcesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDocumentBatchProcesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2387,9 +2410,9 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDocumentBatchProcesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDocumentBatchProcesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2422,7 +2445,7 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2435,10 +2458,10 @@ impl<'a> ProjectLocationDocumentBatchProcesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDocumentProcesCall<'a>
-    where  {
+pub struct ProjectLocationDocumentProcesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
     _request: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2446,9 +2469,15 @@ pub struct ProjectLocationDocumentProcesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDocumentProcesCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDocumentProcesCall<'a, S> {}
 
-impl<'a> ProjectLocationDocumentProcesCall<'a> {
+impl<'a, S> ProjectLocationDocumentProcesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2608,7 +2637,7 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest) -> ProjectLocationDocumentProcesCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDocumentaiV1beta2ProcessDocumentRequest) -> ProjectLocationDocumentProcesCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2618,7 +2647,7 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDocumentProcesCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDocumentProcesCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2628,7 +2657,7 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDocumentProcesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDocumentProcesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2653,7 +2682,7 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDocumentProcesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDocumentProcesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2673,9 +2702,9 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDocumentProcesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDocumentProcesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2707,7 +2736,7 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2715,19 +2744,25 @@ impl<'a> ProjectLocationDocumentProcesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationGetCall<'a> {
+impl<'a, S> ProjectLocationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2874,7 +2909,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2884,7 +2919,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2909,7 +2944,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2929,9 +2964,9 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2963,7 +2998,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Document::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2971,19 +3006,25 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a>
-    where  {
+pub struct ProjectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Document<>,
+    hub: &'a Document<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationGetCall<'a, S> {}
 
-impl<'a> ProjectOperationGetCall<'a> {
+impl<'a, S> ProjectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3130,7 +3171,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3140,7 +3181,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3165,7 +3206,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3185,9 +3226,9 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

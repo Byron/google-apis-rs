@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -111,37 +116,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct TasksHub<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct TasksHub<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for TasksHub<> {}
+impl<'a, S> client::Hub for TasksHub<S> {}
 
-impl<'a, > TasksHub<> {
+impl<'a, S> TasksHub<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> TasksHub<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> TasksHub<S> {
         TasksHub {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://tasks.googleapis.com/".to_string(),
             _root_url: "https://tasks.googleapis.com/".to_string(),
         }
     }
 
-    pub fn tasklists(&'a self) -> TasklistMethods<'a> {
+    pub fn tasklists(&'a self) -> TasklistMethods<'a, S> {
         TasklistMethods { hub: &self }
     }
-    pub fn tasks(&'a self) -> TaskMethods<'a> {
+    pub fn tasks(&'a self) -> TaskMethods<'a, S> {
         TaskMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -354,22 +359,22 @@ impl client::Part for TaskLinks {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.tasklists();
 /// # }
 /// ```
-pub struct TasklistMethods<'a>
-    where  {
+pub struct TasklistMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for TasklistMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TasklistMethods<'a, S> {}
 
-impl<'a> TasklistMethods<'a> {
+impl<'a, S> TasklistMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -378,7 +383,7 @@ impl<'a> TasklistMethods<'a> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a> {
+    pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a, S> {
         TasklistDeleteCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -395,7 +400,7 @@ impl<'a> TasklistMethods<'a> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a> {
+    pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a, S> {
         TasklistGetCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -412,7 +417,7 @@ impl<'a> TasklistMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: TaskList) -> TasklistInsertCall<'a> {
+    pub fn insert(&self, request: TaskList) -> TasklistInsertCall<'a, S> {
         TasklistInsertCall {
             hub: self.hub,
             _request: request,
@@ -425,7 +430,7 @@ impl<'a> TasklistMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all the authenticated user's task lists.
-    pub fn list(&self) -> TasklistListCall<'a> {
+    pub fn list(&self) -> TasklistListCall<'a, S> {
         TasklistListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -444,7 +449,7 @@ impl<'a> TasklistMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn patch(&self, request: TaskList, tasklist: &str) -> TasklistPatchCall<'a> {
+    pub fn patch(&self, request: TaskList, tasklist: &str) -> TasklistPatchCall<'a, S> {
         TasklistPatchCall {
             hub: self.hub,
             _request: request,
@@ -463,7 +468,7 @@ impl<'a> TasklistMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn update(&self, request: TaskList, tasklist: &str) -> TasklistUpdateCall<'a> {
+    pub fn update(&self, request: TaskList, tasklist: &str) -> TasklistUpdateCall<'a, S> {
         TasklistUpdateCall {
             hub: self.hub,
             _request: request,
@@ -498,22 +503,22 @@ impl<'a> TasklistMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `clear(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `move_(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.tasks();
 /// # }
 /// ```
-pub struct TaskMethods<'a>
-    where  {
+pub struct TaskMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for TaskMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TaskMethods<'a, S> {}
 
-impl<'a> TaskMethods<'a> {
+impl<'a, S> TaskMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -522,7 +527,7 @@ impl<'a> TaskMethods<'a> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a> {
+    pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a, S> {
         TaskClearCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -540,7 +545,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a> {
+    pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a, S> {
         TaskDeleteCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -559,7 +564,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a> {
+    pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a, S> {
         TaskGetCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -578,7 +583,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn insert(&self, request: Task, tasklist: &str) -> TaskInsertCall<'a> {
+    pub fn insert(&self, request: Task, tasklist: &str) -> TaskInsertCall<'a, S> {
         TaskInsertCall {
             hub: self.hub,
             _request: request,
@@ -598,7 +603,7 @@ impl<'a> TaskMethods<'a> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn list(&self, tasklist: &str) -> TaskListCall<'a> {
+    pub fn list(&self, tasklist: &str) -> TaskListCall<'a, S> {
         TaskListCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -626,7 +631,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a> {
+    pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a, S> {
         TaskMoveCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -648,7 +653,7 @@ impl<'a> TaskMethods<'a> {
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn patch(&self, request: Task, tasklist: &str, task: &str) -> TaskPatchCall<'a> {
+    pub fn patch(&self, request: Task, tasklist: &str, task: &str) -> TaskPatchCall<'a, S> {
         TaskPatchCall {
             hub: self.hub,
             _request: request,
@@ -669,7 +674,7 @@ impl<'a> TaskMethods<'a> {
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn update(&self, request: Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a> {
+    pub fn update(&self, request: Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a, S> {
         TaskUpdateCall {
             hub: self.hub,
             _request: request,
@@ -712,7 +717,7 @@ impl<'a> TaskMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -720,19 +725,25 @@ impl<'a> TaskMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistDeleteCall<'a>
-    where  {
+pub struct TasklistDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TasklistDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TasklistDeleteCall<'a, S> {}
 
-impl<'a> TasklistDeleteCall<'a> {
+impl<'a, S> TasklistDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -864,7 +875,7 @@ impl<'a> TasklistDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -874,7 +885,7 @@ impl<'a> TasklistDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -899,7 +910,7 @@ impl<'a> TasklistDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -919,9 +930,9 @@ impl<'a> TasklistDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TasklistDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -953,7 +964,7 @@ impl<'a> TasklistDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -961,19 +972,25 @@ impl<'a> TasklistDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistGetCall<'a>
-    where  {
+pub struct TasklistGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TasklistGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TasklistGetCall<'a, S> {}
 
-impl<'a> TasklistGetCall<'a> {
+impl<'a, S> TasklistGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1116,7 +1133,7 @@ impl<'a> TasklistGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1126,7 +1143,7 @@ impl<'a> TasklistGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1151,7 +1168,7 @@ impl<'a> TasklistGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1171,9 +1188,9 @@ impl<'a> TasklistGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TasklistGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1206,7 +1223,7 @@ impl<'a> TasklistGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1219,19 +1236,25 @@ impl<'a> TasklistGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistInsertCall<'a>
-    where  {
+pub struct TasklistInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _request: TaskList,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TasklistInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TasklistInsertCall<'a, S> {}
 
-impl<'a> TasklistInsertCall<'a> {
+impl<'a, S> TasklistInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1365,7 +1388,7 @@ impl<'a> TasklistInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TaskList) -> TasklistInsertCall<'a> {
+    pub fn request(mut self, new_value: TaskList) -> TasklistInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1375,7 +1398,7 @@ impl<'a> TasklistInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1400,7 +1423,7 @@ impl<'a> TasklistInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1420,9 +1443,9 @@ impl<'a> TasklistInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TasklistInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1454,7 +1477,7 @@ impl<'a> TasklistInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1464,10 +1487,10 @@ impl<'a> TasklistInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistListCall<'a>
-    where  {
+pub struct TasklistListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1475,9 +1498,15 @@ pub struct TasklistListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TasklistListCall<'a> {}
+impl<'a, S> client::CallBuilder for TasklistListCall<'a, S> {}
 
-impl<'a> TasklistListCall<'a> {
+impl<'a, S> TasklistListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1601,14 +1630,14 @@ impl<'a> TasklistListCall<'a> {
     /// Token specifying the result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> TasklistListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> TasklistListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -1618,7 +1647,7 @@ impl<'a> TasklistListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1643,7 +1672,7 @@ impl<'a> TasklistListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1663,9 +1692,9 @@ impl<'a> TasklistListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TasklistListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1698,7 +1727,7 @@ impl<'a> TasklistListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1711,10 +1740,10 @@ impl<'a> TasklistListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistPatchCall<'a>
-    where  {
+pub struct TasklistPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _request: TaskList,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1722,9 +1751,15 @@ pub struct TasklistPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TasklistPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TasklistPatchCall<'a, S> {}
 
-impl<'a> TasklistPatchCall<'a> {
+impl<'a, S> TasklistPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1880,7 +1915,7 @@ impl<'a> TasklistPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TaskList) -> TasklistPatchCall<'a> {
+    pub fn request(mut self, new_value: TaskList) -> TasklistPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1890,7 +1925,7 @@ impl<'a> TasklistPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1900,7 +1935,7 @@ impl<'a> TasklistPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1925,7 +1960,7 @@ impl<'a> TasklistPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1945,9 +1980,9 @@ impl<'a> TasklistPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TasklistPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1980,7 +2015,7 @@ impl<'a> TasklistPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1993,10 +2028,10 @@ impl<'a> TasklistPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistUpdateCall<'a>
-    where  {
+pub struct TasklistUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _request: TaskList,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2004,9 +2039,15 @@ pub struct TasklistUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TasklistUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TasklistUpdateCall<'a, S> {}
 
-impl<'a> TasklistUpdateCall<'a> {
+impl<'a, S> TasklistUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2162,7 +2203,7 @@ impl<'a> TasklistUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TaskList) -> TasklistUpdateCall<'a> {
+    pub fn request(mut self, new_value: TaskList) -> TasklistUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2172,7 +2213,7 @@ impl<'a> TasklistUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2182,7 +2223,7 @@ impl<'a> TasklistUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2207,7 +2248,7 @@ impl<'a> TasklistUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2227,9 +2268,9 @@ impl<'a> TasklistUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TasklistUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2261,7 +2302,7 @@ impl<'a> TasklistUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2269,19 +2310,25 @@ impl<'a> TasklistUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskClearCall<'a>
-    where  {
+pub struct TaskClearCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskClearCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskClearCall<'a, S> {}
 
-impl<'a> TaskClearCall<'a> {
+impl<'a, S> TaskClearCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2413,7 +2460,7 @@ impl<'a> TaskClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2423,7 +2470,7 @@ impl<'a> TaskClearCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskClearCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskClearCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2448,7 +2495,7 @@ impl<'a> TaskClearCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2468,9 +2515,9 @@ impl<'a> TaskClearCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskClearCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskClearCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2502,7 +2549,7 @@ impl<'a> TaskClearCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2510,10 +2557,10 @@ impl<'a> TaskClearCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a>
-    where  {
+pub struct TaskDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _task: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2521,9 +2568,15 @@ pub struct TaskDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskDeleteCall<'a, S> {}
 
-impl<'a> TaskDeleteCall<'a> {
+impl<'a, S> TaskDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2656,7 +2709,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2666,7 +2719,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -2676,7 +2729,7 @@ impl<'a> TaskDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2701,7 +2754,7 @@ impl<'a> TaskDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2721,9 +2774,9 @@ impl<'a> TaskDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2755,7 +2808,7 @@ impl<'a> TaskDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2763,10 +2816,10 @@ impl<'a> TaskDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskGetCall<'a>
-    where  {
+pub struct TaskGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _task: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2774,9 +2827,15 @@ pub struct TaskGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskGetCall<'a, S> {}
 
-impl<'a> TaskGetCall<'a> {
+impl<'a, S> TaskGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2920,7 +2979,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2930,7 +2989,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -2940,7 +2999,7 @@ impl<'a> TaskGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2965,7 +3024,7 @@ impl<'a> TaskGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2985,9 +3044,9 @@ impl<'a> TaskGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3020,7 +3079,7 @@ impl<'a> TaskGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3035,10 +3094,10 @@ impl<'a> TaskGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskInsertCall<'a>
-    where  {
+pub struct TaskInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _request: Task,
     _tasklist: String,
     _previous: Option<String>,
@@ -3048,9 +3107,15 @@ pub struct TaskInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskInsertCall<'a, S> {}
 
-impl<'a> TaskInsertCall<'a> {
+impl<'a, S> TaskInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3212,7 +3277,7 @@ impl<'a> TaskInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a> {
+    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3222,21 +3287,21 @@ impl<'a> TaskInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
     /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.
     ///
     /// Sets the *previous* query property to the given value.
-    pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a> {
+    pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, S> {
         self._previous = Some(new_value.to_string());
         self
     }
     /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, S> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -3246,7 +3311,7 @@ impl<'a> TaskInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3271,7 +3336,7 @@ impl<'a> TaskInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3291,9 +3356,9 @@ impl<'a> TaskInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3325,7 +3390,7 @@ impl<'a> TaskInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3343,10 +3408,10 @@ impl<'a> TaskInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskListCall<'a>
-    where  {
+pub struct TaskListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _updated_min: Option<String>,
     _show_hidden: Option<bool>,
@@ -3363,9 +3428,15 @@ pub struct TaskListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskListCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskListCall<'a, S> {}
 
-impl<'a> TaskListCall<'a> {
+impl<'a, S> TaskListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3538,77 +3609,77 @@ impl<'a> TaskListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
     /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
-    pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a> {
+    pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, S> {
         self._show_hidden = Some(new_value);
         self
     }
     /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True. Note that showHidden must also be True to show tasks completed in first party clients, such as the web UI and Google's mobile apps.
     ///
     /// Sets the *show completed* query property to the given value.
-    pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a> {
+    pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, S> {
         self._show_completed = Some(new_value);
         self
     }
     /// Token specifying the result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
     ///
     /// Sets the *due min* query property to the given value.
-    pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._due_min = Some(new_value.to_string());
         self
     }
     /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
     ///
     /// Sets the *due max* query property to the given value.
-    pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._due_max = Some(new_value.to_string());
         self
     }
     /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
     ///
     /// Sets the *completed min* query property to the given value.
-    pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._completed_min = Some(new_value.to_string());
         self
     }
     /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
     ///
     /// Sets the *completed max* query property to the given value.
-    pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._completed_max = Some(new_value.to_string());
         self
     }
@@ -3618,7 +3689,7 @@ impl<'a> TaskListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3643,7 +3714,7 @@ impl<'a> TaskListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3663,9 +3734,9 @@ impl<'a> TaskListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3697,7 +3768,7 @@ impl<'a> TaskListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3707,10 +3778,10 @@ impl<'a> TaskListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskMoveCall<'a>
-    where  {
+pub struct TaskMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _tasklist: String,
     _task: String,
     _previous: Option<String>,
@@ -3720,9 +3791,15 @@ pub struct TaskMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskMoveCall<'a, S> {}
 
-impl<'a> TaskMoveCall<'a> {
+impl<'a, S> TaskMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3872,7 +3949,7 @@ impl<'a> TaskMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -3882,21 +3959,21 @@ impl<'a> TaskMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
     /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
     ///
     /// Sets the *previous* query property to the given value.
-    pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a> {
+    pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, S> {
         self._previous = Some(new_value.to_string());
         self
     }
     /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, S> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -3906,7 +3983,7 @@ impl<'a> TaskMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3931,7 +4008,7 @@ impl<'a> TaskMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3951,9 +4028,9 @@ impl<'a> TaskMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3986,7 +4063,7 @@ impl<'a> TaskMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3999,10 +4076,10 @@ impl<'a> TaskMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskPatchCall<'a>
-    where  {
+pub struct TaskPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _request: Task,
     _tasklist: String,
     _task: String,
@@ -4011,9 +4088,15 @@ pub struct TaskPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskPatchCall<'a, S> {}
 
-impl<'a> TaskPatchCall<'a> {
+impl<'a, S> TaskPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4170,7 +4253,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a> {
+    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4180,7 +4263,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -4190,7 +4273,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -4200,7 +4283,7 @@ impl<'a> TaskPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4225,7 +4308,7 @@ impl<'a> TaskPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4245,9 +4328,9 @@ impl<'a> TaskPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4280,7 +4363,7 @@ impl<'a> TaskPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4293,10 +4376,10 @@ impl<'a> TaskPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskUpdateCall<'a>
-    where  {
+pub struct TaskUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TasksHub<>,
+    hub: &'a TasksHub<S>,
     _request: Task,
     _tasklist: String,
     _task: String,
@@ -4305,9 +4388,15 @@ pub struct TaskUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskUpdateCall<'a, S> {}
 
-impl<'a> TaskUpdateCall<'a> {
+impl<'a, S> TaskUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4464,7 +4553,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a> {
+    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4474,7 +4563,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a, S> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -4484,7 +4573,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -4494,7 +4583,7 @@ impl<'a> TaskUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4519,7 +4608,7 @@ impl<'a> TaskUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4539,9 +4628,9 @@ impl<'a> TaskUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

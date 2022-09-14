@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -97,46 +102,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct DLP<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct DLP<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for DLP<> {}
+impl<'a, S> client::Hub for DLP<S> {}
 
-impl<'a, > DLP<> {
+impl<'a, S> DLP<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DLP<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DLP<S> {
         DLP {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://dlp.googleapis.com/".to_string(),
             _root_url: "https://dlp.googleapis.com/".to_string(),
         }
     }
 
-    pub fn content(&'a self) -> ContentMethods<'a> {
+    pub fn content(&'a self) -> ContentMethods<'a, S> {
         ContentMethods { hub: &self }
     }
-    pub fn data_source(&'a self) -> DataSourceMethods<'a> {
+    pub fn data_source(&'a self) -> DataSourceMethods<'a, S> {
         DataSourceMethods { hub: &self }
     }
-    pub fn inspect(&'a self) -> InspectMethods<'a> {
+    pub fn inspect(&'a self) -> InspectMethods<'a, S> {
         InspectMethods { hub: &self }
     }
-    pub fn risk_analysis(&'a self) -> RiskAnalysiMethods<'a> {
+    pub fn risk_analysis(&'a self) -> RiskAnalysiMethods<'a, S> {
         RiskAnalysiMethods { hub: &self }
     }
-    pub fn root_categories(&'a self) -> RootCategoryMethods<'a> {
+    pub fn root_categories(&'a self) -> RootCategoryMethods<'a, S> {
         RootCategoryMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2366,22 +2371,22 @@ impl client::Part for GooglePrivacyDlpV2beta1PropertyReference {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `deidentify(...)`, `inspect(...)` and `redact(...)`
 /// // to build up your call.
 /// let rb = hub.content();
 /// # }
 /// ```
-pub struct ContentMethods<'a>
-    where  {
+pub struct ContentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
 }
 
-impl<'a> client::MethodsBuilder for ContentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ContentMethods<'a, S> {}
 
-impl<'a> ContentMethods<'a> {
+impl<'a, S> ContentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2391,7 +2396,7 @@ impl<'a> ContentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn deidentify(&self, request: GooglePrivacyDlpV2beta1DeidentifyContentRequest) -> ContentDeidentifyCall<'a> {
+    pub fn deidentify(&self, request: GooglePrivacyDlpV2beta1DeidentifyContentRequest) -> ContentDeidentifyCall<'a, S> {
         ContentDeidentifyCall {
             hub: self.hub,
             _request: request,
@@ -2409,7 +2414,7 @@ impl<'a> ContentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn inspect(&self, request: GooglePrivacyDlpV2beta1InspectContentRequest) -> ContentInspectCall<'a> {
+    pub fn inspect(&self, request: GooglePrivacyDlpV2beta1InspectContentRequest) -> ContentInspectCall<'a, S> {
         ContentInspectCall {
             hub: self.hub,
             _request: request,
@@ -2427,7 +2432,7 @@ impl<'a> ContentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn redact(&self, request: GooglePrivacyDlpV2beta1RedactContentRequest) -> ContentRedactCall<'a> {
+    pub fn redact(&self, request: GooglePrivacyDlpV2beta1RedactContentRequest) -> ContentRedactCall<'a, S> {
         ContentRedactCall {
             hub: self.hub,
             _request: request,
@@ -2461,22 +2466,22 @@ impl<'a> ContentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `info_types_list(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.root_categories();
 /// # }
 /// ```
-pub struct RootCategoryMethods<'a>
-    where  {
+pub struct RootCategoryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
 }
 
-impl<'a> client::MethodsBuilder for RootCategoryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RootCategoryMethods<'a, S> {}
 
-impl<'a> RootCategoryMethods<'a> {
+impl<'a, S> RootCategoryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2485,7 +2490,7 @@ impl<'a> RootCategoryMethods<'a> {
     /// # Arguments
     ///
     /// * `category` - Category name as returned by ListRootCategories.
-    pub fn info_types_list(&self, category: &str) -> RootCategoryInfoTypeListCall<'a> {
+    pub fn info_types_list(&self, category: &str) -> RootCategoryInfoTypeListCall<'a, S> {
         RootCategoryInfoTypeListCall {
             hub: self.hub,
             _category: category.to_string(),
@@ -2499,7 +2504,7 @@ impl<'a> RootCategoryMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the list of root categories of sensitive information.
-    pub fn list(&self) -> RootCategoryListCall<'a> {
+    pub fn list(&self) -> RootCategoryListCall<'a, S> {
         RootCategoryListCall {
             hub: self.hub,
             _language_code: Default::default(),
@@ -2533,22 +2538,22 @@ impl<'a> RootCategoryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)` and `operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.risk_analysis();
 /// # }
 /// ```
-pub struct RiskAnalysiMethods<'a>
-    where  {
+pub struct RiskAnalysiMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
 }
 
-impl<'a> client::MethodsBuilder for RiskAnalysiMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RiskAnalysiMethods<'a, S> {}
 
-impl<'a> RiskAnalysiMethods<'a> {
+impl<'a, S> RiskAnalysiMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2558,7 +2563,7 @@ impl<'a> RiskAnalysiMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> RiskAnalysiOperationCancelCall<'a> {
+    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> RiskAnalysiOperationCancelCall<'a, S> {
         RiskAnalysiOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -2576,7 +2581,7 @@ impl<'a> RiskAnalysiMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn operations_delete(&self, name: &str) -> RiskAnalysiOperationDeleteCall<'a> {
+    pub fn operations_delete(&self, name: &str) -> RiskAnalysiOperationDeleteCall<'a, S> {
         RiskAnalysiOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2593,7 +2598,7 @@ impl<'a> RiskAnalysiMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn operations_list(&self, name: &str) -> RiskAnalysiOperationListCall<'a> {
+    pub fn operations_list(&self, name: &str) -> RiskAnalysiOperationListCall<'a, S> {
         RiskAnalysiOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2615,7 +2620,7 @@ impl<'a> RiskAnalysiMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> RiskAnalysiOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> RiskAnalysiOperationGetCall<'a, S> {
         RiskAnalysiOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2649,22 +2654,22 @@ impl<'a> RiskAnalysiMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `analyze(...)`
 /// // to build up your call.
 /// let rb = hub.data_source();
 /// # }
 /// ```
-pub struct DataSourceMethods<'a>
-    where  {
+pub struct DataSourceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
 }
 
-impl<'a> client::MethodsBuilder for DataSourceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DataSourceMethods<'a, S> {}
 
-impl<'a> DataSourceMethods<'a> {
+impl<'a, S> DataSourceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2674,7 +2679,7 @@ impl<'a> DataSourceMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze(&self, request: GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest) -> DataSourceAnalyzeCall<'a> {
+    pub fn analyze(&self, request: GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest) -> DataSourceAnalyzeCall<'a, S> {
         DataSourceAnalyzeCall {
             hub: self.hub,
             _request: request,
@@ -2708,22 +2713,22 @@ impl<'a> DataSourceMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `operations_cancel(...)`, `operations_create(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)` and `results_findings_list(...)`
 /// // to build up your call.
 /// let rb = hub.inspect();
 /// # }
 /// ```
-pub struct InspectMethods<'a>
-    where  {
+pub struct InspectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
 }
 
-impl<'a> client::MethodsBuilder for InspectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for InspectMethods<'a, S> {}
 
-impl<'a> InspectMethods<'a> {
+impl<'a, S> InspectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2733,7 +2738,7 @@ impl<'a> InspectMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn operations_create(&self, request: GooglePrivacyDlpV2beta1CreateInspectOperationRequest) -> InspectOperationCreateCall<'a> {
+    pub fn operations_create(&self, request: GooglePrivacyDlpV2beta1CreateInspectOperationRequest) -> InspectOperationCreateCall<'a, S> {
         InspectOperationCreateCall {
             hub: self.hub,
             _request: request,
@@ -2751,7 +2756,7 @@ impl<'a> InspectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> InspectOperationCancelCall<'a> {
+    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> InspectOperationCancelCall<'a, S> {
         InspectOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -2769,7 +2774,7 @@ impl<'a> InspectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn operations_delete(&self, name: &str) -> InspectOperationDeleteCall<'a> {
+    pub fn operations_delete(&self, name: &str) -> InspectOperationDeleteCall<'a, S> {
         InspectOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2786,7 +2791,7 @@ impl<'a> InspectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn operations_list(&self, name: &str) -> InspectOperationListCall<'a> {
+    pub fn operations_list(&self, name: &str) -> InspectOperationListCall<'a, S> {
         InspectOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2808,7 +2813,7 @@ impl<'a> InspectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> InspectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> InspectOperationGetCall<'a, S> {
         InspectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2827,7 +2832,7 @@ impl<'a> InspectMethods<'a> {
     /// * `name` - Identifier of the results set returned as metadata of
     ///            the longrunning operation created by a call to InspectDataSource.
     ///            Should be in the format of `inspect/results/{id}`.
-    pub fn results_findings_list(&self, name: &str) -> InspectResultFindingListCall<'a> {
+    pub fn results_findings_list(&self, name: &str) -> InspectResultFindingListCall<'a, S> {
         InspectResultFindingListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2873,7 +2878,7 @@ impl<'a> InspectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2886,19 +2891,25 @@ impl<'a> InspectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContentDeidentifyCall<'a>
-    where  {
+pub struct ContentDeidentifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GooglePrivacyDlpV2beta1DeidentifyContentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContentDeidentifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ContentDeidentifyCall<'a, S> {}
 
-impl<'a> ContentDeidentifyCall<'a> {
+impl<'a, S> ContentDeidentifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3032,7 +3043,7 @@ impl<'a> ContentDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1DeidentifyContentRequest) -> ContentDeidentifyCall<'a> {
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1DeidentifyContentRequest) -> ContentDeidentifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3042,7 +3053,7 @@ impl<'a> ContentDeidentifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentDeidentifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentDeidentifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3069,7 +3080,7 @@ impl<'a> ContentDeidentifyCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> ContentDeidentifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContentDeidentifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3089,9 +3100,9 @@ impl<'a> ContentDeidentifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContentDeidentifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContentDeidentifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3125,7 +3136,7 @@ impl<'a> ContentDeidentifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3138,19 +3149,25 @@ impl<'a> ContentDeidentifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContentInspectCall<'a>
-    where  {
+pub struct ContentInspectCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GooglePrivacyDlpV2beta1InspectContentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContentInspectCall<'a> {}
+impl<'a, S> client::CallBuilder for ContentInspectCall<'a, S> {}
 
-impl<'a> ContentInspectCall<'a> {
+impl<'a, S> ContentInspectCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3284,7 +3301,7 @@ impl<'a> ContentInspectCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1InspectContentRequest) -> ContentInspectCall<'a> {
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1InspectContentRequest) -> ContentInspectCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3294,7 +3311,7 @@ impl<'a> ContentInspectCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentInspectCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentInspectCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3321,7 +3338,7 @@ impl<'a> ContentInspectCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> ContentInspectCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContentInspectCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3341,9 +3358,9 @@ impl<'a> ContentInspectCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContentInspectCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContentInspectCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3377,7 +3394,7 @@ impl<'a> ContentInspectCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3390,19 +3407,25 @@ impl<'a> ContentInspectCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContentRedactCall<'a>
-    where  {
+pub struct ContentRedactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GooglePrivacyDlpV2beta1RedactContentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContentRedactCall<'a> {}
+impl<'a, S> client::CallBuilder for ContentRedactCall<'a, S> {}
 
-impl<'a> ContentRedactCall<'a> {
+impl<'a, S> ContentRedactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3536,7 +3559,7 @@ impl<'a> ContentRedactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1RedactContentRequest) -> ContentRedactCall<'a> {
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1RedactContentRequest) -> ContentRedactCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3546,7 +3569,7 @@ impl<'a> ContentRedactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentRedactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContentRedactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3573,7 +3596,7 @@ impl<'a> ContentRedactCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> ContentRedactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContentRedactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3593,9 +3616,9 @@ impl<'a> ContentRedactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContentRedactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContentRedactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3627,7 +3650,7 @@ impl<'a> ContentRedactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3636,10 +3659,10 @@ impl<'a> ContentRedactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RootCategoryInfoTypeListCall<'a>
-    where  {
+pub struct RootCategoryInfoTypeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _category: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3647,9 +3670,15 @@ pub struct RootCategoryInfoTypeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RootCategoryInfoTypeListCall<'a> {}
+impl<'a, S> client::CallBuilder for RootCategoryInfoTypeListCall<'a, S> {}
 
-impl<'a> RootCategoryInfoTypeListCall<'a> {
+impl<'a, S> RootCategoryInfoTypeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3799,7 +3828,7 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn category(mut self, new_value: &str) -> RootCategoryInfoTypeListCall<'a> {
+    pub fn category(mut self, new_value: &str) -> RootCategoryInfoTypeListCall<'a, S> {
         self._category = new_value.to_string();
         self
     }
@@ -3808,7 +3837,7 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
     /// en-US strings will be returned.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> RootCategoryInfoTypeListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> RootCategoryInfoTypeListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -3818,7 +3847,7 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RootCategoryInfoTypeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RootCategoryInfoTypeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3845,7 +3874,7 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> RootCategoryInfoTypeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RootCategoryInfoTypeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3865,9 +3894,9 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RootCategoryInfoTypeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RootCategoryInfoTypeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3899,7 +3928,7 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3908,19 +3937,25 @@ impl<'a> RootCategoryInfoTypeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RootCategoryListCall<'a>
-    where  {
+pub struct RootCategoryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RootCategoryListCall<'a> {}
+impl<'a, S> client::CallBuilder for RootCategoryListCall<'a, S> {}
 
-impl<'a> RootCategoryListCall<'a> {
+impl<'a, S> RootCategoryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4043,7 +4078,7 @@ impl<'a> RootCategoryListCall<'a> {
     /// en-US strings will be returned.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> RootCategoryListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> RootCategoryListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -4053,7 +4088,7 @@ impl<'a> RootCategoryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RootCategoryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RootCategoryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4080,7 +4115,7 @@ impl<'a> RootCategoryListCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> RootCategoryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RootCategoryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4100,9 +4135,9 @@ impl<'a> RootCategoryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RootCategoryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RootCategoryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4135,7 +4170,7 @@ impl<'a> RootCategoryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4148,10 +4183,10 @@ impl<'a> RootCategoryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RiskAnalysiOperationCancelCall<'a>
-    where  {
+pub struct RiskAnalysiOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GoogleLongrunningCancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4159,9 +4194,15 @@ pub struct RiskAnalysiOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RiskAnalysiOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for RiskAnalysiOperationCancelCall<'a, S> {}
 
-impl<'a> RiskAnalysiOperationCancelCall<'a> {
+impl<'a, S> RiskAnalysiOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4321,7 +4362,7 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> RiskAnalysiOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> RiskAnalysiOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4331,7 +4372,7 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4341,7 +4382,7 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4368,7 +4409,7 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4388,9 +4429,9 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RiskAnalysiOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4422,7 +4463,7 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4430,19 +4471,25 @@ impl<'a> RiskAnalysiOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RiskAnalysiOperationDeleteCall<'a>
-    where  {
+pub struct RiskAnalysiOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RiskAnalysiOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for RiskAnalysiOperationDeleteCall<'a, S> {}
 
-impl<'a> RiskAnalysiOperationDeleteCall<'a> {
+impl<'a, S> RiskAnalysiOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4589,7 +4636,7 @@ impl<'a> RiskAnalysiOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4599,7 +4646,7 @@ impl<'a> RiskAnalysiOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4626,7 +4673,7 @@ impl<'a> RiskAnalysiOperationDeleteCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4646,9 +4693,9 @@ impl<'a> RiskAnalysiOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RiskAnalysiOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4680,7 +4727,7 @@ impl<'a> RiskAnalysiOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4691,10 +4738,10 @@ impl<'a> RiskAnalysiOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RiskAnalysiOperationListCall<'a>
-    where  {
+pub struct RiskAnalysiOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4704,9 +4751,15 @@ pub struct RiskAnalysiOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RiskAnalysiOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for RiskAnalysiOperationListCall<'a, S> {}
 
-impl<'a> RiskAnalysiOperationListCall<'a> {
+impl<'a, S> RiskAnalysiOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4862,28 +4915,28 @@ impl<'a> RiskAnalysiOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RiskAnalysiOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> RiskAnalysiOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The maximum allowed value is 256 and the default is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> RiskAnalysiOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> RiskAnalysiOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Filters by `done`. That is, `done=true` or `done=false`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> RiskAnalysiOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> RiskAnalysiOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4893,7 +4946,7 @@ impl<'a> RiskAnalysiOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4920,7 +4973,7 @@ impl<'a> RiskAnalysiOperationListCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4940,9 +4993,9 @@ impl<'a> RiskAnalysiOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RiskAnalysiOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4976,7 +5029,7 @@ impl<'a> RiskAnalysiOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4984,19 +5037,25 @@ impl<'a> RiskAnalysiOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RiskAnalysiOperationGetCall<'a>
-    where  {
+pub struct RiskAnalysiOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RiskAnalysiOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for RiskAnalysiOperationGetCall<'a, S> {}
 
-impl<'a> RiskAnalysiOperationGetCall<'a> {
+impl<'a, S> RiskAnalysiOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5143,7 +5202,7 @@ impl<'a> RiskAnalysiOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> RiskAnalysiOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5153,7 +5212,7 @@ impl<'a> RiskAnalysiOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RiskAnalysiOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5180,7 +5239,7 @@ impl<'a> RiskAnalysiOperationGetCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RiskAnalysiOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5200,9 +5259,9 @@ impl<'a> RiskAnalysiOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RiskAnalysiOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RiskAnalysiOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5236,7 +5295,7 @@ impl<'a> RiskAnalysiOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5249,19 +5308,25 @@ impl<'a> RiskAnalysiOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DataSourceAnalyzeCall<'a>
-    where  {
+pub struct DataSourceAnalyzeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DataSourceAnalyzeCall<'a> {}
+impl<'a, S> client::CallBuilder for DataSourceAnalyzeCall<'a, S> {}
 
-impl<'a> DataSourceAnalyzeCall<'a> {
+impl<'a, S> DataSourceAnalyzeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5395,7 +5460,7 @@ impl<'a> DataSourceAnalyzeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest) -> DataSourceAnalyzeCall<'a> {
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1AnalyzeDataSourceRiskRequest) -> DataSourceAnalyzeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5405,7 +5470,7 @@ impl<'a> DataSourceAnalyzeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DataSourceAnalyzeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DataSourceAnalyzeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5432,7 +5497,7 @@ impl<'a> DataSourceAnalyzeCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> DataSourceAnalyzeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DataSourceAnalyzeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5452,9 +5517,9 @@ impl<'a> DataSourceAnalyzeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DataSourceAnalyzeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DataSourceAnalyzeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5488,7 +5553,7 @@ impl<'a> DataSourceAnalyzeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5501,19 +5566,25 @@ impl<'a> DataSourceAnalyzeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InspectOperationCreateCall<'a>
-    where  {
+pub struct InspectOperationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GooglePrivacyDlpV2beta1CreateInspectOperationRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InspectOperationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for InspectOperationCreateCall<'a, S> {}
 
-impl<'a> InspectOperationCreateCall<'a> {
+impl<'a, S> InspectOperationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5647,7 +5718,7 @@ impl<'a> InspectOperationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1CreateInspectOperationRequest) -> InspectOperationCreateCall<'a> {
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2beta1CreateInspectOperationRequest) -> InspectOperationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5657,7 +5728,7 @@ impl<'a> InspectOperationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5684,7 +5755,7 @@ impl<'a> InspectOperationCreateCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5704,9 +5775,9 @@ impl<'a> InspectOperationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InspectOperationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5739,7 +5810,7 @@ impl<'a> InspectOperationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5752,10 +5823,10 @@ impl<'a> InspectOperationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InspectOperationCancelCall<'a>
-    where  {
+pub struct InspectOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _request: GoogleLongrunningCancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5763,9 +5834,15 @@ pub struct InspectOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InspectOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for InspectOperationCancelCall<'a, S> {}
 
-impl<'a> InspectOperationCancelCall<'a> {
+impl<'a, S> InspectOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5925,7 +6002,7 @@ impl<'a> InspectOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> InspectOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> InspectOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5935,7 +6012,7 @@ impl<'a> InspectOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> InspectOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> InspectOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5945,7 +6022,7 @@ impl<'a> InspectOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5972,7 +6049,7 @@ impl<'a> InspectOperationCancelCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5992,9 +6069,9 @@ impl<'a> InspectOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InspectOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6026,7 +6103,7 @@ impl<'a> InspectOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6034,19 +6111,25 @@ impl<'a> InspectOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InspectOperationDeleteCall<'a>
-    where  {
+pub struct InspectOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InspectOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for InspectOperationDeleteCall<'a, S> {}
 
-impl<'a> InspectOperationDeleteCall<'a> {
+impl<'a, S> InspectOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6193,7 +6276,7 @@ impl<'a> InspectOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> InspectOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> InspectOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6203,7 +6286,7 @@ impl<'a> InspectOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6230,7 +6313,7 @@ impl<'a> InspectOperationDeleteCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6250,9 +6333,9 @@ impl<'a> InspectOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InspectOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6284,7 +6367,7 @@ impl<'a> InspectOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6295,10 +6378,10 @@ impl<'a> InspectOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InspectOperationListCall<'a>
-    where  {
+pub struct InspectOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6308,9 +6391,15 @@ pub struct InspectOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InspectOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for InspectOperationListCall<'a, S> {}
 
-impl<'a> InspectOperationListCall<'a> {
+impl<'a, S> InspectOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6466,28 +6555,28 @@ impl<'a> InspectOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> InspectOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> InspectOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> InspectOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> InspectOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The maximum allowed value is 256 and the default is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> InspectOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> InspectOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Filters by `done`. That is, `done=true` or `done=false`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> InspectOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> InspectOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6497,7 +6586,7 @@ impl<'a> InspectOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6524,7 +6613,7 @@ impl<'a> InspectOperationListCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6544,9 +6633,9 @@ impl<'a> InspectOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InspectOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6580,7 +6669,7 @@ impl<'a> InspectOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6588,19 +6677,25 @@ impl<'a> InspectOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InspectOperationGetCall<'a>
-    where  {
+pub struct InspectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InspectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for InspectOperationGetCall<'a, S> {}
 
-impl<'a> InspectOperationGetCall<'a> {
+impl<'a, S> InspectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6747,7 +6842,7 @@ impl<'a> InspectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> InspectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> InspectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6757,7 +6852,7 @@ impl<'a> InspectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6784,7 +6879,7 @@ impl<'a> InspectOperationGetCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InspectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6804,9 +6899,9 @@ impl<'a> InspectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InspectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InspectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6838,7 +6933,7 @@ impl<'a> InspectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DLP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6849,10 +6944,10 @@ impl<'a> InspectOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InspectResultFindingListCall<'a>
-    where  {
+pub struct InspectResultFindingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DLP<>,
+    hub: &'a DLP<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6862,9 +6957,15 @@ pub struct InspectResultFindingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InspectResultFindingListCall<'a> {}
+impl<'a, S> client::CallBuilder for InspectResultFindingListCall<'a, S> {}
 
-impl<'a> InspectResultFindingListCall<'a> {
+impl<'a, S> InspectResultFindingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7022,7 +7123,7 @@ impl<'a> InspectResultFindingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> InspectResultFindingListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> InspectResultFindingListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7031,7 +7132,7 @@ impl<'a> InspectResultFindingListCall<'a> {
     /// the system should return the next page of data.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> InspectResultFindingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> InspectResultFindingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7039,7 +7140,7 @@ impl<'a> InspectResultFindingListCall<'a> {
     /// If 0, the implementation selects a reasonable value.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> InspectResultFindingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> InspectResultFindingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7054,7 +7155,7 @@ impl<'a> InspectResultFindingListCall<'a> {
     /// - info_type=EMAIL_ADDRESS,likelihood=VERY_LIKELY,LIKELY
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> InspectResultFindingListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> InspectResultFindingListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7064,7 +7165,7 @@ impl<'a> InspectResultFindingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectResultFindingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InspectResultFindingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7091,7 +7192,7 @@ impl<'a> InspectResultFindingListCall<'a> {
     /// * *access_token* (query-string) - OAuth access token.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *pp* (query-boolean) - Pretty-print response.
-    pub fn param<T>(mut self, name: T, value: T) -> InspectResultFindingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InspectResultFindingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7111,9 +7212,9 @@ impl<'a> InspectResultFindingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InspectResultFindingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InspectResultFindingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

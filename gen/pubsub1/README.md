@@ -1,20 +1,20 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/api/README.md.mako'
+This file was generated automatically from 'src/generator/templates/api/README.md.mako'
 DO NOT EDIT !
 -->
 The `google-pubsub1` library allows access to all features of the *Google Pubsub* service.
 
-This documentation was generated from *Pubsub* crate version *3.1.0+20220221*, where *20220221* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
+This documentation was generated from *Pubsub* crate version *4.0.1+20220221*, where *20220221* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
 
 Everything else about the *Pubsub* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/pubsub/docs).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/Pubsub) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/Pubsub) ... 
 
 * projects
- * [*schemas create*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaCreateCall), [*schemas delete*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaDeleteCall), [*schemas get*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaGetCall), [*schemas get iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaGetIamPolicyCall), [*schemas list*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaListCall), [*schemas set iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaSetIamPolicyCall), [*schemas test iam permissions*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaTestIamPermissionCall), [*schemas validate*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaValidateCall), [*schemas validate message*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSchemaValidateMessageCall), [*snapshots create*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotCreateCall), [*snapshots delete*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotDeleteCall), [*snapshots get*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotGetCall), [*snapshots get iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotGetIamPolicyCall), [*snapshots list*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotListCall), [*snapshots patch*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotPatchCall), [*snapshots set iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotSetIamPolicyCall), [*snapshots test iam permissions*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSnapshotTestIamPermissionCall), [*subscriptions acknowledge*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionAcknowledgeCall), [*subscriptions create*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionCreateCall), [*subscriptions delete*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionDeleteCall), [*subscriptions detach*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionDetachCall), [*subscriptions get*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionGetCall), [*subscriptions get iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionGetIamPolicyCall), [*subscriptions list*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionListCall), [*subscriptions modify ack deadline*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionModifyAckDeadlineCall), [*subscriptions modify push config*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionModifyPushConfigCall), [*subscriptions patch*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionPatchCall), [*subscriptions pull*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionPullCall), [*subscriptions seek*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionSeekCall), [*subscriptions set iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionSetIamPolicyCall), [*subscriptions test iam permissions*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectSubscriptionTestIamPermissionCall), [*topics create*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicCreateCall), [*topics delete*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicDeleteCall), [*topics get*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicGetCall), [*topics get iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicGetIamPolicyCall), [*topics list*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicListCall), [*topics patch*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicPatchCall), [*topics publish*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicPublishCall), [*topics set iam policy*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicSetIamPolicyCall), [*topics snapshots list*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicSnapshotListCall), [*topics subscriptions list*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicSubscriptionListCall) and [*topics test iam permissions*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/api::ProjectTopicTestIamPermissionCall)
+ * [*schemas create*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaCreateCall), [*schemas delete*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaDeleteCall), [*schemas get*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaGetCall), [*schemas get iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaGetIamPolicyCall), [*schemas list*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaListCall), [*schemas set iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaSetIamPolicyCall), [*schemas test iam permissions*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaTestIamPermissionCall), [*schemas validate*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaValidateCall), [*schemas validate message*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSchemaValidateMessageCall), [*snapshots create*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotCreateCall), [*snapshots delete*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotDeleteCall), [*snapshots get*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotGetCall), [*snapshots get iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotGetIamPolicyCall), [*snapshots list*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotListCall), [*snapshots patch*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotPatchCall), [*snapshots set iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotSetIamPolicyCall), [*snapshots test iam permissions*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSnapshotTestIamPermissionCall), [*subscriptions acknowledge*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionAcknowledgeCall), [*subscriptions create*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionCreateCall), [*subscriptions delete*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionDeleteCall), [*subscriptions detach*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionDetachCall), [*subscriptions get*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionGetCall), [*subscriptions get iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionGetIamPolicyCall), [*subscriptions list*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionListCall), [*subscriptions modify ack deadline*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionModifyAckDeadlineCall), [*subscriptions modify push config*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionModifyPushConfigCall), [*subscriptions patch*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionPatchCall), [*subscriptions pull*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionPullCall), [*subscriptions seek*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionSeekCall), [*subscriptions set iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionSetIamPolicyCall), [*subscriptions test iam permissions*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectSubscriptionTestIamPermissionCall), [*topics create*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicCreateCall), [*topics delete*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicDeleteCall), [*topics get*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicGetCall), [*topics get iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicGetIamPolicyCall), [*topics list*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicListCall), [*topics patch*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicPatchCall), [*topics publish*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicPublishCall), [*topics set iam policy*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicSetIamPolicyCall), [*topics snapshots list*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicSnapshotListCall), [*topics subscriptions list*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicSubscriptionListCall) and [*topics test iam permissions*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/api::ProjectTopicTestIamPermissionCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/Pubsub)**
+* **[Hub](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/Pubsub)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Part)**
+    * **[Parts](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -97,7 +97,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = Pubsub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+let mut hub = Pubsub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
@@ -126,17 +126,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -146,29 +146,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::RequestValue) and 
-[decodable](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::RequestValue) and 
+[decodable](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-pubsub1/3.1.0+20220221/google_pubsub1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-pubsub1/4.0.1+20220221/google_pubsub1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
@@ -182,3 +182,4 @@ under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 
 [repo-license]: https://github.com/Byron/google-apis-rsblob/main/LICENSE.md
+

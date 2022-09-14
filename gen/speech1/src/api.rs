@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -101,40 +106,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Speech<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Speech<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Speech<> {}
+impl<'a, S> client::Hub for Speech<S> {}
 
-impl<'a, > Speech<> {
+impl<'a, S> Speech<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Speech<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Speech<S> {
         Speech {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://speech.googleapis.com/".to_string(),
             _root_url: "https://speech.googleapis.com/".to_string(),
         }
     }
 
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn speech(&'a self) -> SpeechMethods<'a> {
+    pub fn speech(&'a self) -> SpeechMethods<'a, S> {
         SpeechMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -751,22 +756,22 @@ impl client::Part for WordInfo {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -775,7 +780,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -788,7 +793,7 @@ impl<'a> OperationMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
-    pub fn list(&self) -> OperationListCall<'a> {
+    pub fn list(&self) -> OperationListCall<'a, S> {
         OperationListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -825,22 +830,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_custom_classes_create(...)`, `locations_custom_classes_delete(...)`, `locations_custom_classes_get(...)`, `locations_custom_classes_list(...)`, `locations_custom_classes_patch(...)`, `locations_phrase_sets_create(...)`, `locations_phrase_sets_delete(...)`, `locations_phrase_sets_get(...)`, `locations_phrase_sets_list(...)` and `locations_phrase_sets_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -850,7 +855,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this custom class will be created. Format: `projects/{project}/locations/{location}/customClasses` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
-    pub fn locations_custom_classes_create(&self, request: CreateCustomClassRequest, parent: &str) -> ProjectLocationCustomClasseCreateCall<'a> {
+    pub fn locations_custom_classes_create(&self, request: CreateCustomClassRequest, parent: &str) -> ProjectLocationCustomClasseCreateCall<'a, S> {
         ProjectLocationCustomClasseCreateCall {
             hub: self.hub,
             _request: request,
@@ -868,7 +873,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the custom class to delete. Format: `projects/{project}/locations/{location}/customClasses/{custom_class}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
-    pub fn locations_custom_classes_delete(&self, name: &str) -> ProjectLocationCustomClasseDeleteCall<'a> {
+    pub fn locations_custom_classes_delete(&self, name: &str) -> ProjectLocationCustomClasseDeleteCall<'a, S> {
         ProjectLocationCustomClasseDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -885,7 +890,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the custom class to retrieve. Format: `projects/{project}/locations/{location}/customClasses/{custom_class}`
-    pub fn locations_custom_classes_get(&self, name: &str) -> ProjectLocationCustomClasseGetCall<'a> {
+    pub fn locations_custom_classes_get(&self, name: &str) -> ProjectLocationCustomClasseGetCall<'a, S> {
         ProjectLocationCustomClasseGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -902,7 +907,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent, which owns this collection of custom classes. Format: `projects/{project}/locations/{location}/customClasses` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
-    pub fn locations_custom_classes_list(&self, parent: &str) -> ProjectLocationCustomClasseListCall<'a> {
+    pub fn locations_custom_classes_list(&self, parent: &str) -> ProjectLocationCustomClasseListCall<'a, S> {
         ProjectLocationCustomClasseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -922,7 +927,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the custom class.
-    pub fn locations_custom_classes_patch(&self, request: CustomClass, name: &str) -> ProjectLocationCustomClassePatchCall<'a> {
+    pub fn locations_custom_classes_patch(&self, request: CustomClass, name: &str) -> ProjectLocationCustomClassePatchCall<'a, S> {
         ProjectLocationCustomClassePatchCall {
             hub: self.hub,
             _request: request,
@@ -942,7 +947,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}/phraseSets` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
-    pub fn locations_phrase_sets_create(&self, request: CreatePhraseSetRequest, parent: &str) -> ProjectLocationPhraseSetCreateCall<'a> {
+    pub fn locations_phrase_sets_create(&self, request: CreatePhraseSetRequest, parent: &str) -> ProjectLocationPhraseSetCreateCall<'a, S> {
         ProjectLocationPhraseSetCreateCall {
             hub: self.hub,
             _request: request,
@@ -960,7 +965,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the phrase set to delete. Format: `projects/{project}/locations/{location}/phraseSets/{phrase_set}`
-    pub fn locations_phrase_sets_delete(&self, name: &str) -> ProjectLocationPhraseSetDeleteCall<'a> {
+    pub fn locations_phrase_sets_delete(&self, name: &str) -> ProjectLocationPhraseSetDeleteCall<'a, S> {
         ProjectLocationPhraseSetDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -977,7 +982,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the phrase set to retrieve. Format: `projects/{project}/locations/{location}/phraseSets/{phrase_set}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
-    pub fn locations_phrase_sets_get(&self, name: &str) -> ProjectLocationPhraseSetGetCall<'a> {
+    pub fn locations_phrase_sets_get(&self, name: &str) -> ProjectLocationPhraseSetGetCall<'a, S> {
         ProjectLocationPhraseSetGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -994,7 +999,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent, which owns this collection of phrase set. Format: `projects/{project}/locations/{location}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
-    pub fn locations_phrase_sets_list(&self, parent: &str) -> ProjectLocationPhraseSetListCall<'a> {
+    pub fn locations_phrase_sets_list(&self, parent: &str) -> ProjectLocationPhraseSetListCall<'a, S> {
         ProjectLocationPhraseSetListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1014,7 +1019,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the phrase set.
-    pub fn locations_phrase_sets_patch(&self, request: PhraseSet, name: &str) -> ProjectLocationPhraseSetPatchCall<'a> {
+    pub fn locations_phrase_sets_patch(&self, request: PhraseSet, name: &str) -> ProjectLocationPhraseSetPatchCall<'a, S> {
         ProjectLocationPhraseSetPatchCall {
             hub: self.hub,
             _request: request,
@@ -1050,22 +1055,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `longrunningrecognize(...)` and `recognize(...)`
 /// // to build up your call.
 /// let rb = hub.speech();
 /// # }
 /// ```
-pub struct SpeechMethods<'a>
-    where  {
+pub struct SpeechMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
 }
 
-impl<'a> client::MethodsBuilder for SpeechMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SpeechMethods<'a, S> {}
 
-impl<'a> SpeechMethods<'a> {
+impl<'a, S> SpeechMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1074,7 +1079,7 @@ impl<'a> SpeechMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn longrunningrecognize(&self, request: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a> {
+    pub fn longrunningrecognize(&self, request: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a, S> {
         SpeechLongrunningrecognizeCall {
             hub: self.hub,
             _request: request,
@@ -1091,7 +1096,7 @@ impl<'a> SpeechMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn recognize(&self, request: RecognizeRequest) -> SpeechRecognizeCall<'a> {
+    pub fn recognize(&self, request: RecognizeRequest) -> SpeechRecognizeCall<'a, S> {
         SpeechRecognizeCall {
             hub: self.hub,
             _request: request,
@@ -1132,7 +1137,7 @@ impl<'a> SpeechMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1140,19 +1145,25 @@ impl<'a> SpeechMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1299,7 +1310,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1309,7 +1320,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1334,7 +1345,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1354,9 +1365,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1388,7 +1399,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1400,10 +1411,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a>
-    where  {
+pub struct OperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
@@ -1413,9 +1424,15 @@ pub struct OperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationListCall<'a, S> {}
 
-impl<'a> OperationListCall<'a> {
+impl<'a, S> OperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1545,28 +1562,28 @@ impl<'a> OperationListCall<'a> {
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The name of the operation's parent resource.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1576,7 +1593,7 @@ impl<'a> OperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1601,7 +1618,7 @@ impl<'a> OperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1621,9 +1638,9 @@ impl<'a> OperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1656,7 +1673,7 @@ impl<'a> OperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1669,10 +1686,10 @@ impl<'a> OperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCustomClasseCreateCall<'a>
-    where  {
+pub struct ProjectLocationCustomClasseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _request: CreateCustomClassRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1680,9 +1697,15 @@ pub struct ProjectLocationCustomClasseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCustomClasseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCustomClasseCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
+impl<'a, S> ProjectLocationCustomClasseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1842,7 +1865,7 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateCustomClassRequest) -> ProjectLocationCustomClasseCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateCustomClassRequest) -> ProjectLocationCustomClasseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1852,7 +1875,7 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCustomClasseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCustomClasseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1862,7 +1885,7 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1887,7 +1910,7 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1907,9 +1930,9 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCustomClasseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCustomClasseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1941,7 +1964,7 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1949,19 +1972,25 @@ impl<'a> ProjectLocationCustomClasseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCustomClasseDeleteCall<'a>
-    where  {
+pub struct ProjectLocationCustomClasseDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCustomClasseDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCustomClasseDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
+impl<'a, S> ProjectLocationCustomClasseDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2108,7 +2137,7 @@ impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCustomClasseDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCustomClasseDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2118,7 +2147,7 @@ impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2143,7 +2172,7 @@ impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2163,9 +2192,9 @@ impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCustomClasseDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCustomClasseDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2197,7 +2226,7 @@ impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2205,19 +2234,25 @@ impl<'a> ProjectLocationCustomClasseDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCustomClasseGetCall<'a>
-    where  {
+pub struct ProjectLocationCustomClasseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCustomClasseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCustomClasseGetCall<'a, S> {}
 
-impl<'a> ProjectLocationCustomClasseGetCall<'a> {
+impl<'a, S> ProjectLocationCustomClasseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2364,7 +2399,7 @@ impl<'a> ProjectLocationCustomClasseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCustomClasseGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCustomClasseGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2374,7 +2409,7 @@ impl<'a> ProjectLocationCustomClasseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2399,7 +2434,7 @@ impl<'a> ProjectLocationCustomClasseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2419,9 +2454,9 @@ impl<'a> ProjectLocationCustomClasseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCustomClasseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCustomClasseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2453,7 +2488,7 @@ impl<'a> ProjectLocationCustomClasseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2463,10 +2498,10 @@ impl<'a> ProjectLocationCustomClasseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCustomClasseListCall<'a>
-    where  {
+pub struct ProjectLocationCustomClasseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2475,9 +2510,15 @@ pub struct ProjectLocationCustomClasseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCustomClasseListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCustomClasseListCall<'a, S> {}
 
-impl<'a> ProjectLocationCustomClasseListCall<'a> {
+impl<'a, S> ProjectLocationCustomClasseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2630,21 +2671,21 @@ impl<'a> ProjectLocationCustomClasseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCustomClasseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCustomClasseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListCustomClass` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCustomClass` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCustomClasseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCustomClasseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of custom classes to return. The service may return fewer than this value. If unspecified, at most 50 custom classes will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCustomClasseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCustomClasseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2654,7 +2695,7 @@ impl<'a> ProjectLocationCustomClasseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClasseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2679,7 +2720,7 @@ impl<'a> ProjectLocationCustomClasseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClasseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2699,9 +2740,9 @@ impl<'a> ProjectLocationCustomClasseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCustomClasseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCustomClasseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2734,7 +2775,7 @@ impl<'a> ProjectLocationCustomClasseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2748,10 +2789,10 @@ impl<'a> ProjectLocationCustomClasseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCustomClassePatchCall<'a>
-    where  {
+pub struct ProjectLocationCustomClassePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _request: CustomClass,
     _name: String,
     _update_mask: Option<String>,
@@ -2760,9 +2801,15 @@ pub struct ProjectLocationCustomClassePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCustomClassePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCustomClassePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationCustomClassePatchCall<'a> {
+impl<'a, S> ProjectLocationCustomClassePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2925,7 +2972,7 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomClass) -> ProjectLocationCustomClassePatchCall<'a> {
+    pub fn request(mut self, new_value: CustomClass) -> ProjectLocationCustomClassePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2935,14 +2982,14 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCustomClassePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCustomClassePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCustomClassePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCustomClassePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2952,7 +2999,7 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClassePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCustomClassePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2977,7 +3024,7 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClassePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCustomClassePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2997,9 +3044,9 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCustomClassePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCustomClassePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3032,7 +3079,7 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3045,10 +3092,10 @@ impl<'a> ProjectLocationCustomClassePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPhraseSetCreateCall<'a>
-    where  {
+pub struct ProjectLocationPhraseSetCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _request: CreatePhraseSetRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3056,9 +3103,15 @@ pub struct ProjectLocationPhraseSetCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPhraseSetCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPhraseSetCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
+impl<'a, S> ProjectLocationPhraseSetCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3218,7 +3271,7 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreatePhraseSetRequest) -> ProjectLocationPhraseSetCreateCall<'a> {
+    pub fn request(mut self, new_value: CreatePhraseSetRequest) -> ProjectLocationPhraseSetCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3228,7 +3281,7 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationPhraseSetCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationPhraseSetCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3238,7 +3291,7 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3263,7 +3316,7 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3283,9 +3336,9 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPhraseSetCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPhraseSetCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3317,7 +3370,7 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3325,19 +3378,25 @@ impl<'a> ProjectLocationPhraseSetCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPhraseSetDeleteCall<'a>
-    where  {
+pub struct ProjectLocationPhraseSetDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPhraseSetDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPhraseSetDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
+impl<'a, S> ProjectLocationPhraseSetDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3484,7 +3543,7 @@ impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPhraseSetDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPhraseSetDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3494,7 +3553,7 @@ impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3519,7 +3578,7 @@ impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3539,9 +3598,9 @@ impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPhraseSetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPhraseSetDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3573,7 +3632,7 @@ impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3581,19 +3640,25 @@ impl<'a> ProjectLocationPhraseSetDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPhraseSetGetCall<'a>
-    where  {
+pub struct ProjectLocationPhraseSetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPhraseSetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPhraseSetGetCall<'a, S> {}
 
-impl<'a> ProjectLocationPhraseSetGetCall<'a> {
+impl<'a, S> ProjectLocationPhraseSetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3740,7 +3805,7 @@ impl<'a> ProjectLocationPhraseSetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPhraseSetGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPhraseSetGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3750,7 +3815,7 @@ impl<'a> ProjectLocationPhraseSetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3775,7 +3840,7 @@ impl<'a> ProjectLocationPhraseSetGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3795,9 +3860,9 @@ impl<'a> ProjectLocationPhraseSetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPhraseSetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPhraseSetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3829,7 +3894,7 @@ impl<'a> ProjectLocationPhraseSetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3839,10 +3904,10 @@ impl<'a> ProjectLocationPhraseSetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPhraseSetListCall<'a>
-    where  {
+pub struct ProjectLocationPhraseSetListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3851,9 +3916,15 @@ pub struct ProjectLocationPhraseSetListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPhraseSetListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPhraseSetListCall<'a, S> {}
 
-impl<'a> ProjectLocationPhraseSetListCall<'a> {
+impl<'a, S> ProjectLocationPhraseSetListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4006,21 +4077,21 @@ impl<'a> ProjectLocationPhraseSetListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationPhraseSetListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationPhraseSetListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListPhraseSet` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListPhraseSet` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationPhraseSetListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationPhraseSetListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of phrase sets to return. The service may return fewer than this value. If unspecified, at most 50 phrase sets will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationPhraseSetListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationPhraseSetListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4030,7 +4101,7 @@ impl<'a> ProjectLocationPhraseSetListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4055,7 +4126,7 @@ impl<'a> ProjectLocationPhraseSetListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4075,9 +4146,9 @@ impl<'a> ProjectLocationPhraseSetListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPhraseSetListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPhraseSetListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4110,7 +4181,7 @@ impl<'a> ProjectLocationPhraseSetListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4124,10 +4195,10 @@ impl<'a> ProjectLocationPhraseSetListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPhraseSetPatchCall<'a>
-    where  {
+pub struct ProjectLocationPhraseSetPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _request: PhraseSet,
     _name: String,
     _update_mask: Option<String>,
@@ -4136,9 +4207,15 @@ pub struct ProjectLocationPhraseSetPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPhraseSetPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPhraseSetPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
+impl<'a, S> ProjectLocationPhraseSetPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4301,7 +4378,7 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PhraseSet) -> ProjectLocationPhraseSetPatchCall<'a> {
+    pub fn request(mut self, new_value: PhraseSet) -> ProjectLocationPhraseSetPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4311,14 +4388,14 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPhraseSetPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPhraseSetPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationPhraseSetPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationPhraseSetPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4328,7 +4405,7 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPhraseSetPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4353,7 +4430,7 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPhraseSetPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4373,9 +4450,9 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPhraseSetPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPhraseSetPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4408,7 +4485,7 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4421,19 +4498,25 @@ impl<'a> ProjectLocationPhraseSetPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpeechLongrunningrecognizeCall<'a>
-    where  {
+pub struct SpeechLongrunningrecognizeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _request: LongRunningRecognizeRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpeechLongrunningrecognizeCall<'a> {}
+impl<'a, S> client::CallBuilder for SpeechLongrunningrecognizeCall<'a, S> {}
 
-impl<'a> SpeechLongrunningrecognizeCall<'a> {
+impl<'a, S> SpeechLongrunningrecognizeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4567,7 +4650,7 @@ impl<'a> SpeechLongrunningrecognizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a> {
+    pub fn request(mut self, new_value: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4577,7 +4660,7 @@ impl<'a> SpeechLongrunningrecognizeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechLongrunningrecognizeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechLongrunningrecognizeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4602,7 +4685,7 @@ impl<'a> SpeechLongrunningrecognizeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpeechLongrunningrecognizeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpeechLongrunningrecognizeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4622,9 +4705,9 @@ impl<'a> SpeechLongrunningrecognizeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpeechLongrunningrecognizeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpeechLongrunningrecognizeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4657,7 +4740,7 @@ impl<'a> SpeechLongrunningrecognizeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4670,19 +4753,25 @@ impl<'a> SpeechLongrunningrecognizeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpeechRecognizeCall<'a>
-    where  {
+pub struct SpeechRecognizeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Speech<>,
+    hub: &'a Speech<S>,
     _request: RecognizeRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpeechRecognizeCall<'a> {}
+impl<'a, S> client::CallBuilder for SpeechRecognizeCall<'a, S> {}
 
-impl<'a> SpeechRecognizeCall<'a> {
+impl<'a, S> SpeechRecognizeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4816,7 +4905,7 @@ impl<'a> SpeechRecognizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RecognizeRequest) -> SpeechRecognizeCall<'a> {
+    pub fn request(mut self, new_value: RecognizeRequest) -> SpeechRecognizeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4826,7 +4915,7 @@ impl<'a> SpeechRecognizeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechRecognizeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechRecognizeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4851,7 +4940,7 @@ impl<'a> SpeechRecognizeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpeechRecognizeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpeechRecognizeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4871,9 +4960,9 @@ impl<'a> SpeechRecognizeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpeechRecognizeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpeechRecognizeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

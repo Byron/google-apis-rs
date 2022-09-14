@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -81,34 +86,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Ideahub<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Ideahub<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Ideahub<> {}
+impl<'a, S> client::Hub for Ideahub<S> {}
 
-impl<'a, > Ideahub<> {
+impl<'a, S> Ideahub<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Ideahub<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Ideahub<S> {
         Ideahub {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://ideahub.googleapis.com/".to_string(),
             _root_url: "https://ideahub.googleapis.com/".to_string(),
         }
     }
 
-    pub fn platforms(&'a self) -> PlatformMethods<'a> {
+    pub fn platforms(&'a self) -> PlatformMethods<'a, S> {
         PlatformMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -329,22 +334,22 @@ impl client::ResponseResult for GoogleSearchIdeahubV1betaTopicState {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `properties_idea_activities_create(...)`, `properties_idea_states_patch(...)`, `properties_ideas_list(...)`, `properties_locales_list(...)` and `properties_topic_states_patch(...)`
 /// // to build up your call.
 /// let rb = hub.platforms();
 /// # }
 /// ```
-pub struct PlatformMethods<'a>
-    where  {
+pub struct PlatformMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Ideahub<>,
+    hub: &'a Ideahub<S>,
 }
 
-impl<'a> client::MethodsBuilder for PlatformMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PlatformMethods<'a, S> {}
 
-impl<'a> PlatformMethods<'a> {
+impl<'a, S> PlatformMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -354,7 +359,7 @@ impl<'a> PlatformMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this idea activity will be created. Format: platforms/{platform}/property/{property}
-    pub fn properties_idea_activities_create(&self, request: GoogleSearchIdeahubV1betaIdeaActivity, parent: &str) -> PlatformPropertyIdeaActivityCreateCall<'a> {
+    pub fn properties_idea_activities_create(&self, request: GoogleSearchIdeahubV1betaIdeaActivity, parent: &str) -> PlatformPropertyIdeaActivityCreateCall<'a, S> {
         PlatformPropertyIdeaActivityCreateCall {
             hub: self.hub,
             _request: request,
@@ -372,7 +377,7 @@ impl<'a> PlatformMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Unique identifier for the idea state. Format: platforms/{platform}/properties/{property}/ideaStates/{idea_state}
-    pub fn properties_idea_states_patch(&self, request: GoogleSearchIdeahubV1betaIdeaState, name: &str) -> PlatformPropertyIdeaStatePatchCall<'a> {
+    pub fn properties_idea_states_patch(&self, request: GoogleSearchIdeahubV1betaIdeaState, name: &str) -> PlatformPropertyIdeaStatePatchCall<'a, S> {
         PlatformPropertyIdeaStatePatchCall {
             hub: self.hub,
             _request: request,
@@ -390,7 +395,7 @@ impl<'a> PlatformMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. If defined, specifies the creator for which to filter by. Format: publishers/{publisher}/properties/{property}
-    pub fn properties_ideas_list(&self, parent: &str) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn properties_ideas_list(&self, parent: &str) -> PlatformPropertyIdeaListCall<'a, S> {
         PlatformPropertyIdeaListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -410,7 +415,7 @@ impl<'a> PlatformMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The web property to check idea availability for Format: platforms/{platform}/property/{property}
-    pub fn properties_locales_list(&self, parent: &str) -> PlatformPropertyLocaleListCall<'a> {
+    pub fn properties_locales_list(&self, parent: &str) -> PlatformPropertyLocaleListCall<'a, S> {
         PlatformPropertyLocaleListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -429,7 +434,7 @@ impl<'a> PlatformMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Unique identifier for the topic state. Format: platforms/{platform}/properties/{property}/topicStates/{topic_state}
-    pub fn properties_topic_states_patch(&self, request: GoogleSearchIdeahubV1betaTopicState, name: &str) -> PlatformPropertyTopicStatePatchCall<'a> {
+    pub fn properties_topic_states_patch(&self, request: GoogleSearchIdeahubV1betaTopicState, name: &str) -> PlatformPropertyTopicStatePatchCall<'a, S> {
         PlatformPropertyTopicStatePatchCall {
             hub: self.hub,
             _request: request,
@@ -472,7 +477,7 @@ impl<'a> PlatformMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -485,19 +490,25 @@ impl<'a> PlatformMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformPropertyIdeaActivityCreateCall<'a>
-    where  {
+pub struct PlatformPropertyIdeaActivityCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Ideahub<>,
+    hub: &'a Ideahub<S>,
     _request: GoogleSearchIdeahubV1betaIdeaActivity,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformPropertyIdeaActivityCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformPropertyIdeaActivityCreateCall<'a, S> {}
 
-impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
+impl<'a, S> PlatformPropertyIdeaActivityCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -651,7 +662,7 @@ impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSearchIdeahubV1betaIdeaActivity) -> PlatformPropertyIdeaActivityCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleSearchIdeahubV1betaIdeaActivity) -> PlatformPropertyIdeaActivityCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -661,7 +672,7 @@ impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformPropertyIdeaActivityCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformPropertyIdeaActivityCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -671,7 +682,7 @@ impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyIdeaActivityCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyIdeaActivityCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -696,7 +707,7 @@ impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyIdeaActivityCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyIdeaActivityCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -728,7 +739,7 @@ impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -742,10 +753,10 @@ impl<'a> PlatformPropertyIdeaActivityCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformPropertyIdeaStatePatchCall<'a>
-    where  {
+pub struct PlatformPropertyIdeaStatePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Ideahub<>,
+    hub: &'a Ideahub<S>,
     _request: GoogleSearchIdeahubV1betaIdeaState,
     _name: String,
     _update_mask: Option<String>,
@@ -753,9 +764,15 @@ pub struct PlatformPropertyIdeaStatePatchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformPropertyIdeaStatePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformPropertyIdeaStatePatchCall<'a, S> {}
 
-impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
+impl<'a, S> PlatformPropertyIdeaStatePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -912,7 +929,7 @@ impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSearchIdeahubV1betaIdeaState) -> PlatformPropertyIdeaStatePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleSearchIdeahubV1betaIdeaState) -> PlatformPropertyIdeaStatePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -922,14 +939,14 @@ impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PlatformPropertyIdeaStatePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PlatformPropertyIdeaStatePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PlatformPropertyIdeaStatePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PlatformPropertyIdeaStatePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -939,7 +956,7 @@ impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyIdeaStatePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyIdeaStatePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -964,7 +981,7 @@ impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyIdeaStatePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyIdeaStatePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -995,7 +1012,7 @@ impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1007,10 +1024,10 @@ impl<'a> PlatformPropertyIdeaStatePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformPropertyIdeaListCall<'a>
-    where  {
+pub struct PlatformPropertyIdeaListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Ideahub<>,
+    hub: &'a Ideahub<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1020,9 +1037,15 @@ pub struct PlatformPropertyIdeaListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformPropertyIdeaListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformPropertyIdeaListCall<'a, S> {}
 
-impl<'a> PlatformPropertyIdeaListCall<'a> {
+impl<'a, S> PlatformPropertyIdeaListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1175,35 +1198,35 @@ impl<'a> PlatformPropertyIdeaListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Used to fetch next page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ideas per page. If unspecified, at most 10 ideas will be returned. The maximum value is 2000; values above 2000 will be coerced to 2000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlatformPropertyIdeaListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Order semantics described below.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions are implicitly combined, as if the `AND` operator was always used. The `OR` operator is currently unsupported. * Supported functions: - `saved(bool)`: If set to true, fetches only saved ideas. If set to false, fetches all except saved ideas. Can't be simultaneously used with `dismissed(bool)`. - `dismissed(bool)`: If set to true, fetches only dismissed ideas. Can't be simultaneously used with `saved(bool)`. The `false` value is currently unsupported. Examples: * `saved(true)` * `saved(false)` * `dismissed(true)` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> PlatformPropertyIdeaListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1213,7 +1236,7 @@ impl<'a> PlatformPropertyIdeaListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyIdeaListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyIdeaListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1238,7 +1261,7 @@ impl<'a> PlatformPropertyIdeaListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyIdeaListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyIdeaListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1269,7 +1292,7 @@ impl<'a> PlatformPropertyIdeaListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1279,10 +1302,10 @@ impl<'a> PlatformPropertyIdeaListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformPropertyLocaleListCall<'a>
-    where  {
+pub struct PlatformPropertyLocaleListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Ideahub<>,
+    hub: &'a Ideahub<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1290,9 +1313,15 @@ pub struct PlatformPropertyLocaleListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformPropertyLocaleListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformPropertyLocaleListCall<'a, S> {}
 
-impl<'a> PlatformPropertyLocaleListCall<'a> {
+impl<'a, S> PlatformPropertyLocaleListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1439,21 +1468,21 @@ impl<'a> PlatformPropertyLocaleListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformPropertyLocaleListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformPropertyLocaleListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListAvailableLocales` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAvailableLocales` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlatformPropertyLocaleListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlatformPropertyLocaleListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of locales to return. The service may return fewer than this value. If unspecified, at most 100 locales will be returned. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlatformPropertyLocaleListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlatformPropertyLocaleListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1463,7 +1492,7 @@ impl<'a> PlatformPropertyLocaleListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyLocaleListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyLocaleListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1488,7 +1517,7 @@ impl<'a> PlatformPropertyLocaleListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyLocaleListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyLocaleListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1520,7 +1549,7 @@ impl<'a> PlatformPropertyLocaleListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Ideahub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1534,10 +1563,10 @@ impl<'a> PlatformPropertyLocaleListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformPropertyTopicStatePatchCall<'a>
-    where  {
+pub struct PlatformPropertyTopicStatePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Ideahub<>,
+    hub: &'a Ideahub<S>,
     _request: GoogleSearchIdeahubV1betaTopicState,
     _name: String,
     _update_mask: Option<String>,
@@ -1545,9 +1574,15 @@ pub struct PlatformPropertyTopicStatePatchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformPropertyTopicStatePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformPropertyTopicStatePatchCall<'a, S> {}
 
-impl<'a> PlatformPropertyTopicStatePatchCall<'a> {
+impl<'a, S> PlatformPropertyTopicStatePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1704,7 +1739,7 @@ impl<'a> PlatformPropertyTopicStatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSearchIdeahubV1betaTopicState) -> PlatformPropertyTopicStatePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleSearchIdeahubV1betaTopicState) -> PlatformPropertyTopicStatePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1714,14 +1749,14 @@ impl<'a> PlatformPropertyTopicStatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PlatformPropertyTopicStatePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PlatformPropertyTopicStatePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PlatformPropertyTopicStatePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PlatformPropertyTopicStatePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -1731,7 +1766,7 @@ impl<'a> PlatformPropertyTopicStatePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyTopicStatePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformPropertyTopicStatePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1756,7 +1791,7 @@ impl<'a> PlatformPropertyTopicStatePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyTopicStatePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformPropertyTopicStatePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

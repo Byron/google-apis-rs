@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -102,34 +107,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudKMS<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudKMS<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudKMS<> {}
+impl<'a, S> client::Hub for CloudKMS<S> {}
 
-impl<'a, > CloudKMS<> {
+impl<'a, S> CloudKMS<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudKMS<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudKMS<S> {
         CloudKMS {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudkms.googleapis.com/".to_string(),
             _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1362,22 +1367,22 @@ impl client::Part for WrappingPublicKey {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_ekm_connections_create(...)`, `locations_ekm_connections_get(...)`, `locations_ekm_connections_get_iam_policy(...)`, `locations_ekm_connections_list(...)`, `locations_ekm_connections_patch(...)`, `locations_ekm_connections_set_iam_policy(...)`, `locations_ekm_connections_test_iam_permissions(...)`, `locations_generate_random_bytes(...)`, `locations_get(...)`, `locations_key_rings_create(...)`, `locations_key_rings_crypto_keys_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_destroy(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_import(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_list(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_mac_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_mac_verify(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_patch(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_restore(...)`, `locations_key_rings_crypto_keys_decrypt(...)`, `locations_key_rings_crypto_keys_encrypt(...)`, `locations_key_rings_crypto_keys_get(...)`, `locations_key_rings_crypto_keys_get_iam_policy(...)`, `locations_key_rings_crypto_keys_list(...)`, `locations_key_rings_crypto_keys_patch(...)`, `locations_key_rings_crypto_keys_set_iam_policy(...)`, `locations_key_rings_crypto_keys_test_iam_permissions(...)`, `locations_key_rings_crypto_keys_update_primary_version(...)`, `locations_key_rings_get(...)`, `locations_key_rings_get_iam_policy(...)`, `locations_key_rings_import_jobs_create(...)`, `locations_key_rings_import_jobs_get(...)`, `locations_key_rings_import_jobs_get_iam_policy(...)`, `locations_key_rings_import_jobs_list(...)`, `locations_key_rings_import_jobs_set_iam_policy(...)`, `locations_key_rings_import_jobs_test_iam_permissions(...)`, `locations_key_rings_list(...)`, `locations_key_rings_set_iam_policy(...)`, `locations_key_rings_test_iam_permissions(...)` and `locations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1387,7 +1392,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the location associated with the EkmConnection, in the format `projects/*/locations/*`.
-    pub fn locations_ekm_connections_create(&self, request: EkmConnection, parent: &str) -> ProjectLocationEkmConnectionCreateCall<'a> {
+    pub fn locations_ekm_connections_create(&self, request: EkmConnection, parent: &str) -> ProjectLocationEkmConnectionCreateCall<'a, S> {
         ProjectLocationEkmConnectionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1406,7 +1411,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the EkmConnection to get.
-    pub fn locations_ekm_connections_get(&self, name: &str) -> ProjectLocationEkmConnectionGetCall<'a> {
+    pub fn locations_ekm_connections_get(&self, name: &str) -> ProjectLocationEkmConnectionGetCall<'a, S> {
         ProjectLocationEkmConnectionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1423,7 +1428,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_ekm_connections_get_iam_policy(&self, resource: &str) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
+    pub fn locations_ekm_connections_get_iam_policy(&self, resource: &str) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S> {
         ProjectLocationEkmConnectionGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1441,7 +1446,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the location associated with the EkmConnections to list, in the format `projects/*/locations/*`.
-    pub fn locations_ekm_connections_list(&self, parent: &str) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn locations_ekm_connections_list(&self, parent: &str) -> ProjectLocationEkmConnectionListCall<'a, S> {
         ProjectLocationEkmConnectionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1463,7 +1468,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name for the EkmConnection in the format `projects/*/locations/*/ekmConnections/*`.
-    pub fn locations_ekm_connections_patch(&self, request: EkmConnection, name: &str) -> ProjectLocationEkmConnectionPatchCall<'a> {
+    pub fn locations_ekm_connections_patch(&self, request: EkmConnection, name: &str) -> ProjectLocationEkmConnectionPatchCall<'a, S> {
         ProjectLocationEkmConnectionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1483,7 +1488,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_ekm_connections_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
+    pub fn locations_ekm_connections_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S> {
         ProjectLocationEkmConnectionSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1502,7 +1507,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_ekm_connections_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
+    pub fn locations_ekm_connections_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S> {
         ProjectLocationEkmConnectionTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1521,7 +1526,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKeyVersion to use for decryption.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(&self, request: AsymmetricDecryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(&self, request: AsymmetricDecryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall {
             hub: self.hub,
             _request: request,
@@ -1540,7 +1545,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKeyVersion to use for signing.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(&self, request: AsymmetricSignRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(&self, request: AsymmetricSignRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall {
             hub: self.hub,
             _request: request,
@@ -1559,7 +1564,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the CryptoKey associated with the CryptoKeyVersions.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_create(&self, request: CryptoKeyVersion, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_create(&self, request: CryptoKeyVersion, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1578,7 +1583,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKeyVersion to destroy.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, request: DestroyCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, request: DestroyCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall {
             hub: self.hub,
             _request: request,
@@ -1596,7 +1601,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the CryptoKeyVersion to get.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1613,7 +1618,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the CryptoKeyVersion public key to get.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1631,7 +1636,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the CryptoKey to be imported into. The create permission is only required on this key when creating a new CryptoKeyVersion.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_import(&self, request: ImportCryptoKeyVersionRequest, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_import(&self, request: ImportCryptoKeyVersionRequest, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall {
             hub: self.hub,
             _request: request,
@@ -1649,7 +1654,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the CryptoKey to list, in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1672,7 +1677,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKeyVersion to use for signing.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_mac_sign(&self, request: MacSignRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_mac_sign(&self, request: MacSignRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall {
             hub: self.hub,
             _request: request,
@@ -1691,7 +1696,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKeyVersion to use for verification.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_mac_verify(&self, request: MacVerifyRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_mac_verify(&self, request: MacVerifyRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall {
             hub: self.hub,
             _request: request,
@@ -1710,7 +1715,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name for this CryptoKeyVersion in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_patch(&self, request: CryptoKeyVersion, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_patch(&self, request: CryptoKeyVersion, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1730,7 +1735,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKeyVersion to restore.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, request: RestoreCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, request: RestoreCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall {
             hub: self.hub,
             _request: request,
@@ -1749,7 +1754,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the KeyRing associated with the CryptoKeys.
-    pub fn locations_key_rings_crypto_keys_create(&self, request: CryptoKey, parent: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+    pub fn locations_key_rings_crypto_keys_create(&self, request: CryptoKey, parent: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyCreateCall {
             hub: self.hub,
             _request: request,
@@ -1770,7 +1775,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKey to use for decryption. The server will choose the appropriate version.
-    pub fn locations_key_rings_crypto_keys_decrypt(&self, request: DecryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
+    pub fn locations_key_rings_crypto_keys_decrypt(&self, request: DecryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyDecryptCall {
             hub: self.hub,
             _request: request,
@@ -1789,7 +1794,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKey or CryptoKeyVersion to use for encryption. If a CryptoKey is specified, the server will use its primary version.
-    pub fn locations_key_rings_crypto_keys_encrypt(&self, request: EncryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
+    pub fn locations_key_rings_crypto_keys_encrypt(&self, request: EncryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyEncryptCall {
             hub: self.hub,
             _request: request,
@@ -1807,7 +1812,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the CryptoKey to get.
-    pub fn locations_key_rings_crypto_keys_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
+    pub fn locations_key_rings_crypto_keys_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1824,7 +1829,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_crypto_keys_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
+    pub fn locations_key_rings_crypto_keys_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1842,7 +1847,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the KeyRing to list, in the format `projects/*/locations/*/keyRings/*`.
-    pub fn locations_key_rings_crypto_keys_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn locations_key_rings_crypto_keys_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1865,7 +1870,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name for this CryptoKey in the format `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-    pub fn locations_key_rings_crypto_keys_patch(&self, request: CryptoKey, name: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
+    pub fn locations_key_rings_crypto_keys_patch(&self, request: CryptoKey, name: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyPatchCall {
             hub: self.hub,
             _request: request,
@@ -1885,7 +1890,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_crypto_keys_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
+    pub fn locations_key_rings_crypto_keys_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S> {
         ProjectLocationKeyRingCryptoKeySetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1904,7 +1909,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_crypto_keys_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
+    pub fn locations_key_rings_crypto_keys_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1923,7 +1928,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKey to update.
-    pub fn locations_key_rings_crypto_keys_update_primary_version(&self, request: UpdateCryptoKeyPrimaryVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
+    pub fn locations_key_rings_crypto_keys_update_primary_version(&self, request: UpdateCryptoKeyPrimaryVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S> {
         ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall {
             hub: self.hub,
             _request: request,
@@ -1942,7 +1947,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the KeyRing associated with the ImportJobs.
-    pub fn locations_key_rings_import_jobs_create(&self, request: ImportJob, parent: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a> {
+    pub fn locations_key_rings_import_jobs_create(&self, request: ImportJob, parent: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a, S> {
         ProjectLocationKeyRingImportJobCreateCall {
             hub: self.hub,
             _request: request,
@@ -1961,7 +1966,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the ImportJob to get.
-    pub fn locations_key_rings_import_jobs_get(&self, name: &str) -> ProjectLocationKeyRingImportJobGetCall<'a> {
+    pub fn locations_key_rings_import_jobs_get(&self, name: &str) -> ProjectLocationKeyRingImportJobGetCall<'a, S> {
         ProjectLocationKeyRingImportJobGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1978,7 +1983,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_import_jobs_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
+    pub fn locations_key_rings_import_jobs_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S> {
         ProjectLocationKeyRingImportJobGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1996,7 +2001,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the KeyRing to list, in the format `projects/*/locations/*/keyRings/*`.
-    pub fn locations_key_rings_import_jobs_list(&self, parent: &str) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn locations_key_rings_import_jobs_list(&self, parent: &str) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         ProjectLocationKeyRingImportJobListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2018,7 +2023,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_import_jobs_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
+    pub fn locations_key_rings_import_jobs_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S> {
         ProjectLocationKeyRingImportJobSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2037,7 +2042,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_import_jobs_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
+    pub fn locations_key_rings_import_jobs_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S> {
         ProjectLocationKeyRingImportJobTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -2056,7 +2061,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the location associated with the KeyRings, in the format `projects/*/locations/*`.
-    pub fn locations_key_rings_create(&self, request: KeyRing, parent: &str) -> ProjectLocationKeyRingCreateCall<'a> {
+    pub fn locations_key_rings_create(&self, request: KeyRing, parent: &str) -> ProjectLocationKeyRingCreateCall<'a, S> {
         ProjectLocationKeyRingCreateCall {
             hub: self.hub,
             _request: request,
@@ -2075,7 +2080,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the KeyRing to get.
-    pub fn locations_key_rings_get(&self, name: &str) -> ProjectLocationKeyRingGetCall<'a> {
+    pub fn locations_key_rings_get(&self, name: &str) -> ProjectLocationKeyRingGetCall<'a, S> {
         ProjectLocationKeyRingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2092,7 +2097,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
+    pub fn locations_key_rings_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a, S> {
         ProjectLocationKeyRingGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -2110,7 +2115,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the location associated with the KeyRings, in the format `projects/*/locations/*`.
-    pub fn locations_key_rings_list(&self, parent: &str) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn locations_key_rings_list(&self, parent: &str) -> ProjectLocationKeyRingListCall<'a, S> {
         ProjectLocationKeyRingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2132,7 +2137,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
+    pub fn locations_key_rings_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a, S> {
         ProjectLocationKeyRingSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2151,7 +2156,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
+    pub fn locations_key_rings_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a, S> {
         ProjectLocationKeyRingTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -2170,7 +2175,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `location` - The project-specific location in which to generate random bytes. For example, "projects/my-project/locations/us-central1".
-    pub fn locations_generate_random_bytes(&self, request: GenerateRandomBytesRequest, location: &str) -> ProjectLocationGenerateRandomByteCall<'a> {
+    pub fn locations_generate_random_bytes(&self, request: GenerateRandomBytesRequest, location: &str) -> ProjectLocationGenerateRandomByteCall<'a, S> {
         ProjectLocationGenerateRandomByteCall {
             hub: self.hub,
             _request: request,
@@ -2188,7 +2193,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, S> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2205,7 +2210,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, S> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2250,7 +2255,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2264,10 +2269,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionCreateCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: EkmConnection,
     _parent: String,
     _ekm_connection_id: Option<String>,
@@ -2276,9 +2281,15 @@ pub struct ProjectLocationEkmConnectionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2441,7 +2452,7 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EkmConnection) -> ProjectLocationEkmConnectionCreateCall<'a> {
+    pub fn request(mut self, new_value: EkmConnection) -> ProjectLocationEkmConnectionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2451,14 +2462,14 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationEkmConnectionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationEkmConnectionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`.
     ///
     /// Sets the *ekm connection id* query property to the given value.
-    pub fn ekm_connection_id(mut self, new_value: &str) -> ProjectLocationEkmConnectionCreateCall<'a> {
+    pub fn ekm_connection_id(mut self, new_value: &str) -> ProjectLocationEkmConnectionCreateCall<'a, S> {
         self._ekm_connection_id = Some(new_value.to_string());
         self
     }
@@ -2468,7 +2479,7 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2493,7 +2504,7 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2513,9 +2524,9 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2547,7 +2558,7 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2555,19 +2566,25 @@ impl<'a> ProjectLocationEkmConnectionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionGetCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionGetCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2714,7 +2731,7 @@ impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationEkmConnectionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationEkmConnectionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2724,7 +2741,7 @@ impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2749,7 +2766,7 @@ impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2769,9 +2786,9 @@ impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2803,7 +2820,7 @@ impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2812,10 +2829,10 @@ impl<'a> ProjectLocationEkmConnectionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2823,9 +2840,15 @@ pub struct ProjectLocationEkmConnectionGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2975,14 +2998,14 @@ impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -2992,7 +3015,7 @@ impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3017,7 +3040,7 @@ impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3037,9 +3060,9 @@ impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3071,7 +3094,7 @@ impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3083,10 +3106,10 @@ impl<'a> ProjectLocationEkmConnectionGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionListCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3097,9 +3120,15 @@ pub struct ProjectLocationEkmConnectionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionListCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionListCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3258,35 +3287,35 @@ impl<'a> ProjectLocationEkmConnectionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Optional pagination token, returned earlier via ListEkmConnectionsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of EkmConnections to include in the response. Further EkmConnections can subsequently be obtained by including the ListEkmConnectionsResponse.next_page_token in a subsequent request. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationEkmConnectionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the results will be sorted in the default order. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Only include resources that match the filter in the response. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationEkmConnectionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3296,7 +3325,7 @@ impl<'a> ProjectLocationEkmConnectionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3321,7 +3350,7 @@ impl<'a> ProjectLocationEkmConnectionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3341,9 +3370,9 @@ impl<'a> ProjectLocationEkmConnectionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3376,7 +3405,7 @@ impl<'a> ProjectLocationEkmConnectionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3390,10 +3419,10 @@ impl<'a> ProjectLocationEkmConnectionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionPatchCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: EkmConnection,
     _name: String,
     _update_mask: Option<String>,
@@ -3402,9 +3431,15 @@ pub struct ProjectLocationEkmConnectionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3567,7 +3602,7 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EkmConnection) -> ProjectLocationEkmConnectionPatchCall<'a> {
+    pub fn request(mut self, new_value: EkmConnection) -> ProjectLocationEkmConnectionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3577,14 +3612,14 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationEkmConnectionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationEkmConnectionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationEkmConnectionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationEkmConnectionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3594,7 +3629,7 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3619,7 +3654,7 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3639,9 +3674,9 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3674,7 +3709,7 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3687,10 +3722,10 @@ impl<'a> ProjectLocationEkmConnectionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3698,9 +3733,15 @@ pub struct ProjectLocationEkmConnectionSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3860,7 +3901,7 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3870,7 +3911,7 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3880,7 +3921,7 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3905,7 +3946,7 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3925,9 +3966,9 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3960,7 +4001,7 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3973,10 +4014,10 @@ impl<'a> ProjectLocationEkmConnectionSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEkmConnectionTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationEkmConnectionTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3984,9 +4025,15 @@ pub struct ProjectLocationEkmConnectionTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationEkmConnectionTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationEkmConnectionTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4146,7 +4193,7 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4156,7 +4203,7 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4166,7 +4213,7 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4191,7 +4238,7 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4211,9 +4258,9 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationEkmConnectionTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4246,7 +4293,7 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4259,10 +4306,10 @@ impl<'a> ProjectLocationEkmConnectionTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: AsymmetricDecryptRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4270,9 +4317,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4432,7 +4485,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AsymmetricDecryptRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a> {
+    pub fn request(mut self, new_value: AsymmetricDecryptRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4442,7 +4495,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4452,7 +4505,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4477,7 +4530,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4497,9 +4550,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4532,7 +4585,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4545,10 +4598,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricDecryptCall<'a
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: AsymmetricSignRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4556,9 +4609,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4718,7 +4777,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AsymmetricSignRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
+    pub fn request(mut self, new_value: AsymmetricSignRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4728,7 +4787,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4738,7 +4797,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4763,7 +4822,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4783,9 +4842,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4818,7 +4877,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4831,10 +4890,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionAsymmetricSignCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: CryptoKeyVersion,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4842,9 +4901,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5004,7 +5069,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
+    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5014,7 +5079,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5024,7 +5089,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5049,7 +5114,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5069,9 +5134,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5104,7 +5169,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5117,10 +5182,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: DestroyCryptoKeyVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5128,9 +5193,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5290,7 +5361,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DestroyCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
+    pub fn request(mut self, new_value: DestroyCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5300,7 +5371,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5310,7 +5381,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5335,7 +5406,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5355,9 +5426,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5389,7 +5460,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5397,19 +5468,25 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5556,7 +5633,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5566,7 +5643,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5591,7 +5668,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5611,9 +5688,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5645,7 +5722,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5653,19 +5730,25 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5812,7 +5895,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5822,7 +5905,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5847,7 +5930,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5867,9 +5950,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5902,7 +5985,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5915,10 +5998,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: ImportCryptoKeyVersionRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5926,9 +6009,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6088,7 +6177,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
+    pub fn request(mut self, new_value: ImportCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6098,7 +6187,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6108,7 +6197,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6133,7 +6222,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6153,9 +6242,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6187,7 +6276,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6200,10 +6289,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -6215,9 +6304,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6379,42 +6474,42 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The fields to include in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Optional. Optional pagination token, returned earlier via ListCryptoKeyVersionsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of CryptoKeyVersions to include in the response. Further CryptoKeyVersions can subsequently be obtained by including the ListCryptoKeyVersionsResponse.next_page_token in a subsequent request. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the results will be sorted in the default order. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Only include resources that match the filter in the response. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6424,7 +6519,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6449,7 +6544,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6469,9 +6564,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6504,7 +6599,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6517,10 +6612,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: MacSignRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6528,9 +6623,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6690,7 +6791,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MacSignRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
+    pub fn request(mut self, new_value: MacSignRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6700,7 +6801,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6710,7 +6811,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6735,7 +6836,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6755,9 +6856,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6790,7 +6891,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6803,10 +6904,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacSignCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: MacVerifyRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6814,9 +6915,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6976,7 +7083,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MacVerifyRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
+    pub fn request(mut self, new_value: MacVerifyRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6986,7 +7093,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6996,7 +7103,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7021,7 +7128,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7041,9 +7148,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7076,7 +7183,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7090,10 +7197,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionMacVerifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: CryptoKeyVersion,
     _name: String,
     _update_mask: Option<String>,
@@ -7102,9 +7209,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7267,7 +7380,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
+    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7277,14 +7390,14 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7294,7 +7407,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7319,7 +7432,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7339,9 +7452,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7374,7 +7487,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7387,10 +7500,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: RestoreCryptoKeyVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7398,9 +7511,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7560,7 +7679,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RestoreCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
+    pub fn request(mut self, new_value: RestoreCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7570,7 +7689,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7580,7 +7699,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7605,7 +7724,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7625,9 +7744,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7660,7 +7779,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7675,10 +7794,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: CryptoKey,
     _parent: String,
     _skip_initial_version_creation: Option<bool>,
@@ -7688,9 +7807,15 @@ pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7856,7 +7981,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7866,21 +7991,21 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If set to true, the request will create a CryptoKey without any CryptoKeyVersions. You must manually call CreateCryptoKeyVersion or ImportCryptoKeyVersion before you can use this CryptoKey.
     ///
     /// Sets the *skip initial version creation* query property to the given value.
-    pub fn skip_initial_version_creation(mut self, new_value: bool) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+    pub fn skip_initial_version_creation(mut self, new_value: bool) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {
         self._skip_initial_version_creation = Some(new_value);
         self
     }
     /// Required. It must be unique within a KeyRing and match the regular expression `[a-zA-Z0-9_-]{1,63}`
     ///
     /// Sets the *crypto key id* query property to the given value.
-    pub fn crypto_key_id(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+    pub fn crypto_key_id(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {
         self._crypto_key_id = Some(new_value.to_string());
         self
     }
@@ -7890,7 +8015,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7915,7 +8040,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7935,9 +8060,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7970,7 +8095,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7983,10 +8108,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: DecryptRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7994,9 +8119,15 @@ pub struct ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8156,7 +8287,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DecryptRequest) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
+    pub fn request(mut self, new_value: DecryptRequest) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8166,7 +8297,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8176,7 +8307,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8201,7 +8332,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8221,9 +8352,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8256,7 +8387,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8269,10 +8400,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: EncryptRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8280,9 +8411,15 @@ pub struct ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8442,7 +8579,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EncryptRequest) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
+    pub fn request(mut self, new_value: EncryptRequest) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8452,7 +8589,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8462,7 +8599,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8487,7 +8624,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8507,9 +8644,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8541,7 +8678,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8549,19 +8686,25 @@ impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyGetCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8708,7 +8851,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8718,7 +8861,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8743,7 +8886,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8763,9 +8906,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8797,7 +8940,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8806,10 +8949,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8817,9 +8960,15 @@ pub struct ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8969,14 +9118,14 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -8986,7 +9135,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9011,7 +9160,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9031,9 +9180,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9065,7 +9214,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9078,10 +9227,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyListCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _parent: String,
     _version_view: Option<String>,
     _page_token: Option<String>,
@@ -9093,9 +9242,15 @@ pub struct ProjectLocationKeyRingCryptoKeyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyListCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9257,42 +9412,42 @@ impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The fields of the primary version to include in the response.
     ///
     /// Sets the *version view* query property to the given value.
-    pub fn version_view(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn version_view(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._version_view = Some(new_value.to_string());
         self
     }
     /// Optional. Optional pagination token, returned earlier via ListCryptoKeysResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of CryptoKeys to include in the response. Further CryptoKeys can subsequently be obtained by including the ListCryptoKeysResponse.next_page_token in a subsequent request. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the results will be sorted in the default order. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Only include resources that match the filter in the response. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9302,7 +9457,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9327,7 +9482,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9347,9 +9502,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9382,7 +9537,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9396,10 +9551,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyPatchCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: CryptoKey,
     _name: String,
     _update_mask: Option<String>,
@@ -9408,9 +9563,15 @@ pub struct ProjectLocationKeyRingCryptoKeyPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9573,7 +9734,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
+    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9583,14 +9744,14 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9600,7 +9761,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9625,7 +9786,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9645,9 +9806,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9680,7 +9841,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9693,10 +9854,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9704,9 +9865,15 @@ pub struct ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9866,7 +10033,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9876,7 +10043,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -9886,7 +10053,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9911,7 +10078,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9931,9 +10098,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9966,7 +10133,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9979,10 +10146,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9990,9 +10157,15 @@ pub struct ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10152,7 +10325,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10162,7 +10335,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -10172,7 +10345,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10197,7 +10370,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10217,9 +10390,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10252,7 +10425,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10265,10 +10438,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: UpdateCryptoKeyPrimaryVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10276,9 +10449,15 @@ pub struct ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10438,7 +10617,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateCryptoKeyPrimaryVersionRequest) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
+    pub fn request(mut self, new_value: UpdateCryptoKeyPrimaryVersionRequest) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10448,7 +10627,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10458,7 +10637,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10483,7 +10662,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10503,9 +10682,9 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10538,7 +10717,7 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10552,10 +10731,10 @@ impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingImportJobCreateCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingImportJobCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: ImportJob,
     _parent: String,
     _import_job_id: Option<String>,
@@ -10564,9 +10743,15 @@ pub struct ProjectLocationKeyRingImportJobCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingImportJobCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingImportJobCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
+impl<'a, S> ProjectLocationKeyRingImportJobCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10729,7 +10914,7 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportJob) -> ProjectLocationKeyRingImportJobCreateCall<'a> {
+    pub fn request(mut self, new_value: ImportJob) -> ProjectLocationKeyRingImportJobCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10739,14 +10924,14 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. It must be unique within a KeyRing and match the regular expression `[a-zA-Z0-9_-]{1,63}`
     ///
     /// Sets the *import job id* query property to the given value.
-    pub fn import_job_id(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a> {
+    pub fn import_job_id(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobCreateCall<'a, S> {
         self._import_job_id = Some(new_value.to_string());
         self
     }
@@ -10756,7 +10941,7 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10781,7 +10966,7 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10801,9 +10986,9 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingImportJobCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10835,7 +11020,7 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10843,19 +11028,25 @@ impl<'a> ProjectLocationKeyRingImportJobCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingImportJobGetCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingImportJobGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingImportJobGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingImportJobGetCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
+impl<'a, S> ProjectLocationKeyRingImportJobGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11002,7 +11193,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11012,7 +11203,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11037,7 +11228,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11057,9 +11248,9 @@ impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingImportJobGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11091,7 +11282,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11100,10 +11291,10 @@ impl<'a> ProjectLocationKeyRingImportJobGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingImportJobGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11111,9 +11302,15 @@ pub struct ProjectLocationKeyRingImportJobGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11263,14 +11460,14 @@ impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -11280,7 +11477,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11305,7 +11502,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11325,9 +11522,9 @@ impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11359,7 +11556,7 @@ impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11371,10 +11568,10 @@ impl<'a> ProjectLocationKeyRingImportJobGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingImportJobListCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingImportJobListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11385,9 +11582,15 @@ pub struct ProjectLocationKeyRingImportJobListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingImportJobListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingImportJobListCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
+impl<'a, S> ProjectLocationKeyRingImportJobListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11546,35 +11749,35 @@ impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Optional pagination token, returned earlier via ListImportJobsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of ImportJobs to include in the response. Further ImportJobs can subsequently be obtained by including the ListImportJobsResponse.next_page_token in a subsequent request. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the results will be sorted in the default order. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Only include resources that match the filter in the response. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11584,7 +11787,7 @@ impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11609,7 +11812,7 @@ impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11629,9 +11832,9 @@ impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingImportJobListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11664,7 +11867,7 @@ impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11677,10 +11880,10 @@ impl<'a> ProjectLocationKeyRingImportJobListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingImportJobSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11688,9 +11891,15 @@ pub struct ProjectLocationKeyRingImportJobSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11850,7 +12059,7 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11860,7 +12069,7 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -11870,7 +12079,7 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11895,7 +12104,7 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11915,9 +12124,9 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11950,7 +12159,7 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11963,10 +12172,10 @@ impl<'a> ProjectLocationKeyRingImportJobSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingImportJobTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11974,9 +12183,15 @@ pub struct ProjectLocationKeyRingImportJobTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12136,7 +12351,7 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12146,7 +12361,7 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -12156,7 +12371,7 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12181,7 +12396,7 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12201,9 +12416,9 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12236,7 +12451,7 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12250,10 +12465,10 @@ impl<'a> ProjectLocationKeyRingImportJobTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCreateCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: KeyRing,
     _parent: String,
     _key_ring_id: Option<String>,
@@ -12262,9 +12477,15 @@ pub struct ProjectLocationKeyRingCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingCreateCall<'a> {
+impl<'a, S> ProjectLocationKeyRingCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12427,7 +12648,7 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: KeyRing) -> ProjectLocationKeyRingCreateCall<'a> {
+    pub fn request(mut self, new_value: KeyRing) -> ProjectLocationKeyRingCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12437,14 +12658,14 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. It must be unique within a location and match the regular expression `[a-zA-Z0-9_-]{1,63}`
     ///
     /// Sets the *key ring id* query property to the given value.
-    pub fn key_ring_id(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a> {
+    pub fn key_ring_id(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a, S> {
         self._key_ring_id = Some(new_value.to_string());
         self
     }
@@ -12454,7 +12675,7 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12479,7 +12700,7 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12499,9 +12720,9 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12533,7 +12754,7 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12541,19 +12762,25 @@ impl<'a> ProjectLocationKeyRingCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingGetCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingGetCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingGetCall<'a> {
+impl<'a, S> ProjectLocationKeyRingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12700,7 +12927,7 @@ impl<'a> ProjectLocationKeyRingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12710,7 +12937,7 @@ impl<'a> ProjectLocationKeyRingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12735,7 +12962,7 @@ impl<'a> ProjectLocationKeyRingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12755,9 +12982,9 @@ impl<'a> ProjectLocationKeyRingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12789,7 +13016,7 @@ impl<'a> ProjectLocationKeyRingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12798,10 +13025,10 @@ impl<'a> ProjectLocationKeyRingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12809,9 +13036,15 @@ pub struct ProjectLocationKeyRingGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12961,14 +13194,14 @@ impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationKeyRingGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -12978,7 +13211,7 @@ impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13003,7 +13236,7 @@ impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13023,9 +13256,9 @@ impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13057,7 +13290,7 @@ impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13069,10 +13302,10 @@ impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingListCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13083,9 +13316,15 @@ pub struct ProjectLocationKeyRingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingListCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingListCall<'a> {
+impl<'a, S> ProjectLocationKeyRingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13244,35 +13483,35 @@ impl<'a> ProjectLocationKeyRingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Optional pagination token, returned earlier via ListKeyRingsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of KeyRings to include in the response. Further KeyRings can subsequently be obtained by including the ListKeyRingsResponse.next_page_token in a subsequent request. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specify how the results should be sorted. If not specified, the results will be sorted in the default order. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Only include resources that match the filter in the response. For more information, see [Sorting and filtering list results](https://cloud.google.com/kms/docs/sorting-and-filtering).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -13282,7 +13521,7 @@ impl<'a> ProjectLocationKeyRingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13307,7 +13546,7 @@ impl<'a> ProjectLocationKeyRingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13327,9 +13566,9 @@ impl<'a> ProjectLocationKeyRingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13362,7 +13601,7 @@ impl<'a> ProjectLocationKeyRingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13375,10 +13614,10 @@ impl<'a> ProjectLocationKeyRingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13386,9 +13625,15 @@ pub struct ProjectLocationKeyRingSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationKeyRingSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13548,7 +13793,7 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13558,7 +13803,7 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -13568,7 +13813,7 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13593,7 +13838,7 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13613,9 +13858,9 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13648,7 +13893,7 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13661,10 +13906,10 @@ impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationKeyRingTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13672,9 +13917,15 @@ pub struct ProjectLocationKeyRingTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyRingTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyRingTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationKeyRingTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13834,7 +14085,7 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13844,7 +14095,7 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -13854,7 +14105,7 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13879,7 +14130,7 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13899,9 +14150,9 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13934,7 +14185,7 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13947,10 +14198,10 @@ impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGenerateRandomByteCall<'a>
-    where  {
+pub struct ProjectLocationGenerateRandomByteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _request: GenerateRandomBytesRequest,
     _location: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13958,9 +14209,15 @@ pub struct ProjectLocationGenerateRandomByteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGenerateRandomByteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGenerateRandomByteCall<'a, S> {}
 
-impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
+impl<'a, S> ProjectLocationGenerateRandomByteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14120,7 +14377,7 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateRandomBytesRequest) -> ProjectLocationGenerateRandomByteCall<'a> {
+    pub fn request(mut self, new_value: GenerateRandomBytesRequest) -> ProjectLocationGenerateRandomByteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14130,7 +14387,7 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location(mut self, new_value: &str) -> ProjectLocationGenerateRandomByteCall<'a> {
+    pub fn location(mut self, new_value: &str) -> ProjectLocationGenerateRandomByteCall<'a, S> {
         self._location = new_value.to_string();
         self
     }
@@ -14140,7 +14397,7 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGenerateRandomByteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGenerateRandomByteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14165,7 +14422,7 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGenerateRandomByteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGenerateRandomByteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14185,9 +14442,9 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGenerateRandomByteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGenerateRandomByteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14219,7 +14476,7 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14227,19 +14484,25 @@ impl<'a> ProjectLocationGenerateRandomByteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a>
-    where  {
+pub struct ProjectLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGetCall<'a> {
+impl<'a, S> ProjectLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14386,7 +14649,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14396,7 +14659,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14421,7 +14684,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14441,9 +14704,9 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14475,7 +14738,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudKMS::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14486,10 +14749,10 @@ impl<'a> ProjectLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a>
-    where  {
+pub struct ProjectLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudKMS<>,
+    hub: &'a CloudKMS<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14499,9 +14762,15 @@ pub struct ProjectLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationListCall<'a, S> {}
 
-impl<'a> ProjectLocationListCall<'a> {
+impl<'a, S> ProjectLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14657,28 +14926,28 @@ impl<'a> ProjectLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service selects a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -14688,7 +14957,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14713,7 +14982,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14733,9 +15002,9 @@ impl<'a> ProjectLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

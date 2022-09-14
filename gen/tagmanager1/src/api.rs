@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -95,7 +100,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -130,34 +135,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct TagManager<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct TagManager<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for TagManager<> {}
+impl<'a, S> client::Hub for TagManager<S> {}
 
-impl<'a, > TagManager<> {
+impl<'a, S> TagManager<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> TagManager<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> TagManager<S> {
         TagManager {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://tagmanager.googleapis.com/".to_string(),
             _root_url: "https://tagmanager.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1203,22 +1208,22 @@ impl client::ResponseResult for Variable {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `containers_create(...)`, `containers_delete(...)`, `containers_environments_create(...)`, `containers_environments_delete(...)`, `containers_environments_get(...)`, `containers_environments_list(...)`, `containers_environments_update(...)`, `containers_folders_create(...)`, `containers_folders_delete(...)`, `containers_folders_entities_list(...)`, `containers_folders_get(...)`, `containers_folders_list(...)`, `containers_folders_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_move_folders_update(...)`, `containers_reauthorize_environments_update(...)`, `containers_tags_create(...)`, `containers_tags_delete(...)`, `containers_tags_get(...)`, `containers_tags_list(...)`, `containers_tags_update(...)`, `containers_triggers_create(...)`, `containers_triggers_delete(...)`, `containers_triggers_get(...)`, `containers_triggers_list(...)`, `containers_triggers_update(...)`, `containers_update(...)`, `containers_variables_create(...)`, `containers_variables_delete(...)`, `containers_variables_get(...)`, `containers_variables_list(...)`, `containers_variables_update(...)`, `containers_versions_create(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_list(...)`, `containers_versions_publish(...)`, `containers_versions_restore(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `get(...)`, `list(...)`, `permissions_create(...)`, `permissions_delete(...)`, `permissions_get(...)`, `permissions_list(...)`, `permissions_update(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1229,7 +1234,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_environments_create(&self, request: Environment, account_id: &str, container_id: &str) -> AccountContainerEnvironmentCreateCall<'a> {
+    pub fn containers_environments_create(&self, request: Environment, account_id: &str, container_id: &str) -> AccountContainerEnvironmentCreateCall<'a, S> {
         AccountContainerEnvironmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1250,7 +1255,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_environments_delete(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
+    pub fn containers_environments_delete(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentDeleteCall<'a, S> {
         AccountContainerEnvironmentDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1271,7 +1276,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_environments_get(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentGetCall<'a> {
+    pub fn containers_environments_get(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentGetCall<'a, S> {
         AccountContainerEnvironmentGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1291,7 +1296,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_environments_list(&self, account_id: &str, container_id: &str) -> AccountContainerEnvironmentListCall<'a> {
+    pub fn containers_environments_list(&self, account_id: &str, container_id: &str) -> AccountContainerEnvironmentListCall<'a, S> {
         AccountContainerEnvironmentListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1312,7 +1317,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn containers_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         AccountContainerEnvironmentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1335,7 +1340,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_entities_list(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderEntityListCall<'a> {
+    pub fn containers_folders_entities_list(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderEntityListCall<'a, S> {
         AccountContainerFolderEntityListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1356,7 +1361,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_folders_create(&self, request: Folder, account_id: &str, container_id: &str) -> AccountContainerFolderCreateCall<'a> {
+    pub fn containers_folders_create(&self, request: Folder, account_id: &str, container_id: &str) -> AccountContainerFolderCreateCall<'a, S> {
         AccountContainerFolderCreateCall {
             hub: self.hub,
             _request: request,
@@ -1377,7 +1382,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_delete(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderDeleteCall<'a> {
+    pub fn containers_folders_delete(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderDeleteCall<'a, S> {
         AccountContainerFolderDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1398,7 +1403,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_get(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderGetCall<'a> {
+    pub fn containers_folders_get(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderGetCall<'a, S> {
         AccountContainerFolderGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1418,7 +1423,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_folders_list(&self, account_id: &str, container_id: &str) -> AccountContainerFolderListCall<'a> {
+    pub fn containers_folders_list(&self, account_id: &str, container_id: &str) -> AccountContainerFolderListCall<'a, S> {
         AccountContainerFolderListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1439,7 +1444,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn containers_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderUpdateCall<'a, S> {
         AccountContainerFolderUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1463,7 +1468,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_move_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn containers_move_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         AccountContainerMoveFolderUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1489,7 +1494,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_reauthorize_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+    pub fn containers_reauthorize_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {
         AccountContainerReauthorizeEnvironmentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1511,7 +1516,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_tags_create(&self, request: Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a> {
+    pub fn containers_tags_create(&self, request: Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a, S> {
         AccountContainerTagCreateCall {
             hub: self.hub,
             _request: request,
@@ -1532,7 +1537,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a> {
+    pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a, S> {
         AccountContainerTagDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1553,7 +1558,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a> {
+    pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a, S> {
         AccountContainerTagGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1573,7 +1578,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a> {
+    pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a, S> {
         AccountContainerTagListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1594,7 +1599,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_update(&self, request: Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a> {
+    pub fn containers_tags_update(&self, request: Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a, S> {
         AccountContainerTagUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1617,7 +1622,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_triggers_create(&self, request: Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a> {
+    pub fn containers_triggers_create(&self, request: Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a, S> {
         AccountContainerTriggerCreateCall {
             hub: self.hub,
             _request: request,
@@ -1638,7 +1643,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a> {
+    pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a, S> {
         AccountContainerTriggerDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1659,7 +1664,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a> {
+    pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a, S> {
         AccountContainerTriggerGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1679,7 +1684,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a> {
+    pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a, S> {
         AccountContainerTriggerListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1700,7 +1705,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_update(&self, request: Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn containers_triggers_update(&self, request: Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a, S> {
         AccountContainerTriggerUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1723,7 +1728,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_variables_create(&self, request: Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a> {
+    pub fn containers_variables_create(&self, request: Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a, S> {
         AccountContainerVariableCreateCall {
             hub: self.hub,
             _request: request,
@@ -1744,7 +1749,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a> {
+    pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a, S> {
         AccountContainerVariableDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1765,7 +1770,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a> {
+    pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a, S> {
         AccountContainerVariableGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1785,7 +1790,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a> {
+    pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a, S> {
         AccountContainerVariableListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1806,7 +1811,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_update(&self, request: Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn containers_variables_update(&self, request: Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a, S> {
         AccountContainerVariableUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1829,7 +1834,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_versions_create(&self, request: CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a> {
+    pub fn containers_versions_create(&self, request: CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a, S> {
         AccountContainerVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1850,7 +1855,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a> {
+    pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a, S> {
         AccountContainerVersionDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1871,7 +1876,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID. Specify published to retrieve the currently published version.
-    pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a> {
+    pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a, S> {
         AccountContainerVersionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1891,7 +1896,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a> {
+    pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a, S> {
         AccountContainerVersionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1913,7 +1918,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a> {
+    pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a, S> {
         AccountContainerVersionPublishCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1935,7 +1940,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a> {
+    pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a, S> {
         AccountContainerVersionRestoreCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1956,7 +1961,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a> {
+    pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a, S> {
         AccountContainerVersionUndeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1978,7 +1983,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_update(&self, request: ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn containers_versions_update(&self, request: ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a, S> {
         AccountContainerVersionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2000,7 +2005,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_create(&self, request: Container, account_id: &str) -> AccountContainerCreateCall<'a> {
+    pub fn containers_create(&self, request: Container, account_id: &str) -> AccountContainerCreateCall<'a, S> {
         AccountContainerCreateCall {
             hub: self.hub,
             _request: request,
@@ -2019,7 +2024,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a> {
+    pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a, S> {
         AccountContainerDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2038,7 +2043,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a> {
+    pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a, S> {
         AccountContainerGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2056,7 +2061,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a> {
+    pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a, S> {
         AccountContainerListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2075,7 +2080,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_update(&self, request: Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a> {
+    pub fn containers_update(&self, request: Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a, S> {
         AccountContainerUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2096,7 +2101,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn permissions_create(&self, request: UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a> {
+    pub fn permissions_create(&self, request: UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a, S> {
         AccountPermissionCreateCall {
             hub: self.hub,
             _request: request,
@@ -2115,7 +2120,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a> {
+    pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a, S> {
         AccountPermissionDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2134,7 +2139,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a> {
+    pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a, S> {
         AccountPermissionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2152,7 +2157,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a> {
+    pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a, S> {
         AccountPermissionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2171,7 +2176,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_update(&self, request: UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a> {
+    pub fn permissions_update(&self, request: UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a, S> {
         AccountPermissionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2190,7 +2195,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn get(&self, account_id: &str) -> AccountGetCall<'a> {
+    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, S> {
         AccountGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2203,7 +2208,7 @@ impl<'a> AccountMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all GTM Accounts that a user has access to.
-    pub fn list(&self) -> AccountListCall<'a> {
+    pub fn list(&self) -> AccountListCall<'a, S> {
         AccountListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2220,7 +2225,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn update(&self, request: Account, account_id: &str) -> AccountUpdateCall<'a> {
+    pub fn update(&self, request: Account, account_id: &str) -> AccountUpdateCall<'a, S> {
         AccountUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2264,7 +2269,7 @@ impl<'a> AccountMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2277,10 +2282,10 @@ impl<'a> AccountMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentCreateCall<'a>
-    where  {
+pub struct AccountContainerEnvironmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Environment,
     _account_id: String,
     _container_id: String,
@@ -2289,9 +2294,15 @@ pub struct AccountContainerEnvironmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerEnvironmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerEnvironmentCreateCall<'a, S> {}
 
-impl<'a> AccountContainerEnvironmentCreateCall<'a> {
+impl<'a, S> AccountContainerEnvironmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2448,7 +2459,7 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentCreateCall<'a> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2458,7 +2469,7 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2468,7 +2479,7 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -2478,7 +2489,7 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2503,7 +2514,7 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2523,9 +2534,9 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerEnvironmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2557,7 +2568,7 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2565,10 +2576,10 @@ impl<'a> AccountContainerEnvironmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentDeleteCall<'a>
-    where  {
+pub struct AccountContainerEnvironmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _environment_id: String,
@@ -2577,9 +2588,15 @@ pub struct AccountContainerEnvironmentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerEnvironmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerEnvironmentDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
+impl<'a, S> AccountContainerEnvironmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2713,7 +2730,7 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2723,7 +2740,7 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -2733,7 +2750,7 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, S> {
         self._environment_id = new_value.to_string();
         self
     }
@@ -2743,7 +2760,7 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2768,7 +2785,7 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2788,9 +2805,9 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerEnvironmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2822,7 +2839,7 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2830,10 +2847,10 @@ impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentGetCall<'a>
-    where  {
+pub struct AccountContainerEnvironmentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _environment_id: String,
@@ -2842,9 +2859,15 @@ pub struct AccountContainerEnvironmentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerEnvironmentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerEnvironmentGetCall<'a, S> {}
 
-impl<'a> AccountContainerEnvironmentGetCall<'a> {
+impl<'a, S> AccountContainerEnvironmentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2989,7 +3012,7 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2999,7 +3022,7 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3009,7 +3032,7 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, S> {
         self._environment_id = new_value.to_string();
         self
     }
@@ -3019,7 +3042,7 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3044,7 +3067,7 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3064,9 +3087,9 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerEnvironmentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3098,7 +3121,7 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3106,10 +3129,10 @@ impl<'a> AccountContainerEnvironmentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentListCall<'a>
-    where  {
+pub struct AccountContainerEnvironmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3117,9 +3140,15 @@ pub struct AccountContainerEnvironmentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerEnvironmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerEnvironmentListCall<'a, S> {}
 
-impl<'a> AccountContainerEnvironmentListCall<'a> {
+impl<'a, S> AccountContainerEnvironmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3263,7 +3292,7 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3273,7 +3302,7 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3283,7 +3312,7 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3308,7 +3337,7 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3328,9 +3357,9 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerEnvironmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3363,7 +3392,7 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3377,10 +3406,10 @@ impl<'a> AccountContainerEnvironmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentUpdateCall<'a>
-    where  {
+pub struct AccountContainerEnvironmentUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Environment,
     _account_id: String,
     _container_id: String,
@@ -3391,9 +3420,15 @@ pub struct AccountContainerEnvironmentUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerEnvironmentUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerEnvironmentUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
+impl<'a, S> AccountContainerEnvironmentUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3554,7 +3589,7 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3564,7 +3599,7 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3574,7 +3609,7 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3584,14 +3619,14 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         self._environment_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the environment in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -3601,7 +3636,7 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3626,7 +3661,7 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3646,9 +3681,9 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerEnvironmentUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3680,7 +3715,7 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3688,10 +3723,10 @@ impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderEntityListCall<'a>
-    where  {
+pub struct AccountContainerFolderEntityListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -3700,9 +3735,15 @@ pub struct AccountContainerFolderEntityListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerFolderEntityListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerFolderEntityListCall<'a, S> {}
 
-impl<'a> AccountContainerFolderEntityListCall<'a> {
+impl<'a, S> AccountContainerFolderEntityListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3847,7 +3888,7 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3857,7 +3898,7 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3867,7 +3908,7 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a, S> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -3877,7 +3918,7 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderEntityListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderEntityListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3902,7 +3943,7 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderEntityListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderEntityListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3922,9 +3963,9 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderEntityListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerFolderEntityListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3957,7 +3998,7 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3970,10 +4011,10 @@ impl<'a> AccountContainerFolderEntityListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderCreateCall<'a>
-    where  {
+pub struct AccountContainerFolderCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Folder,
     _account_id: String,
     _container_id: String,
@@ -3982,9 +4023,15 @@ pub struct AccountContainerFolderCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerFolderCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerFolderCreateCall<'a, S> {}
 
-impl<'a> AccountContainerFolderCreateCall<'a> {
+impl<'a, S> AccountContainerFolderCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4141,7 +4188,7 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderCreateCall<'a> {
+    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4151,7 +4198,7 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4161,7 +4208,7 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4171,7 +4218,7 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4196,7 +4243,7 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4216,9 +4263,9 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerFolderCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4250,7 +4297,7 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4258,10 +4305,10 @@ impl<'a> AccountContainerFolderCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderDeleteCall<'a>
-    where  {
+pub struct AccountContainerFolderDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -4270,9 +4317,15 @@ pub struct AccountContainerFolderDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerFolderDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerFolderDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerFolderDeleteCall<'a> {
+impl<'a, S> AccountContainerFolderDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4406,7 +4459,7 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4416,7 +4469,7 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4426,7 +4479,7 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a, S> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -4436,7 +4489,7 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4461,7 +4514,7 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4481,9 +4534,9 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerFolderDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4515,7 +4568,7 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4523,10 +4576,10 @@ impl<'a> AccountContainerFolderDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderGetCall<'a>
-    where  {
+pub struct AccountContainerFolderGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -4535,9 +4588,15 @@ pub struct AccountContainerFolderGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerFolderGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerFolderGetCall<'a, S> {}
 
-impl<'a> AccountContainerFolderGetCall<'a> {
+impl<'a, S> AccountContainerFolderGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4682,7 +4741,7 @@ impl<'a> AccountContainerFolderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4692,7 +4751,7 @@ impl<'a> AccountContainerFolderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4702,7 +4761,7 @@ impl<'a> AccountContainerFolderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a, S> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -4712,7 +4771,7 @@ impl<'a> AccountContainerFolderGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4737,7 +4796,7 @@ impl<'a> AccountContainerFolderGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4757,9 +4816,9 @@ impl<'a> AccountContainerFolderGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerFolderGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4791,7 +4850,7 @@ impl<'a> AccountContainerFolderGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4799,10 +4858,10 @@ impl<'a> AccountContainerFolderGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderListCall<'a>
-    where  {
+pub struct AccountContainerFolderListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4810,9 +4869,15 @@ pub struct AccountContainerFolderListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerFolderListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerFolderListCall<'a, S> {}
 
-impl<'a> AccountContainerFolderListCall<'a> {
+impl<'a, S> AccountContainerFolderListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4956,7 +5021,7 @@ impl<'a> AccountContainerFolderListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4966,7 +5031,7 @@ impl<'a> AccountContainerFolderListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4976,7 +5041,7 @@ impl<'a> AccountContainerFolderListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5001,7 +5066,7 @@ impl<'a> AccountContainerFolderListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5021,9 +5086,9 @@ impl<'a> AccountContainerFolderListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerFolderListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5056,7 +5121,7 @@ impl<'a> AccountContainerFolderListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5070,10 +5135,10 @@ impl<'a> AccountContainerFolderListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderUpdateCall<'a>
-    where  {
+pub struct AccountContainerFolderUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Folder,
     _account_id: String,
     _container_id: String,
@@ -5084,9 +5149,15 @@ pub struct AccountContainerFolderUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerFolderUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerFolderUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerFolderUpdateCall<'a> {
+impl<'a, S> AccountContainerFolderUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5247,7 +5318,7 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5257,7 +5328,7 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5267,7 +5338,7 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5277,14 +5348,14 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, S> {
         self._folder_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the folder in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -5294,7 +5365,7 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5319,7 +5390,7 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5339,9 +5410,9 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerFolderUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5374,7 +5445,7 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5390,10 +5461,10 @@ impl<'a> AccountContainerFolderUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerMoveFolderUpdateCall<'a>
-    where  {
+pub struct AccountContainerMoveFolderUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Folder,
     _account_id: String,
     _container_id: String,
@@ -5406,9 +5477,15 @@ pub struct AccountContainerMoveFolderUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerMoveFolderUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerMoveFolderUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
+impl<'a, S> AccountContainerMoveFolderUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5570,7 +5647,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn request(mut self, new_value: Folder) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5580,7 +5657,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5590,7 +5667,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5600,7 +5677,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -5608,7 +5685,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Append the given value to the *variable id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_variable_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn add_variable_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._variable_id.push(new_value.to_string());
         self
     }
@@ -5616,7 +5693,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Append the given value to the *trigger id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_trigger_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn add_trigger_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._trigger_id.push(new_value.to_string());
         self
     }
@@ -5624,7 +5701,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     ///
     /// Append the given value to the *tag id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_tag_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn add_tag_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._tag_id.push(new_value.to_string());
         self
     }
@@ -5634,7 +5711,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerMoveFolderUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerMoveFolderUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5659,7 +5736,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMoveFolderUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMoveFolderUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5679,9 +5756,9 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerMoveFolderUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerMoveFolderUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5714,7 +5791,7 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5727,10 +5804,10 @@ impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a>
-    where  {
+pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Environment,
     _account_id: String,
     _container_id: String,
@@ -5740,9 +5817,15 @@ pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerReauthorizeEnvironmentUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+impl<'a, S> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5900,7 +5983,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Environment) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5910,7 +5993,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5920,7 +6003,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5930,7 +6013,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {
         self._environment_id = new_value.to_string();
         self
     }
@@ -5940,7 +6023,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5965,7 +6048,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5985,9 +6068,9 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6020,7 +6103,7 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6033,10 +6116,10 @@ impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagCreateCall<'a>
-    where  {
+pub struct AccountContainerTagCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Tag,
     _account_id: String,
     _container_id: String,
@@ -6045,9 +6128,15 @@ pub struct AccountContainerTagCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTagCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTagCreateCall<'a, S> {}
 
-impl<'a> AccountContainerTagCreateCall<'a> {
+impl<'a, S> AccountContainerTagCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6204,7 +6293,7 @@ impl<'a> AccountContainerTagCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Tag) -> AccountContainerTagCreateCall<'a> {
+    pub fn request(mut self, new_value: Tag) -> AccountContainerTagCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6214,7 +6303,7 @@ impl<'a> AccountContainerTagCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6224,7 +6313,7 @@ impl<'a> AccountContainerTagCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6234,7 +6323,7 @@ impl<'a> AccountContainerTagCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6259,7 +6348,7 @@ impl<'a> AccountContainerTagCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6279,9 +6368,9 @@ impl<'a> AccountContainerTagCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTagCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6313,7 +6402,7 @@ impl<'a> AccountContainerTagCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6321,10 +6410,10 @@ impl<'a> AccountContainerTagCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagDeleteCall<'a>
-    where  {
+pub struct AccountContainerTagDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _tag_id: String,
@@ -6333,9 +6422,15 @@ pub struct AccountContainerTagDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTagDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTagDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerTagDeleteCall<'a> {
+impl<'a, S> AccountContainerTagDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6469,7 +6564,7 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6479,7 +6574,7 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6489,7 +6584,7 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, S> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -6499,7 +6594,7 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6524,7 +6619,7 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6544,9 +6639,9 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6578,7 +6673,7 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6586,10 +6681,10 @@ impl<'a> AccountContainerTagDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagGetCall<'a>
-    where  {
+pub struct AccountContainerTagGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _tag_id: String,
@@ -6598,9 +6693,15 @@ pub struct AccountContainerTagGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTagGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTagGetCall<'a, S> {}
 
-impl<'a> AccountContainerTagGetCall<'a> {
+impl<'a, S> AccountContainerTagGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6745,7 +6846,7 @@ impl<'a> AccountContainerTagGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6755,7 +6856,7 @@ impl<'a> AccountContainerTagGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6765,7 +6866,7 @@ impl<'a> AccountContainerTagGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, S> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -6775,7 +6876,7 @@ impl<'a> AccountContainerTagGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6800,7 +6901,7 @@ impl<'a> AccountContainerTagGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6820,9 +6921,9 @@ impl<'a> AccountContainerTagGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTagGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6854,7 +6955,7 @@ impl<'a> AccountContainerTagGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6862,10 +6963,10 @@ impl<'a> AccountContainerTagGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagListCall<'a>
-    where  {
+pub struct AccountContainerTagListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6873,9 +6974,15 @@ pub struct AccountContainerTagListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTagListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTagListCall<'a, S> {}
 
-impl<'a> AccountContainerTagListCall<'a> {
+impl<'a, S> AccountContainerTagListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7019,7 +7126,7 @@ impl<'a> AccountContainerTagListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7029,7 +7136,7 @@ impl<'a> AccountContainerTagListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7039,7 +7146,7 @@ impl<'a> AccountContainerTagListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7064,7 +7171,7 @@ impl<'a> AccountContainerTagListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7084,9 +7191,9 @@ impl<'a> AccountContainerTagListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTagListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7119,7 +7226,7 @@ impl<'a> AccountContainerTagListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7133,10 +7240,10 @@ impl<'a> AccountContainerTagListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagUpdateCall<'a>
-    where  {
+pub struct AccountContainerTagUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Tag,
     _account_id: String,
     _container_id: String,
@@ -7147,9 +7254,15 @@ pub struct AccountContainerTagUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTagUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTagUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerTagUpdateCall<'a> {
+impl<'a, S> AccountContainerTagUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7310,7 +7423,7 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Tag) -> AccountContainerTagUpdateCall<'a> {
+    pub fn request(mut self, new_value: Tag) -> AccountContainerTagUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7320,7 +7433,7 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7330,7 +7443,7 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7340,14 +7453,14 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, S> {
         self._tag_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the tag in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -7357,7 +7470,7 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7382,7 +7495,7 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7402,9 +7515,9 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7437,7 +7550,7 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7450,10 +7563,10 @@ impl<'a> AccountContainerTagUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerCreateCall<'a>
-    where  {
+pub struct AccountContainerTriggerCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Trigger,
     _account_id: String,
     _container_id: String,
@@ -7462,9 +7575,15 @@ pub struct AccountContainerTriggerCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTriggerCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTriggerCreateCall<'a, S> {}
 
-impl<'a> AccountContainerTriggerCreateCall<'a> {
+impl<'a, S> AccountContainerTriggerCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7621,7 +7740,7 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerCreateCall<'a> {
+    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7631,7 +7750,7 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7641,7 +7760,7 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7651,7 +7770,7 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7676,7 +7795,7 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7696,9 +7815,9 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7730,7 +7849,7 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7738,10 +7857,10 @@ impl<'a> AccountContainerTriggerCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerDeleteCall<'a>
-    where  {
+pub struct AccountContainerTriggerDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _trigger_id: String,
@@ -7750,9 +7869,15 @@ pub struct AccountContainerTriggerDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTriggerDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTriggerDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerTriggerDeleteCall<'a> {
+impl<'a, S> AccountContainerTriggerDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7886,7 +8011,7 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7896,7 +8021,7 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7906,7 +8031,7 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, S> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -7916,7 +8041,7 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7941,7 +8066,7 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7961,9 +8086,9 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7995,7 +8120,7 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8003,10 +8128,10 @@ impl<'a> AccountContainerTriggerDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerGetCall<'a>
-    where  {
+pub struct AccountContainerTriggerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _trigger_id: String,
@@ -8015,9 +8140,15 @@ pub struct AccountContainerTriggerGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTriggerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTriggerGetCall<'a, S> {}
 
-impl<'a> AccountContainerTriggerGetCall<'a> {
+impl<'a, S> AccountContainerTriggerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8162,7 +8293,7 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8172,7 +8303,7 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8182,7 +8313,7 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, S> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -8192,7 +8323,7 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8217,7 +8348,7 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8237,9 +8368,9 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8271,7 +8402,7 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8279,10 +8410,10 @@ impl<'a> AccountContainerTriggerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerListCall<'a>
-    where  {
+pub struct AccountContainerTriggerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8290,9 +8421,15 @@ pub struct AccountContainerTriggerListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTriggerListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTriggerListCall<'a, S> {}
 
-impl<'a> AccountContainerTriggerListCall<'a> {
+impl<'a, S> AccountContainerTriggerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8436,7 +8573,7 @@ impl<'a> AccountContainerTriggerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8446,7 +8583,7 @@ impl<'a> AccountContainerTriggerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8456,7 +8593,7 @@ impl<'a> AccountContainerTriggerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8481,7 +8618,7 @@ impl<'a> AccountContainerTriggerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8501,9 +8638,9 @@ impl<'a> AccountContainerTriggerListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTriggerListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8536,7 +8673,7 @@ impl<'a> AccountContainerTriggerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8550,10 +8687,10 @@ impl<'a> AccountContainerTriggerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerUpdateCall<'a>
-    where  {
+pub struct AccountContainerTriggerUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Trigger,
     _account_id: String,
     _container_id: String,
@@ -8564,9 +8701,15 @@ pub struct AccountContainerTriggerUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerTriggerUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerTriggerUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerTriggerUpdateCall<'a> {
+impl<'a, S> AccountContainerTriggerUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8727,7 +8870,7 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8737,7 +8880,7 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8747,7 +8890,7 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8757,14 +8900,14 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, S> {
         self._trigger_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -8774,7 +8917,7 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8799,7 +8942,7 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8819,9 +8962,9 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8854,7 +8997,7 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8867,10 +9010,10 @@ impl<'a> AccountContainerTriggerUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableCreateCall<'a>
-    where  {
+pub struct AccountContainerVariableCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Variable,
     _account_id: String,
     _container_id: String,
@@ -8879,9 +9022,15 @@ pub struct AccountContainerVariableCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVariableCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVariableCreateCall<'a, S> {}
 
-impl<'a> AccountContainerVariableCreateCall<'a> {
+impl<'a, S> AccountContainerVariableCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9038,7 +9187,7 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableCreateCall<'a> {
+    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9048,7 +9197,7 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9058,7 +9207,7 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9068,7 +9217,7 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9093,7 +9242,7 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9113,9 +9262,9 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9147,7 +9296,7 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9155,10 +9304,10 @@ impl<'a> AccountContainerVariableCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableDeleteCall<'a>
-    where  {
+pub struct AccountContainerVariableDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _variable_id: String,
@@ -9167,9 +9316,15 @@ pub struct AccountContainerVariableDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVariableDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVariableDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerVariableDeleteCall<'a> {
+impl<'a, S> AccountContainerVariableDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9303,7 +9458,7 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9313,7 +9468,7 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9323,7 +9478,7 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, S> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -9333,7 +9488,7 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9358,7 +9513,7 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9378,9 +9533,9 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9412,7 +9567,7 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9420,10 +9575,10 @@ impl<'a> AccountContainerVariableDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableGetCall<'a>
-    where  {
+pub struct AccountContainerVariableGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _variable_id: String,
@@ -9432,9 +9587,15 @@ pub struct AccountContainerVariableGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVariableGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVariableGetCall<'a, S> {}
 
-impl<'a> AccountContainerVariableGetCall<'a> {
+impl<'a, S> AccountContainerVariableGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9579,7 +9740,7 @@ impl<'a> AccountContainerVariableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9589,7 +9750,7 @@ impl<'a> AccountContainerVariableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9599,7 +9760,7 @@ impl<'a> AccountContainerVariableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, S> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -9609,7 +9770,7 @@ impl<'a> AccountContainerVariableGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9634,7 +9795,7 @@ impl<'a> AccountContainerVariableGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9654,9 +9815,9 @@ impl<'a> AccountContainerVariableGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVariableGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9688,7 +9849,7 @@ impl<'a> AccountContainerVariableGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9696,10 +9857,10 @@ impl<'a> AccountContainerVariableGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableListCall<'a>
-    where  {
+pub struct AccountContainerVariableListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9707,9 +9868,15 @@ pub struct AccountContainerVariableListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVariableListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVariableListCall<'a, S> {}
 
-impl<'a> AccountContainerVariableListCall<'a> {
+impl<'a, S> AccountContainerVariableListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9853,7 +10020,7 @@ impl<'a> AccountContainerVariableListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9863,7 +10030,7 @@ impl<'a> AccountContainerVariableListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9873,7 +10040,7 @@ impl<'a> AccountContainerVariableListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9898,7 +10065,7 @@ impl<'a> AccountContainerVariableListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9918,9 +10085,9 @@ impl<'a> AccountContainerVariableListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVariableListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9953,7 +10120,7 @@ impl<'a> AccountContainerVariableListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9967,10 +10134,10 @@ impl<'a> AccountContainerVariableListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableUpdateCall<'a>
-    where  {
+pub struct AccountContainerVariableUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Variable,
     _account_id: String,
     _container_id: String,
@@ -9981,9 +10148,15 @@ pub struct AccountContainerVariableUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVariableUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVariableUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerVariableUpdateCall<'a> {
+impl<'a, S> AccountContainerVariableUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10144,7 +10317,7 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10154,7 +10327,7 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10164,7 +10337,7 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10174,14 +10347,14 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, S> {
         self._variable_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the variable in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -10191,7 +10364,7 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10216,7 +10389,7 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10236,9 +10409,9 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10271,7 +10444,7 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10284,10 +10457,10 @@ impl<'a> AccountContainerVariableUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionCreateCall<'a>
-    where  {
+pub struct AccountContainerVersionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: CreateContainerVersionRequestVersionOptions,
     _account_id: String,
     _container_id: String,
@@ -10296,9 +10469,15 @@ pub struct AccountContainerVersionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionCreateCall<'a, S> {}
 
-impl<'a> AccountContainerVersionCreateCall<'a> {
+impl<'a, S> AccountContainerVersionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10455,7 +10634,7 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10465,7 +10644,7 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10475,7 +10654,7 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10485,7 +10664,7 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10510,7 +10689,7 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10530,9 +10709,9 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10564,7 +10743,7 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10572,10 +10751,10 @@ impl<'a> AccountContainerVersionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionDeleteCall<'a>
-    where  {
+pub struct AccountContainerVersionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -10584,9 +10763,15 @@ pub struct AccountContainerVersionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerVersionDeleteCall<'a> {
+impl<'a, S> AccountContainerVersionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10720,7 +10905,7 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10730,7 +10915,7 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10740,7 +10925,7 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, S> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -10750,7 +10935,7 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10775,7 +10960,7 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10795,9 +10980,9 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10829,7 +11014,7 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10837,10 +11022,10 @@ impl<'a> AccountContainerVersionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionGetCall<'a>
-    where  {
+pub struct AccountContainerVersionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -10849,9 +11034,15 @@ pub struct AccountContainerVersionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionGetCall<'a, S> {}
 
-impl<'a> AccountContainerVersionGetCall<'a> {
+impl<'a, S> AccountContainerVersionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10996,7 +11187,7 @@ impl<'a> AccountContainerVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11006,7 +11197,7 @@ impl<'a> AccountContainerVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11016,7 +11207,7 @@ impl<'a> AccountContainerVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, S> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -11026,7 +11217,7 @@ impl<'a> AccountContainerVersionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11051,7 +11242,7 @@ impl<'a> AccountContainerVersionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11071,9 +11262,9 @@ impl<'a> AccountContainerVersionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11105,7 +11296,7 @@ impl<'a> AccountContainerVersionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11115,10 +11306,10 @@ impl<'a> AccountContainerVersionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionListCall<'a>
-    where  {
+pub struct AccountContainerVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _include_deleted: Option<bool>,
@@ -11128,9 +11319,15 @@ pub struct AccountContainerVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionListCall<'a, S> {}
 
-impl<'a> AccountContainerVersionListCall<'a> {
+impl<'a, S> AccountContainerVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11280,7 +11477,7 @@ impl<'a> AccountContainerVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11290,21 +11487,21 @@ impl<'a> AccountContainerVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
     /// Also retrieve deleted (archived) versions when true.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> AccountContainerVersionListCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
     /// Retrieve headers only when true.
     ///
     /// Sets the *headers* query property to the given value.
-    pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a> {
+    pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, S> {
         self._headers = Some(new_value);
         self
     }
@@ -11314,7 +11511,7 @@ impl<'a> AccountContainerVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11339,7 +11536,7 @@ impl<'a> AccountContainerVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11359,9 +11556,9 @@ impl<'a> AccountContainerVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11393,7 +11590,7 @@ impl<'a> AccountContainerVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11402,10 +11599,10 @@ impl<'a> AccountContainerVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionPublishCall<'a>
-    where  {
+pub struct AccountContainerVersionPublishCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -11415,9 +11612,15 @@ pub struct AccountContainerVersionPublishCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionPublishCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionPublishCall<'a, S> {}
 
-impl<'a> AccountContainerVersionPublishCall<'a> {
+impl<'a, S> AccountContainerVersionPublishCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11565,7 +11768,7 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11575,7 +11778,7 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11585,14 +11788,14 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, S> {
         self._container_version_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -11602,7 +11805,7 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionPublishCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionPublishCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11627,7 +11830,7 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11647,9 +11850,9 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11681,7 +11884,7 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11689,10 +11892,10 @@ impl<'a> AccountContainerVersionPublishCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionRestoreCall<'a>
-    where  {
+pub struct AccountContainerVersionRestoreCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -11701,9 +11904,15 @@ pub struct AccountContainerVersionRestoreCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionRestoreCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionRestoreCall<'a, S> {}
 
-impl<'a> AccountContainerVersionRestoreCall<'a> {
+impl<'a, S> AccountContainerVersionRestoreCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11848,7 +12057,7 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11858,7 +12067,7 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11868,7 +12077,7 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, S> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -11878,7 +12087,7 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionRestoreCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionRestoreCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11903,7 +12112,7 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11923,9 +12132,9 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11957,7 +12166,7 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11965,10 +12174,10 @@ impl<'a> AccountContainerVersionRestoreCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionUndeleteCall<'a>
-    where  {
+pub struct AccountContainerVersionUndeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -11977,9 +12186,15 @@ pub struct AccountContainerVersionUndeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionUndeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionUndeleteCall<'a, S> {}
 
-impl<'a> AccountContainerVersionUndeleteCall<'a> {
+impl<'a, S> AccountContainerVersionUndeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12124,7 +12339,7 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12134,7 +12349,7 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12144,7 +12359,7 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, S> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -12154,7 +12369,7 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUndeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUndeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12179,7 +12394,7 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12199,9 +12414,9 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12234,7 +12449,7 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12248,10 +12463,10 @@ impl<'a> AccountContainerVersionUndeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionUpdateCall<'a>
-    where  {
+pub struct AccountContainerVersionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: ContainerVersion,
     _account_id: String,
     _container_id: String,
@@ -12262,9 +12477,15 @@ pub struct AccountContainerVersionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerVersionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerVersionUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerVersionUpdateCall<'a> {
+impl<'a, S> AccountContainerVersionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12425,7 +12646,7 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ContainerVersion) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn request(mut self, new_value: ContainerVersion) -> AccountContainerVersionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12435,7 +12656,7 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12445,7 +12666,7 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12455,14 +12676,14 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, S> {
         self._container_version_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -12472,7 +12693,7 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12497,7 +12718,7 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12517,9 +12738,9 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12552,7 +12773,7 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12565,10 +12786,10 @@ impl<'a> AccountContainerVersionUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerCreateCall<'a>
-    where  {
+pub struct AccountContainerCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Container,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12576,9 +12797,15 @@ pub struct AccountContainerCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerCreateCall<'a, S> {}
 
-impl<'a> AccountContainerCreateCall<'a> {
+impl<'a, S> AccountContainerCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12734,7 +12961,7 @@ impl<'a> AccountContainerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Container) -> AccountContainerCreateCall<'a> {
+    pub fn request(mut self, new_value: Container) -> AccountContainerCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12744,7 +12971,7 @@ impl<'a> AccountContainerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12754,7 +12981,7 @@ impl<'a> AccountContainerCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12779,7 +13006,7 @@ impl<'a> AccountContainerCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12799,9 +13026,9 @@ impl<'a> AccountContainerCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12833,7 +13060,7 @@ impl<'a> AccountContainerCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12841,10 +13068,10 @@ impl<'a> AccountContainerCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerDeleteCall<'a>
-    where  {
+pub struct AccountContainerDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12852,9 +13079,15 @@ pub struct AccountContainerDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerDeleteCall<'a, S> {}
 
-impl<'a> AccountContainerDeleteCall<'a> {
+impl<'a, S> AccountContainerDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12987,7 +13220,7 @@ impl<'a> AccountContainerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12997,7 +13230,7 @@ impl<'a> AccountContainerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13007,7 +13240,7 @@ impl<'a> AccountContainerDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13032,7 +13265,7 @@ impl<'a> AccountContainerDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13052,9 +13285,9 @@ impl<'a> AccountContainerDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13086,7 +13319,7 @@ impl<'a> AccountContainerDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13094,10 +13327,10 @@ impl<'a> AccountContainerDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerGetCall<'a>
-    where  {
+pub struct AccountContainerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13105,9 +13338,15 @@ pub struct AccountContainerGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerGetCall<'a, S> {}
 
-impl<'a> AccountContainerGetCall<'a> {
+impl<'a, S> AccountContainerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13251,7 +13490,7 @@ impl<'a> AccountContainerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13261,7 +13500,7 @@ impl<'a> AccountContainerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13271,7 +13510,7 @@ impl<'a> AccountContainerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13296,7 +13535,7 @@ impl<'a> AccountContainerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13316,9 +13555,9 @@ impl<'a> AccountContainerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13350,7 +13589,7 @@ impl<'a> AccountContainerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13358,19 +13597,25 @@ impl<'a> AccountContainerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerListCall<'a>
-    where  {
+pub struct AccountContainerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerListCall<'a, S> {}
 
-impl<'a> AccountContainerListCall<'a> {
+impl<'a, S> AccountContainerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13513,7 +13758,7 @@ impl<'a> AccountContainerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13523,7 +13768,7 @@ impl<'a> AccountContainerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13548,7 +13793,7 @@ impl<'a> AccountContainerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13568,9 +13813,9 @@ impl<'a> AccountContainerListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13603,7 +13848,7 @@ impl<'a> AccountContainerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13617,10 +13862,10 @@ impl<'a> AccountContainerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerUpdateCall<'a>
-    where  {
+pub struct AccountContainerUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Container,
     _account_id: String,
     _container_id: String,
@@ -13630,9 +13875,15 @@ pub struct AccountContainerUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountContainerUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountContainerUpdateCall<'a, S> {}
 
-impl<'a> AccountContainerUpdateCall<'a> {
+impl<'a, S> AccountContainerUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13792,7 +14043,7 @@ impl<'a> AccountContainerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Container) -> AccountContainerUpdateCall<'a> {
+    pub fn request(mut self, new_value: Container) -> AccountContainerUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13802,7 +14053,7 @@ impl<'a> AccountContainerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13812,14 +14063,14 @@ impl<'a> AccountContainerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, S> {
         self._container_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the container in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -13829,7 +14080,7 @@ impl<'a> AccountContainerUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13854,7 +14105,7 @@ impl<'a> AccountContainerUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13874,9 +14125,9 @@ impl<'a> AccountContainerUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountContainerUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13909,7 +14160,7 @@ impl<'a> AccountContainerUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13922,10 +14173,10 @@ impl<'a> AccountContainerUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionCreateCall<'a>
-    where  {
+pub struct AccountPermissionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: UserAccess,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13933,9 +14184,15 @@ pub struct AccountPermissionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPermissionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPermissionCreateCall<'a, S> {}
 
-impl<'a> AccountPermissionCreateCall<'a> {
+impl<'a, S> AccountPermissionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14091,7 +14348,7 @@ impl<'a> AccountPermissionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionCreateCall<'a> {
+    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14101,7 +14358,7 @@ impl<'a> AccountPermissionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14111,7 +14368,7 @@ impl<'a> AccountPermissionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14136,7 +14393,7 @@ impl<'a> AccountPermissionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14156,9 +14413,9 @@ impl<'a> AccountPermissionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPermissionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14190,7 +14447,7 @@ impl<'a> AccountPermissionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14198,10 +14455,10 @@ impl<'a> AccountPermissionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionDeleteCall<'a>
-    where  {
+pub struct AccountPermissionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14209,9 +14466,15 @@ pub struct AccountPermissionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPermissionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPermissionDeleteCall<'a, S> {}
 
-impl<'a> AccountPermissionDeleteCall<'a> {
+impl<'a, S> AccountPermissionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14344,7 +14607,7 @@ impl<'a> AccountPermissionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14354,7 +14617,7 @@ impl<'a> AccountPermissionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, S> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14364,7 +14627,7 @@ impl<'a> AccountPermissionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14389,7 +14652,7 @@ impl<'a> AccountPermissionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14409,9 +14672,9 @@ impl<'a> AccountPermissionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPermissionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14443,7 +14706,7 @@ impl<'a> AccountPermissionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14451,10 +14714,10 @@ impl<'a> AccountPermissionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionGetCall<'a>
-    where  {
+pub struct AccountPermissionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14462,9 +14725,15 @@ pub struct AccountPermissionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPermissionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPermissionGetCall<'a, S> {}
 
-impl<'a> AccountPermissionGetCall<'a> {
+impl<'a, S> AccountPermissionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14608,7 +14877,7 @@ impl<'a> AccountPermissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14618,7 +14887,7 @@ impl<'a> AccountPermissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, S> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14628,7 +14897,7 @@ impl<'a> AccountPermissionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14653,7 +14922,7 @@ impl<'a> AccountPermissionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14673,9 +14942,9 @@ impl<'a> AccountPermissionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPermissionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14707,7 +14976,7 @@ impl<'a> AccountPermissionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14715,19 +14984,25 @@ impl<'a> AccountPermissionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionListCall<'a>
-    where  {
+pub struct AccountPermissionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPermissionListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPermissionListCall<'a, S> {}
 
-impl<'a> AccountPermissionListCall<'a> {
+impl<'a, S> AccountPermissionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14870,7 +15145,7 @@ impl<'a> AccountPermissionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14880,7 +15155,7 @@ impl<'a> AccountPermissionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14905,7 +15180,7 @@ impl<'a> AccountPermissionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14925,9 +15200,9 @@ impl<'a> AccountPermissionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPermissionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14960,7 +15235,7 @@ impl<'a> AccountPermissionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14973,10 +15248,10 @@ impl<'a> AccountPermissionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionUpdateCall<'a>
-    where  {
+pub struct AccountPermissionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: UserAccess,
     _account_id: String,
     _permission_id: String,
@@ -14985,9 +15260,15 @@ pub struct AccountPermissionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPermissionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPermissionUpdateCall<'a, S> {}
 
-impl<'a> AccountPermissionUpdateCall<'a> {
+impl<'a, S> AccountPermissionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15144,7 +15425,7 @@ impl<'a> AccountPermissionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionUpdateCall<'a> {
+    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15154,7 +15435,7 @@ impl<'a> AccountPermissionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15164,7 +15445,7 @@ impl<'a> AccountPermissionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, S> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -15174,7 +15455,7 @@ impl<'a> AccountPermissionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15199,7 +15480,7 @@ impl<'a> AccountPermissionUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15219,9 +15500,9 @@ impl<'a> AccountPermissionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPermissionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15253,7 +15534,7 @@ impl<'a> AccountPermissionUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15261,19 +15542,25 @@ impl<'a> AccountPermissionUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a>
-    where  {
+pub struct AccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetCall<'a, S> {}
 
-impl<'a> AccountGetCall<'a> {
+impl<'a, S> AccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15416,7 +15703,7 @@ impl<'a> AccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15426,7 +15713,7 @@ impl<'a> AccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15451,7 +15738,7 @@ impl<'a> AccountGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15471,9 +15758,9 @@ impl<'a> AccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15505,7 +15792,7 @@ impl<'a> AccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15513,18 +15800,24 @@ impl<'a> AccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a>
-    where  {
+pub struct AccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListCall<'a, S> {}
 
-impl<'a> AccountListCall<'a> {
+impl<'a, S> AccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15645,7 +15938,7 @@ impl<'a> AccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15670,7 +15963,7 @@ impl<'a> AccountListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15690,9 +15983,9 @@ impl<'a> AccountListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15725,7 +16018,7 @@ impl<'a> AccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15739,10 +16032,10 @@ impl<'a> AccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUpdateCall<'a>
-    where  {
+pub struct AccountUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a TagManager<>,
+    hub: &'a TagManager<S>,
     _request: Account,
     _account_id: String,
     _fingerprint: Option<String>,
@@ -15751,9 +16044,15 @@ pub struct AccountUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUpdateCall<'a, S> {}
 
-impl<'a> AccountUpdateCall<'a> {
+impl<'a, S> AccountUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15912,7 +16211,7 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a> {
+    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15922,14 +16221,14 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the account in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, S> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -15939,7 +16238,7 @@ impl<'a> AccountUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15964,7 +16263,7 @@ impl<'a> AccountUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15984,9 +16283,9 @@ impl<'a> AccountUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

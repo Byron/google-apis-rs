@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,34 +109,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Assuredworkloads<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Assuredworkloads<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Assuredworkloads<> {}
+impl<'a, S> client::Hub for Assuredworkloads<S> {}
 
-impl<'a, > Assuredworkloads<> {
+impl<'a, S> Assuredworkloads<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Assuredworkloads<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Assuredworkloads<S> {
         Assuredworkloads {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://assuredworkloads.googleapis.com/".to_string(),
             _root_url: "https://assuredworkloads.googleapis.com/".to_string(),
         }
     }
 
-    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
         OrganizationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -414,22 +419,22 @@ impl client::Part for GoogleRpcStatus {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_workloads_create(...)`, `locations_workloads_delete(...)`, `locations_workloads_get(...)`, `locations_workloads_list(...)` and `locations_workloads_patch(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a>
-    where  {
+pub struct OrganizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
 
-impl<'a> OrganizationMethods<'a> {
+impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -438,7 +443,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_operations_get(&self, name: &str) -> OrganizationLocationOperationGetCall<'a> {
+    pub fn locations_operations_get(&self, name: &str) -> OrganizationLocationOperationGetCall<'a, S> {
         OrganizationLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -455,7 +460,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_operations_list(&self, name: &str) -> OrganizationLocationOperationListCall<'a> {
+    pub fn locations_operations_list(&self, name: &str) -> OrganizationLocationOperationListCall<'a, S> {
         OrganizationLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -476,7 +481,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the new Workload's parent. Must be of the form `organizations/{org_id}/locations/{location_id}`.
-    pub fn locations_workloads_create(&self, request: GoogleCloudAssuredworkloadsV1Workload, parent: &str) -> OrganizationLocationWorkloadCreateCall<'a> {
+    pub fn locations_workloads_create(&self, request: GoogleCloudAssuredworkloadsV1Workload, parent: &str) -> OrganizationLocationWorkloadCreateCall<'a, S> {
         OrganizationLocationWorkloadCreateCall {
             hub: self.hub,
             _request: request,
@@ -495,7 +500,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The `name` field is used to identify the workload. Format: organizations/{org_id}/locations/{location_id}/workloads/{workload_id}
-    pub fn locations_workloads_delete(&self, name: &str) -> OrganizationLocationWorkloadDeleteCall<'a> {
+    pub fn locations_workloads_delete(&self, name: &str) -> OrganizationLocationWorkloadDeleteCall<'a, S> {
         OrganizationLocationWorkloadDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -513,7 +518,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Workload to fetch. This is the workloads's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1".
-    pub fn locations_workloads_get(&self, name: &str) -> OrganizationLocationWorkloadGetCall<'a> {
+    pub fn locations_workloads_get(&self, name: &str) -> OrganizationLocationWorkloadGetCall<'a, S> {
         OrganizationLocationWorkloadGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -530,7 +535,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Parent Resource to list workloads from. Must be of the form `organizations/{org_id}/locations/{location}`.
-    pub fn locations_workloads_list(&self, parent: &str) -> OrganizationLocationWorkloadListCall<'a> {
+    pub fn locations_workloads_list(&self, parent: &str) -> OrganizationLocationWorkloadListCall<'a, S> {
         OrganizationLocationWorkloadListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -551,7 +556,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Optional. The resource name of the workload. Format: organizations/{organization}/locations/{location}/workloads/{workload} Read-only.
-    pub fn locations_workloads_patch(&self, request: GoogleCloudAssuredworkloadsV1Workload, name: &str) -> OrganizationLocationWorkloadPatchCall<'a> {
+    pub fn locations_workloads_patch(&self, request: GoogleCloudAssuredworkloadsV1Workload, name: &str) -> OrganizationLocationWorkloadPatchCall<'a, S> {
         OrganizationLocationWorkloadPatchCall {
             hub: self.hub,
             _request: request,
@@ -594,7 +599,7 @@ impl<'a> OrganizationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -602,19 +607,25 @@ impl<'a> OrganizationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationOperationGetCall<'a>
-    where  {
+pub struct OrganizationLocationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationOperationGetCall<'a, S> {}
 
-impl<'a> OrganizationLocationOperationGetCall<'a> {
+impl<'a, S> OrganizationLocationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -761,7 +772,7 @@ impl<'a> OrganizationLocationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -771,7 +782,7 @@ impl<'a> OrganizationLocationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -796,7 +807,7 @@ impl<'a> OrganizationLocationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -816,9 +827,9 @@ impl<'a> OrganizationLocationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -850,7 +861,7 @@ impl<'a> OrganizationLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -861,10 +872,10 @@ impl<'a> OrganizationLocationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationOperationListCall<'a>
-    where  {
+pub struct OrganizationLocationOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -874,9 +885,15 @@ pub struct OrganizationLocationOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationOperationListCall<'a, S> {}
 
-impl<'a> OrganizationLocationOperationListCall<'a> {
+impl<'a, S> OrganizationLocationOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1032,28 +1049,28 @@ impl<'a> OrganizationLocationOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OrganizationLocationOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OrganizationLocationOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1063,7 +1080,7 @@ impl<'a> OrganizationLocationOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1088,7 +1105,7 @@ impl<'a> OrganizationLocationOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1108,9 +1125,9 @@ impl<'a> OrganizationLocationOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1143,7 +1160,7 @@ impl<'a> OrganizationLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1157,10 +1174,10 @@ impl<'a> OrganizationLocationOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationWorkloadCreateCall<'a>
-    where  {
+pub struct OrganizationLocationWorkloadCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _request: GoogleCloudAssuredworkloadsV1Workload,
     _parent: String,
     _external_id: Option<String>,
@@ -1169,9 +1186,15 @@ pub struct OrganizationLocationWorkloadCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationWorkloadCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadCreateCall<'a, S> {}
 
-impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
+impl<'a, S> OrganizationLocationWorkloadCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1334,7 +1357,7 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudAssuredworkloadsV1Workload) -> OrganizationLocationWorkloadCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudAssuredworkloadsV1Workload) -> OrganizationLocationWorkloadCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1344,14 +1367,14 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationWorkloadCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationLocationWorkloadCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A identifier associated with the workload and underlying projects which allows for the break down of billing costs for a workload. The value provided for the identifier will add a label to the workload and contained projects with the identifier as the value.
     ///
     /// Sets the *external id* query property to the given value.
-    pub fn external_id(mut self, new_value: &str) -> OrganizationLocationWorkloadCreateCall<'a> {
+    pub fn external_id(mut self, new_value: &str) -> OrganizationLocationWorkloadCreateCall<'a, S> {
         self._external_id = Some(new_value.to_string());
         self
     }
@@ -1361,7 +1384,7 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1386,7 +1409,7 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1406,9 +1429,9 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationWorkloadCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationWorkloadCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1440,7 +1463,7 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1449,10 +1472,10 @@ impl<'a> OrganizationLocationWorkloadCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationWorkloadDeleteCall<'a>
-    where  {
+pub struct OrganizationLocationWorkloadDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _name: String,
     _etag: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1460,9 +1483,15 @@ pub struct OrganizationLocationWorkloadDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationWorkloadDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadDeleteCall<'a, S> {}
 
-impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
+impl<'a, S> OrganizationLocationWorkloadDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1612,14 +1641,14 @@ impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The etag of the workload. If this is provided, it must match the server's etag.
     ///
     /// Sets the *etag* query property to the given value.
-    pub fn etag(mut self, new_value: &str) -> OrganizationLocationWorkloadDeleteCall<'a> {
+    pub fn etag(mut self, new_value: &str) -> OrganizationLocationWorkloadDeleteCall<'a, S> {
         self._etag = Some(new_value.to_string());
         self
     }
@@ -1629,7 +1658,7 @@ impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1654,7 +1683,7 @@ impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1674,9 +1703,9 @@ impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationWorkloadDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationWorkloadDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1708,7 +1737,7 @@ impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1716,19 +1745,25 @@ impl<'a> OrganizationLocationWorkloadDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationWorkloadGetCall<'a>
-    where  {
+pub struct OrganizationLocationWorkloadGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationWorkloadGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadGetCall<'a, S> {}
 
-impl<'a> OrganizationLocationWorkloadGetCall<'a> {
+impl<'a, S> OrganizationLocationWorkloadGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1875,7 +1910,7 @@ impl<'a> OrganizationLocationWorkloadGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1885,7 +1920,7 @@ impl<'a> OrganizationLocationWorkloadGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1910,7 +1945,7 @@ impl<'a> OrganizationLocationWorkloadGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1930,9 +1965,9 @@ impl<'a> OrganizationLocationWorkloadGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationWorkloadGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationWorkloadGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1964,7 +1999,7 @@ impl<'a> OrganizationLocationWorkloadGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1975,10 +2010,10 @@ impl<'a> OrganizationLocationWorkloadGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationWorkloadListCall<'a>
-    where  {
+pub struct OrganizationLocationWorkloadListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1988,9 +2023,15 @@ pub struct OrganizationLocationWorkloadListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationWorkloadListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadListCall<'a, S> {}
 
-impl<'a> OrganizationLocationWorkloadListCall<'a> {
+impl<'a, S> OrganizationLocationWorkloadListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2146,28 +2187,28 @@ impl<'a> OrganizationLocationWorkloadListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationWorkloadListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationLocationWorkloadListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Page token returned from previous request. Page token contains context from previous request. Page token needs to be passed in the second and following requests.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationWorkloadListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationWorkloadListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationWorkloadListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationWorkloadListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A custom filter for filtering by properties of a workload. At this time, only filtering by labels is supported.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OrganizationLocationWorkloadListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OrganizationLocationWorkloadListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2177,7 +2218,7 @@ impl<'a> OrganizationLocationWorkloadListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2202,7 +2243,7 @@ impl<'a> OrganizationLocationWorkloadListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2222,9 +2263,9 @@ impl<'a> OrganizationLocationWorkloadListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationWorkloadListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationWorkloadListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2257,7 +2298,7 @@ impl<'a> OrganizationLocationWorkloadListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Assuredworkloads::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2271,10 +2312,10 @@ impl<'a> OrganizationLocationWorkloadListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationWorkloadPatchCall<'a>
-    where  {
+pub struct OrganizationLocationWorkloadPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Assuredworkloads<>,
+    hub: &'a Assuredworkloads<S>,
     _request: GoogleCloudAssuredworkloadsV1Workload,
     _name: String,
     _update_mask: Option<String>,
@@ -2283,9 +2324,15 @@ pub struct OrganizationLocationWorkloadPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationWorkloadPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationWorkloadPatchCall<'a, S> {}
 
-impl<'a> OrganizationLocationWorkloadPatchCall<'a> {
+impl<'a, S> OrganizationLocationWorkloadPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2448,7 +2495,7 @@ impl<'a> OrganizationLocationWorkloadPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudAssuredworkloadsV1Workload) -> OrganizationLocationWorkloadPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudAssuredworkloadsV1Workload) -> OrganizationLocationWorkloadPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2458,14 +2505,14 @@ impl<'a> OrganizationLocationWorkloadPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationWorkloadPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> OrganizationLocationWorkloadPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> OrganizationLocationWorkloadPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2475,7 +2522,7 @@ impl<'a> OrganizationLocationWorkloadPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationWorkloadPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2500,7 +2547,7 @@ impl<'a> OrganizationLocationWorkloadPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationWorkloadPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2520,9 +2567,9 @@ impl<'a> OrganizationLocationWorkloadPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationWorkloadPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationWorkloadPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

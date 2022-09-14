@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -98,34 +103,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Indexing<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Indexing<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Indexing<> {}
+impl<'a, S> client::Hub for Indexing<S> {}
 
-impl<'a, > Indexing<> {
+impl<'a, S> Indexing<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Indexing<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Indexing<S> {
         Indexing {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://indexing.googleapis.com/".to_string(),
             _root_url: "https://indexing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn url_notifications(&'a self) -> UrlNotificationMethods<'a> {
+    pub fn url_notifications(&'a self) -> UrlNotificationMethods<'a, S> {
         UrlNotificationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -248,27 +253,27 @@ impl client::ResponseResult for UrlNotificationMetadata {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_metadata(...)` and `publish(...)`
 /// // to build up your call.
 /// let rb = hub.url_notifications();
 /// # }
 /// ```
-pub struct UrlNotificationMethods<'a>
-    where  {
+pub struct UrlNotificationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Indexing<>,
+    hub: &'a Indexing<S>,
 }
 
-impl<'a> client::MethodsBuilder for UrlNotificationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UrlNotificationMethods<'a, S> {}
 
-impl<'a> UrlNotificationMethods<'a> {
+impl<'a, S> UrlNotificationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets metadata about a Web Document. This method can _only_ be used to query URLs that were previously seen in successful Indexing API notifications. Includes the latest `UrlNotification` received via this API.
-    pub fn get_metadata(&self) -> UrlNotificationGetMetadataCall<'a> {
+    pub fn get_metadata(&self) -> UrlNotificationGetMetadataCall<'a, S> {
         UrlNotificationGetMetadataCall {
             hub: self.hub,
             _url: Default::default(),
@@ -285,7 +290,7 @@ impl<'a> UrlNotificationMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn publish(&self, request: UrlNotification) -> UrlNotificationPublishCall<'a> {
+    pub fn publish(&self, request: UrlNotification) -> UrlNotificationPublishCall<'a, S> {
         UrlNotificationPublishCall {
             hub: self.hub,
             _request: request,
@@ -326,7 +331,7 @@ impl<'a> UrlNotificationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -335,19 +340,25 @@ impl<'a> UrlNotificationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlNotificationGetMetadataCall<'a>
-    where  {
+pub struct UrlNotificationGetMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Indexing<>,
+    hub: &'a Indexing<S>,
     _url: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UrlNotificationGetMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlNotificationGetMetadataCall<'a, S> {}
 
-impl<'a> UrlNotificationGetMetadataCall<'a> {
+impl<'a, S> UrlNotificationGetMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -468,7 +479,7 @@ impl<'a> UrlNotificationGetMetadataCall<'a> {
     /// URL that is being queried.
     ///
     /// Sets the *url* query property to the given value.
-    pub fn url(mut self, new_value: &str) -> UrlNotificationGetMetadataCall<'a> {
+    pub fn url(mut self, new_value: &str) -> UrlNotificationGetMetadataCall<'a, S> {
         self._url = Some(new_value.to_string());
         self
     }
@@ -478,7 +489,7 @@ impl<'a> UrlNotificationGetMetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationGetMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationGetMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -503,7 +514,7 @@ impl<'a> UrlNotificationGetMetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationGetMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationGetMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -523,9 +534,9 @@ impl<'a> UrlNotificationGetMetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlNotificationGetMetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UrlNotificationGetMetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -558,7 +569,7 @@ impl<'a> UrlNotificationGetMetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Indexing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -571,19 +582,25 @@ impl<'a> UrlNotificationGetMetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlNotificationPublishCall<'a>
-    where  {
+pub struct UrlNotificationPublishCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Indexing<>,
+    hub: &'a Indexing<S>,
     _request: UrlNotification,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UrlNotificationPublishCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlNotificationPublishCall<'a, S> {}
 
-impl<'a> UrlNotificationPublishCall<'a> {
+impl<'a, S> UrlNotificationPublishCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -717,7 +734,7 @@ impl<'a> UrlNotificationPublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UrlNotification) -> UrlNotificationPublishCall<'a> {
+    pub fn request(mut self, new_value: UrlNotification) -> UrlNotificationPublishCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -727,7 +744,7 @@ impl<'a> UrlNotificationPublishCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationPublishCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationPublishCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -752,7 +769,7 @@ impl<'a> UrlNotificationPublishCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationPublishCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationPublishCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -772,9 +789,9 @@ impl<'a> UrlNotificationPublishCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlNotificationPublishCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UrlNotificationPublishCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

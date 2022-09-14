@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -101,34 +106,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Container<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Container<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Container<> {}
+impl<'a, S> client::Hub for Container<S> {}
 
-impl<'a, > Container<> {
+impl<'a, S> Container<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Container<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Container<S> {
         Container {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://container.googleapis.com/".to_string(),
             _root_url: "https://container.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3026,22 +3031,22 @@ impl client::Part for WorkloadMetadataConfig {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `aggregated_usable_subnetworks_list(...)`, `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3050,7 +3055,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The parent project where subnetworks are usable. Specified in the format `projects/*`.
-    pub fn aggregated_usable_subnetworks_list(&self, parent: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a> {
+    pub fn aggregated_usable_subnetworks_list(&self, parent: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, S> {
         ProjectAggregatedUsableSubnetworkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3071,7 +3076,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent (project, location, cluster name) where the node pool will be created. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_node_pools_create(&self, request: CreateNodePoolRequest, parent: &str) -> ProjectLocationClusterNodePoolCreateCall<'a> {
+    pub fn locations_clusters_node_pools_create(&self, request: CreateNodePoolRequest, parent: &str) -> ProjectLocationClusterNodePoolCreateCall<'a, S> {
         ProjectLocationClusterNodePoolCreateCall {
             hub: self.hub,
             _request: request,
@@ -3089,7 +3094,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to delete. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_delete(&self, name: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn locations_clusters_node_pools_delete(&self, name: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         ProjectLocationClusterNodePoolDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3110,7 +3115,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_get(&self, name: &str) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn locations_clusters_node_pools_get(&self, name: &str) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         ProjectLocationClusterNodePoolGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3131,7 +3136,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The parent (project, location, cluster name) where the node pools will be listed. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_node_pools_list(&self, parent: &str) -> ProjectLocationClusterNodePoolListCall<'a> {
+    pub fn locations_clusters_node_pools_list(&self, parent: &str) -> ProjectLocationClusterNodePoolListCall<'a, S> {
         ProjectLocationClusterNodePoolListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3152,7 +3157,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool id) of the node poll to rollback upgrade. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_rollback(&self, request: RollbackNodePoolUpgradeRequest, name: &str) -> ProjectLocationClusterNodePoolRollbackCall<'a> {
+    pub fn locations_clusters_node_pools_rollback(&self, request: RollbackNodePoolUpgradeRequest, name: &str) -> ProjectLocationClusterNodePoolRollbackCall<'a, S> {
         ProjectLocationClusterNodePoolRollbackCall {
             hub: self.hub,
             _request: request,
@@ -3171,7 +3176,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool) of the node pool to set autoscaler settings. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_set_autoscaling(&self, request: SetNodePoolAutoscalingRequest, name: &str) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
+    pub fn locations_clusters_node_pools_set_autoscaling(&self, request: SetNodePoolAutoscalingRequest, name: &str) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S> {
         ProjectLocationClusterNodePoolSetAutoscalingCall {
             hub: self.hub,
             _request: request,
@@ -3190,7 +3195,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to set management properties. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_set_management(&self, request: SetNodePoolManagementRequest, name: &str) -> ProjectLocationClusterNodePoolSetManagementCall<'a> {
+    pub fn locations_clusters_node_pools_set_management(&self, request: SetNodePoolManagementRequest, name: &str) -> ProjectLocationClusterNodePoolSetManagementCall<'a, S> {
         ProjectLocationClusterNodePoolSetManagementCall {
             hub: self.hub,
             _request: request,
@@ -3209,7 +3214,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool id) of the node pool to set size. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, name: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a> {
+    pub fn locations_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, name: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, S> {
         ProjectLocationClusterNodePoolSetSizeCall {
             hub: self.hub,
             _request: request,
@@ -3228,7 +3233,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster, node pool) of the node pool to update. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
-    pub fn locations_clusters_node_pools_update(&self, request: UpdateNodePoolRequest, name: &str) -> ProjectLocationClusterNodePoolUpdateCall<'a> {
+    pub fn locations_clusters_node_pools_update(&self, request: UpdateNodePoolRequest, name: &str) -> ProjectLocationClusterNodePoolUpdateCall<'a, S> {
         ProjectLocationClusterNodePoolUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3246,7 +3251,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The cluster (project, location, cluster name) to get the discovery document for. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_well_known_get_openid_configuration(&self, parent: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
+    pub fn locations_clusters_well_known_get_openid_configuration(&self, parent: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S> {
         ProjectLocationClusterWellKnownGetOpenidConfigurationCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3263,7 +3268,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster name) of the cluster to complete IP rotation. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_complete_ip_rotation(&self, request: CompleteIPRotationRequest, name: &str) -> ProjectLocationClusterCompleteIpRotationCall<'a> {
+    pub fn locations_clusters_complete_ip_rotation(&self, request: CompleteIPRotationRequest, name: &str) -> ProjectLocationClusterCompleteIpRotationCall<'a, S> {
         ProjectLocationClusterCompleteIpRotationCall {
             hub: self.hub,
             _request: request,
@@ -3282,7 +3287,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent (project and location) where the cluster will be created. Specified in the format `projects/*/locations/*`.
-    pub fn locations_clusters_create(&self, request: CreateClusterRequest, parent: &str) -> ProjectLocationClusterCreateCall<'a> {
+    pub fn locations_clusters_create(&self, request: CreateClusterRequest, parent: &str) -> ProjectLocationClusterCreateCall<'a, S> {
         ProjectLocationClusterCreateCall {
             hub: self.hub,
             _request: request,
@@ -3300,7 +3305,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, cluster) of the cluster to delete. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_delete(&self, name: &str) -> ProjectLocationClusterDeleteCall<'a> {
+    pub fn locations_clusters_delete(&self, name: &str) -> ProjectLocationClusterDeleteCall<'a, S> {
         ProjectLocationClusterDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3320,7 +3325,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, cluster) of the cluster to retrieve. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_get(&self, name: &str) -> ProjectLocationClusterGetCall<'a> {
+    pub fn locations_clusters_get(&self, name: &str) -> ProjectLocationClusterGetCall<'a, S> {
         ProjectLocationClusterGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3340,7 +3345,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The cluster (project, location, cluster name) to get keys for. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_get_jwks(&self, parent: &str) -> ProjectLocationClusterGetJwkCall<'a> {
+    pub fn locations_clusters_get_jwks(&self, parent: &str) -> ProjectLocationClusterGetJwkCall<'a, S> {
         ProjectLocationClusterGetJwkCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3356,7 +3361,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The parent (project and location) where the clusters will be listed. Specified in the format `projects/*/locations/*`. Location "-" matches all zones and all regions.
-    pub fn locations_clusters_list(&self, parent: &str) -> ProjectLocationClusterListCall<'a> {
+    pub fn locations_clusters_list(&self, parent: &str) -> ProjectLocationClusterListCall<'a, S> {
         ProjectLocationClusterListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3376,7 +3381,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set addons. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_addons(&self, request: SetAddonsConfigRequest, name: &str) -> ProjectLocationClusterSetAddonCall<'a> {
+    pub fn locations_clusters_set_addons(&self, request: SetAddonsConfigRequest, name: &str) -> ProjectLocationClusterSetAddonCall<'a, S> {
         ProjectLocationClusterSetAddonCall {
             hub: self.hub,
             _request: request,
@@ -3395,7 +3400,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster name) of the cluster to set legacy abac. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_legacy_abac(&self, request: SetLegacyAbacRequest, name: &str) -> ProjectLocationClusterSetLegacyAbacCall<'a> {
+    pub fn locations_clusters_set_legacy_abac(&self, request: SetLegacyAbacRequest, name: &str) -> ProjectLocationClusterSetLegacyAbacCall<'a, S> {
         ProjectLocationClusterSetLegacyAbacCall {
             hub: self.hub,
             _request: request,
@@ -3414,7 +3419,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set locations. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_locations(&self, request: SetLocationsRequest, name: &str) -> ProjectLocationClusterSetLocationCall<'a> {
+    pub fn locations_clusters_set_locations(&self, request: SetLocationsRequest, name: &str) -> ProjectLocationClusterSetLocationCall<'a, S> {
         ProjectLocationClusterSetLocationCall {
             hub: self.hub,
             _request: request,
@@ -3433,7 +3438,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set logging. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_logging(&self, request: SetLoggingServiceRequest, name: &str) -> ProjectLocationClusterSetLoggingCall<'a> {
+    pub fn locations_clusters_set_logging(&self, request: SetLoggingServiceRequest, name: &str) -> ProjectLocationClusterSetLoggingCall<'a, S> {
         ProjectLocationClusterSetLoggingCall {
             hub: self.hub,
             _request: request,
@@ -3452,7 +3457,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster name) of the cluster to set maintenance policy. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, name: &str) -> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
+    pub fn locations_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, name: &str) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, S> {
         ProjectLocationClusterSetMaintenancePolicyCall {
             hub: self.hub,
             _request: request,
@@ -3471,7 +3476,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set auth. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_master_auth(&self, request: SetMasterAuthRequest, name: &str) -> ProjectLocationClusterSetMasterAuthCall<'a> {
+    pub fn locations_clusters_set_master_auth(&self, request: SetMasterAuthRequest, name: &str) -> ProjectLocationClusterSetMasterAuthCall<'a, S> {
         ProjectLocationClusterSetMasterAuthCall {
             hub: self.hub,
             _request: request,
@@ -3490,7 +3495,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to set monitoring. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_monitoring(&self, request: SetMonitoringServiceRequest, name: &str) -> ProjectLocationClusterSetMonitoringCall<'a> {
+    pub fn locations_clusters_set_monitoring(&self, request: SetMonitoringServiceRequest, name: &str) -> ProjectLocationClusterSetMonitoringCall<'a, S> {
         ProjectLocationClusterSetMonitoringCall {
             hub: self.hub,
             _request: request,
@@ -3509,7 +3514,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster name) of the cluster to set networking policy. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_network_policy(&self, request: SetNetworkPolicyRequest, name: &str) -> ProjectLocationClusterSetNetworkPolicyCall<'a> {
+    pub fn locations_clusters_set_network_policy(&self, request: SetNetworkPolicyRequest, name: &str) -> ProjectLocationClusterSetNetworkPolicyCall<'a, S> {
         ProjectLocationClusterSetNetworkPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3528,7 +3533,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster name) of the cluster to set labels. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_set_resource_labels(&self, request: SetLabelsRequest, name: &str) -> ProjectLocationClusterSetResourceLabelCall<'a> {
+    pub fn locations_clusters_set_resource_labels(&self, request: SetLabelsRequest, name: &str) -> ProjectLocationClusterSetResourceLabelCall<'a, S> {
         ProjectLocationClusterSetResourceLabelCall {
             hub: self.hub,
             _request: request,
@@ -3547,7 +3552,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster name) of the cluster to start IP rotation. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_start_ip_rotation(&self, request: StartIPRotationRequest, name: &str) -> ProjectLocationClusterStartIpRotationCall<'a> {
+    pub fn locations_clusters_start_ip_rotation(&self, request: StartIPRotationRequest, name: &str) -> ProjectLocationClusterStartIpRotationCall<'a, S> {
         ProjectLocationClusterStartIpRotationCall {
             hub: self.hub,
             _request: request,
@@ -3566,7 +3571,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to update. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_update(&self, request: UpdateClusterRequest, name: &str) -> ProjectLocationClusterUpdateCall<'a> {
+    pub fn locations_clusters_update(&self, request: UpdateClusterRequest, name: &str) -> ProjectLocationClusterUpdateCall<'a, S> {
         ProjectLocationClusterUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3585,7 +3590,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, cluster) of the cluster to update. Specified in the format `projects/*/locations/*/clusters/*`.
-    pub fn locations_clusters_update_master(&self, request: UpdateMasterRequest, name: &str) -> ProjectLocationClusterUpdateMasterCall<'a> {
+    pub fn locations_clusters_update_master(&self, request: UpdateMasterRequest, name: &str) -> ProjectLocationClusterUpdateMasterCall<'a, S> {
         ProjectLocationClusterUpdateMasterCall {
             hub: self.hub,
             _request: request,
@@ -3604,7 +3609,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name (project, location, operation id) of the operation to cancel. Specified in the format `projects/*/locations/*/operations/*`.
-    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a, S> {
         ProjectLocationOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -3622,7 +3627,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name (project, location, operation id) of the operation to get. Specified in the format `projects/*/locations/*/operations/*`.
-    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, S> {
         ProjectLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3642,7 +3647,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The parent (project and location) where the operations will be listed. Specified in the format `projects/*/locations/*`. Location "-" matches all zones and all regions.
-    pub fn locations_operations_list(&self, parent: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn locations_operations_list(&self, parent: &str) -> ProjectLocationOperationListCall<'a, S> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3661,7 +3666,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name (project and location) of the server config to get, specified in the format `projects/*/locations/*`.
-    pub fn locations_get_server_config(&self, name: &str) -> ProjectLocationGetServerConfigCall<'a> {
+    pub fn locations_get_server_config(&self, name: &str) -> ProjectLocationGetServerConfigCall<'a, S> {
         ProjectLocationGetServerConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3684,7 +3689,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_autoscaling(&self, request: SetNodePoolAutoscalingRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn zones_clusters_node_pools_autoscaling(&self, request: SetNodePoolAutoscalingRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         ProjectZoneClusterNodePoolAutoscalingCall {
             hub: self.hub,
             _request: request,
@@ -3708,7 +3713,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the parent field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the parent field.
-    pub fn zones_clusters_node_pools_create(&self, request: CreateNodePoolRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolCreateCall<'a> {
+    pub fn zones_clusters_node_pools_create(&self, request: CreateNodePoolRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, S> {
         ProjectZoneClusterNodePoolCreateCall {
             hub: self.hub,
             _request: request,
@@ -3731,7 +3736,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to delete. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_delete(&self, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn zones_clusters_node_pools_delete(&self, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         ProjectZoneClusterNodePoolDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3755,7 +3760,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_get(&self, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn zones_clusters_node_pools_get(&self, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         ProjectZoneClusterNodePoolGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3778,7 +3783,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the parent field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the parent field.
-    pub fn zones_clusters_node_pools_list(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolListCall<'a> {
+    pub fn zones_clusters_node_pools_list(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterNodePoolListCall<'a, S> {
         ProjectZoneClusterNodePoolListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3802,7 +3807,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to rollback. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to rollback. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_rollback(&self, request: RollbackNodePoolUpgradeRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn zones_clusters_node_pools_rollback(&self, request: RollbackNodePoolUpgradeRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         ProjectZoneClusterNodePoolRollbackCall {
             hub: self.hub,
             _request: request,
@@ -3827,7 +3832,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to update. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to update. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_set_management(&self, request: SetNodePoolManagementRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn zones_clusters_node_pools_set_management(&self, request: SetNodePoolManagementRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         ProjectZoneClusterNodePoolSetManagementCall {
             hub: self.hub,
             _request: request,
@@ -3852,7 +3857,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to update. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to update. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn zones_clusters_node_pools_set_size(&self, request: SetNodePoolSizeRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         ProjectZoneClusterNodePoolSetSizeCall {
             hub: self.hub,
             _request: request,
@@ -3877,7 +3882,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
     /// * `nodePoolId` - Deprecated. The name of the node pool to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_node_pools_update(&self, request: UpdateNodePoolRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn zones_clusters_node_pools_update(&self, request: UpdateNodePoolRequest, project_id: &str, zone: &str, cluster_id: &str, node_pool_id: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         ProjectZoneClusterNodePoolUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3901,7 +3906,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_addons(&self, request: SetAddonsConfigRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterAddonCall<'a> {
+    pub fn zones_clusters_addons(&self, request: SetAddonsConfigRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterAddonCall<'a, S> {
         ProjectZoneClusterAddonCall {
             hub: self.hub,
             _request: request,
@@ -3924,7 +3929,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_complete_ip_rotation(&self, request: CompleteIPRotationRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a> {
+    pub fn zones_clusters_complete_ip_rotation(&self, request: CompleteIPRotationRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a, S> {
         ProjectZoneClusterCompleteIpRotationCall {
             hub: self.hub,
             _request: request,
@@ -3946,7 +3951,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the parent field.
-    pub fn zones_clusters_create(&self, request: CreateClusterRequest, project_id: &str, zone: &str) -> ProjectZoneClusterCreateCall<'a> {
+    pub fn zones_clusters_create(&self, request: CreateClusterRequest, project_id: &str, zone: &str) -> ProjectZoneClusterCreateCall<'a, S> {
         ProjectZoneClusterCreateCall {
             hub: self.hub,
             _request: request,
@@ -3967,7 +3972,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to delete. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_delete(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterDeleteCall<'a> {
+    pub fn zones_clusters_delete(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterDeleteCall<'a, S> {
         ProjectZoneClusterDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3989,7 +3994,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to retrieve. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_get(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterGetCall<'a> {
+    pub fn zones_clusters_get(&self, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterGetCall<'a, S> {
         ProjectZoneClusterGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4012,7 +4017,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to update. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_legacy_abac(&self, request: SetLegacyAbacRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLegacyAbacCall<'a> {
+    pub fn zones_clusters_legacy_abac(&self, request: SetLegacyAbacRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLegacyAbacCall<'a, S> {
         ProjectZoneClusterLegacyAbacCall {
             hub: self.hub,
             _request: request,
@@ -4033,7 +4038,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides, or "-" for all zones. This field has been deprecated and replaced by the parent field.
-    pub fn zones_clusters_list(&self, project_id: &str, zone: &str) -> ProjectZoneClusterListCall<'a> {
+    pub fn zones_clusters_list(&self, project_id: &str, zone: &str) -> ProjectZoneClusterListCall<'a, S> {
         ProjectZoneClusterListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4055,7 +4060,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_locations(&self, request: SetLocationsRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLocationCall<'a> {
+    pub fn zones_clusters_locations(&self, request: SetLocationsRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLocationCall<'a, S> {
         ProjectZoneClusterLocationCall {
             hub: self.hub,
             _request: request,
@@ -4078,7 +4083,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_logging(&self, request: SetLoggingServiceRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLoggingCall<'a> {
+    pub fn zones_clusters_logging(&self, request: SetLoggingServiceRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterLoggingCall<'a, S> {
         ProjectZoneClusterLoggingCall {
             hub: self.hub,
             _request: request,
@@ -4101,7 +4106,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_master(&self, request: UpdateMasterRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterMasterCall<'a> {
+    pub fn zones_clusters_master(&self, request: UpdateMasterRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterMasterCall<'a, S> {
         ProjectZoneClusterMasterCall {
             hub: self.hub,
             _request: request,
@@ -4124,7 +4129,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_monitoring(&self, request: SetMonitoringServiceRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterMonitoringCall<'a> {
+    pub fn zones_clusters_monitoring(&self, request: SetMonitoringServiceRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterMonitoringCall<'a, S> {
         ProjectZoneClusterMonitoringCall {
             hub: self.hub,
             _request: request,
@@ -4147,7 +4152,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_resource_labels(&self, request: SetLabelsRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterResourceLabelCall<'a> {
+    pub fn zones_clusters_resource_labels(&self, request: SetLabelsRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterResourceLabelCall<'a, S> {
         ProjectZoneClusterResourceLabelCall {
             hub: self.hub,
             _request: request,
@@ -4170,7 +4175,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840).
     /// * `zone` - Required. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides.
     /// * `clusterId` - Required. The name of the cluster to update.
-    pub fn zones_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+    pub fn zones_clusters_set_maintenance_policy(&self, request: SetMaintenancePolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {
         ProjectZoneClusterSetMaintenancePolicyCall {
             hub: self.hub,
             _request: request,
@@ -4193,7 +4198,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_set_master_auth(&self, request: SetMasterAuthRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMasterAuthCall<'a> {
+    pub fn zones_clusters_set_master_auth(&self, request: SetMasterAuthRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetMasterAuthCall<'a, S> {
         ProjectZoneClusterSetMasterAuthCall {
             hub: self.hub,
             _request: request,
@@ -4216,7 +4221,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_set_network_policy(&self, request: SetNetworkPolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+    pub fn zones_clusters_set_network_policy(&self, request: SetNetworkPolicyRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S> {
         ProjectZoneClusterSetNetworkPolicyCall {
             hub: self.hub,
             _request: request,
@@ -4239,7 +4244,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_start_ip_rotation(&self, request: StartIPRotationRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterStartIpRotationCall<'a> {
+    pub fn zones_clusters_start_ip_rotation(&self, request: StartIPRotationRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterStartIpRotationCall<'a, S> {
         ProjectZoneClusterStartIpRotationCall {
             hub: self.hub,
             _request: request,
@@ -4262,7 +4267,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `clusterId` - Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
-    pub fn zones_clusters_update(&self, request: UpdateClusterRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterUpdateCall<'a> {
+    pub fn zones_clusters_update(&self, request: UpdateClusterRequest, project_id: &str, zone: &str, cluster_id: &str) -> ProjectZoneClusterUpdateCall<'a, S> {
         ProjectZoneClusterUpdateCall {
             hub: self.hub,
             _request: request,
@@ -4285,7 +4290,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the operation resides. This field has been deprecated and replaced by the name field.
     /// * `operationId` - Deprecated. The server-assigned `name` of the operation. This field has been deprecated and replaced by the name field.
-    pub fn zones_operations_cancel(&self, request: CancelOperationRequest, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationCancelCall<'a> {
+    pub fn zones_operations_cancel(&self, request: CancelOperationRequest, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationCancelCall<'a, S> {
         ProjectZoneOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -4307,7 +4312,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     /// * `operationId` - Deprecated. The server-assigned `name` of the operation. This field has been deprecated and replaced by the name field.
-    pub fn zones_operations_get(&self, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a> {
+    pub fn zones_operations_get(&self, project_id: &str, zone: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, S> {
         ProjectZoneOperationGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4328,7 +4333,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the parent field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) to return operations for, or `-` for all zones. This field has been deprecated and replaced by the parent field.
-    pub fn zones_operations_list(&self, project_id: &str, zone: &str) -> ProjectZoneOperationListCall<'a> {
+    pub fn zones_operations_list(&self, project_id: &str, zone: &str) -> ProjectZoneOperationListCall<'a, S> {
         ProjectZoneOperationListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4348,7 +4353,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     /// * `zone` - Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) to return operations for. This field has been deprecated and replaced by the name field.
-    pub fn zones_get_serverconfig(&self, project_id: &str, zone: &str) -> ProjectZoneGetServerconfigCall<'a> {
+    pub fn zones_get_serverconfig(&self, project_id: &str, zone: &str) -> ProjectZoneGetServerconfigCall<'a, S> {
         ProjectZoneGetServerconfigCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4391,7 +4396,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4402,10 +4407,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAggregatedUsableSubnetworkListCall<'a>
-    where  {
+pub struct ProjectAggregatedUsableSubnetworkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4415,9 +4420,15 @@ pub struct ProjectAggregatedUsableSubnetworkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAggregatedUsableSubnetworkListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAggregatedUsableSubnetworkListCall<'a, S> {}
 
-impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
+impl<'a, S> ProjectAggregatedUsableSubnetworkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4573,28 +4584,28 @@ impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set this to the nextPageToken returned by previous list requests to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The max number of results per page that should be returned. If the number of available results is larger than `page_size`, a `next_page_token` is returned which can be used to get the next page of results in subsequent requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAggregatedUsableSubnetworkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectAggregatedUsableSubnetworkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Filtering currently only supports equality on the networkProjectId and must be in the form: "networkProjectId=[PROJECTID]", where `networkProjectId` is the project which owns the listed subnetworks. This defaults to the parent project ID.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectAggregatedUsableSubnetworkListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4604,7 +4615,7 @@ impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAggregatedUsableSubnetworkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAggregatedUsableSubnetworkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4629,7 +4640,7 @@ impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAggregatedUsableSubnetworkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAggregatedUsableSubnetworkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4649,9 +4660,9 @@ impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAggregatedUsableSubnetworkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAggregatedUsableSubnetworkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4684,7 +4695,7 @@ impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4697,10 +4708,10 @@ impl<'a> ProjectAggregatedUsableSubnetworkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolCreateCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CreateNodePoolRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4708,9 +4719,15 @@ pub struct ProjectLocationClusterNodePoolCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4870,7 +4887,7 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateNodePoolRequest) -> ProjectLocationClusterNodePoolCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateNodePoolRequest) -> ProjectLocationClusterNodePoolCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4880,7 +4897,7 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterNodePoolCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterNodePoolCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4890,7 +4907,7 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4915,7 +4932,7 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4935,9 +4952,9 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4969,7 +4986,7 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4981,10 +4998,10 @@ impl<'a> ProjectLocationClusterNodePoolCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolDeleteCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _name: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -4995,9 +5012,15 @@ pub struct ProjectLocationClusterNodePoolDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5156,35 +5179,35 @@ impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the node pool to delete. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *node pool id* query property to the given value.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         self._node_pool_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *cluster id* query property to the given value.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         self._cluster_id = Some(new_value.to_string());
         self
     }
@@ -5194,7 +5217,7 @@ impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5219,7 +5242,7 @@ impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5239,9 +5262,9 @@ impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5273,7 +5296,7 @@ impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5285,10 +5308,10 @@ impl<'a> ProjectLocationClusterNodePoolDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolGetCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _name: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -5299,9 +5322,15 @@ pub struct ProjectLocationClusterNodePoolGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolGetCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5460,35 +5489,35 @@ impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the node pool. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *node pool id* query property to the given value.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         self._node_pool_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the cluster. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *cluster id* query property to the given value.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         self._cluster_id = Some(new_value.to_string());
         self
     }
@@ -5498,7 +5527,7 @@ impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5523,7 +5552,7 @@ impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5543,9 +5572,9 @@ impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5577,7 +5606,7 @@ impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5588,10 +5617,10 @@ impl<'a> ProjectLocationClusterNodePoolGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolListCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _parent: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -5601,9 +5630,15 @@ pub struct ProjectLocationClusterNodePoolListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolListCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5759,28 +5794,28 @@ impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://developers.google.com/console/help/new/#projectnumber). This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the cluster. This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *cluster id* query property to the given value.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterNodePoolListCall<'a, S> {
         self._cluster_id = Some(new_value.to_string());
         self
     }
@@ -5790,7 +5825,7 @@ impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5815,7 +5850,7 @@ impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5835,9 +5870,9 @@ impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5870,7 +5905,7 @@ impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5883,10 +5918,10 @@ impl<'a> ProjectLocationClusterNodePoolListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolRollbackCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolRollbackCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: RollbackNodePoolUpgradeRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5894,9 +5929,15 @@ pub struct ProjectLocationClusterNodePoolRollbackCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolRollbackCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolRollbackCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolRollbackCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6056,7 +6097,7 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RollbackNodePoolUpgradeRequest) -> ProjectLocationClusterNodePoolRollbackCall<'a> {
+    pub fn request(mut self, new_value: RollbackNodePoolUpgradeRequest) -> ProjectLocationClusterNodePoolRollbackCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6066,7 +6107,7 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolRollbackCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolRollbackCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6076,7 +6117,7 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolRollbackCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolRollbackCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6101,7 +6142,7 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolRollbackCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolRollbackCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6121,9 +6162,9 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolRollbackCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolRollbackCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6156,7 +6197,7 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6169,10 +6210,10 @@ impl<'a> ProjectLocationClusterNodePoolRollbackCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolSetAutoscalingCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNodePoolAutoscalingRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6180,9 +6221,15 @@ pub struct ProjectLocationClusterNodePoolSetAutoscalingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6342,7 +6389,7 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolAutoscalingRequest) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
+    pub fn request(mut self, new_value: SetNodePoolAutoscalingRequest) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6352,7 +6399,7 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6362,7 +6409,7 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6387,7 +6434,7 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6407,9 +6454,9 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetAutoscalingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6442,7 +6489,7 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6455,10 +6502,10 @@ impl<'a> ProjectLocationClusterNodePoolSetAutoscalingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolSetManagementCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolSetManagementCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNodePoolManagementRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6466,9 +6513,15 @@ pub struct ProjectLocationClusterNodePoolSetManagementCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolSetManagementCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolSetManagementCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolSetManagementCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6628,7 +6681,7 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolManagementRequest) -> ProjectLocationClusterNodePoolSetManagementCall<'a> {
+    pub fn request(mut self, new_value: SetNodePoolManagementRequest) -> ProjectLocationClusterNodePoolSetManagementCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6638,7 +6691,7 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetManagementCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetManagementCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6648,7 +6701,7 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolSetManagementCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolSetManagementCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6673,7 +6726,7 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetManagementCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetManagementCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6693,9 +6746,9 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetManagementCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetManagementCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6728,7 +6781,7 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6741,10 +6794,10 @@ impl<'a> ProjectLocationClusterNodePoolSetManagementCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolSetSizeCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolSetSizeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNodePoolSizeRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6752,9 +6805,15 @@ pub struct ProjectLocationClusterNodePoolSetSizeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolSetSizeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolSetSizeCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolSetSizeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6914,7 +6973,7 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolSizeRequest) -> ProjectLocationClusterNodePoolSetSizeCall<'a> {
+    pub fn request(mut self, new_value: SetNodePoolSizeRequest) -> ProjectLocationClusterNodePoolSetSizeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6924,7 +6983,7 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolSetSizeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6934,7 +6993,7 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolSetSizeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolSetSizeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6959,7 +7018,7 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6979,9 +7038,9 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolSetSizeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7014,7 +7073,7 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7027,10 +7086,10 @@ impl<'a> ProjectLocationClusterNodePoolSetSizeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterNodePoolUpdateCall<'a>
-    where  {
+pub struct ProjectLocationClusterNodePoolUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: UpdateNodePoolRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7038,9 +7097,15 @@ pub struct ProjectLocationClusterNodePoolUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterNodePoolUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterNodePoolUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
+impl<'a, S> ProjectLocationClusterNodePoolUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7200,7 +7265,7 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateNodePoolRequest) -> ProjectLocationClusterNodePoolUpdateCall<'a> {
+    pub fn request(mut self, new_value: UpdateNodePoolRequest) -> ProjectLocationClusterNodePoolUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7210,7 +7275,7 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterNodePoolUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7220,7 +7285,7 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterNodePoolUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7245,7 +7310,7 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterNodePoolUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7265,9 +7330,9 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterNodePoolUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterNodePoolUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7299,7 +7364,7 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7307,18 +7372,24 @@ impl<'a> ProjectLocationClusterNodePoolUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a>
-    where  {
+pub struct ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
+impl<'a, S> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7459,7 +7530,7 @@ impl<'a> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -7469,7 +7540,7 @@ impl<'a> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7494,7 +7565,7 @@ impl<'a> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7526,7 +7597,7 @@ impl<'a> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7539,10 +7610,10 @@ impl<'a> ProjectLocationClusterWellKnownGetOpenidConfigurationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterCompleteIpRotationCall<'a>
-    where  {
+pub struct ProjectLocationClusterCompleteIpRotationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CompleteIPRotationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7550,9 +7621,15 @@ pub struct ProjectLocationClusterCompleteIpRotationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterCompleteIpRotationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterCompleteIpRotationCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
+impl<'a, S> ProjectLocationClusterCompleteIpRotationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7712,7 +7789,7 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompleteIPRotationRequest) -> ProjectLocationClusterCompleteIpRotationCall<'a> {
+    pub fn request(mut self, new_value: CompleteIPRotationRequest) -> ProjectLocationClusterCompleteIpRotationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7722,7 +7799,7 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterCompleteIpRotationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterCompleteIpRotationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7732,7 +7809,7 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterCompleteIpRotationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterCompleteIpRotationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7757,7 +7834,7 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterCompleteIpRotationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterCompleteIpRotationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7777,9 +7854,9 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterCompleteIpRotationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterCompleteIpRotationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7812,7 +7889,7 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7825,10 +7902,10 @@ impl<'a> ProjectLocationClusterCompleteIpRotationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterCreateCall<'a>
-    where  {
+pub struct ProjectLocationClusterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CreateClusterRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7836,9 +7913,15 @@ pub struct ProjectLocationClusterCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterCreateCall<'a> {
+impl<'a, S> ProjectLocationClusterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7998,7 +8081,7 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateClusterRequest) -> ProjectLocationClusterCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateClusterRequest) -> ProjectLocationClusterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8008,7 +8091,7 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8018,7 +8101,7 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8043,7 +8126,7 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8063,9 +8146,9 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8097,7 +8180,7 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8108,10 +8191,10 @@ impl<'a> ProjectLocationClusterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterDeleteCall<'a>
-    where  {
+pub struct ProjectLocationClusterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _name: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -8121,9 +8204,15 @@ pub struct ProjectLocationClusterDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterDeleteCall<'a> {
+impl<'a, S> ProjectLocationClusterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8279,28 +8368,28 @@ impl<'a> ProjectLocationClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the cluster to delete. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *cluster id* query property to the given value.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterDeleteCall<'a, S> {
         self._cluster_id = Some(new_value.to_string());
         self
     }
@@ -8310,7 +8399,7 @@ impl<'a> ProjectLocationClusterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8335,7 +8424,7 @@ impl<'a> ProjectLocationClusterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8355,9 +8444,9 @@ impl<'a> ProjectLocationClusterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8389,7 +8478,7 @@ impl<'a> ProjectLocationClusterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8400,10 +8489,10 @@ impl<'a> ProjectLocationClusterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterGetCall<'a>
-    where  {
+pub struct ProjectLocationClusterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _name: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -8413,9 +8502,15 @@ pub struct ProjectLocationClusterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterGetCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterGetCall<'a> {
+impl<'a, S> ProjectLocationClusterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8571,28 +8666,28 @@ impl<'a> ProjectLocationClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The name of the cluster to retrieve. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *cluster id* query property to the given value.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectLocationClusterGetCall<'a, S> {
         self._cluster_id = Some(new_value.to_string());
         self
     }
@@ -8602,7 +8697,7 @@ impl<'a> ProjectLocationClusterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8627,7 +8722,7 @@ impl<'a> ProjectLocationClusterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8647,9 +8742,9 @@ impl<'a> ProjectLocationClusterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8681,7 +8776,7 @@ impl<'a> ProjectLocationClusterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8689,18 +8784,24 @@ impl<'a> ProjectLocationClusterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterGetJwkCall<'a>
-    where  {
+pub struct ProjectLocationClusterGetJwkCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterGetJwkCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterGetJwkCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterGetJwkCall<'a> {
+impl<'a, S> ProjectLocationClusterGetJwkCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8841,7 +8942,7 @@ impl<'a> ProjectLocationClusterGetJwkCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterGetJwkCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterGetJwkCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8851,7 +8952,7 @@ impl<'a> ProjectLocationClusterGetJwkCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterGetJwkCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterGetJwkCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8876,7 +8977,7 @@ impl<'a> ProjectLocationClusterGetJwkCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterGetJwkCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterGetJwkCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8907,7 +9008,7 @@ impl<'a> ProjectLocationClusterGetJwkCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8917,10 +9018,10 @@ impl<'a> ProjectLocationClusterGetJwkCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterListCall<'a>
-    where  {
+pub struct ProjectLocationClusterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _parent: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -8929,9 +9030,15 @@ pub struct ProjectLocationClusterListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterListCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterListCall<'a> {
+impl<'a, S> ProjectLocationClusterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9084,21 +9191,21 @@ impl<'a> ProjectLocationClusterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides, or "-" for all zones. This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationClusterListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -9108,7 +9215,7 @@ impl<'a> ProjectLocationClusterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9133,7 +9240,7 @@ impl<'a> ProjectLocationClusterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9153,9 +9260,9 @@ impl<'a> ProjectLocationClusterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9188,7 +9295,7 @@ impl<'a> ProjectLocationClusterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9201,10 +9308,10 @@ impl<'a> ProjectLocationClusterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetAddonCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetAddonCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetAddonsConfigRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9212,9 +9319,15 @@ pub struct ProjectLocationClusterSetAddonCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetAddonCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetAddonCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetAddonCall<'a> {
+impl<'a, S> ProjectLocationClusterSetAddonCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9374,7 +9487,7 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetAddonsConfigRequest) -> ProjectLocationClusterSetAddonCall<'a> {
+    pub fn request(mut self, new_value: SetAddonsConfigRequest) -> ProjectLocationClusterSetAddonCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9384,7 +9497,7 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetAddonCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetAddonCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9394,7 +9507,7 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetAddonCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetAddonCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9419,7 +9532,7 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetAddonCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetAddonCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9439,9 +9552,9 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetAddonCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetAddonCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9474,7 +9587,7 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9487,10 +9600,10 @@ impl<'a> ProjectLocationClusterSetAddonCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetLegacyAbacCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetLegacyAbacCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLegacyAbacRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9498,9 +9611,15 @@ pub struct ProjectLocationClusterSetLegacyAbacCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetLegacyAbacCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetLegacyAbacCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
+impl<'a, S> ProjectLocationClusterSetLegacyAbacCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9660,7 +9779,7 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLegacyAbacRequest) -> ProjectLocationClusterSetLegacyAbacCall<'a> {
+    pub fn request(mut self, new_value: SetLegacyAbacRequest) -> ProjectLocationClusterSetLegacyAbacCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9670,7 +9789,7 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetLegacyAbacCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetLegacyAbacCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9680,7 +9799,7 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetLegacyAbacCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetLegacyAbacCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9705,7 +9824,7 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetLegacyAbacCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetLegacyAbacCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9725,9 +9844,9 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetLegacyAbacCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetLegacyAbacCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9760,7 +9879,7 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9773,10 +9892,10 @@ impl<'a> ProjectLocationClusterSetLegacyAbacCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetLocationCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetLocationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLocationsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9784,9 +9903,15 @@ pub struct ProjectLocationClusterSetLocationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetLocationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetLocationCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetLocationCall<'a> {
+impl<'a, S> ProjectLocationClusterSetLocationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9946,7 +10071,7 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLocationsRequest) -> ProjectLocationClusterSetLocationCall<'a> {
+    pub fn request(mut self, new_value: SetLocationsRequest) -> ProjectLocationClusterSetLocationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9956,7 +10081,7 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetLocationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetLocationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9966,7 +10091,7 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetLocationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetLocationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9991,7 +10116,7 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetLocationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetLocationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10011,9 +10136,9 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetLocationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetLocationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10046,7 +10171,7 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10059,10 +10184,10 @@ impl<'a> ProjectLocationClusterSetLocationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetLoggingCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetLoggingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLoggingServiceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10070,9 +10195,15 @@ pub struct ProjectLocationClusterSetLoggingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetLoggingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetLoggingCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
+impl<'a, S> ProjectLocationClusterSetLoggingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10232,7 +10363,7 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLoggingServiceRequest) -> ProjectLocationClusterSetLoggingCall<'a> {
+    pub fn request(mut self, new_value: SetLoggingServiceRequest) -> ProjectLocationClusterSetLoggingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10242,7 +10373,7 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetLoggingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetLoggingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10252,7 +10383,7 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetLoggingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetLoggingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10277,7 +10408,7 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetLoggingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetLoggingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10297,9 +10428,9 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetLoggingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetLoggingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10332,7 +10463,7 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10345,10 +10476,10 @@ impl<'a> ProjectLocationClusterSetLoggingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetMaintenancePolicyCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetMaintenancePolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetMaintenancePolicyRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10356,9 +10487,15 @@ pub struct ProjectLocationClusterSetMaintenancePolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetMaintenancePolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetMaintenancePolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
+impl<'a, S> ProjectLocationClusterSetMaintenancePolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10518,7 +10655,7 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetMaintenancePolicyRequest) -> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
+    pub fn request(mut self, new_value: SetMaintenancePolicyRequest) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10528,7 +10665,7 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10538,7 +10675,7 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10563,7 +10700,7 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetMaintenancePolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10583,9 +10720,9 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetMaintenancePolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetMaintenancePolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10618,7 +10755,7 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10631,10 +10768,10 @@ impl<'a> ProjectLocationClusterSetMaintenancePolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetMasterAuthCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetMasterAuthCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetMasterAuthRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10642,9 +10779,15 @@ pub struct ProjectLocationClusterSetMasterAuthCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetMasterAuthCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetMasterAuthCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
+impl<'a, S> ProjectLocationClusterSetMasterAuthCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10804,7 +10947,7 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetMasterAuthRequest) -> ProjectLocationClusterSetMasterAuthCall<'a> {
+    pub fn request(mut self, new_value: SetMasterAuthRequest) -> ProjectLocationClusterSetMasterAuthCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10814,7 +10957,7 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetMasterAuthCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetMasterAuthCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10824,7 +10967,7 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetMasterAuthCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetMasterAuthCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10849,7 +10992,7 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetMasterAuthCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetMasterAuthCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10869,9 +11012,9 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetMasterAuthCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetMasterAuthCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10904,7 +11047,7 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10917,10 +11060,10 @@ impl<'a> ProjectLocationClusterSetMasterAuthCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetMonitoringCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetMonitoringCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetMonitoringServiceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10928,9 +11071,15 @@ pub struct ProjectLocationClusterSetMonitoringCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetMonitoringCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetMonitoringCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
+impl<'a, S> ProjectLocationClusterSetMonitoringCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11090,7 +11239,7 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetMonitoringServiceRequest) -> ProjectLocationClusterSetMonitoringCall<'a> {
+    pub fn request(mut self, new_value: SetMonitoringServiceRequest) -> ProjectLocationClusterSetMonitoringCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11100,7 +11249,7 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetMonitoringCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetMonitoringCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11110,7 +11259,7 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetMonitoringCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetMonitoringCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11135,7 +11284,7 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetMonitoringCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetMonitoringCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11155,9 +11304,9 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetMonitoringCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetMonitoringCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11190,7 +11339,7 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11203,10 +11352,10 @@ impl<'a> ProjectLocationClusterSetMonitoringCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetNetworkPolicyCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetNetworkPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNetworkPolicyRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11214,9 +11363,15 @@ pub struct ProjectLocationClusterSetNetworkPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetNetworkPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetNetworkPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
+impl<'a, S> ProjectLocationClusterSetNetworkPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11376,7 +11531,7 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNetworkPolicyRequest) -> ProjectLocationClusterSetNetworkPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetNetworkPolicyRequest) -> ProjectLocationClusterSetNetworkPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11386,7 +11541,7 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetNetworkPolicyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetNetworkPolicyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11396,7 +11551,7 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetNetworkPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetNetworkPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11421,7 +11576,7 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetNetworkPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetNetworkPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11441,9 +11596,9 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetNetworkPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetNetworkPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11476,7 +11631,7 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11489,10 +11644,10 @@ impl<'a> ProjectLocationClusterSetNetworkPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterSetResourceLabelCall<'a>
-    where  {
+pub struct ProjectLocationClusterSetResourceLabelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLabelsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11500,9 +11655,15 @@ pub struct ProjectLocationClusterSetResourceLabelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterSetResourceLabelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterSetResourceLabelCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
+impl<'a, S> ProjectLocationClusterSetResourceLabelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11662,7 +11823,7 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLabelsRequest) -> ProjectLocationClusterSetResourceLabelCall<'a> {
+    pub fn request(mut self, new_value: SetLabelsRequest) -> ProjectLocationClusterSetResourceLabelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11672,7 +11833,7 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetResourceLabelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterSetResourceLabelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11682,7 +11843,7 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetResourceLabelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterSetResourceLabelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11707,7 +11868,7 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetResourceLabelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterSetResourceLabelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11727,9 +11888,9 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterSetResourceLabelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterSetResourceLabelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11762,7 +11923,7 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11775,10 +11936,10 @@ impl<'a> ProjectLocationClusterSetResourceLabelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterStartIpRotationCall<'a>
-    where  {
+pub struct ProjectLocationClusterStartIpRotationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: StartIPRotationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11786,9 +11947,15 @@ pub struct ProjectLocationClusterStartIpRotationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterStartIpRotationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterStartIpRotationCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
+impl<'a, S> ProjectLocationClusterStartIpRotationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11948,7 +12115,7 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StartIPRotationRequest) -> ProjectLocationClusterStartIpRotationCall<'a> {
+    pub fn request(mut self, new_value: StartIPRotationRequest) -> ProjectLocationClusterStartIpRotationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11958,7 +12125,7 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterStartIpRotationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterStartIpRotationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11968,7 +12135,7 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterStartIpRotationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterStartIpRotationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11993,7 +12160,7 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterStartIpRotationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterStartIpRotationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12013,9 +12180,9 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterStartIpRotationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterStartIpRotationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12048,7 +12215,7 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12061,10 +12228,10 @@ impl<'a> ProjectLocationClusterStartIpRotationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterUpdateCall<'a>
-    where  {
+pub struct ProjectLocationClusterUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: UpdateClusterRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12072,9 +12239,15 @@ pub struct ProjectLocationClusterUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterUpdateCall<'a> {
+impl<'a, S> ProjectLocationClusterUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12234,7 +12407,7 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateClusterRequest) -> ProjectLocationClusterUpdateCall<'a> {
+    pub fn request(mut self, new_value: UpdateClusterRequest) -> ProjectLocationClusterUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12244,7 +12417,7 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12254,7 +12427,7 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12279,7 +12452,7 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12299,9 +12472,9 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12334,7 +12507,7 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12347,10 +12520,10 @@ impl<'a> ProjectLocationClusterUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationClusterUpdateMasterCall<'a>
-    where  {
+pub struct ProjectLocationClusterUpdateMasterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: UpdateMasterRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12358,9 +12531,15 @@ pub struct ProjectLocationClusterUpdateMasterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationClusterUpdateMasterCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationClusterUpdateMasterCall<'a, S> {}
 
-impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
+impl<'a, S> ProjectLocationClusterUpdateMasterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12520,7 +12699,7 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateMasterRequest) -> ProjectLocationClusterUpdateMasterCall<'a> {
+    pub fn request(mut self, new_value: UpdateMasterRequest) -> ProjectLocationClusterUpdateMasterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12530,7 +12709,7 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterUpdateMasterCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterUpdateMasterCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12540,7 +12719,7 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterUpdateMasterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterUpdateMasterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12565,7 +12744,7 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterUpdateMasterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterUpdateMasterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12585,9 +12764,9 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationClusterUpdateMasterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationClusterUpdateMasterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12620,7 +12799,7 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12633,10 +12812,10 @@ impl<'a> ProjectLocationClusterUpdateMasterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationCancelCall<'a>
-    where  {
+pub struct ProjectLocationOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12644,9 +12823,15 @@ pub struct ProjectLocationOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationCancelCall<'a> {
+impl<'a, S> ProjectLocationOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12806,7 +12991,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12816,7 +13001,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12826,7 +13011,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12851,7 +13036,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12871,9 +13056,9 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12905,7 +13090,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12916,10 +13101,10 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _name: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -12929,9 +13114,15 @@ pub struct ProjectLocationOperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationGetCall<'a> {
+impl<'a, S> ProjectLocationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13087,28 +13278,28 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// Deprecated. The server-assigned `name` of the operation. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *operation id* query property to the given value.
-    pub fn operation_id(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn operation_id(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._operation_id = Some(new_value.to_string());
         self
     }
@@ -13118,7 +13309,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13143,7 +13334,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13163,9 +13354,9 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13197,7 +13388,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13207,10 +13398,10 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationListCall<'a>
-    where  {
+pub struct ProjectLocationOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _parent: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -13219,9 +13410,15 @@ pub struct ProjectLocationOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationListCall<'a> {
+impl<'a, S> ProjectLocationOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13374,21 +13571,21 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) to return operations for, or `-` for all zones. This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the parent field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -13398,7 +13595,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13423,7 +13620,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13443,9 +13640,9 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13477,7 +13674,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13487,10 +13684,10 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetServerConfigCall<'a>
-    where  {
+pub struct ProjectLocationGetServerConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _name: String,
     _zone: Option<String>,
     _project_id: Option<String>,
@@ -13499,9 +13696,15 @@ pub struct ProjectLocationGetServerConfigCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetServerConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetServerConfigCall<'a, S> {}
 
-impl<'a> ProjectLocationGetServerConfigCall<'a> {
+impl<'a, S> ProjectLocationGetServerConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13654,21 +13857,21 @@ impl<'a> ProjectLocationGetServerConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Deprecated. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) to return operations for. This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *zone* query property to the given value.
-    pub fn zone(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a, S> {
         self._zone = Some(new_value.to_string());
         self
     }
     /// Deprecated. The Google Developers Console [project ID or project number](https://support.google.com/cloud/answer/6158840). This field has been deprecated and replaced by the name field.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLocationGetServerConfigCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -13678,7 +13881,7 @@ impl<'a> ProjectLocationGetServerConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetServerConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetServerConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13703,7 +13906,7 @@ impl<'a> ProjectLocationGetServerConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetServerConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetServerConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13723,9 +13926,9 @@ impl<'a> ProjectLocationGetServerConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetServerConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetServerConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13758,7 +13961,7 @@ impl<'a> ProjectLocationGetServerConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13771,10 +13974,10 @@ impl<'a> ProjectLocationGetServerConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolAutoscalingCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolAutoscalingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNodePoolAutoscalingRequest,
     _project_id: String,
     _zone: String,
@@ -13785,9 +13988,15 @@ pub struct ProjectZoneClusterNodePoolAutoscalingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolAutoscalingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolAutoscalingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13946,7 +14155,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolAutoscalingRequest) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn request(mut self, new_value: SetNodePoolAutoscalingRequest) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13956,7 +14165,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -13966,7 +14175,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -13976,7 +14185,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -13986,7 +14195,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
@@ -13996,7 +14205,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14021,7 +14230,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolAutoscalingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14041,9 +14250,9 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolAutoscalingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolAutoscalingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14076,7 +14285,7 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14089,10 +14298,10 @@ impl<'a> ProjectZoneClusterNodePoolAutoscalingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolCreateCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CreateNodePoolRequest,
     _project_id: String,
     _zone: String,
@@ -14102,9 +14311,15 @@ pub struct ProjectZoneClusterNodePoolCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolCreateCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14262,7 +14477,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateNodePoolRequest) -> ProjectZoneClusterNodePoolCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateNodePoolRequest) -> ProjectZoneClusterNodePoolCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14272,7 +14487,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14282,7 +14497,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -14292,7 +14507,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolCreateCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -14302,7 +14517,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14327,7 +14542,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14347,9 +14562,9 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14381,7 +14596,7 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14390,10 +14605,10 @@ impl<'a> ProjectZoneClusterNodePoolCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolDeleteCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _cluster_id: String,
@@ -14404,9 +14619,15 @@ pub struct ProjectZoneClusterNodePoolDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolDeleteCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14555,7 +14776,7 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14565,7 +14786,7 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -14575,7 +14796,7 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -14585,14 +14806,14 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
     /// The name (project, location, cluster, node pool id) of the node pool to delete. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -14602,7 +14823,7 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14627,7 +14848,7 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14647,9 +14868,9 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14681,7 +14902,7 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14690,10 +14911,10 @@ impl<'a> ProjectZoneClusterNodePoolDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolGetCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _cluster_id: String,
@@ -14704,9 +14925,15 @@ pub struct ProjectZoneClusterNodePoolGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolGetCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14855,7 +15082,7 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14865,7 +15092,7 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -14875,7 +15102,7 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -14885,14 +15112,14 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
     /// The name (project, location, cluster, node pool id) of the node pool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -14902,7 +15129,7 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14927,7 +15154,7 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14947,9 +15174,9 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14981,7 +15208,7 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14990,10 +15217,10 @@ impl<'a> ProjectZoneClusterNodePoolGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolListCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _cluster_id: String,
@@ -15003,9 +15230,15 @@ pub struct ProjectZoneClusterNodePoolListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolListCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15153,7 +15386,7 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15163,7 +15396,7 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -15173,14 +15406,14 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
     /// The parent (project, location, cluster name) where the node pools will be listed. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectZoneClusterNodePoolListCall<'a, S> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -15190,7 +15423,7 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15215,7 +15448,7 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15235,9 +15468,9 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15270,7 +15503,7 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15283,10 +15516,10 @@ impl<'a> ProjectZoneClusterNodePoolListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolRollbackCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolRollbackCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: RollbackNodePoolUpgradeRequest,
     _project_id: String,
     _zone: String,
@@ -15297,9 +15530,15 @@ pub struct ProjectZoneClusterNodePoolRollbackCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolRollbackCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolRollbackCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolRollbackCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15458,7 +15697,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RollbackNodePoolUpgradeRequest) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn request(mut self, new_value: RollbackNodePoolUpgradeRequest) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15468,7 +15707,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15478,7 +15717,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -15488,7 +15727,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -15498,7 +15737,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
@@ -15508,7 +15747,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolRollbackCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolRollbackCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15533,7 +15772,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolRollbackCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolRollbackCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15553,9 +15792,9 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolRollbackCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolRollbackCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15588,7 +15827,7 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15601,10 +15840,10 @@ impl<'a> ProjectZoneClusterNodePoolRollbackCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolSetManagementCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolSetManagementCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNodePoolManagementRequest,
     _project_id: String,
     _zone: String,
@@ -15615,9 +15854,15 @@ pub struct ProjectZoneClusterNodePoolSetManagementCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolSetManagementCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolSetManagementCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolSetManagementCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15776,7 +16021,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolManagementRequest) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn request(mut self, new_value: SetNodePoolManagementRequest) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15786,7 +16031,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15796,7 +16041,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -15806,7 +16051,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -15816,7 +16061,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
@@ -15826,7 +16071,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolSetManagementCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15851,7 +16096,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolSetManagementCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15871,9 +16116,9 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolSetManagementCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolSetManagementCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15906,7 +16151,7 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15919,10 +16164,10 @@ impl<'a> ProjectZoneClusterNodePoolSetManagementCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolSetSizeCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolSetSizeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNodePoolSizeRequest,
     _project_id: String,
     _zone: String,
@@ -15933,9 +16178,15 @@ pub struct ProjectZoneClusterNodePoolSetSizeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolSetSizeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolSetSizeCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolSetSizeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16094,7 +16345,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNodePoolSizeRequest) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn request(mut self, new_value: SetNodePoolSizeRequest) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16104,7 +16355,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16114,7 +16365,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -16124,7 +16375,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -16134,7 +16385,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
@@ -16144,7 +16395,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolSetSizeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16169,7 +16420,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolSetSizeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16189,9 +16440,9 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolSetSizeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolSetSizeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16224,7 +16475,7 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16237,10 +16488,10 @@ impl<'a> ProjectZoneClusterNodePoolSetSizeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterNodePoolUpdateCall<'a>
-    where  {
+pub struct ProjectZoneClusterNodePoolUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: UpdateNodePoolRequest,
     _project_id: String,
     _zone: String,
@@ -16251,9 +16502,15 @@ pub struct ProjectZoneClusterNodePoolUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterNodePoolUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterNodePoolUpdateCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
+impl<'a, S> ProjectZoneClusterNodePoolUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16412,7 +16669,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateNodePoolRequest) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn request(mut self, new_value: UpdateNodePoolRequest) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16422,7 +16679,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16432,7 +16689,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -16442,7 +16699,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -16452,7 +16709,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn node_pool_id(mut self, new_value: &str) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         self._node_pool_id = new_value.to_string();
         self
     }
@@ -16462,7 +16719,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterNodePoolUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16487,7 +16744,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterNodePoolUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16507,9 +16764,9 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterNodePoolUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterNodePoolUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16542,7 +16799,7 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16555,10 +16812,10 @@ impl<'a> ProjectZoneClusterNodePoolUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterAddonCall<'a>
-    where  {
+pub struct ProjectZoneClusterAddonCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetAddonsConfigRequest,
     _project_id: String,
     _zone: String,
@@ -16568,9 +16825,15 @@ pub struct ProjectZoneClusterAddonCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterAddonCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterAddonCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterAddonCall<'a> {
+impl<'a, S> ProjectZoneClusterAddonCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16728,7 +16991,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetAddonsConfigRequest) -> ProjectZoneClusterAddonCall<'a> {
+    pub fn request(mut self, new_value: SetAddonsConfigRequest) -> ProjectZoneClusterAddonCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16738,7 +17001,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterAddonCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterAddonCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16748,7 +17011,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterAddonCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterAddonCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -16758,7 +17021,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterAddonCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterAddonCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -16768,7 +17031,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterAddonCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterAddonCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16793,7 +17056,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterAddonCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterAddonCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16813,9 +17076,9 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterAddonCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterAddonCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16848,7 +17111,7 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16861,10 +17124,10 @@ impl<'a> ProjectZoneClusterAddonCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterCompleteIpRotationCall<'a>
-    where  {
+pub struct ProjectZoneClusterCompleteIpRotationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CompleteIPRotationRequest,
     _project_id: String,
     _zone: String,
@@ -16874,9 +17137,15 @@ pub struct ProjectZoneClusterCompleteIpRotationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterCompleteIpRotationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterCompleteIpRotationCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
+impl<'a, S> ProjectZoneClusterCompleteIpRotationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17034,7 +17303,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompleteIPRotationRequest) -> ProjectZoneClusterCompleteIpRotationCall<'a> {
+    pub fn request(mut self, new_value: CompleteIPRotationRequest) -> ProjectZoneClusterCompleteIpRotationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17044,7 +17313,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -17054,7 +17323,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -17064,7 +17333,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterCompleteIpRotationCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -17074,7 +17343,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterCompleteIpRotationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterCompleteIpRotationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17099,7 +17368,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterCompleteIpRotationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterCompleteIpRotationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17119,9 +17388,9 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterCompleteIpRotationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterCompleteIpRotationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17154,7 +17423,7 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17167,10 +17436,10 @@ impl<'a> ProjectZoneClusterCompleteIpRotationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterCreateCall<'a>
-    where  {
+pub struct ProjectZoneClusterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CreateClusterRequest,
     _project_id: String,
     _zone: String,
@@ -17179,9 +17448,15 @@ pub struct ProjectZoneClusterCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterCreateCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterCreateCall<'a> {
+impl<'a, S> ProjectZoneClusterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17338,7 +17613,7 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateClusterRequest) -> ProjectZoneClusterCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateClusterRequest) -> ProjectZoneClusterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17348,7 +17623,7 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -17358,7 +17633,7 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -17368,7 +17643,7 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17393,7 +17668,7 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17413,9 +17688,9 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17447,7 +17722,7 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17456,10 +17731,10 @@ impl<'a> ProjectZoneClusterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterDeleteCall<'a>
-    where  {
+pub struct ProjectZoneClusterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _cluster_id: String,
@@ -17469,9 +17744,15 @@ pub struct ProjectZoneClusterDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterDeleteCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterDeleteCall<'a> {
+impl<'a, S> ProjectZoneClusterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17619,7 +17900,7 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -17629,7 +17910,7 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -17639,14 +17920,14 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
     /// The name (project, location, cluster) of the cluster to delete. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -17656,7 +17937,7 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17681,7 +17962,7 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17701,9 +17982,9 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17735,7 +18016,7 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17744,10 +18025,10 @@ impl<'a> ProjectZoneClusterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterGetCall<'a>
-    where  {
+pub struct ProjectZoneClusterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _cluster_id: String,
@@ -17757,9 +18038,15 @@ pub struct ProjectZoneClusterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterGetCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterGetCall<'a> {
+impl<'a, S> ProjectZoneClusterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17907,7 +18194,7 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -17917,7 +18204,7 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -17927,14 +18214,14 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
     /// The name (project, location, cluster) of the cluster to retrieve. Specified in the format `projects/*/locations/*/clusters/*`.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -17944,7 +18231,7 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17969,7 +18256,7 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17989,9 +18276,9 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18024,7 +18311,7 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18037,10 +18324,10 @@ impl<'a> ProjectZoneClusterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterLegacyAbacCall<'a>
-    where  {
+pub struct ProjectZoneClusterLegacyAbacCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLegacyAbacRequest,
     _project_id: String,
     _zone: String,
@@ -18050,9 +18337,15 @@ pub struct ProjectZoneClusterLegacyAbacCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterLegacyAbacCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterLegacyAbacCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
+impl<'a, S> ProjectZoneClusterLegacyAbacCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18210,7 +18503,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLegacyAbacRequest) -> ProjectZoneClusterLegacyAbacCall<'a> {
+    pub fn request(mut self, new_value: SetLegacyAbacRequest) -> ProjectZoneClusterLegacyAbacCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18220,7 +18513,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterLegacyAbacCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterLegacyAbacCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18230,7 +18523,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterLegacyAbacCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterLegacyAbacCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -18240,7 +18533,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterLegacyAbacCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterLegacyAbacCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -18250,7 +18543,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterLegacyAbacCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterLegacyAbacCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18275,7 +18568,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterLegacyAbacCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterLegacyAbacCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18295,9 +18588,9 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterLegacyAbacCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterLegacyAbacCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18329,7 +18622,7 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18338,10 +18631,10 @@ impl<'a> ProjectZoneClusterLegacyAbacCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterListCall<'a>
-    where  {
+pub struct ProjectZoneClusterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _parent: Option<String>,
@@ -18350,9 +18643,15 @@ pub struct ProjectZoneClusterListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterListCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterListCall<'a> {
+impl<'a, S> ProjectZoneClusterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18499,7 +18798,7 @@ impl<'a> ProjectZoneClusterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18509,14 +18808,14 @@ impl<'a> ProjectZoneClusterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// The parent (project and location) where the clusters will be listed. Specified in the format `projects/*/locations/*`. Location "-" matches all zones and all regions.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, S> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -18526,7 +18825,7 @@ impl<'a> ProjectZoneClusterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18551,7 +18850,7 @@ impl<'a> ProjectZoneClusterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18571,9 +18870,9 @@ impl<'a> ProjectZoneClusterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18606,7 +18905,7 @@ impl<'a> ProjectZoneClusterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18619,10 +18918,10 @@ impl<'a> ProjectZoneClusterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterLocationCall<'a>
-    where  {
+pub struct ProjectZoneClusterLocationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLocationsRequest,
     _project_id: String,
     _zone: String,
@@ -18632,9 +18931,15 @@ pub struct ProjectZoneClusterLocationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterLocationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterLocationCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterLocationCall<'a> {
+impl<'a, S> ProjectZoneClusterLocationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18792,7 +19097,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLocationsRequest) -> ProjectZoneClusterLocationCall<'a> {
+    pub fn request(mut self, new_value: SetLocationsRequest) -> ProjectZoneClusterLocationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18802,7 +19107,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterLocationCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterLocationCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18812,7 +19117,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterLocationCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterLocationCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -18822,7 +19127,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterLocationCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterLocationCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -18832,7 +19137,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterLocationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterLocationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18857,7 +19162,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterLocationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterLocationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18877,9 +19182,9 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterLocationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterLocationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18912,7 +19217,7 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18925,10 +19230,10 @@ impl<'a> ProjectZoneClusterLocationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterLoggingCall<'a>
-    where  {
+pub struct ProjectZoneClusterLoggingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLoggingServiceRequest,
     _project_id: String,
     _zone: String,
@@ -18938,9 +19243,15 @@ pub struct ProjectZoneClusterLoggingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterLoggingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterLoggingCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterLoggingCall<'a> {
+impl<'a, S> ProjectZoneClusterLoggingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19098,7 +19409,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLoggingServiceRequest) -> ProjectZoneClusterLoggingCall<'a> {
+    pub fn request(mut self, new_value: SetLoggingServiceRequest) -> ProjectZoneClusterLoggingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19108,7 +19419,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterLoggingCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterLoggingCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -19118,7 +19429,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterLoggingCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterLoggingCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -19128,7 +19439,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterLoggingCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterLoggingCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -19138,7 +19449,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterLoggingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterLoggingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19163,7 +19474,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterLoggingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterLoggingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19183,9 +19494,9 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterLoggingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterLoggingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19218,7 +19529,7 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19231,10 +19542,10 @@ impl<'a> ProjectZoneClusterLoggingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterMasterCall<'a>
-    where  {
+pub struct ProjectZoneClusterMasterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: UpdateMasterRequest,
     _project_id: String,
     _zone: String,
@@ -19244,9 +19555,15 @@ pub struct ProjectZoneClusterMasterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterMasterCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterMasterCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterMasterCall<'a> {
+impl<'a, S> ProjectZoneClusterMasterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19404,7 +19721,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateMasterRequest) -> ProjectZoneClusterMasterCall<'a> {
+    pub fn request(mut self, new_value: UpdateMasterRequest) -> ProjectZoneClusterMasterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19414,7 +19731,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterMasterCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterMasterCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -19424,7 +19741,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterMasterCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterMasterCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -19434,7 +19751,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterMasterCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterMasterCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -19444,7 +19761,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterMasterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterMasterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19469,7 +19786,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterMasterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterMasterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19489,9 +19806,9 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterMasterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterMasterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19524,7 +19841,7 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19537,10 +19854,10 @@ impl<'a> ProjectZoneClusterMasterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterMonitoringCall<'a>
-    where  {
+pub struct ProjectZoneClusterMonitoringCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetMonitoringServiceRequest,
     _project_id: String,
     _zone: String,
@@ -19550,9 +19867,15 @@ pub struct ProjectZoneClusterMonitoringCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterMonitoringCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterMonitoringCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterMonitoringCall<'a> {
+impl<'a, S> ProjectZoneClusterMonitoringCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19710,7 +20033,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetMonitoringServiceRequest) -> ProjectZoneClusterMonitoringCall<'a> {
+    pub fn request(mut self, new_value: SetMonitoringServiceRequest) -> ProjectZoneClusterMonitoringCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19720,7 +20043,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterMonitoringCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterMonitoringCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -19730,7 +20053,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterMonitoringCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterMonitoringCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -19740,7 +20063,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterMonitoringCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterMonitoringCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -19750,7 +20073,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterMonitoringCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterMonitoringCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19775,7 +20098,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterMonitoringCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterMonitoringCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19795,9 +20118,9 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterMonitoringCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterMonitoringCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19830,7 +20153,7 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19843,10 +20166,10 @@ impl<'a> ProjectZoneClusterMonitoringCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterResourceLabelCall<'a>
-    where  {
+pub struct ProjectZoneClusterResourceLabelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetLabelsRequest,
     _project_id: String,
     _zone: String,
@@ -19856,9 +20179,15 @@ pub struct ProjectZoneClusterResourceLabelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterResourceLabelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterResourceLabelCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
+impl<'a, S> ProjectZoneClusterResourceLabelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20016,7 +20345,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetLabelsRequest) -> ProjectZoneClusterResourceLabelCall<'a> {
+    pub fn request(mut self, new_value: SetLabelsRequest) -> ProjectZoneClusterResourceLabelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20026,7 +20355,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterResourceLabelCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterResourceLabelCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -20036,7 +20365,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterResourceLabelCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterResourceLabelCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -20046,7 +20375,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterResourceLabelCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterResourceLabelCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -20056,7 +20385,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterResourceLabelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterResourceLabelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20081,7 +20410,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterResourceLabelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterResourceLabelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20101,9 +20430,9 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterResourceLabelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterResourceLabelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20136,7 +20465,7 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20149,10 +20478,10 @@ impl<'a> ProjectZoneClusterResourceLabelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterSetMaintenancePolicyCall<'a>
-    where  {
+pub struct ProjectZoneClusterSetMaintenancePolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetMaintenancePolicyRequest,
     _project_id: String,
     _zone: String,
@@ -20162,9 +20491,15 @@ pub struct ProjectZoneClusterSetMaintenancePolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterSetMaintenancePolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+impl<'a, S> ProjectZoneClusterSetMaintenancePolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20322,7 +20657,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetMaintenancePolicyRequest) -> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+    pub fn request(mut self, new_value: SetMaintenancePolicyRequest) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20332,7 +20667,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -20342,7 +20677,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -20352,7 +20687,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -20362,7 +20697,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20387,7 +20722,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterSetMaintenancePolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20407,9 +20742,9 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterSetMaintenancePolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterSetMaintenancePolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20442,7 +20777,7 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20455,10 +20790,10 @@ impl<'a> ProjectZoneClusterSetMaintenancePolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterSetMasterAuthCall<'a>
-    where  {
+pub struct ProjectZoneClusterSetMasterAuthCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetMasterAuthRequest,
     _project_id: String,
     _zone: String,
@@ -20468,9 +20803,15 @@ pub struct ProjectZoneClusterSetMasterAuthCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterSetMasterAuthCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterSetMasterAuthCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
+impl<'a, S> ProjectZoneClusterSetMasterAuthCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20628,7 +20969,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetMasterAuthRequest) -> ProjectZoneClusterSetMasterAuthCall<'a> {
+    pub fn request(mut self, new_value: SetMasterAuthRequest) -> ProjectZoneClusterSetMasterAuthCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20638,7 +20979,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterSetMasterAuthCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterSetMasterAuthCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -20648,7 +20989,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterSetMasterAuthCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterSetMasterAuthCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -20658,7 +20999,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterSetMasterAuthCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterSetMasterAuthCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -20668,7 +21009,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterSetMasterAuthCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterSetMasterAuthCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20693,7 +21034,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterSetMasterAuthCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterSetMasterAuthCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20713,9 +21054,9 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterSetMasterAuthCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterSetMasterAuthCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20748,7 +21089,7 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20761,10 +21102,10 @@ impl<'a> ProjectZoneClusterSetMasterAuthCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterSetNetworkPolicyCall<'a>
-    where  {
+pub struct ProjectZoneClusterSetNetworkPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: SetNetworkPolicyRequest,
     _project_id: String,
     _zone: String,
@@ -20774,9 +21115,15 @@ pub struct ProjectZoneClusterSetNetworkPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterSetNetworkPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterSetNetworkPolicyCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+impl<'a, S> ProjectZoneClusterSetNetworkPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20934,7 +21281,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetNetworkPolicyRequest) -> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetNetworkPolicyRequest) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20944,7 +21291,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -20954,7 +21301,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -20964,7 +21311,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -20974,7 +21321,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterSetNetworkPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20999,7 +21346,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterSetNetworkPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21019,9 +21366,9 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterSetNetworkPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterSetNetworkPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21054,7 +21401,7 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21067,10 +21414,10 @@ impl<'a> ProjectZoneClusterSetNetworkPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterStartIpRotationCall<'a>
-    where  {
+pub struct ProjectZoneClusterStartIpRotationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: StartIPRotationRequest,
     _project_id: String,
     _zone: String,
@@ -21080,9 +21427,15 @@ pub struct ProjectZoneClusterStartIpRotationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterStartIpRotationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterStartIpRotationCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
+impl<'a, S> ProjectZoneClusterStartIpRotationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21240,7 +21593,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StartIPRotationRequest) -> ProjectZoneClusterStartIpRotationCall<'a> {
+    pub fn request(mut self, new_value: StartIPRotationRequest) -> ProjectZoneClusterStartIpRotationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21250,7 +21603,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterStartIpRotationCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterStartIpRotationCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -21260,7 +21613,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterStartIpRotationCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterStartIpRotationCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -21270,7 +21623,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterStartIpRotationCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterStartIpRotationCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -21280,7 +21633,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterStartIpRotationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterStartIpRotationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21305,7 +21658,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterStartIpRotationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterStartIpRotationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21325,9 +21678,9 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterStartIpRotationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterStartIpRotationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21360,7 +21713,7 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21373,10 +21726,10 @@ impl<'a> ProjectZoneClusterStartIpRotationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneClusterUpdateCall<'a>
-    where  {
+pub struct ProjectZoneClusterUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: UpdateClusterRequest,
     _project_id: String,
     _zone: String,
@@ -21386,9 +21739,15 @@ pub struct ProjectZoneClusterUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneClusterUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneClusterUpdateCall<'a, S> {}
 
-impl<'a> ProjectZoneClusterUpdateCall<'a> {
+impl<'a, S> ProjectZoneClusterUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21546,7 +21905,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateClusterRequest) -> ProjectZoneClusterUpdateCall<'a> {
+    pub fn request(mut self, new_value: UpdateClusterRequest) -> ProjectZoneClusterUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21556,7 +21915,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -21566,7 +21925,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterUpdateCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneClusterUpdateCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -21576,7 +21935,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterUpdateCall<'a> {
+    pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterUpdateCall<'a, S> {
         self._cluster_id = new_value.to_string();
         self
     }
@@ -21586,7 +21945,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneClusterUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21611,7 +21970,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneClusterUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21631,9 +21990,9 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneClusterUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneClusterUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21666,7 +22025,7 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21679,10 +22038,10 @@ impl<'a> ProjectZoneClusterUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneOperationCancelCall<'a>
-    where  {
+pub struct ProjectZoneOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _request: CancelOperationRequest,
     _project_id: String,
     _zone: String,
@@ -21692,9 +22051,15 @@ pub struct ProjectZoneOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectZoneOperationCancelCall<'a> {
+impl<'a, S> ProjectZoneOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21852,7 +22217,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectZoneOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectZoneOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21862,7 +22227,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationCancelCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationCancelCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -21872,7 +22237,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationCancelCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationCancelCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -21882,7 +22247,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationCancelCall<'a> {
+    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationCancelCall<'a, S> {
         self._operation_id = new_value.to_string();
         self
     }
@@ -21892,7 +22257,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21917,7 +22282,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21937,9 +22302,9 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21971,7 +22336,7 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21980,10 +22345,10 @@ impl<'a> ProjectZoneOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneOperationGetCall<'a>
-    where  {
+pub struct ProjectZoneOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _operation_id: String,
@@ -21993,9 +22358,15 @@ pub struct ProjectZoneOperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneOperationGetCall<'a, S> {}
 
-impl<'a> ProjectZoneOperationGetCall<'a> {
+impl<'a, S> ProjectZoneOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22143,7 +22514,7 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -22153,7 +22524,7 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -22163,14 +22534,14 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a> {
+    pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, S> {
         self._operation_id = new_value.to_string();
         self
     }
     /// The name (project, location, operation id) of the operation to get. Specified in the format `projects/*/locations/*/operations/*`.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -22180,7 +22551,7 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22205,7 +22576,7 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22225,9 +22596,9 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22259,7 +22630,7 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22268,10 +22639,10 @@ impl<'a> ProjectZoneOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneOperationListCall<'a>
-    where  {
+pub struct ProjectZoneOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _parent: Option<String>,
@@ -22280,9 +22651,15 @@ pub struct ProjectZoneOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneOperationListCall<'a, S> {}
 
-impl<'a> ProjectZoneOperationListCall<'a> {
+impl<'a, S> ProjectZoneOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22429,7 +22806,7 @@ impl<'a> ProjectZoneOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -22439,14 +22816,14 @@ impl<'a> ProjectZoneOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// The parent (project and location) where the operations will be listed. Specified in the format `projects/*/locations/*`. Location "-" matches all zones and all regions.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, S> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -22456,7 +22833,7 @@ impl<'a> ProjectZoneOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22481,7 +22858,7 @@ impl<'a> ProjectZoneOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22501,9 +22878,9 @@ impl<'a> ProjectZoneOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22535,7 +22912,7 @@ impl<'a> ProjectZoneOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22544,10 +22921,10 @@ impl<'a> ProjectZoneOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectZoneGetServerconfigCall<'a>
-    where  {
+pub struct ProjectZoneGetServerconfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Container<>,
+    hub: &'a Container<S>,
     _project_id: String,
     _zone: String,
     _name: Option<String>,
@@ -22556,9 +22933,15 @@ pub struct ProjectZoneGetServerconfigCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectZoneGetServerconfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectZoneGetServerconfigCall<'a, S> {}
 
-impl<'a> ProjectZoneGetServerconfigCall<'a> {
+impl<'a, S> ProjectZoneGetServerconfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22705,7 +23088,7 @@ impl<'a> ProjectZoneGetServerconfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -22715,14 +23098,14 @@ impl<'a> ProjectZoneGetServerconfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// The name (project and location) of the server config to get, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectZoneGetServerconfigCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -22732,7 +23115,7 @@ impl<'a> ProjectZoneGetServerconfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneGetServerconfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectZoneGetServerconfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22757,7 +23140,7 @@ impl<'a> ProjectZoneGetServerconfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneGetServerconfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectZoneGetServerconfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22777,9 +23160,9 @@ impl<'a> ProjectZoneGetServerconfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectZoneGetServerconfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectZoneGetServerconfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

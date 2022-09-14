@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -81,34 +86,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Spectrum<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Spectrum<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Spectrum<> {}
+impl<'a, S> client::Hub for Spectrum<S> {}
 
-impl<'a, > Spectrum<> {
+impl<'a, S> Spectrum<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Spectrum<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Spectrum<S> {
         Spectrum {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/spectrum/v1explorer/paws/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn paws(&'a self) -> PawMethods<'a> {
+    pub fn paws(&'a self) -> PawMethods<'a, S> {
         PawMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1002,22 +1007,22 @@ impl client::Part for VcardTypedText {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_spectrum(...)`, `get_spectrum_batch(...)`, `init(...)`, `notify_spectrum_use(...)`, `register(...)` and `verify_device(...)`
 /// // to build up your call.
 /// let rb = hub.paws();
 /// # }
 /// ```
-pub struct PawMethods<'a>
-    where  {
+pub struct PawMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
 }
 
-impl<'a> client::MethodsBuilder for PawMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PawMethods<'a, S> {}
 
-impl<'a> PawMethods<'a> {
+impl<'a, S> PawMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1026,7 +1031,7 @@ impl<'a> PawMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_spectrum(&self, request: PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a> {
+    pub fn get_spectrum(&self, request: PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, S> {
         PawGetSpectrumCall {
             hub: self.hub,
             _request: request,
@@ -1042,7 +1047,7 @@ impl<'a> PawMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_spectrum_batch(&self, request: PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a> {
+    pub fn get_spectrum_batch(&self, request: PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, S> {
         PawGetSpectrumBatchCall {
             hub: self.hub,
             _request: request,
@@ -1058,7 +1063,7 @@ impl<'a> PawMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn init(&self, request: PawsInitRequest) -> PawInitCall<'a> {
+    pub fn init(&self, request: PawsInitRequest) -> PawInitCall<'a, S> {
         PawInitCall {
             hub: self.hub,
             _request: request,
@@ -1074,7 +1079,7 @@ impl<'a> PawMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn notify_spectrum_use(&self, request: PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a> {
+    pub fn notify_spectrum_use(&self, request: PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, S> {
         PawNotifySpectrumUseCall {
             hub: self.hub,
             _request: request,
@@ -1090,7 +1095,7 @@ impl<'a> PawMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn register(&self, request: PawsRegisterRequest) -> PawRegisterCall<'a> {
+    pub fn register(&self, request: PawsRegisterRequest) -> PawRegisterCall<'a, S> {
         PawRegisterCall {
             hub: self.hub,
             _request: request,
@@ -1106,7 +1111,7 @@ impl<'a> PawMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_device(&self, request: PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a> {
+    pub fn verify_device(&self, request: PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, S> {
         PawVerifyDeviceCall {
             hub: self.hub,
             _request: request,
@@ -1147,7 +1152,7 @@ impl<'a> PawMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1160,18 +1165,24 @@ impl<'a> PawMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PawGetSpectrumCall<'a>
-    where  {
+pub struct PawGetSpectrumCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
     _request: PawsGetSpectrumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PawGetSpectrumCall<'a> {}
+impl<'a, S> client::CallBuilder for PawGetSpectrumCall<'a, S> {}
 
-impl<'a> PawGetSpectrumCall<'a> {
+impl<'a, S> PawGetSpectrumCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1299,7 +1310,7 @@ impl<'a> PawGetSpectrumCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a> {
+    pub fn request(mut self, new_value: PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1309,7 +1320,7 @@ impl<'a> PawGetSpectrumCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawGetSpectrumCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawGetSpectrumCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1330,7 +1341,7 @@ impl<'a> PawGetSpectrumCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1362,7 +1373,7 @@ impl<'a> PawGetSpectrumCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1375,18 +1386,24 @@ impl<'a> PawGetSpectrumCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PawGetSpectrumBatchCall<'a>
-    where  {
+pub struct PawGetSpectrumBatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
     _request: PawsGetSpectrumBatchRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PawGetSpectrumBatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PawGetSpectrumBatchCall<'a, S> {}
 
-impl<'a> PawGetSpectrumBatchCall<'a> {
+impl<'a, S> PawGetSpectrumBatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1514,7 +1531,7 @@ impl<'a> PawGetSpectrumBatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a> {
+    pub fn request(mut self, new_value: PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1524,7 +1541,7 @@ impl<'a> PawGetSpectrumBatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawGetSpectrumBatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawGetSpectrumBatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1545,7 +1562,7 @@ impl<'a> PawGetSpectrumBatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumBatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PawGetSpectrumBatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1577,7 +1594,7 @@ impl<'a> PawGetSpectrumBatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1590,18 +1607,24 @@ impl<'a> PawGetSpectrumBatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PawInitCall<'a>
-    where  {
+pub struct PawInitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
     _request: PawsInitRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PawInitCall<'a> {}
+impl<'a, S> client::CallBuilder for PawInitCall<'a, S> {}
 
-impl<'a> PawInitCall<'a> {
+impl<'a, S> PawInitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1729,7 +1752,7 @@ impl<'a> PawInitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PawsInitRequest) -> PawInitCall<'a> {
+    pub fn request(mut self, new_value: PawsInitRequest) -> PawInitCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1739,7 +1762,7 @@ impl<'a> PawInitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawInitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawInitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1760,7 +1783,7 @@ impl<'a> PawInitCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PawInitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PawInitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1792,7 +1815,7 @@ impl<'a> PawInitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1805,18 +1828,24 @@ impl<'a> PawInitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PawNotifySpectrumUseCall<'a>
-    where  {
+pub struct PawNotifySpectrumUseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
     _request: PawsNotifySpectrumUseRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PawNotifySpectrumUseCall<'a> {}
+impl<'a, S> client::CallBuilder for PawNotifySpectrumUseCall<'a, S> {}
 
-impl<'a> PawNotifySpectrumUseCall<'a> {
+impl<'a, S> PawNotifySpectrumUseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1944,7 +1973,7 @@ impl<'a> PawNotifySpectrumUseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a> {
+    pub fn request(mut self, new_value: PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1954,7 +1983,7 @@ impl<'a> PawNotifySpectrumUseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawNotifySpectrumUseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawNotifySpectrumUseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1975,7 +2004,7 @@ impl<'a> PawNotifySpectrumUseCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PawNotifySpectrumUseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PawNotifySpectrumUseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2007,7 +2036,7 @@ impl<'a> PawNotifySpectrumUseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2020,18 +2049,24 @@ impl<'a> PawNotifySpectrumUseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PawRegisterCall<'a>
-    where  {
+pub struct PawRegisterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
     _request: PawsRegisterRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PawRegisterCall<'a> {}
+impl<'a, S> client::CallBuilder for PawRegisterCall<'a, S> {}
 
-impl<'a> PawRegisterCall<'a> {
+impl<'a, S> PawRegisterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2159,7 +2194,7 @@ impl<'a> PawRegisterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PawsRegisterRequest) -> PawRegisterCall<'a> {
+    pub fn request(mut self, new_value: PawsRegisterRequest) -> PawRegisterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2169,7 +2204,7 @@ impl<'a> PawRegisterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawRegisterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawRegisterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2190,7 +2225,7 @@ impl<'a> PawRegisterCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PawRegisterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PawRegisterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2222,7 +2257,7 @@ impl<'a> PawRegisterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Spectrum::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2235,18 +2270,24 @@ impl<'a> PawRegisterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PawVerifyDeviceCall<'a>
-    where  {
+pub struct PawVerifyDeviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Spectrum<>,
+    hub: &'a Spectrum<S>,
     _request: PawsVerifyDeviceRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PawVerifyDeviceCall<'a> {}
+impl<'a, S> client::CallBuilder for PawVerifyDeviceCall<'a, S> {}
 
-impl<'a> PawVerifyDeviceCall<'a> {
+impl<'a, S> PawVerifyDeviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2374,7 +2415,7 @@ impl<'a> PawVerifyDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a> {
+    pub fn request(mut self, new_value: PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2384,7 +2425,7 @@ impl<'a> PawVerifyDeviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawVerifyDeviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PawVerifyDeviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2405,7 +2446,7 @@ impl<'a> PawVerifyDeviceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> PawVerifyDeviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PawVerifyDeviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

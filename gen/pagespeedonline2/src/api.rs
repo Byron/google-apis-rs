@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -80,34 +85,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Pagespeedonline<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Pagespeedonline<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Pagespeedonline<> {}
+impl<'a, S> client::Hub for Pagespeedonline<S> {}
 
-impl<'a, > Pagespeedonline<> {
+impl<'a, S> Pagespeedonline<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Pagespeedonline<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Pagespeedonline<S> {
         Pagespeedonline {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/pagespeedonline/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn pagespeedapi(&'a self) -> PagespeedapiMethods<'a> {
+    pub fn pagespeedapi(&'a self) -> PagespeedapiMethods<'a, S> {
         PagespeedapiMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -481,22 +486,22 @@ impl client::Part for ResultVersion {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `runpagespeed(...)`
 /// // to build up your call.
 /// let rb = hub.pagespeedapi();
 /// # }
 /// ```
-pub struct PagespeedapiMethods<'a>
-    where  {
+pub struct PagespeedapiMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Pagespeedonline<>,
+    hub: &'a Pagespeedonline<S>,
 }
 
-impl<'a> client::MethodsBuilder for PagespeedapiMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PagespeedapiMethods<'a, S> {}
 
-impl<'a> PagespeedapiMethods<'a> {
+impl<'a, S> PagespeedapiMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -505,7 +510,7 @@ impl<'a> PagespeedapiMethods<'a> {
     /// # Arguments
     ///
     /// * `url` - The URL to fetch and analyze
-    pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
         PagespeedapiRunpagespeedCall {
             hub: self.hub,
             _url: url.to_string(),
@@ -550,7 +555,7 @@ impl<'a> PagespeedapiMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -563,10 +568,10 @@ impl<'a> PagespeedapiMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PagespeedapiRunpagespeedCall<'a>
-    where  {
+pub struct PagespeedapiRunpagespeedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Pagespeedonline<>,
+    hub: &'a Pagespeedonline<S>,
     _url: String,
     _strategy: Option<String>,
     _screenshot: Option<bool>,
@@ -577,9 +582,15 @@ pub struct PagespeedapiRunpagespeedCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PagespeedapiRunpagespeedCall<'a> {}
+impl<'a, S> client::CallBuilder for PagespeedapiRunpagespeedCall<'a, S> {}
 
-impl<'a> PagespeedapiRunpagespeedCall<'a> {
+impl<'a, S> PagespeedapiRunpagespeedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -712,21 +723,21 @@ impl<'a> PagespeedapiRunpagespeedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._url = new_value.to_string();
         self
     }
     /// The analysis strategy to use
     ///
     /// Sets the *strategy* query property to the given value.
-    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._strategy = Some(new_value.to_string());
         self
     }
     /// Indicates if binary data containing a screenshot should be included
     ///
     /// Sets the *screenshot* query property to the given value.
-    pub fn screenshot(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn screenshot(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._screenshot = Some(new_value);
         self
     }
@@ -734,21 +745,21 @@ impl<'a> PagespeedapiRunpagespeedCall<'a> {
     ///
     /// Append the given value to the *rule* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_rule(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn add_rule(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._rule.push(new_value.to_string());
         self
     }
     /// The locale used to localize formatted results
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// Indicates if third party resources should be filtered out before PageSpeed analysis.
     ///
     /// Sets the *filter_third_party_resources* query property to the given value.
-    pub fn filter_third_party_resources(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn filter_third_party_resources(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._filter_third_party_resources = Some(new_value);
         self
     }
@@ -758,7 +769,7 @@ impl<'a> PagespeedapiRunpagespeedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagespeedapiRunpagespeedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagespeedapiRunpagespeedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -779,7 +790,7 @@ impl<'a> PagespeedapiRunpagespeedCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

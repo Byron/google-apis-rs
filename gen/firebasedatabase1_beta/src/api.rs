@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -83,7 +88,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -117,34 +122,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct FirebaseRealtimeDatabase<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct FirebaseRealtimeDatabase<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for FirebaseRealtimeDatabase<> {}
+impl<'a, S> client::Hub for FirebaseRealtimeDatabase<S> {}
 
-impl<'a, > FirebaseRealtimeDatabase<> {
+impl<'a, S> FirebaseRealtimeDatabase<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseRealtimeDatabase<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> FirebaseRealtimeDatabase<S> {
         FirebaseRealtimeDatabase {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://firebasedatabase.googleapis.com/".to_string(),
             _root_url: "https://firebasedatabase.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -282,22 +287,22 @@ impl client::RequestValue for ReenableDatabaseInstanceRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_instances_create(...)`, `locations_instances_delete(...)`, `locations_instances_disable(...)`, `locations_instances_get(...)`, `locations_instances_list(...)` and `locations_instances_reenable(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -307,7 +312,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent project for which to create a database instance, in the form: `projects/{project-number}/locations/{location-id}`.
-    pub fn locations_instances_create(&self, request: DatabaseInstance, parent: &str) -> ProjectLocationInstanceCreateCall<'a> {
+    pub fn locations_instances_create(&self, request: DatabaseInstance, parent: &str) -> ProjectLocationInstanceCreateCall<'a, S> {
         ProjectLocationInstanceCreateCall {
             hub: self.hub,
             _request: request,
@@ -327,7 +332,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`
-    pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a> {
+    pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a, S> {
         ProjectLocationInstanceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -345,7 +350,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`
-    pub fn locations_instances_disable(&self, request: DisableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceDisableCall<'a> {
+    pub fn locations_instances_disable(&self, request: DisableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceDisableCall<'a, S> {
         ProjectLocationInstanceDisableCall {
             hub: self.hub,
             _request: request,
@@ -363,7 +368,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`. `database-id` is a globally unique identifier across all parent collections. For convenience, this method allows you to supply `-` as a wildcard character in place of specific collections under `projects` and `locations`. The resulting wildcarding form of the method is: `projects/-/locations/-/instances/{database-id}`.
-    pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a> {
+    pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a, S> {
         ProjectLocationInstanceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -380,7 +385,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The parent project for which to list database instances, in the form: `projects/{project-number}/locations/{location-id}` To list across all locations, use a parent in the form: `projects/{project-number}/locations/-`
-    pub fn locations_instances_list(&self, parent: &str) -> ProjectLocationInstanceListCall<'a> {
+    pub fn locations_instances_list(&self, parent: &str) -> ProjectLocationInstanceListCall<'a, S> {
         ProjectLocationInstanceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -400,7 +405,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`
-    pub fn locations_instances_reenable(&self, request: ReenableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceReenableCall<'a> {
+    pub fn locations_instances_reenable(&self, request: ReenableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceReenableCall<'a, S> {
         ProjectLocationInstanceReenableCall {
             hub: self.hub,
             _request: request,
@@ -443,7 +448,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -458,10 +463,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceCreateCall<'a>
-    where  {
+pub struct ProjectLocationInstanceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
     _request: DatabaseInstance,
     _parent: String,
     _validate_only: Option<bool>,
@@ -471,9 +476,15 @@ pub struct ProjectLocationInstanceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationInstanceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationInstanceCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationInstanceCreateCall<'a> {
+impl<'a, S> ProjectLocationInstanceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -639,7 +650,7 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DatabaseInstance) -> ProjectLocationInstanceCreateCall<'a> {
+    pub fn request(mut self, new_value: DatabaseInstance) -> ProjectLocationInstanceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -649,21 +660,21 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// When set to true, the request will be validated but not submitted.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationInstanceCreateCall<'a> {
+    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationInstanceCreateCall<'a, S> {
         self._validate_only = Some(new_value);
         self
     }
     /// The globally unique identifier of the database instance.
     ///
     /// Sets the *database id* query property to the given value.
-    pub fn database_id(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a> {
+    pub fn database_id(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a, S> {
         self._database_id = Some(new_value.to_string());
         self
     }
@@ -673,7 +684,7 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -698,7 +709,7 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -718,9 +729,9 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationInstanceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -752,7 +763,7 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -760,19 +771,25 @@ impl<'a> ProjectLocationInstanceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceDeleteCall<'a>
-    where  {
+pub struct ProjectLocationInstanceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationInstanceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationInstanceDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationInstanceDeleteCall<'a> {
+impl<'a, S> ProjectLocationInstanceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -919,7 +936,7 @@ impl<'a> ProjectLocationInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -929,7 +946,7 @@ impl<'a> ProjectLocationInstanceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -954,7 +971,7 @@ impl<'a> ProjectLocationInstanceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -974,9 +991,9 @@ impl<'a> ProjectLocationInstanceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationInstanceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1009,7 +1026,7 @@ impl<'a> ProjectLocationInstanceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1022,10 +1039,10 @@ impl<'a> ProjectLocationInstanceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceDisableCall<'a>
-    where  {
+pub struct ProjectLocationInstanceDisableCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
     _request: DisableDatabaseInstanceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1033,9 +1050,15 @@ pub struct ProjectLocationInstanceDisableCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationInstanceDisableCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationInstanceDisableCall<'a, S> {}
 
-impl<'a> ProjectLocationInstanceDisableCall<'a> {
+impl<'a, S> ProjectLocationInstanceDisableCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1195,7 +1218,7 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DisableDatabaseInstanceRequest) -> ProjectLocationInstanceDisableCall<'a> {
+    pub fn request(mut self, new_value: DisableDatabaseInstanceRequest) -> ProjectLocationInstanceDisableCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1205,7 +1228,7 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDisableCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDisableCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1215,7 +1238,7 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDisableCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDisableCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1240,7 +1263,7 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDisableCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDisableCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1260,9 +1283,9 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDisableCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationInstanceDisableCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1294,7 +1317,7 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1302,19 +1325,25 @@ impl<'a> ProjectLocationInstanceDisableCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceGetCall<'a>
-    where  {
+pub struct ProjectLocationInstanceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationInstanceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationInstanceGetCall<'a, S> {}
 
-impl<'a> ProjectLocationInstanceGetCall<'a> {
+impl<'a, S> ProjectLocationInstanceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1461,7 +1490,7 @@ impl<'a> ProjectLocationInstanceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1471,7 +1500,7 @@ impl<'a> ProjectLocationInstanceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1496,7 +1525,7 @@ impl<'a> ProjectLocationInstanceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1516,9 +1545,9 @@ impl<'a> ProjectLocationInstanceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationInstanceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1550,7 +1579,7 @@ impl<'a> ProjectLocationInstanceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1560,10 +1589,10 @@ impl<'a> ProjectLocationInstanceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceListCall<'a>
-    where  {
+pub struct ProjectLocationInstanceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1572,9 +1601,15 @@ pub struct ProjectLocationInstanceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationInstanceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationInstanceListCall<'a, S> {}
 
-impl<'a> ProjectLocationInstanceListCall<'a> {
+impl<'a, S> ProjectLocationInstanceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1727,21 +1762,21 @@ impl<'a> ProjectLocationInstanceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `ListDatabaseInstances` indicating where in the set of database instances to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of database instances to return in the response. The server may return fewer than this at its discretion. If no value is specified (or too large a value is specified), then the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationInstanceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationInstanceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1751,7 +1786,7 @@ impl<'a> ProjectLocationInstanceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1776,7 +1811,7 @@ impl<'a> ProjectLocationInstanceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1796,9 +1831,9 @@ impl<'a> ProjectLocationInstanceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationInstanceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1831,7 +1866,7 @@ impl<'a> ProjectLocationInstanceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseRealtimeDatabase::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1844,10 +1879,10 @@ impl<'a> ProjectLocationInstanceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceReenableCall<'a>
-    where  {
+pub struct ProjectLocationInstanceReenableCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseRealtimeDatabase<>,
+    hub: &'a FirebaseRealtimeDatabase<S>,
     _request: ReenableDatabaseInstanceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1855,9 +1890,15 @@ pub struct ProjectLocationInstanceReenableCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationInstanceReenableCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationInstanceReenableCall<'a, S> {}
 
-impl<'a> ProjectLocationInstanceReenableCall<'a> {
+impl<'a, S> ProjectLocationInstanceReenableCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2017,7 +2058,7 @@ impl<'a> ProjectLocationInstanceReenableCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReenableDatabaseInstanceRequest) -> ProjectLocationInstanceReenableCall<'a> {
+    pub fn request(mut self, new_value: ReenableDatabaseInstanceRequest) -> ProjectLocationInstanceReenableCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2027,7 +2068,7 @@ impl<'a> ProjectLocationInstanceReenableCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceReenableCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceReenableCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2037,7 +2078,7 @@ impl<'a> ProjectLocationInstanceReenableCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceReenableCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceReenableCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2062,7 +2103,7 @@ impl<'a> ProjectLocationInstanceReenableCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceReenableCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceReenableCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2082,9 +2123,9 @@ impl<'a> ProjectLocationInstanceReenableCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceReenableCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationInstanceReenableCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

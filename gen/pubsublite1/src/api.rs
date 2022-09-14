@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,40 +108,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PubsubLite<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PubsubLite<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PubsubLite<> {}
+impl<'a, S> client::Hub for PubsubLite<S> {}
 
-impl<'a, > PubsubLite<> {
+impl<'a, S> PubsubLite<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PubsubLite<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PubsubLite<S> {
         PubsubLite {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://pubsublite.googleapis.com/".to_string(),
             _root_url: "https://pubsublite.googleapis.com/".to_string(),
         }
     }
 
-    pub fn admin(&'a self) -> AdminMethods<'a> {
+    pub fn admin(&'a self) -> AdminMethods<'a, S> {
         AdminMethods { hub: &self }
     }
-    pub fn cursor(&'a self) -> CursorMethods<'a> {
+    pub fn cursor(&'a self) -> CursorMethods<'a, S> {
         CursorMethods { hub: &self }
     }
-    pub fn topic_stats(&'a self) -> TopicStatMethods<'a> {
+    pub fn topic_stats(&'a self) -> TopicStatMethods<'a, S> {
         TopicStatMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -822,22 +827,22 @@ impl client::ResponseResult for TopicPartitions {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `projects_locations_operations_cancel(...)`, `projects_locations_operations_delete(...)`, `projects_locations_operations_get(...)`, `projects_locations_operations_list(...)`, `projects_locations_reservations_create(...)`, `projects_locations_reservations_delete(...)`, `projects_locations_reservations_get(...)`, `projects_locations_reservations_list(...)`, `projects_locations_reservations_patch(...)`, `projects_locations_reservations_topics_list(...)`, `projects_locations_subscriptions_create(...)`, `projects_locations_subscriptions_delete(...)`, `projects_locations_subscriptions_get(...)`, `projects_locations_subscriptions_list(...)`, `projects_locations_subscriptions_patch(...)`, `projects_locations_subscriptions_seek(...)`, `projects_locations_topics_create(...)`, `projects_locations_topics_delete(...)`, `projects_locations_topics_get(...)`, `projects_locations_topics_get_partitions(...)`, `projects_locations_topics_list(...)`, `projects_locations_topics_patch(...)` and `projects_locations_topics_subscriptions_list(...)`
 /// // to build up your call.
 /// let rb = hub.admin();
 /// # }
 /// ```
-pub struct AdminMethods<'a>
-    where  {
+pub struct AdminMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
 }
 
-impl<'a> client::MethodsBuilder for AdminMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AdminMethods<'a, S> {}
 
-impl<'a> AdminMethods<'a> {
+impl<'a, S> AdminMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -847,7 +852,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn projects_locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> AdminProjectLocationOperationCancelCall<'a> {
+    pub fn projects_locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> AdminProjectLocationOperationCancelCall<'a, S> {
         AdminProjectLocationOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -865,7 +870,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn projects_locations_operations_delete(&self, name: &str) -> AdminProjectLocationOperationDeleteCall<'a> {
+    pub fn projects_locations_operations_delete(&self, name: &str) -> AdminProjectLocationOperationDeleteCall<'a, S> {
         AdminProjectLocationOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -882,7 +887,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn projects_locations_operations_get(&self, name: &str) -> AdminProjectLocationOperationGetCall<'a> {
+    pub fn projects_locations_operations_get(&self, name: &str) -> AdminProjectLocationOperationGetCall<'a, S> {
         AdminProjectLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -899,7 +904,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn projects_locations_operations_list(&self, name: &str) -> AdminProjectLocationOperationListCall<'a> {
+    pub fn projects_locations_operations_list(&self, name: &str) -> AdminProjectLocationOperationListCall<'a, S> {
         AdminProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -919,7 +924,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the reservation whose topics to list. Structured like: projects/{project_number}/locations/{location}/reservations/{reservation_id}
-    pub fn projects_locations_reservations_topics_list(&self, name: &str) -> AdminProjectLocationReservationTopicListCall<'a> {
+    pub fn projects_locations_reservations_topics_list(&self, name: &str) -> AdminProjectLocationReservationTopicListCall<'a, S> {
         AdminProjectLocationReservationTopicListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -939,7 +944,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent location in which to create the reservation. Structured like `projects/{project_number}/locations/{location}`.
-    pub fn projects_locations_reservations_create(&self, request: Reservation, parent: &str) -> AdminProjectLocationReservationCreateCall<'a> {
+    pub fn projects_locations_reservations_create(&self, request: Reservation, parent: &str) -> AdminProjectLocationReservationCreateCall<'a, S> {
         AdminProjectLocationReservationCreateCall {
             hub: self.hub,
             _request: request,
@@ -958,7 +963,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the reservation to delete. Structured like: projects/{project_number}/locations/{location}/reservations/{reservation_id}
-    pub fn projects_locations_reservations_delete(&self, name: &str) -> AdminProjectLocationReservationDeleteCall<'a> {
+    pub fn projects_locations_reservations_delete(&self, name: &str) -> AdminProjectLocationReservationDeleteCall<'a, S> {
         AdminProjectLocationReservationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -975,7 +980,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the reservation whose configuration to return. Structured like: projects/{project_number}/locations/{location}/reservations/{reservation_id}
-    pub fn projects_locations_reservations_get(&self, name: &str) -> AdminProjectLocationReservationGetCall<'a> {
+    pub fn projects_locations_reservations_get(&self, name: &str) -> AdminProjectLocationReservationGetCall<'a, S> {
         AdminProjectLocationReservationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -992,7 +997,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent whose reservations are to be listed. Structured like `projects/{project_number}/locations/{location}`.
-    pub fn projects_locations_reservations_list(&self, parent: &str) -> AdminProjectLocationReservationListCall<'a> {
+    pub fn projects_locations_reservations_list(&self, parent: &str) -> AdminProjectLocationReservationListCall<'a, S> {
         AdminProjectLocationReservationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1012,7 +1017,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the reservation. Structured like: projects/{project_number}/locations/{location}/reservations/{reservation_id}
-    pub fn projects_locations_reservations_patch(&self, request: Reservation, name: &str) -> AdminProjectLocationReservationPatchCall<'a> {
+    pub fn projects_locations_reservations_patch(&self, request: Reservation, name: &str) -> AdminProjectLocationReservationPatchCall<'a, S> {
         AdminProjectLocationReservationPatchCall {
             hub: self.hub,
             _request: request,
@@ -1032,7 +1037,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent location in which to create the subscription. Structured like `projects/{project_number}/locations/{location}`.
-    pub fn projects_locations_subscriptions_create(&self, request: Subscription, parent: &str) -> AdminProjectLocationSubscriptionCreateCall<'a> {
+    pub fn projects_locations_subscriptions_create(&self, request: Subscription, parent: &str) -> AdminProjectLocationSubscriptionCreateCall<'a, S> {
         AdminProjectLocationSubscriptionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1052,7 +1057,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the subscription to delete.
-    pub fn projects_locations_subscriptions_delete(&self, name: &str) -> AdminProjectLocationSubscriptionDeleteCall<'a> {
+    pub fn projects_locations_subscriptions_delete(&self, name: &str) -> AdminProjectLocationSubscriptionDeleteCall<'a, S> {
         AdminProjectLocationSubscriptionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1069,7 +1074,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the subscription whose configuration to return.
-    pub fn projects_locations_subscriptions_get(&self, name: &str) -> AdminProjectLocationSubscriptionGetCall<'a> {
+    pub fn projects_locations_subscriptions_get(&self, name: &str) -> AdminProjectLocationSubscriptionGetCall<'a, S> {
         AdminProjectLocationSubscriptionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1086,7 +1091,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent whose subscriptions are to be listed. Structured like `projects/{project_number}/locations/{location}`.
-    pub fn projects_locations_subscriptions_list(&self, parent: &str) -> AdminProjectLocationSubscriptionListCall<'a> {
+    pub fn projects_locations_subscriptions_list(&self, parent: &str) -> AdminProjectLocationSubscriptionListCall<'a, S> {
         AdminProjectLocationSubscriptionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1106,7 +1111,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the subscription. Structured like: projects/{project_number}/locations/{location}/subscriptions/{subscription_id}
-    pub fn projects_locations_subscriptions_patch(&self, request: Subscription, name: &str) -> AdminProjectLocationSubscriptionPatchCall<'a> {
+    pub fn projects_locations_subscriptions_patch(&self, request: Subscription, name: &str) -> AdminProjectLocationSubscriptionPatchCall<'a, S> {
         AdminProjectLocationSubscriptionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1126,7 +1131,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the subscription to seek.
-    pub fn projects_locations_subscriptions_seek(&self, request: SeekSubscriptionRequest, name: &str) -> AdminProjectLocationSubscriptionSeekCall<'a> {
+    pub fn projects_locations_subscriptions_seek(&self, request: SeekSubscriptionRequest, name: &str) -> AdminProjectLocationSubscriptionSeekCall<'a, S> {
         AdminProjectLocationSubscriptionSeekCall {
             hub: self.hub,
             _request: request,
@@ -1144,7 +1149,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the topic whose subscriptions to list.
-    pub fn projects_locations_topics_subscriptions_list(&self, name: &str) -> AdminProjectLocationTopicSubscriptionListCall<'a> {
+    pub fn projects_locations_topics_subscriptions_list(&self, name: &str) -> AdminProjectLocationTopicSubscriptionListCall<'a, S> {
         AdminProjectLocationTopicSubscriptionListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1164,7 +1169,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent location in which to create the topic. Structured like `projects/{project_number}/locations/{location}`.
-    pub fn projects_locations_topics_create(&self, request: Topic, parent: &str) -> AdminProjectLocationTopicCreateCall<'a> {
+    pub fn projects_locations_topics_create(&self, request: Topic, parent: &str) -> AdminProjectLocationTopicCreateCall<'a, S> {
         AdminProjectLocationTopicCreateCall {
             hub: self.hub,
             _request: request,
@@ -1183,7 +1188,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the topic to delete.
-    pub fn projects_locations_topics_delete(&self, name: &str) -> AdminProjectLocationTopicDeleteCall<'a> {
+    pub fn projects_locations_topics_delete(&self, name: &str) -> AdminProjectLocationTopicDeleteCall<'a, S> {
         AdminProjectLocationTopicDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1200,7 +1205,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the topic whose configuration to return.
-    pub fn projects_locations_topics_get(&self, name: &str) -> AdminProjectLocationTopicGetCall<'a> {
+    pub fn projects_locations_topics_get(&self, name: &str) -> AdminProjectLocationTopicGetCall<'a, S> {
         AdminProjectLocationTopicGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1217,7 +1222,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The topic whose partition information to return.
-    pub fn projects_locations_topics_get_partitions(&self, name: &str) -> AdminProjectLocationTopicGetPartitionCall<'a> {
+    pub fn projects_locations_topics_get_partitions(&self, name: &str) -> AdminProjectLocationTopicGetPartitionCall<'a, S> {
         AdminProjectLocationTopicGetPartitionCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1234,7 +1239,7 @@ impl<'a> AdminMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent whose topics are to be listed. Structured like `projects/{project_number}/locations/{location}`.
-    pub fn projects_locations_topics_list(&self, parent: &str) -> AdminProjectLocationTopicListCall<'a> {
+    pub fn projects_locations_topics_list(&self, parent: &str) -> AdminProjectLocationTopicListCall<'a, S> {
         AdminProjectLocationTopicListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1254,7 +1259,7 @@ impl<'a> AdminMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the topic. Structured like: projects/{project_number}/locations/{location}/topics/{topic_id}
-    pub fn projects_locations_topics_patch(&self, request: Topic, name: &str) -> AdminProjectLocationTopicPatchCall<'a> {
+    pub fn projects_locations_topics_patch(&self, request: Topic, name: &str) -> AdminProjectLocationTopicPatchCall<'a, S> {
         AdminProjectLocationTopicPatchCall {
             hub: self.hub,
             _request: request,
@@ -1290,22 +1295,22 @@ impl<'a> AdminMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `projects_locations_subscriptions_commit_cursor(...)` and `projects_locations_subscriptions_cursors_list(...)`
 /// // to build up your call.
 /// let rb = hub.cursor();
 /// # }
 /// ```
-pub struct CursorMethods<'a>
-    where  {
+pub struct CursorMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
 }
 
-impl<'a> client::MethodsBuilder for CursorMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CursorMethods<'a, S> {}
 
-impl<'a> CursorMethods<'a> {
+impl<'a, S> CursorMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1314,7 +1319,7 @@ impl<'a> CursorMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The subscription for which to retrieve cursors. Structured like `projects/{project_number}/locations/{location}/subscriptions/{subscription_id}`.
-    pub fn projects_locations_subscriptions_cursors_list(&self, parent: &str) -> CursorProjectLocationSubscriptionCursorListCall<'a> {
+    pub fn projects_locations_subscriptions_cursors_list(&self, parent: &str) -> CursorProjectLocationSubscriptionCursorListCall<'a, S> {
         CursorProjectLocationSubscriptionCursorListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1334,7 +1339,7 @@ impl<'a> CursorMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `subscription` - The subscription for which to update the cursor.
-    pub fn projects_locations_subscriptions_commit_cursor(&self, request: CommitCursorRequest, subscription: &str) -> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
+    pub fn projects_locations_subscriptions_commit_cursor(&self, request: CommitCursorRequest, subscription: &str) -> CursorProjectLocationSubscriptionCommitCursorCall<'a, S> {
         CursorProjectLocationSubscriptionCommitCursorCall {
             hub: self.hub,
             _request: request,
@@ -1369,22 +1374,22 @@ impl<'a> CursorMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `projects_locations_topics_compute_head_cursor(...)`, `projects_locations_topics_compute_message_stats(...)` and `projects_locations_topics_compute_time_cursor(...)`
 /// // to build up your call.
 /// let rb = hub.topic_stats();
 /// # }
 /// ```
-pub struct TopicStatMethods<'a>
-    where  {
+pub struct TopicStatMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
 }
 
-impl<'a> client::MethodsBuilder for TopicStatMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TopicStatMethods<'a, S> {}
 
-impl<'a> TopicStatMethods<'a> {
+impl<'a, S> TopicStatMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1394,7 +1399,7 @@ impl<'a> TopicStatMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `topic` - Required. The topic for which we should compute the head cursor.
-    pub fn projects_locations_topics_compute_head_cursor(&self, request: ComputeHeadCursorRequest, topic: &str) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
+    pub fn projects_locations_topics_compute_head_cursor(&self, request: ComputeHeadCursorRequest, topic: &str) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S> {
         TopicStatProjectLocationTopicComputeHeadCursorCall {
             hub: self.hub,
             _request: request,
@@ -1413,7 +1418,7 @@ impl<'a> TopicStatMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `topic` - Required. The topic for which we should compute message stats.
-    pub fn projects_locations_topics_compute_message_stats(&self, request: ComputeMessageStatsRequest, topic: &str) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
+    pub fn projects_locations_topics_compute_message_stats(&self, request: ComputeMessageStatsRequest, topic: &str) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S> {
         TopicStatProjectLocationTopicComputeMessageStatCall {
             hub: self.hub,
             _request: request,
@@ -1432,7 +1437,7 @@ impl<'a> TopicStatMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `topic` - Required. The topic for which we should compute the cursor.
-    pub fn projects_locations_topics_compute_time_cursor(&self, request: ComputeTimeCursorRequest, topic: &str) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
+    pub fn projects_locations_topics_compute_time_cursor(&self, request: ComputeTimeCursorRequest, topic: &str) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S> {
         TopicStatProjectLocationTopicComputeTimeCursorCall {
             hub: self.hub,
             _request: request,
@@ -1475,7 +1480,7 @@ impl<'a> TopicStatMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1488,10 +1493,10 @@ impl<'a> TopicStatMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationOperationCancelCall<'a>
-    where  {
+pub struct AdminProjectLocationOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1499,9 +1504,15 @@ pub struct AdminProjectLocationOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationOperationCancelCall<'a, S> {}
 
-impl<'a> AdminProjectLocationOperationCancelCall<'a> {
+impl<'a, S> AdminProjectLocationOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1661,7 +1672,7 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> AdminProjectLocationOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> AdminProjectLocationOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1671,7 +1682,7 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1681,7 +1692,7 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1706,7 +1717,7 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1726,9 +1737,9 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1760,7 +1771,7 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1768,19 +1779,25 @@ impl<'a> AdminProjectLocationOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationOperationDeleteCall<'a>
-    where  {
+pub struct AdminProjectLocationOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationOperationDeleteCall<'a, S> {}
 
-impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
+impl<'a, S> AdminProjectLocationOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1927,7 +1944,7 @@ impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1937,7 +1954,7 @@ impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1962,7 +1979,7 @@ impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1982,9 +1999,9 @@ impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2016,7 +2033,7 @@ impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2024,19 +2041,25 @@ impl<'a> AdminProjectLocationOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationOperationGetCall<'a>
-    where  {
+pub struct AdminProjectLocationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationOperationGetCall<'a, S> {}
 
-impl<'a> AdminProjectLocationOperationGetCall<'a> {
+impl<'a, S> AdminProjectLocationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2183,7 +2206,7 @@ impl<'a> AdminProjectLocationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2193,7 +2216,7 @@ impl<'a> AdminProjectLocationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2218,7 +2241,7 @@ impl<'a> AdminProjectLocationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2238,9 +2261,9 @@ impl<'a> AdminProjectLocationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2272,7 +2295,7 @@ impl<'a> AdminProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2283,10 +2306,10 @@ impl<'a> AdminProjectLocationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationOperationListCall<'a>
-    where  {
+pub struct AdminProjectLocationOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2296,9 +2319,15 @@ pub struct AdminProjectLocationOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationOperationListCall<'a, S> {}
 
-impl<'a> AdminProjectLocationOperationListCall<'a> {
+impl<'a, S> AdminProjectLocationOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2454,28 +2483,28 @@ impl<'a> AdminProjectLocationOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdminProjectLocationOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AdminProjectLocationOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2485,7 +2514,7 @@ impl<'a> AdminProjectLocationOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2510,7 +2539,7 @@ impl<'a> AdminProjectLocationOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2530,9 +2559,9 @@ impl<'a> AdminProjectLocationOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2564,7 +2593,7 @@ impl<'a> AdminProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2574,10 +2603,10 @@ impl<'a> AdminProjectLocationOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationReservationTopicListCall<'a>
-    where  {
+pub struct AdminProjectLocationReservationTopicListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2586,9 +2615,15 @@ pub struct AdminProjectLocationReservationTopicListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationReservationTopicListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationReservationTopicListCall<'a, S> {}
 
-impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
+impl<'a, S> AdminProjectLocationReservationTopicListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2741,21 +2776,21 @@ impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationTopicListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationTopicListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListReservationTopics` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListReservationTopics` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationReservationTopicListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationReservationTopicListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of topics to return. The service may return fewer than this value. If unset or zero, all topics for the given reservation will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationReservationTopicListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationReservationTopicListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2765,7 +2800,7 @@ impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationTopicListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationTopicListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2790,7 +2825,7 @@ impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationTopicListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationTopicListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2810,9 +2845,9 @@ impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationReservationTopicListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationReservationTopicListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2845,7 +2880,7 @@ impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2859,10 +2894,10 @@ impl<'a> AdminProjectLocationReservationTopicListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationReservationCreateCall<'a>
-    where  {
+pub struct AdminProjectLocationReservationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: Reservation,
     _parent: String,
     _reservation_id: Option<String>,
@@ -2871,9 +2906,15 @@ pub struct AdminProjectLocationReservationCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationReservationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationReservationCreateCall<'a, S> {}
 
-impl<'a> AdminProjectLocationReservationCreateCall<'a> {
+impl<'a, S> AdminProjectLocationReservationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3036,7 +3077,7 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reservation) -> AdminProjectLocationReservationCreateCall<'a> {
+    pub fn request(mut self, new_value: Reservation) -> AdminProjectLocationReservationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3046,14 +3087,14 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationReservationCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationReservationCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID to use for the reservation, which will become the final component of the reservation's name. This value is structured like: `my-reservation-name`.
     ///
     /// Sets the *reservation id* query property to the given value.
-    pub fn reservation_id(mut self, new_value: &str) -> AdminProjectLocationReservationCreateCall<'a> {
+    pub fn reservation_id(mut self, new_value: &str) -> AdminProjectLocationReservationCreateCall<'a, S> {
         self._reservation_id = Some(new_value.to_string());
         self
     }
@@ -3063,7 +3104,7 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3088,7 +3129,7 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3108,9 +3149,9 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationReservationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationReservationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3142,7 +3183,7 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3150,19 +3191,25 @@ impl<'a> AdminProjectLocationReservationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationReservationDeleteCall<'a>
-    where  {
+pub struct AdminProjectLocationReservationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationReservationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationReservationDeleteCall<'a, S> {}
 
-impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
+impl<'a, S> AdminProjectLocationReservationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3309,7 +3356,7 @@ impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3319,7 +3366,7 @@ impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3344,7 +3391,7 @@ impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3364,9 +3411,9 @@ impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationReservationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationReservationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3398,7 +3445,7 @@ impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3406,19 +3453,25 @@ impl<'a> AdminProjectLocationReservationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationReservationGetCall<'a>
-    where  {
+pub struct AdminProjectLocationReservationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationReservationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationReservationGetCall<'a, S> {}
 
-impl<'a> AdminProjectLocationReservationGetCall<'a> {
+impl<'a, S> AdminProjectLocationReservationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3565,7 +3618,7 @@ impl<'a> AdminProjectLocationReservationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3575,7 +3628,7 @@ impl<'a> AdminProjectLocationReservationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3600,7 +3653,7 @@ impl<'a> AdminProjectLocationReservationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3620,9 +3673,9 @@ impl<'a> AdminProjectLocationReservationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationReservationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationReservationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3654,7 +3707,7 @@ impl<'a> AdminProjectLocationReservationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3664,10 +3717,10 @@ impl<'a> AdminProjectLocationReservationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationReservationListCall<'a>
-    where  {
+pub struct AdminProjectLocationReservationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3676,9 +3729,15 @@ pub struct AdminProjectLocationReservationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationReservationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationReservationListCall<'a, S> {}
 
-impl<'a> AdminProjectLocationReservationListCall<'a> {
+impl<'a, S> AdminProjectLocationReservationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3831,21 +3890,21 @@ impl<'a> AdminProjectLocationReservationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationReservationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationReservationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListReservations` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListReservations` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationReservationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationReservationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of reservations to return. The service may return fewer than this value. If unset or zero, all reservations for the parent will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationReservationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationReservationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3855,7 +3914,7 @@ impl<'a> AdminProjectLocationReservationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3880,7 +3939,7 @@ impl<'a> AdminProjectLocationReservationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3900,9 +3959,9 @@ impl<'a> AdminProjectLocationReservationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationReservationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationReservationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3935,7 +3994,7 @@ impl<'a> AdminProjectLocationReservationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3949,10 +4008,10 @@ impl<'a> AdminProjectLocationReservationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationReservationPatchCall<'a>
-    where  {
+pub struct AdminProjectLocationReservationPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: Reservation,
     _name: String,
     _update_mask: Option<String>,
@@ -3961,9 +4020,15 @@ pub struct AdminProjectLocationReservationPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationReservationPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationReservationPatchCall<'a, S> {}
 
-impl<'a> AdminProjectLocationReservationPatchCall<'a> {
+impl<'a, S> AdminProjectLocationReservationPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4126,7 +4191,7 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reservation) -> AdminProjectLocationReservationPatchCall<'a> {
+    pub fn request(mut self, new_value: Reservation) -> AdminProjectLocationReservationPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4136,14 +4201,14 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationReservationPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A mask specifying the reservation fields to change.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdminProjectLocationReservationPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AdminProjectLocationReservationPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4153,7 +4218,7 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationReservationPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4178,7 +4243,7 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationReservationPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4198,9 +4263,9 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationReservationPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationReservationPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4233,7 +4298,7 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4248,10 +4313,10 @@ impl<'a> AdminProjectLocationReservationPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationSubscriptionCreateCall<'a>
-    where  {
+pub struct AdminProjectLocationSubscriptionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: Subscription,
     _parent: String,
     _subscription_id: Option<String>,
@@ -4261,9 +4326,15 @@ pub struct AdminProjectLocationSubscriptionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationSubscriptionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationSubscriptionCreateCall<'a, S> {}
 
-impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
+impl<'a, S> AdminProjectLocationSubscriptionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4429,7 +4500,7 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> AdminProjectLocationSubscriptionCreateCall<'a> {
+    pub fn request(mut self, new_value: Subscription) -> AdminProjectLocationSubscriptionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4439,21 +4510,21 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationSubscriptionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationSubscriptionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID to use for the subscription, which will become the final component of the subscription's name. This value is structured like: `my-sub-name`.
     ///
     /// Sets the *subscription id* query property to the given value.
-    pub fn subscription_id(mut self, new_value: &str) -> AdminProjectLocationSubscriptionCreateCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> AdminProjectLocationSubscriptionCreateCall<'a, S> {
         self._subscription_id = Some(new_value.to_string());
         self
     }
     /// If true, the newly created subscription will only receive messages published after the subscription was created. Otherwise, the entire message backlog will be received on the subscription. Defaults to false.
     ///
     /// Sets the *skip backlog* query property to the given value.
-    pub fn skip_backlog(mut self, new_value: bool) -> AdminProjectLocationSubscriptionCreateCall<'a> {
+    pub fn skip_backlog(mut self, new_value: bool) -> AdminProjectLocationSubscriptionCreateCall<'a, S> {
         self._skip_backlog = Some(new_value);
         self
     }
@@ -4463,7 +4534,7 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4488,7 +4559,7 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4508,9 +4579,9 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationSubscriptionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationSubscriptionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4542,7 +4613,7 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4550,19 +4621,25 @@ impl<'a> AdminProjectLocationSubscriptionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationSubscriptionDeleteCall<'a>
-    where  {
+pub struct AdminProjectLocationSubscriptionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationSubscriptionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationSubscriptionDeleteCall<'a, S> {}
 
-impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
+impl<'a, S> AdminProjectLocationSubscriptionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4709,7 +4786,7 @@ impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4719,7 +4796,7 @@ impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4744,7 +4821,7 @@ impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4764,9 +4841,9 @@ impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationSubscriptionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationSubscriptionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4798,7 +4875,7 @@ impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4806,19 +4883,25 @@ impl<'a> AdminProjectLocationSubscriptionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationSubscriptionGetCall<'a>
-    where  {
+pub struct AdminProjectLocationSubscriptionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationSubscriptionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationSubscriptionGetCall<'a, S> {}
 
-impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
+impl<'a, S> AdminProjectLocationSubscriptionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4965,7 +5048,7 @@ impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4975,7 +5058,7 @@ impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5000,7 +5083,7 @@ impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5020,9 +5103,9 @@ impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationSubscriptionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationSubscriptionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5054,7 +5137,7 @@ impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5064,10 +5147,10 @@ impl<'a> AdminProjectLocationSubscriptionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationSubscriptionListCall<'a>
-    where  {
+pub struct AdminProjectLocationSubscriptionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5076,9 +5159,15 @@ pub struct AdminProjectLocationSubscriptionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationSubscriptionListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationSubscriptionListCall<'a, S> {}
 
-impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
+impl<'a, S> AdminProjectLocationSubscriptionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5231,21 +5320,21 @@ impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationSubscriptionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationSubscriptionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListSubscriptions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListSubscriptions` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationSubscriptionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationSubscriptionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of subscriptions to return. The service may return fewer than this value. If unset or zero, all subscriptions for the parent will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationSubscriptionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationSubscriptionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5255,7 +5344,7 @@ impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5280,7 +5369,7 @@ impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5300,9 +5389,9 @@ impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationSubscriptionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationSubscriptionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5335,7 +5424,7 @@ impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5349,10 +5438,10 @@ impl<'a> AdminProjectLocationSubscriptionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationSubscriptionPatchCall<'a>
-    where  {
+pub struct AdminProjectLocationSubscriptionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: Subscription,
     _name: String,
     _update_mask: Option<String>,
@@ -5361,9 +5450,15 @@ pub struct AdminProjectLocationSubscriptionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationSubscriptionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationSubscriptionPatchCall<'a, S> {}
 
-impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
+impl<'a, S> AdminProjectLocationSubscriptionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5526,7 +5621,7 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> AdminProjectLocationSubscriptionPatchCall<'a> {
+    pub fn request(mut self, new_value: Subscription) -> AdminProjectLocationSubscriptionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5536,14 +5631,14 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A mask specifying the subscription fields to change.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdminProjectLocationSubscriptionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AdminProjectLocationSubscriptionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5553,7 +5648,7 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5578,7 +5673,7 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5598,9 +5693,9 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationSubscriptionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationSubscriptionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5633,7 +5728,7 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5646,10 +5741,10 @@ impl<'a> AdminProjectLocationSubscriptionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationSubscriptionSeekCall<'a>
-    where  {
+pub struct AdminProjectLocationSubscriptionSeekCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: SeekSubscriptionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5657,9 +5752,15 @@ pub struct AdminProjectLocationSubscriptionSeekCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationSubscriptionSeekCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationSubscriptionSeekCall<'a, S> {}
 
-impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
+impl<'a, S> AdminProjectLocationSubscriptionSeekCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5819,7 +5920,7 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SeekSubscriptionRequest) -> AdminProjectLocationSubscriptionSeekCall<'a> {
+    pub fn request(mut self, new_value: SeekSubscriptionRequest) -> AdminProjectLocationSubscriptionSeekCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5829,7 +5930,7 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionSeekCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationSubscriptionSeekCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5839,7 +5940,7 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionSeekCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationSubscriptionSeekCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5864,7 +5965,7 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionSeekCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationSubscriptionSeekCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5884,9 +5985,9 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationSubscriptionSeekCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationSubscriptionSeekCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5918,7 +6019,7 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5928,10 +6029,10 @@ impl<'a> AdminProjectLocationSubscriptionSeekCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicSubscriptionListCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicSubscriptionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5940,9 +6041,15 @@ pub struct AdminProjectLocationTopicSubscriptionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicSubscriptionListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicSubscriptionListCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
+impl<'a, S> AdminProjectLocationTopicSubscriptionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6095,21 +6202,21 @@ impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicSubscriptionListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicSubscriptionListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListTopicSubscriptions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListTopicSubscriptions` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationTopicSubscriptionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationTopicSubscriptionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of subscriptions to return. The service may return fewer than this value. If unset or zero, all subscriptions for the given topic will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationTopicSubscriptionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationTopicSubscriptionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6119,7 +6226,7 @@ impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicSubscriptionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicSubscriptionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6144,7 +6251,7 @@ impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicSubscriptionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicSubscriptionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6164,9 +6271,9 @@ impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicSubscriptionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicSubscriptionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6199,7 +6306,7 @@ impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6213,10 +6320,10 @@ impl<'a> AdminProjectLocationTopicSubscriptionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicCreateCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: Topic,
     _parent: String,
     _topic_id: Option<String>,
@@ -6225,9 +6332,15 @@ pub struct AdminProjectLocationTopicCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicCreateCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicCreateCall<'a> {
+impl<'a, S> AdminProjectLocationTopicCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6390,7 +6503,7 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Topic) -> AdminProjectLocationTopicCreateCall<'a> {
+    pub fn request(mut self, new_value: Topic) -> AdminProjectLocationTopicCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6400,14 +6513,14 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationTopicCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationTopicCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID to use for the topic, which will become the final component of the topic's name. This value is structured like: `my-topic-name`.
     ///
     /// Sets the *topic id* query property to the given value.
-    pub fn topic_id(mut self, new_value: &str) -> AdminProjectLocationTopicCreateCall<'a> {
+    pub fn topic_id(mut self, new_value: &str) -> AdminProjectLocationTopicCreateCall<'a, S> {
         self._topic_id = Some(new_value.to_string());
         self
     }
@@ -6417,7 +6530,7 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6442,7 +6555,7 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6462,9 +6575,9 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6496,7 +6609,7 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6504,19 +6617,25 @@ impl<'a> AdminProjectLocationTopicCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicDeleteCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicDeleteCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
+impl<'a, S> AdminProjectLocationTopicDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6663,7 +6782,7 @@ impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6673,7 +6792,7 @@ impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6698,7 +6817,7 @@ impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6718,9 +6837,9 @@ impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6752,7 +6871,7 @@ impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6760,19 +6879,25 @@ impl<'a> AdminProjectLocationTopicDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicGetCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicGetCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicGetCall<'a> {
+impl<'a, S> AdminProjectLocationTopicGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6919,7 +7044,7 @@ impl<'a> AdminProjectLocationTopicGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6929,7 +7054,7 @@ impl<'a> AdminProjectLocationTopicGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6954,7 +7079,7 @@ impl<'a> AdminProjectLocationTopicGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6974,9 +7099,9 @@ impl<'a> AdminProjectLocationTopicGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7008,7 +7133,7 @@ impl<'a> AdminProjectLocationTopicGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7016,19 +7141,25 @@ impl<'a> AdminProjectLocationTopicGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicGetPartitionCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicGetPartitionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicGetPartitionCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicGetPartitionCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
+impl<'a, S> AdminProjectLocationTopicGetPartitionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7175,7 +7306,7 @@ impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicGetPartitionCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicGetPartitionCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7185,7 +7316,7 @@ impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicGetPartitionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicGetPartitionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7210,7 +7341,7 @@ impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicGetPartitionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicGetPartitionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7230,9 +7361,9 @@ impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicGetPartitionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicGetPartitionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7264,7 +7395,7 @@ impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7274,10 +7405,10 @@ impl<'a> AdminProjectLocationTopicGetPartitionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicListCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7286,9 +7417,15 @@ pub struct AdminProjectLocationTopicListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicListCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicListCall<'a> {
+impl<'a, S> AdminProjectLocationTopicListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7441,21 +7578,21 @@ impl<'a> AdminProjectLocationTopicListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationTopicListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AdminProjectLocationTopicListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListTopics` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListTopics` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationTopicListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdminProjectLocationTopicListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of topics to return. The service may return fewer than this value. If unset or zero, all topics for the parent will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationTopicListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AdminProjectLocationTopicListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7465,7 +7602,7 @@ impl<'a> AdminProjectLocationTopicListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7490,7 +7627,7 @@ impl<'a> AdminProjectLocationTopicListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7510,9 +7647,9 @@ impl<'a> AdminProjectLocationTopicListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7545,7 +7682,7 @@ impl<'a> AdminProjectLocationTopicListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7559,10 +7696,10 @@ impl<'a> AdminProjectLocationTopicListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdminProjectLocationTopicPatchCall<'a>
-    where  {
+pub struct AdminProjectLocationTopicPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: Topic,
     _name: String,
     _update_mask: Option<String>,
@@ -7571,9 +7708,15 @@ pub struct AdminProjectLocationTopicPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdminProjectLocationTopicPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AdminProjectLocationTopicPatchCall<'a, S> {}
 
-impl<'a> AdminProjectLocationTopicPatchCall<'a> {
+impl<'a, S> AdminProjectLocationTopicPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7736,7 +7879,7 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Topic) -> AdminProjectLocationTopicPatchCall<'a> {
+    pub fn request(mut self, new_value: Topic) -> AdminProjectLocationTopicPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7746,14 +7889,14 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AdminProjectLocationTopicPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A mask specifying the topic fields to change.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdminProjectLocationTopicPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AdminProjectLocationTopicPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7763,7 +7906,7 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdminProjectLocationTopicPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7788,7 +7931,7 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdminProjectLocationTopicPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7808,9 +7951,9 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdminProjectLocationTopicPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdminProjectLocationTopicPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7842,7 +7985,7 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7852,10 +7995,10 @@ impl<'a> AdminProjectLocationTopicPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CursorProjectLocationSubscriptionCursorListCall<'a>
-    where  {
+pub struct CursorProjectLocationSubscriptionCursorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7864,9 +8007,15 @@ pub struct CursorProjectLocationSubscriptionCursorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CursorProjectLocationSubscriptionCursorListCall<'a> {}
+impl<'a, S> client::CallBuilder for CursorProjectLocationSubscriptionCursorListCall<'a, S> {}
 
-impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
+impl<'a, S> CursorProjectLocationSubscriptionCursorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8019,21 +8168,21 @@ impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CursorProjectLocationSubscriptionCursorListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CursorProjectLocationSubscriptionCursorListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListPartitionCursors` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListPartitionCursors` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CursorProjectLocationSubscriptionCursorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CursorProjectLocationSubscriptionCursorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of cursors to return. The service may return fewer than this value. If unset or zero, all cursors for the parent will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CursorProjectLocationSubscriptionCursorListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CursorProjectLocationSubscriptionCursorListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -8043,7 +8192,7 @@ impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CursorProjectLocationSubscriptionCursorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CursorProjectLocationSubscriptionCursorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8068,7 +8217,7 @@ impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CursorProjectLocationSubscriptionCursorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CursorProjectLocationSubscriptionCursorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8088,9 +8237,9 @@ impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CursorProjectLocationSubscriptionCursorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CursorProjectLocationSubscriptionCursorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8123,7 +8272,7 @@ impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8136,10 +8285,10 @@ impl<'a> CursorProjectLocationSubscriptionCursorListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CursorProjectLocationSubscriptionCommitCursorCall<'a>
-    where  {
+pub struct CursorProjectLocationSubscriptionCommitCursorCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: CommitCursorRequest,
     _subscription: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8147,9 +8296,15 @@ pub struct CursorProjectLocationSubscriptionCommitCursorCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CursorProjectLocationSubscriptionCommitCursorCall<'a> {}
+impl<'a, S> client::CallBuilder for CursorProjectLocationSubscriptionCommitCursorCall<'a, S> {}
 
-impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
+impl<'a, S> CursorProjectLocationSubscriptionCommitCursorCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8309,7 +8464,7 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommitCursorRequest) -> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
+    pub fn request(mut self, new_value: CommitCursorRequest) -> CursorProjectLocationSubscriptionCommitCursorCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8319,7 +8474,7 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription(mut self, new_value: &str) -> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
+    pub fn subscription(mut self, new_value: &str) -> CursorProjectLocationSubscriptionCommitCursorCall<'a, S> {
         self._subscription = new_value.to_string();
         self
     }
@@ -8329,7 +8484,7 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CursorProjectLocationSubscriptionCommitCursorCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8354,7 +8509,7 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CursorProjectLocationSubscriptionCommitCursorCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CursorProjectLocationSubscriptionCommitCursorCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8374,9 +8529,9 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CursorProjectLocationSubscriptionCommitCursorCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CursorProjectLocationSubscriptionCommitCursorCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8409,7 +8564,7 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8422,10 +8577,10 @@ impl<'a> CursorProjectLocationSubscriptionCommitCursorCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TopicStatProjectLocationTopicComputeHeadCursorCall<'a>
-    where  {
+pub struct TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: ComputeHeadCursorRequest,
     _topic: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8433,9 +8588,15 @@ pub struct TopicStatProjectLocationTopicComputeHeadCursorCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {}
+impl<'a, S> client::CallBuilder for TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S> {}
 
-impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
+impl<'a, S> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8595,7 +8756,7 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ComputeHeadCursorRequest) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
+    pub fn request(mut self, new_value: ComputeHeadCursorRequest) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8605,7 +8766,7 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn topic(mut self, new_value: &str) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
+    pub fn topic(mut self, new_value: &str) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S> {
         self._topic = new_value.to_string();
         self
     }
@@ -8615,7 +8776,7 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8640,7 +8801,7 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8660,9 +8821,9 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TopicStatProjectLocationTopicComputeHeadCursorCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8695,7 +8856,7 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8708,10 +8869,10 @@ impl<'a> TopicStatProjectLocationTopicComputeHeadCursorCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TopicStatProjectLocationTopicComputeMessageStatCall<'a>
-    where  {
+pub struct TopicStatProjectLocationTopicComputeMessageStatCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: ComputeMessageStatsRequest,
     _topic: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8719,9 +8880,15 @@ pub struct TopicStatProjectLocationTopicComputeMessageStatCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TopicStatProjectLocationTopicComputeMessageStatCall<'a> {}
+impl<'a, S> client::CallBuilder for TopicStatProjectLocationTopicComputeMessageStatCall<'a, S> {}
 
-impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
+impl<'a, S> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8881,7 +9048,7 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ComputeMessageStatsRequest) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
+    pub fn request(mut self, new_value: ComputeMessageStatsRequest) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8891,7 +9058,7 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn topic(mut self, new_value: &str) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
+    pub fn topic(mut self, new_value: &str) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S> {
         self._topic = new_value.to_string();
         self
     }
@@ -8901,7 +9068,7 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8926,7 +9093,7 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8946,9 +9113,9 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TopicStatProjectLocationTopicComputeMessageStatCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8981,7 +9148,7 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PubsubLite::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8994,10 +9161,10 @@ impl<'a> TopicStatProjectLocationTopicComputeMessageStatCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TopicStatProjectLocationTopicComputeTimeCursorCall<'a>
-    where  {
+pub struct TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PubsubLite<>,
+    hub: &'a PubsubLite<S>,
     _request: ComputeTimeCursorRequest,
     _topic: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9005,9 +9172,15 @@ pub struct TopicStatProjectLocationTopicComputeTimeCursorCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {}
+impl<'a, S> client::CallBuilder for TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S> {}
 
-impl<'a> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
+impl<'a, S> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9167,7 +9340,7 @@ impl<'a> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ComputeTimeCursorRequest) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
+    pub fn request(mut self, new_value: ComputeTimeCursorRequest) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9177,7 +9350,7 @@ impl<'a> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn topic(mut self, new_value: &str) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
+    pub fn topic(mut self, new_value: &str) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S> {
         self._topic = new_value.to_string();
         self
     }
@@ -9187,7 +9360,7 @@ impl<'a> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9212,7 +9385,7 @@ impl<'a> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9232,9 +9405,9 @@ impl<'a> TopicStatProjectLocationTopicComputeTimeCursorCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TopicStatProjectLocationTopicComputeTimeCursorCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

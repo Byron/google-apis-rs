@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -78,7 +83,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -107,40 +112,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Cloudbilling<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Cloudbilling<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Cloudbilling<> {}
+impl<'a, S> client::Hub for Cloudbilling<S> {}
 
-impl<'a, > Cloudbilling<> {
+impl<'a, S> Cloudbilling<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Cloudbilling<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Cloudbilling<S> {
         Cloudbilling {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudbilling.googleapis.com/".to_string(),
             _root_url: "https://cloudbilling.googleapis.com/".to_string(),
         }
     }
 
-    pub fn billing_accounts(&'a self) -> BillingAccountMethods<'a> {
+    pub fn billing_accounts(&'a self) -> BillingAccountMethods<'a, S> {
         BillingAccountMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn services(&'a self) -> ServiceMethods<'a> {
+    pub fn services(&'a self) -> ServiceMethods<'a, S> {
         ServiceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -707,22 +712,22 @@ impl client::Part for TierRate {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `get(...)`, `get_iam_policy(...)`, `list(...)`, `patch(...)`, `projects_list(...)`, `set_iam_policy(...)` and `test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.billing_accounts();
 /// # }
 /// ```
-pub struct BillingAccountMethods<'a>
-    where  {
+pub struct BillingAccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
 }
 
-impl<'a> client::MethodsBuilder for BillingAccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BillingAccountMethods<'a, S> {}
 
-impl<'a> BillingAccountMethods<'a> {
+impl<'a, S> BillingAccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -731,7 +736,7 @@ impl<'a> BillingAccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the billing account associated with the projects that you want to list. For example, `billingAccounts/012345-567890-ABCDEF`.
-    pub fn projects_list(&self, name: &str) -> BillingAccountProjectListCall<'a> {
+    pub fn projects_list(&self, name: &str) -> BillingAccountProjectListCall<'a, S> {
         BillingAccountProjectListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -750,7 +755,7 @@ impl<'a> BillingAccountMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: BillingAccount) -> BillingAccountCreateCall<'a> {
+    pub fn create(&self, request: BillingAccount) -> BillingAccountCreateCall<'a, S> {
         BillingAccountCreateCall {
             hub: self.hub,
             _request: request,
@@ -767,7 +772,7 @@ impl<'a> BillingAccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the billing account to retrieve. For example, `billingAccounts/012345-567890-ABCDEF`.
-    pub fn get(&self, name: &str) -> BillingAccountGetCall<'a> {
+    pub fn get(&self, name: &str) -> BillingAccountGetCall<'a, S> {
         BillingAccountGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -784,7 +789,7 @@ impl<'a> BillingAccountMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, resource: &str) -> BillingAccountGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, resource: &str) -> BillingAccountGetIamPolicyCall<'a, S> {
         BillingAccountGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -798,7 +803,7 @@ impl<'a> BillingAccountMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the billing accounts that the current authenticated user has permission to [view](https://cloud.google.com/billing/docs/how-to/billing-access).
-    pub fn list(&self) -> BillingAccountListCall<'a> {
+    pub fn list(&self) -> BillingAccountListCall<'a, S> {
         BillingAccountListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -818,7 +823,7 @@ impl<'a> BillingAccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the billing account resource to be updated.
-    pub fn patch(&self, request: BillingAccount, name: &str) -> BillingAccountPatchCall<'a> {
+    pub fn patch(&self, request: BillingAccount, name: &str) -> BillingAccountPatchCall<'a, S> {
         BillingAccountPatchCall {
             hub: self.hub,
             _request: request,
@@ -838,7 +843,7 @@ impl<'a> BillingAccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> BillingAccountSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> BillingAccountSetIamPolicyCall<'a, S> {
         BillingAccountSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -857,7 +862,7 @@ impl<'a> BillingAccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> BillingAccountTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> BillingAccountTestIamPermissionCall<'a, S> {
         BillingAccountTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -892,22 +897,22 @@ impl<'a> BillingAccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_billing_info(...)` and `update_billing_info(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -916,7 +921,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the project for which billing information is retrieved. For example, `projects/tokyo-rain-123`.
-    pub fn get_billing_info(&self, name: &str) -> ProjectGetBillingInfoCall<'a> {
+    pub fn get_billing_info(&self, name: &str) -> ProjectGetBillingInfoCall<'a, S> {
         ProjectGetBillingInfoCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -934,7 +939,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the project associated with the billing information that you want to update. For example, `projects/tokyo-rain-123`.
-    pub fn update_billing_info(&self, request: ProjectBillingInfo, name: &str) -> ProjectUpdateBillingInfoCall<'a> {
+    pub fn update_billing_info(&self, request: ProjectBillingInfo, name: &str) -> ProjectUpdateBillingInfoCall<'a, S> {
         ProjectUpdateBillingInfoCall {
             hub: self.hub,
             _request: request,
@@ -969,22 +974,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `skus_list(...)`
 /// // to build up your call.
 /// let rb = hub.services();
 /// # }
 /// ```
-pub struct ServiceMethods<'a>
-    where  {
+pub struct ServiceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
 }
 
-impl<'a> client::MethodsBuilder for ServiceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ServiceMethods<'a, S> {}
 
-impl<'a> ServiceMethods<'a> {
+impl<'a, S> ServiceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -993,7 +998,7 @@ impl<'a> ServiceMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the service. Example: "services/DA34-426B-A397"
-    pub fn skus_list(&self, parent: &str) -> ServiceSkuListCall<'a> {
+    pub fn skus_list(&self, parent: &str) -> ServiceSkuListCall<'a, S> {
         ServiceSkuListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1011,7 +1016,7 @@ impl<'a> ServiceMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all public cloud services.
-    pub fn list(&self) -> ServiceListCall<'a> {
+    pub fn list(&self) -> ServiceListCall<'a, S> {
         ServiceListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1053,7 +1058,7 @@ impl<'a> ServiceMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1063,10 +1068,10 @@ impl<'a> ServiceMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountProjectListCall<'a>
-    where  {
+pub struct BillingAccountProjectListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1075,9 +1080,15 @@ pub struct BillingAccountProjectListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountProjectListCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountProjectListCall<'a, S> {}
 
-impl<'a> BillingAccountProjectListCall<'a> {
+impl<'a, S> BillingAccountProjectListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1230,21 +1241,21 @@ impl<'a> BillingAccountProjectListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountProjectListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountProjectListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A token identifying a page of results to be returned. This should be a `next_page_token` value returned from a previous `ListProjectBillingInfo` call. If unspecified, the first page of results is returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BillingAccountProjectListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BillingAccountProjectListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The maximum page size is 100; this is also the default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BillingAccountProjectListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BillingAccountProjectListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1254,7 +1265,7 @@ impl<'a> BillingAccountProjectListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountProjectListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountProjectListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1279,7 +1290,7 @@ impl<'a> BillingAccountProjectListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountProjectListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountProjectListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1299,9 +1310,9 @@ impl<'a> BillingAccountProjectListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountProjectListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountProjectListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1334,7 +1345,7 @@ impl<'a> BillingAccountProjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1347,19 +1358,25 @@ impl<'a> BillingAccountProjectListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountCreateCall<'a>
-    where  {
+pub struct BillingAccountCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _request: BillingAccount,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountCreateCall<'a, S> {}
 
-impl<'a> BillingAccountCreateCall<'a> {
+impl<'a, S> BillingAccountCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1493,7 +1510,7 @@ impl<'a> BillingAccountCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BillingAccount) -> BillingAccountCreateCall<'a> {
+    pub fn request(mut self, new_value: BillingAccount) -> BillingAccountCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1503,7 +1520,7 @@ impl<'a> BillingAccountCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1528,7 +1545,7 @@ impl<'a> BillingAccountCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1548,9 +1565,9 @@ impl<'a> BillingAccountCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1582,7 +1599,7 @@ impl<'a> BillingAccountCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1590,19 +1607,25 @@ impl<'a> BillingAccountCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountGetCall<'a>
-    where  {
+pub struct BillingAccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountGetCall<'a, S> {}
 
-impl<'a> BillingAccountGetCall<'a> {
+impl<'a, S> BillingAccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1749,7 +1772,7 @@ impl<'a> BillingAccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1759,7 +1782,7 @@ impl<'a> BillingAccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1784,7 +1807,7 @@ impl<'a> BillingAccountGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1804,9 +1827,9 @@ impl<'a> BillingAccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1838,7 +1861,7 @@ impl<'a> BillingAccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1847,10 +1870,10 @@ impl<'a> BillingAccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountGetIamPolicyCall<'a>
-    where  {
+pub struct BillingAccountGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1858,9 +1881,15 @@ pub struct BillingAccountGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountGetIamPolicyCall<'a, S> {}
 
-impl<'a> BillingAccountGetIamPolicyCall<'a> {
+impl<'a, S> BillingAccountGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2010,14 +2039,14 @@ impl<'a> BillingAccountGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> BillingAccountGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> BillingAccountGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> BillingAccountGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> BillingAccountGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -2027,7 +2056,7 @@ impl<'a> BillingAccountGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2052,7 +2081,7 @@ impl<'a> BillingAccountGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2072,9 +2101,9 @@ impl<'a> BillingAccountGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2106,7 +2135,7 @@ impl<'a> BillingAccountGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2117,10 +2146,10 @@ impl<'a> BillingAccountGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountListCall<'a>
-    where  {
+pub struct BillingAccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -2129,9 +2158,15 @@ pub struct BillingAccountListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountListCall<'a, S> {}
 
-impl<'a> BillingAccountListCall<'a> {
+impl<'a, S> BillingAccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2258,21 +2293,21 @@ impl<'a> BillingAccountListCall<'a> {
     /// A token identifying a page of results to return. This should be a `next_page_token` value returned from a previous `ListBillingAccounts` call. If unspecified, the first page of results is returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BillingAccountListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BillingAccountListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The maximum page size is 100; this is also the default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BillingAccountListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BillingAccountListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Options for how to filter the returned billing accounts. Currently this only supports filtering for [subaccounts](https://cloud.google.com/billing/docs/concepts) under a single provided reseller billing account. (e.g. "master_billing_account=billingAccounts/012345-678901-ABCDEF"). Boolean algebra and other fields are not currently supported.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BillingAccountListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> BillingAccountListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2282,7 +2317,7 @@ impl<'a> BillingAccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2307,7 +2342,7 @@ impl<'a> BillingAccountListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2327,9 +2362,9 @@ impl<'a> BillingAccountListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2362,7 +2397,7 @@ impl<'a> BillingAccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2376,10 +2411,10 @@ impl<'a> BillingAccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountPatchCall<'a>
-    where  {
+pub struct BillingAccountPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _request: BillingAccount,
     _name: String,
     _update_mask: Option<String>,
@@ -2388,9 +2423,15 @@ pub struct BillingAccountPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountPatchCall<'a, S> {}
 
-impl<'a> BillingAccountPatchCall<'a> {
+impl<'a, S> BillingAccountPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2553,7 +2594,7 @@ impl<'a> BillingAccountPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BillingAccount) -> BillingAccountPatchCall<'a> {
+    pub fn request(mut self, new_value: BillingAccount) -> BillingAccountPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2563,14 +2604,14 @@ impl<'a> BillingAccountPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applied to the resource. Only "display_name" is currently supported.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> BillingAccountPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> BillingAccountPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2580,7 +2621,7 @@ impl<'a> BillingAccountPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2605,7 +2646,7 @@ impl<'a> BillingAccountPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2625,9 +2666,9 @@ impl<'a> BillingAccountPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2660,7 +2701,7 @@ impl<'a> BillingAccountPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2673,10 +2714,10 @@ impl<'a> BillingAccountPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountSetIamPolicyCall<'a>
-    where  {
+pub struct BillingAccountSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2684,9 +2725,15 @@ pub struct BillingAccountSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountSetIamPolicyCall<'a, S> {}
 
-impl<'a> BillingAccountSetIamPolicyCall<'a> {
+impl<'a, S> BillingAccountSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2846,7 +2893,7 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> BillingAccountSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> BillingAccountSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2856,7 +2903,7 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> BillingAccountSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> BillingAccountSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -2866,7 +2913,7 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2891,7 +2938,7 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2911,9 +2958,9 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2946,7 +2993,7 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2959,10 +3006,10 @@ impl<'a> BillingAccountSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountTestIamPermissionCall<'a>
-    where  {
+pub struct BillingAccountTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2970,9 +3017,15 @@ pub struct BillingAccountTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BillingAccountTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for BillingAccountTestIamPermissionCall<'a, S> {}
 
-impl<'a> BillingAccountTestIamPermissionCall<'a> {
+impl<'a, S> BillingAccountTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3132,7 +3185,7 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> BillingAccountTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> BillingAccountTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3142,7 +3195,7 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> BillingAccountTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> BillingAccountTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3152,7 +3205,7 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3177,7 +3230,7 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3197,9 +3250,9 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BillingAccountTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3231,7 +3284,7 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3239,19 +3292,25 @@ impl<'a> BillingAccountTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetBillingInfoCall<'a>
-    where  {
+pub struct ProjectGetBillingInfoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetBillingInfoCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetBillingInfoCall<'a, S> {}
 
-impl<'a> ProjectGetBillingInfoCall<'a> {
+impl<'a, S> ProjectGetBillingInfoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3398,7 +3457,7 @@ impl<'a> ProjectGetBillingInfoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectGetBillingInfoCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectGetBillingInfoCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3408,7 +3467,7 @@ impl<'a> ProjectGetBillingInfoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetBillingInfoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetBillingInfoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3433,7 +3492,7 @@ impl<'a> ProjectGetBillingInfoCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetBillingInfoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetBillingInfoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3453,9 +3512,9 @@ impl<'a> ProjectGetBillingInfoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetBillingInfoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetBillingInfoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3488,7 +3547,7 @@ impl<'a> ProjectGetBillingInfoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3501,10 +3560,10 @@ impl<'a> ProjectGetBillingInfoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUpdateBillingInfoCall<'a>
-    where  {
+pub struct ProjectUpdateBillingInfoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _request: ProjectBillingInfo,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3512,9 +3571,15 @@ pub struct ProjectUpdateBillingInfoCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectUpdateBillingInfoCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectUpdateBillingInfoCall<'a, S> {}
 
-impl<'a> ProjectUpdateBillingInfoCall<'a> {
+impl<'a, S> ProjectUpdateBillingInfoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3674,7 +3739,7 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ProjectBillingInfo) -> ProjectUpdateBillingInfoCall<'a> {
+    pub fn request(mut self, new_value: ProjectBillingInfo) -> ProjectUpdateBillingInfoCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3684,7 +3749,7 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectUpdateBillingInfoCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectUpdateBillingInfoCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3694,7 +3759,7 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateBillingInfoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateBillingInfoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3719,7 +3784,7 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateBillingInfoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateBillingInfoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3739,9 +3804,9 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUpdateBillingInfoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectUpdateBillingInfoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3773,7 +3838,7 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3786,10 +3851,10 @@ impl<'a> ProjectUpdateBillingInfoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ServiceSkuListCall<'a>
-    where  {
+pub struct ServiceSkuListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _parent: String,
     _start_time: Option<String>,
     _page_token: Option<String>,
@@ -3801,9 +3866,15 @@ pub struct ServiceSkuListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ServiceSkuListCall<'a> {}
+impl<'a, S> client::CallBuilder for ServiceSkuListCall<'a, S> {}
 
-impl<'a> ServiceSkuListCall<'a> {
+impl<'a, S> ServiceSkuListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3965,42 +4036,42 @@ impl<'a> ServiceSkuListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ServiceSkuListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ServiceSkuListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional inclusive start time of the time range for which the pricing versions will be returned. Timestamps in the future are not allowed. The time range has to be within a single calendar month in America/Los_Angeles timezone. Time range as a whole is optional. If not specified, the latest pricing will be returned (up to 12 hours old at most).
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> ServiceSkuListCall<'a> {
+    pub fn start_time(mut self, new_value: &str) -> ServiceSkuListCall<'a, S> {
         self._start_time = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results to return. This should be a `next_page_token` value returned from a previous `ListSkus` call. If unspecified, the first page of results is returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ServiceSkuListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ServiceSkuListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Defaults to 5000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ServiceSkuListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ServiceSkuListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional exclusive end time of the time range for which the pricing versions will be returned. Timestamps in the future are not allowed. The time range has to be within a single calendar month in America/Los_Angeles timezone. Time range as a whole is optional. If not specified, the latest pricing will be returned (up to 12 hours old at most).
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> ServiceSkuListCall<'a> {
+    pub fn end_time(mut self, new_value: &str) -> ServiceSkuListCall<'a, S> {
         self._end_time = Some(new_value.to_string());
         self
     }
     /// The ISO 4217 currency code for the pricing info in the response proto. Will use the conversion rate as of start_time. Optional. If not specified USD will be used.
     ///
     /// Sets the *currency code* query property to the given value.
-    pub fn currency_code(mut self, new_value: &str) -> ServiceSkuListCall<'a> {
+    pub fn currency_code(mut self, new_value: &str) -> ServiceSkuListCall<'a, S> {
         self._currency_code = Some(new_value.to_string());
         self
     }
@@ -4010,7 +4081,7 @@ impl<'a> ServiceSkuListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceSkuListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceSkuListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4035,7 +4106,7 @@ impl<'a> ServiceSkuListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceSkuListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ServiceSkuListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4055,9 +4126,9 @@ impl<'a> ServiceSkuListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceSkuListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ServiceSkuListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4089,7 +4160,7 @@ impl<'a> ServiceSkuListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudbilling::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4099,10 +4170,10 @@ impl<'a> ServiceSkuListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ServiceListCall<'a>
-    where  {
+pub struct ServiceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudbilling<>,
+    hub: &'a Cloudbilling<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4110,9 +4181,15 @@ pub struct ServiceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ServiceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ServiceListCall<'a, S> {}
 
-impl<'a> ServiceListCall<'a> {
+impl<'a, S> ServiceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4236,14 +4313,14 @@ impl<'a> ServiceListCall<'a> {
     /// A token identifying a page of results to return. This should be a `next_page_token` value returned from a previous `ListServices` call. If unspecified, the first page of results is returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ServiceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ServiceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Defaults to 5000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ServiceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ServiceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4253,7 +4330,7 @@ impl<'a> ServiceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4278,7 +4355,7 @@ impl<'a> ServiceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ServiceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4298,9 +4375,9 @@ impl<'a> ServiceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ServiceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

@@ -1,6 +1,6 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/cli/README.md.mako'
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
 DO NOT EDIT !
 -->
 The `metastore1-beta` command-line interface *(CLI)* allows to use most features of the *Google Dataproc Metastore* service from the comfort of your terminal.
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc Metastore* API at revision *20220222*. The CLI is at version *3.1.0*.
+This documentation was generated from the *Dataproc Metastore* API at revision *20220222*. The CLI is at version *4.0.1*.
 
 ```bash
 metastore1-beta [options]

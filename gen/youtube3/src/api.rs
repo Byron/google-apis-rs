@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -94,7 +99,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -133,121 +138,121 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct YouTube<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct YouTube<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for YouTube<> {}
+impl<'a, S> client::Hub for YouTube<S> {}
 
-impl<'a, > YouTube<> {
+impl<'a, S> YouTube<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> YouTube<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> YouTube<S> {
         YouTube {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://youtube.googleapis.com/".to_string(),
             _root_url: "https://youtube.googleapis.com/".to_string(),
         }
     }
 
-    pub fn abuse_reports(&'a self) -> AbuseReportMethods<'a> {
+    pub fn abuse_reports(&'a self) -> AbuseReportMethods<'a, S> {
         AbuseReportMethods { hub: &self }
     }
-    pub fn activities(&'a self) -> ActivityMethods<'a> {
+    pub fn activities(&'a self) -> ActivityMethods<'a, S> {
         ActivityMethods { hub: &self }
     }
-    pub fn captions(&'a self) -> CaptionMethods<'a> {
+    pub fn captions(&'a self) -> CaptionMethods<'a, S> {
         CaptionMethods { hub: &self }
     }
-    pub fn channel_banners(&'a self) -> ChannelBannerMethods<'a> {
+    pub fn channel_banners(&'a self) -> ChannelBannerMethods<'a, S> {
         ChannelBannerMethods { hub: &self }
     }
-    pub fn channel_sections(&'a self) -> ChannelSectionMethods<'a> {
+    pub fn channel_sections(&'a self) -> ChannelSectionMethods<'a, S> {
         ChannelSectionMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, S> {
         ChannelMethods { hub: &self }
     }
-    pub fn comment_threads(&'a self) -> CommentThreadMethods<'a> {
+    pub fn comment_threads(&'a self) -> CommentThreadMethods<'a, S> {
         CommentThreadMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a> {
+    pub fn comments(&'a self) -> CommentMethods<'a, S> {
         CommentMethods { hub: &self }
     }
-    pub fn i18n_languages(&'a self) -> I18nLanguageMethods<'a> {
+    pub fn i18n_languages(&'a self) -> I18nLanguageMethods<'a, S> {
         I18nLanguageMethods { hub: &self }
     }
-    pub fn i18n_regions(&'a self) -> I18nRegionMethods<'a> {
+    pub fn i18n_regions(&'a self) -> I18nRegionMethods<'a, S> {
         I18nRegionMethods { hub: &self }
     }
-    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethods<'a> {
+    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethods<'a, S> {
         LiveBroadcastMethods { hub: &self }
     }
-    pub fn live_chat_bans(&'a self) -> LiveChatBanMethods<'a> {
+    pub fn live_chat_bans(&'a self) -> LiveChatBanMethods<'a, S> {
         LiveChatBanMethods { hub: &self }
     }
-    pub fn live_chat_messages(&'a self) -> LiveChatMessageMethods<'a> {
+    pub fn live_chat_messages(&'a self) -> LiveChatMessageMethods<'a, S> {
         LiveChatMessageMethods { hub: &self }
     }
-    pub fn live_chat_moderators(&'a self) -> LiveChatModeratorMethods<'a> {
+    pub fn live_chat_moderators(&'a self) -> LiveChatModeratorMethods<'a, S> {
         LiveChatModeratorMethods { hub: &self }
     }
-    pub fn live_streams(&'a self) -> LiveStreamMethods<'a> {
+    pub fn live_streams(&'a self) -> LiveStreamMethods<'a, S> {
         LiveStreamMethods { hub: &self }
     }
-    pub fn members(&'a self) -> MemberMethods<'a> {
+    pub fn members(&'a self) -> MemberMethods<'a, S> {
         MemberMethods { hub: &self }
     }
-    pub fn memberships_levels(&'a self) -> MembershipsLevelMethods<'a> {
+    pub fn memberships_levels(&'a self) -> MembershipsLevelMethods<'a, S> {
         MembershipsLevelMethods { hub: &self }
     }
-    pub fn playlist_items(&'a self) -> PlaylistItemMethods<'a> {
+    pub fn playlist_items(&'a self) -> PlaylistItemMethods<'a, S> {
         PlaylistItemMethods { hub: &self }
     }
-    pub fn playlists(&'a self) -> PlaylistMethods<'a> {
+    pub fn playlists(&'a self) -> PlaylistMethods<'a, S> {
         PlaylistMethods { hub: &self }
     }
-    pub fn search(&'a self) -> SearchMethods<'a> {
+    pub fn search(&'a self) -> SearchMethods<'a, S> {
         SearchMethods { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a> {
+    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, S> {
         SubscriptionMethods { hub: &self }
     }
-    pub fn super_chat_events(&'a self) -> SuperChatEventMethods<'a> {
+    pub fn super_chat_events(&'a self) -> SuperChatEventMethods<'a, S> {
         SuperChatEventMethods { hub: &self }
     }
-    pub fn tests(&'a self) -> TestMethods<'a> {
+    pub fn tests(&'a self) -> TestMethods<'a, S> {
         TestMethods { hub: &self }
     }
-    pub fn third_party_links(&'a self) -> ThirdPartyLinkMethods<'a> {
+    pub fn third_party_links(&'a self) -> ThirdPartyLinkMethods<'a, S> {
         ThirdPartyLinkMethods { hub: &self }
     }
-    pub fn thumbnails(&'a self) -> ThumbnailMethods<'a> {
+    pub fn thumbnails(&'a self) -> ThumbnailMethods<'a, S> {
         ThumbnailMethods { hub: &self }
     }
-    pub fn video_abuse_report_reasons(&'a self) -> VideoAbuseReportReasonMethods<'a> {
+    pub fn video_abuse_report_reasons(&'a self) -> VideoAbuseReportReasonMethods<'a, S> {
         VideoAbuseReportReasonMethods { hub: &self }
     }
-    pub fn video_categories(&'a self) -> VideoCategoryMethods<'a> {
+    pub fn video_categories(&'a self) -> VideoCategoryMethods<'a, S> {
         VideoCategoryMethods { hub: &self }
     }
-    pub fn videos(&'a self) -> VideoMethods<'a> {
+    pub fn videos(&'a self) -> VideoMethods<'a, S> {
         VideoMethods { hub: &self }
     }
-    pub fn watermarks(&'a self) -> WatermarkMethods<'a> {
+    pub fn watermarks(&'a self) -> WatermarkMethods<'a, S> {
         WatermarkMethods { hub: &self }
     }
-    pub fn youtube(&'a self) -> YoutubeMethods<'a> {
+    pub fn youtube(&'a self) -> YoutubeMethods<'a, S> {
         YoutubeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5892,22 +5897,22 @@ impl client::Part for ChannelContentDetailsRelatedPlaylists {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert(...)`
 /// // to build up your call.
 /// let rb = hub.abuse_reports();
 /// # }
 /// ```
-pub struct AbuseReportMethods<'a>
-    where  {
+pub struct AbuseReportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for AbuseReportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AbuseReportMethods<'a, S> {}
 
-impl<'a> AbuseReportMethods<'a> {
+impl<'a, S> AbuseReportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5916,7 +5921,7 @@ impl<'a> AbuseReportMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: AbuseReport) -> AbuseReportInsertCall<'a> {
+    pub fn insert(&self, request: AbuseReport) -> AbuseReportInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         AbuseReportInsertCall {
@@ -5953,22 +5958,22 @@ impl<'a> AbuseReportMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a>
-    where  {
+pub struct ActivityMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for ActivityMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ActivityMethods<'a, S> {}
 
-impl<'a> ActivityMethods<'a> {
+impl<'a, S> ActivityMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5977,7 +5982,7 @@ impl<'a> ActivityMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in an activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set *part=snippet*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> ActivityListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> ActivityListCall<'a, S> {
         ActivityListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6019,22 +6024,22 @@ impl<'a> ActivityMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `download(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.captions();
 /// # }
 /// ```
-pub struct CaptionMethods<'a>
-    where  {
+pub struct CaptionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for CaptionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CaptionMethods<'a, S> {}
 
-impl<'a> CaptionMethods<'a> {
+impl<'a, S> CaptionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6043,7 +6048,7 @@ impl<'a> CaptionMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> CaptionDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> CaptionDeleteCall<'a, S> {
         CaptionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6062,7 +6067,7 @@ impl<'a> CaptionMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The ID of the caption track to download, required for One Platform.
-    pub fn download(&self, id: &str) -> CaptionDownloadCall<'a> {
+    pub fn download(&self, id: &str) -> CaptionDownloadCall<'a, S> {
         CaptionDownloadCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6083,7 +6088,7 @@ impl<'a> CaptionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Caption) -> CaptionInsertCall<'a> {
+    pub fn insert(&self, request: Caption) -> CaptionInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CaptionInsertCall {
@@ -6107,7 +6112,7 @@ impl<'a> CaptionMethods<'a> {
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// * `videoId` - Returns the captions for the specified video.
-    pub fn list(&self, part: &Vec<String>, video_id: &str) -> CaptionListCall<'a> {
+    pub fn list(&self, part: &Vec<String>, video_id: &str) -> CaptionListCall<'a, S> {
         CaptionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6128,7 +6133,7 @@ impl<'a> CaptionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Caption) -> CaptionUpdateCall<'a> {
+    pub fn update(&self, request: Caption) -> CaptionUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CaptionUpdateCall {
@@ -6168,22 +6173,22 @@ impl<'a> CaptionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert(...)`
 /// // to build up your call.
 /// let rb = hub.channel_banners();
 /// # }
 /// ```
-pub struct ChannelBannerMethods<'a>
-    where  {
+pub struct ChannelBannerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChannelBannerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChannelBannerMethods<'a, S> {}
 
-impl<'a> ChannelBannerMethods<'a> {
+impl<'a, S> ChannelBannerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6192,7 +6197,7 @@ impl<'a> ChannelBannerMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: ChannelBannerResource) -> ChannelBannerInsertCall<'a> {
+    pub fn insert(&self, request: ChannelBannerResource) -> ChannelBannerInsertCall<'a, S> {
         ChannelBannerInsertCall {
             hub: self.hub,
             _request: request,
@@ -6229,22 +6234,22 @@ impl<'a> ChannelBannerMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.channel_sections();
 /// # }
 /// ```
-pub struct ChannelSectionMethods<'a>
-    where  {
+pub struct ChannelSectionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChannelSectionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChannelSectionMethods<'a, S> {}
 
-impl<'a> ChannelSectionMethods<'a> {
+impl<'a, S> ChannelSectionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6253,7 +6258,7 @@ impl<'a> ChannelSectionMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> ChannelSectionDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> ChannelSectionDeleteCall<'a, S> {
         ChannelSectionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6271,7 +6276,7 @@ impl<'a> ChannelSectionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: ChannelSection) -> ChannelSectionInsertCall<'a> {
+    pub fn insert(&self, request: ChannelSection) -> ChannelSectionInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ChannelSectionInsertCall {
@@ -6293,7 +6298,7 @@ impl<'a> ChannelSectionMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set *part=snippet*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> ChannelSectionListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> ChannelSectionListCall<'a, S> {
         ChannelSectionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6315,7 +6320,7 @@ impl<'a> ChannelSectionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: ChannelSection) -> ChannelSectionUpdateCall<'a> {
+    pub fn update(&self, request: ChannelSection) -> ChannelSectionUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ChannelSectionUpdateCall {
@@ -6353,22 +6358,22 @@ impl<'a> ChannelSectionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a>
-    where  {
+pub struct ChannelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChannelMethods<'a, S> {}
 
-impl<'a> ChannelMethods<'a> {
+impl<'a, S> ChannelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6377,7 +6382,7 @@ impl<'a> ChannelMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set *part=contentDetails*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> ChannelListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> ChannelListCall<'a, S> {
         ChannelListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6404,7 +6409,7 @@ impl<'a> ChannelMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Channel) -> ChannelUpdateCall<'a> {
+    pub fn update(&self, request: Channel) -> ChannelUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ChannelUpdateCall {
@@ -6442,22 +6447,22 @@ impl<'a> ChannelMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.comment_threads();
 /// # }
 /// ```
-pub struct CommentThreadMethods<'a>
-    where  {
+pub struct CommentThreadMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for CommentThreadMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CommentThreadMethods<'a, S> {}
 
-impl<'a> CommentThreadMethods<'a> {
+impl<'a, S> CommentThreadMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6466,7 +6471,7 @@ impl<'a> CommentThreadMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: CommentThread) -> CommentThreadInsertCall<'a> {
+    pub fn insert(&self, request: CommentThread) -> CommentThreadInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentThreadInsertCall {
@@ -6486,7 +6491,7 @@ impl<'a> CommentThreadMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more commentThread resource properties that the API response will include.
-    pub fn list(&self, part: &Vec<String>) -> CommentThreadListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> CommentThreadListCall<'a, S> {
         CommentThreadListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6530,22 +6535,22 @@ impl<'a> CommentThreadMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)`, `mark_as_spam(...)`, `set_moderation_status(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a>
-    where  {
+pub struct CommentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for CommentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CommentMethods<'a, S> {}
 
-impl<'a> CommentMethods<'a> {
+impl<'a, S> CommentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6554,7 +6559,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> CommentDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> CommentDeleteCall<'a, S> {
         CommentDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6571,7 +6576,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Comment) -> CommentInsertCall<'a> {
+    pub fn insert(&self, request: Comment) -> CommentInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentInsertCall {
@@ -6591,7 +6596,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more comment resource properties that the API response will include.
-    pub fn list(&self, part: &Vec<String>) -> CommentListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> CommentListCall<'a, S> {
         CommentListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6613,7 +6618,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Flags the comments with the given IDs as spam in the caller's opinion.
-    pub fn mark_as_spam(&self, id: &Vec<String>) -> CommentMarkAsSpamCall<'a> {
+    pub fn mark_as_spam(&self, id: &Vec<String>) -> CommentMarkAsSpamCall<'a, S> {
         CommentMarkAsSpamCall {
             hub: self.hub,
             _id: id.clone(),
@@ -6631,7 +6636,7 @@ impl<'a> CommentMethods<'a> {
     ///
     /// * `id` - Modifies the moderation status of the comments with the given IDs
     /// * `moderationStatus` - Specifies the requested moderation status. Note, comments can be in statuses, which are not available through this call. For example, this call does not allow to mark a comment as 'likely spam'. Valid values: MODERATION_STATUS_PUBLISHED, MODERATION_STATUS_HELD_FOR_REVIEW, MODERATION_STATUS_REJECTED.
-    pub fn set_moderation_status(&self, id: &Vec<String>, moderation_status: &str) -> CommentSetModerationStatuCall<'a> {
+    pub fn set_moderation_status(&self, id: &Vec<String>, moderation_status: &str) -> CommentSetModerationStatuCall<'a, S> {
         CommentSetModerationStatuCall {
             hub: self.hub,
             _id: id.clone(),
@@ -6650,7 +6655,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Comment) -> CommentUpdateCall<'a> {
+    pub fn update(&self, request: Comment) -> CommentUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentUpdateCall {
@@ -6687,22 +6692,22 @@ impl<'a> CommentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.i18n_languages();
 /// # }
 /// ```
-pub struct I18nLanguageMethods<'a>
-    where  {
+pub struct I18nLanguageMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for I18nLanguageMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for I18nLanguageMethods<'a, S> {}
 
-impl<'a> I18nLanguageMethods<'a> {
+impl<'a, S> I18nLanguageMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6711,7 +6716,7 @@ impl<'a> I18nLanguageMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the i18nLanguage resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> I18nLanguageListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> I18nLanguageListCall<'a, S> {
         I18nLanguageListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6746,22 +6751,22 @@ impl<'a> I18nLanguageMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.i18n_regions();
 /// # }
 /// ```
-pub struct I18nRegionMethods<'a>
-    where  {
+pub struct I18nRegionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for I18nRegionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for I18nRegionMethods<'a, S> {}
 
-impl<'a> I18nRegionMethods<'a> {
+impl<'a, S> I18nRegionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6770,7 +6775,7 @@ impl<'a> I18nRegionMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the i18nRegion resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> I18nRegionListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> I18nRegionListCall<'a, S> {
         I18nRegionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6805,22 +6810,22 @@ impl<'a> I18nRegionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `bind(...)`, `delete(...)`, `insert(...)`, `list(...)`, `transition(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.live_broadcasts();
 /// # }
 /// ```
-pub struct LiveBroadcastMethods<'a>
-    where  {
+pub struct LiveBroadcastMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for LiveBroadcastMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LiveBroadcastMethods<'a, S> {}
 
-impl<'a> LiveBroadcastMethods<'a> {
+impl<'a, S> LiveBroadcastMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6830,7 +6835,7 @@ impl<'a> LiveBroadcastMethods<'a> {
     ///
     /// * `id` - Broadcast to bind to the stream
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn bind(&self, id: &str, part: &Vec<String>) -> LiveBroadcastBindCall<'a> {
+    pub fn bind(&self, id: &str, part: &Vec<String>) -> LiveBroadcastBindCall<'a, S> {
         LiveBroadcastBindCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6851,7 +6856,7 @@ impl<'a> LiveBroadcastMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Broadcast to delete.
-    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCall<'a, S> {
         LiveBroadcastDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6870,7 +6875,7 @@ impl<'a> LiveBroadcastMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveBroadcast) -> LiveBroadcastInsertCall<'a> {
+    pub fn insert(&self, request: LiveBroadcast) -> LiveBroadcastInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveBroadcastInsertCall {
@@ -6892,7 +6897,7 @@ impl<'a> LiveBroadcastMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, status and statistics.
-    pub fn list(&self, part: &Vec<String>) -> LiveBroadcastListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> LiveBroadcastListCall<'a, S> {
         LiveBroadcastListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6919,7 +6924,7 @@ impl<'a> LiveBroadcastMethods<'a> {
     /// * `broadcastStatus` - The status to which the broadcast is going to transition.
     /// * `id` - Broadcast to transition.
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn transition(&self, broadcast_status: &str, id: &str, part: &Vec<String>) -> LiveBroadcastTransitionCall<'a> {
+    pub fn transition(&self, broadcast_status: &str, id: &str, part: &Vec<String>) -> LiveBroadcastTransitionCall<'a, S> {
         LiveBroadcastTransitionCall {
             hub: self.hub,
             _broadcast_status: broadcast_status.to_string(),
@@ -6940,7 +6945,7 @@ impl<'a> LiveBroadcastMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: LiveBroadcast) -> LiveBroadcastUpdateCall<'a> {
+    pub fn update(&self, request: LiveBroadcast) -> LiveBroadcastUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveBroadcastUpdateCall {
@@ -6979,22 +6984,22 @@ impl<'a> LiveBroadcastMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)` and `insert(...)`
 /// // to build up your call.
 /// let rb = hub.live_chat_bans();
 /// # }
 /// ```
-pub struct LiveChatBanMethods<'a>
-    where  {
+pub struct LiveChatBanMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for LiveChatBanMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LiveChatBanMethods<'a, S> {}
 
-impl<'a> LiveChatBanMethods<'a> {
+impl<'a, S> LiveChatBanMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7003,7 +7008,7 @@ impl<'a> LiveChatBanMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveChatBanDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> LiveChatBanDeleteCall<'a, S> {
         LiveChatBanDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7020,7 +7025,7 @@ impl<'a> LiveChatBanMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveChatBan) -> LiveChatBanInsertCall<'a> {
+    pub fn insert(&self, request: LiveChatBan) -> LiveChatBanInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveChatBanInsertCall {
@@ -7057,22 +7062,22 @@ impl<'a> LiveChatBanMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.live_chat_messages();
 /// # }
 /// ```
-pub struct LiveChatMessageMethods<'a>
-    where  {
+pub struct LiveChatMessageMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for LiveChatMessageMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LiveChatMessageMethods<'a, S> {}
 
-impl<'a> LiveChatMessageMethods<'a> {
+impl<'a, S> LiveChatMessageMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7081,7 +7086,7 @@ impl<'a> LiveChatMessageMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveChatMessageDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> LiveChatMessageDeleteCall<'a, S> {
         LiveChatMessageDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7098,7 +7103,7 @@ impl<'a> LiveChatMessageMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveChatMessage) -> LiveChatMessageInsertCall<'a> {
+    pub fn insert(&self, request: LiveChatMessage) -> LiveChatMessageInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveChatMessageInsertCall {
@@ -7119,7 +7124,7 @@ impl<'a> LiveChatMessageMethods<'a> {
     ///
     /// * `liveChatId` - The id of the live chat for which comments should be returned.
     /// * `part` - The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatMessageListCall<'a> {
+    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatMessageListCall<'a, S> {
         LiveChatMessageListCall {
             hub: self.hub,
             _live_chat_id: live_chat_id.to_string(),
@@ -7158,22 +7163,22 @@ impl<'a> LiveChatMessageMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.live_chat_moderators();
 /// # }
 /// ```
-pub struct LiveChatModeratorMethods<'a>
-    where  {
+pub struct LiveChatModeratorMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for LiveChatModeratorMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LiveChatModeratorMethods<'a, S> {}
 
-impl<'a> LiveChatModeratorMethods<'a> {
+impl<'a, S> LiveChatModeratorMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7182,7 +7187,7 @@ impl<'a> LiveChatModeratorMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveChatModeratorDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> LiveChatModeratorDeleteCall<'a, S> {
         LiveChatModeratorDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7199,7 +7204,7 @@ impl<'a> LiveChatModeratorMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveChatModerator) -> LiveChatModeratorInsertCall<'a> {
+    pub fn insert(&self, request: LiveChatModerator) -> LiveChatModeratorInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveChatModeratorInsertCall {
@@ -7220,7 +7225,7 @@ impl<'a> LiveChatModeratorMethods<'a> {
     ///
     /// * `liveChatId` - The id of the live chat for which moderators should be returned.
     /// * `part` - The *part* parameter specifies the liveChatModerator resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatModeratorListCall<'a> {
+    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatModeratorListCall<'a, S> {
         LiveChatModeratorListCall {
             hub: self.hub,
             _live_chat_id: live_chat_id.to_string(),
@@ -7257,22 +7262,22 @@ impl<'a> LiveChatModeratorMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.live_streams();
 /// # }
 /// ```
-pub struct LiveStreamMethods<'a>
-    where  {
+pub struct LiveStreamMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for LiveStreamMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LiveStreamMethods<'a, S> {}
 
-impl<'a> LiveStreamMethods<'a> {
+impl<'a, S> LiveStreamMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7281,7 +7286,7 @@ impl<'a> LiveStreamMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveStreamDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> LiveStreamDeleteCall<'a, S> {
         LiveStreamDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7300,7 +7305,7 @@ impl<'a> LiveStreamMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveStream) -> LiveStreamInsertCall<'a> {
+    pub fn insert(&self, request: LiveStream) -> LiveStreamInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveStreamInsertCall {
@@ -7322,7 +7327,7 @@ impl<'a> LiveStreamMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.
-    pub fn list(&self, part: &Vec<String>) -> LiveStreamListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> LiveStreamListCall<'a, S> {
         LiveStreamListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7345,7 +7350,7 @@ impl<'a> LiveStreamMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: LiveStream) -> LiveStreamUpdateCall<'a> {
+    pub fn update(&self, request: LiveStream) -> LiveStreamUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveStreamUpdateCall {
@@ -7384,22 +7389,22 @@ impl<'a> LiveStreamMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.members();
 /// # }
 /// ```
-pub struct MemberMethods<'a>
-    where  {
+pub struct MemberMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for MemberMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MemberMethods<'a, S> {}
 
-impl<'a> MemberMethods<'a> {
+impl<'a, S> MemberMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7408,7 +7413,7 @@ impl<'a> MemberMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the member resource parts that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> MemberListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> MemberListCall<'a, S> {
         MemberListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7447,22 +7452,22 @@ impl<'a> MemberMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.memberships_levels();
 /// # }
 /// ```
-pub struct MembershipsLevelMethods<'a>
-    where  {
+pub struct MembershipsLevelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for MembershipsLevelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MembershipsLevelMethods<'a, S> {}
 
-impl<'a> MembershipsLevelMethods<'a> {
+impl<'a, S> MembershipsLevelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7471,7 +7476,7 @@ impl<'a> MembershipsLevelMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the membershipsLevel resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, part: &Vec<String>) -> MembershipsLevelListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> MembershipsLevelListCall<'a, S> {
         MembershipsLevelListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7505,22 +7510,22 @@ impl<'a> MembershipsLevelMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.playlist_items();
 /// # }
 /// ```
-pub struct PlaylistItemMethods<'a>
-    where  {
+pub struct PlaylistItemMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for PlaylistItemMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PlaylistItemMethods<'a, S> {}
 
-impl<'a> PlaylistItemMethods<'a> {
+impl<'a, S> PlaylistItemMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7529,7 +7534,7 @@ impl<'a> PlaylistItemMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> PlaylistItemDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> PlaylistItemDeleteCall<'a, S> {
         PlaylistItemDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7547,7 +7552,7 @@ impl<'a> PlaylistItemMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: PlaylistItem) -> PlaylistItemInsertCall<'a> {
+    pub fn insert(&self, request: PlaylistItem) -> PlaylistItemInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistItemInsertCall {
@@ -7568,7 +7573,7 @@ impl<'a> PlaylistItemMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set *part=snippet*, the API response will contain all of those properties.
-    pub fn list(&self, part: &Vec<String>) -> PlaylistItemListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> PlaylistItemListCall<'a, S> {
         PlaylistItemListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7591,7 +7596,7 @@ impl<'a> PlaylistItemMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: PlaylistItem) -> PlaylistItemUpdateCall<'a> {
+    pub fn update(&self, request: PlaylistItem) -> PlaylistItemUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistItemUpdateCall {
@@ -7629,22 +7634,22 @@ impl<'a> PlaylistItemMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.playlists();
 /// # }
 /// ```
-pub struct PlaylistMethods<'a>
-    where  {
+pub struct PlaylistMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for PlaylistMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PlaylistMethods<'a, S> {}
 
-impl<'a> PlaylistMethods<'a> {
+impl<'a, S> PlaylistMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7653,7 +7658,7 @@ impl<'a> PlaylistMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> PlaylistDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> PlaylistDeleteCall<'a, S> {
         PlaylistDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7671,7 +7676,7 @@ impl<'a> PlaylistMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Playlist) -> PlaylistInsertCall<'a> {
+    pub fn insert(&self, request: Playlist) -> PlaylistInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistInsertCall {
@@ -7693,7 +7698,7 @@ impl<'a> PlaylistMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set *part=snippet*, the API response will contain all of those properties.
-    pub fn list(&self, part: &Vec<String>) -> PlaylistListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> PlaylistListCall<'a, S> {
         PlaylistListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7718,7 +7723,7 @@ impl<'a> PlaylistMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Playlist) -> PlaylistUpdateCall<'a> {
+    pub fn update(&self, request: Playlist) -> PlaylistUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistUpdateCall {
@@ -7756,22 +7761,22 @@ impl<'a> PlaylistMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.search();
 /// # }
 /// ```
-pub struct SearchMethods<'a>
-    where  {
+pub struct SearchMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for SearchMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SearchMethods<'a, S> {}
 
-impl<'a> SearchMethods<'a> {
+impl<'a, S> SearchMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7780,7 +7785,7 @@ impl<'a> SearchMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more search resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> SearchListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> SearchListCall<'a, S> {
         SearchListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7844,22 +7849,22 @@ impl<'a> SearchMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionMethods<'a>
-    where  {
+pub struct SubscriptionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for SubscriptionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SubscriptionMethods<'a, S> {}
 
-impl<'a> SubscriptionMethods<'a> {
+impl<'a, S> SubscriptionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7868,7 +7873,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a, S> {
         SubscriptionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7885,7 +7890,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Subscription) -> SubscriptionInsertCall<'a> {
+    pub fn insert(&self, request: Subscription) -> SubscriptionInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         SubscriptionInsertCall {
@@ -7905,7 +7910,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set *part=snippet*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> SubscriptionListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> SubscriptionListCall<'a, S> {
         SubscriptionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7950,22 +7955,22 @@ impl<'a> SubscriptionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.super_chat_events();
 /// # }
 /// ```
-pub struct SuperChatEventMethods<'a>
-    where  {
+pub struct SuperChatEventMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for SuperChatEventMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SuperChatEventMethods<'a, S> {}
 
-impl<'a> SuperChatEventMethods<'a> {
+impl<'a, S> SuperChatEventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7974,7 +7979,7 @@ impl<'a> SuperChatEventMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the superChatEvent resource parts that the API response will include. This parameter is currently not supported.
-    pub fn list(&self, part: &Vec<String>) -> SuperChatEventListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> SuperChatEventListCall<'a, S> {
         SuperChatEventListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8011,22 +8016,22 @@ impl<'a> SuperChatEventMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert(...)`
 /// // to build up your call.
 /// let rb = hub.tests();
 /// # }
 /// ```
-pub struct TestMethods<'a>
-    where  {
+pub struct TestMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for TestMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TestMethods<'a, S> {}
 
-impl<'a> TestMethods<'a> {
+impl<'a, S> TestMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8035,7 +8040,7 @@ impl<'a> TestMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: TestItem) -> TestInsertCall<'a> {
+    pub fn insert(&self, request: TestItem) -> TestInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         TestInsertCall {
@@ -8073,22 +8078,22 @@ impl<'a> TestMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.third_party_links();
 /// # }
 /// ```
-pub struct ThirdPartyLinkMethods<'a>
-    where  {
+pub struct ThirdPartyLinkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThirdPartyLinkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThirdPartyLinkMethods<'a, S> {}
 
-impl<'a> ThirdPartyLinkMethods<'a> {
+impl<'a, S> ThirdPartyLinkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8098,7 +8103,7 @@ impl<'a> ThirdPartyLinkMethods<'a> {
     ///
     /// * `linkingToken` - Delete the partner links with the given linking token.
     /// * `type` - Type of the link to be deleted.
-    pub fn delete(&self, linking_token: &str, type_: &str) -> ThirdPartyLinkDeleteCall<'a> {
+    pub fn delete(&self, linking_token: &str, type_: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
         ThirdPartyLinkDeleteCall {
             hub: self.hub,
             _linking_token: linking_token.to_string(),
@@ -8117,7 +8122,7 @@ impl<'a> ThirdPartyLinkMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a> {
+    pub fn insert(&self, request: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ThirdPartyLinkInsertCall {
@@ -8137,7 +8142,7 @@ impl<'a> ThirdPartyLinkMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the thirdPartyLink resource parts that the API response will include. Supported values are linkingToken, status, and snippet.
-    pub fn list(&self, part: &Vec<String>) -> ThirdPartyLinkListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> ThirdPartyLinkListCall<'a, S> {
         ThirdPartyLinkListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8156,7 +8161,7 @@ impl<'a> ThirdPartyLinkMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a> {
+    pub fn update(&self, request: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ThirdPartyLinkUpdateCall {
@@ -8193,22 +8198,22 @@ impl<'a> ThirdPartyLinkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `set(...)`
 /// // to build up your call.
 /// let rb = hub.thumbnails();
 /// # }
 /// ```
-pub struct ThumbnailMethods<'a>
-    where  {
+pub struct ThumbnailMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThumbnailMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThumbnailMethods<'a, S> {}
 
-impl<'a> ThumbnailMethods<'a> {
+impl<'a, S> ThumbnailMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8217,7 +8222,7 @@ impl<'a> ThumbnailMethods<'a> {
     /// # Arguments
     ///
     /// * `videoId` - Returns the Thumbnail with the given video IDs for Stubby or Apiary.
-    pub fn set(&self, video_id: &str) -> ThumbnailSetCall<'a> {
+    pub fn set(&self, video_id: &str) -> ThumbnailSetCall<'a, S> {
         ThumbnailSetCall {
             hub: self.hub,
             _video_id: video_id.to_string(),
@@ -8252,22 +8257,22 @@ impl<'a> ThumbnailMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.video_abuse_report_reasons();
 /// # }
 /// ```
-pub struct VideoAbuseReportReasonMethods<'a>
-    where  {
+pub struct VideoAbuseReportReasonMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for VideoAbuseReportReasonMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VideoAbuseReportReasonMethods<'a, S> {}
 
-impl<'a> VideoAbuseReportReasonMethods<'a> {
+impl<'a, S> VideoAbuseReportReasonMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8276,7 +8281,7 @@ impl<'a> VideoAbuseReportReasonMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, part: &Vec<String>) -> VideoAbuseReportReasonListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> VideoAbuseReportReasonListCall<'a, S> {
         VideoAbuseReportReasonListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8311,22 +8316,22 @@ impl<'a> VideoAbuseReportReasonMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.video_categories();
 /// # }
 /// ```
-pub struct VideoCategoryMethods<'a>
-    where  {
+pub struct VideoCategoryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for VideoCategoryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VideoCategoryMethods<'a, S> {}
 
-impl<'a> VideoCategoryMethods<'a> {
+impl<'a, S> VideoCategoryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8335,7 +8340,7 @@ impl<'a> VideoCategoryMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the videoCategory resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> VideoCategoryListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> VideoCategoryListCall<'a, S> {
         VideoCategoryListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8372,22 +8377,22 @@ impl<'a> VideoCategoryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get_rating(...)`, `insert(...)`, `list(...)`, `rate(...)`, `report_abuse(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.videos();
 /// # }
 /// ```
-pub struct VideoMethods<'a>
-    where  {
+pub struct VideoMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for VideoMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VideoMethods<'a, S> {}
 
-impl<'a> VideoMethods<'a> {
+impl<'a, S> VideoMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8396,7 +8401,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> VideoDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> VideoDeleteCall<'a, S> {
         VideoDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -8414,7 +8419,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn get_rating(&self, id: &Vec<String>) -> VideoGetRatingCall<'a> {
+    pub fn get_rating(&self, id: &Vec<String>) -> VideoGetRatingCall<'a, S> {
         VideoGetRatingCall {
             hub: self.hub,
             _id: id.clone(),
@@ -8432,7 +8437,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Video) -> VideoInsertCall<'a> {
+    pub fn insert(&self, request: Video) -> VideoInsertCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         VideoInsertCall {
@@ -8457,7 +8462,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more video resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set *part=snippet*, the API response will contain all of those properties.
-    pub fn list(&self, part: &Vec<String>) -> VideoListCall<'a> {
+    pub fn list(&self, part: &Vec<String>) -> VideoListCall<'a, S> {
         VideoListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8487,7 +8492,7 @@ impl<'a> VideoMethods<'a> {
     ///
     /// * `id` - No description provided.
     /// * `rating` - No description provided.
-    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a> {
+    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a, S> {
         VideoRateCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -8505,7 +8510,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn report_abuse(&self, request: VideoAbuseReport) -> VideoReportAbuseCall<'a> {
+    pub fn report_abuse(&self, request: VideoAbuseReport) -> VideoReportAbuseCall<'a, S> {
         VideoReportAbuseCall {
             hub: self.hub,
             _request: request,
@@ -8523,7 +8528,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Video) -> VideoUpdateCall<'a> {
+    pub fn update(&self, request: Video) -> VideoUpdateCall<'a, S> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         VideoUpdateCall {
@@ -8561,22 +8566,22 @@ impl<'a> VideoMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `set(...)` and `unset(...)`
 /// // to build up your call.
 /// let rb = hub.watermarks();
 /// # }
 /// ```
-pub struct WatermarkMethods<'a>
-    where  {
+pub struct WatermarkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for WatermarkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for WatermarkMethods<'a, S> {}
 
-impl<'a> WatermarkMethods<'a> {
+impl<'a, S> WatermarkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8586,7 +8591,7 @@ impl<'a> WatermarkMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `channelId` - No description provided.
-    pub fn set(&self, request: InvideoBranding, channel_id: &str) -> WatermarkSetCall<'a> {
+    pub fn set(&self, request: InvideoBranding, channel_id: &str) -> WatermarkSetCall<'a, S> {
         WatermarkSetCall {
             hub: self.hub,
             _request: request,
@@ -8605,7 +8610,7 @@ impl<'a> WatermarkMethods<'a> {
     /// # Arguments
     ///
     /// * `channelId` - No description provided.
-    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCall<'a> {
+    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCall<'a, S> {
         WatermarkUnsetCall {
             hub: self.hub,
             _channel_id: channel_id.to_string(),
@@ -8640,22 +8645,22 @@ impl<'a> WatermarkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `v3_update_comment_threads(...)`
 /// // to build up your call.
 /// let rb = hub.youtube();
 /// # }
 /// ```
-pub struct YoutubeMethods<'a>
-    where  {
+pub struct YoutubeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
 }
 
-impl<'a> client::MethodsBuilder for YoutubeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for YoutubeMethods<'a, S> {}
 
-impl<'a> YoutubeMethods<'a> {
+impl<'a, S> YoutubeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8664,7 +8669,7 @@ impl<'a> YoutubeMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn v3_update_comment_threads(&self, request: CommentThread) -> YoutubeV3UpdateCommentThreadCall<'a> {
+    pub fn v3_update_comment_threads(&self, request: CommentThread) -> YoutubeV3UpdateCommentThreadCall<'a, S> {
         YoutubeV3UpdateCommentThreadCall {
             hub: self.hub,
             _request: request,
@@ -8706,7 +8711,7 @@ impl<'a> YoutubeMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8719,10 +8724,10 @@ impl<'a> YoutubeMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AbuseReportInsertCall<'a>
-    where  {
+pub struct AbuseReportInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: AbuseReport,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8730,9 +8735,15 @@ pub struct AbuseReportInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AbuseReportInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AbuseReportInsertCall<'a, S> {}
 
-impl<'a> AbuseReportInsertCall<'a> {
+impl<'a, S> AbuseReportInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8874,7 +8885,7 @@ impl<'a> AbuseReportInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AbuseReport) -> AbuseReportInsertCall<'a> {
+    pub fn request(mut self, new_value: AbuseReport) -> AbuseReportInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8888,7 +8899,7 @@ impl<'a> AbuseReportInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> AbuseReportInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> AbuseReportInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -8898,7 +8909,7 @@ impl<'a> AbuseReportInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AbuseReportInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AbuseReportInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8923,7 +8934,7 @@ impl<'a> AbuseReportInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AbuseReportInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AbuseReportInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8943,9 +8954,9 @@ impl<'a> AbuseReportInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AbuseReportInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AbuseReportInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8977,7 +8988,7 @@ impl<'a> AbuseReportInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8993,10 +9004,10 @@ impl<'a> AbuseReportInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityListCall<'a>
-    where  {
+pub struct ActivityListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _region_code: Option<String>,
     _published_before: Option<String>,
@@ -9011,9 +9022,15 @@ pub struct ActivityListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ActivityListCall<'a> {}
+impl<'a, S> client::CallBuilder for ActivityListCall<'a, S> {}
 
-impl<'a> ActivityListCall<'a> {
+impl<'a, S> ActivityListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9164,57 +9181,57 @@ impl<'a> ActivityListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._region_code = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *published before* query property to the given value.
-    pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._published_before = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *published after* query property to the given value.
-    pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._published_after = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *home* query property to the given value.
-    pub fn home(mut self, new_value: bool) -> ActivityListCall<'a> {
+    pub fn home(mut self, new_value: bool) -> ActivityListCall<'a, S> {
         self._home = Some(new_value);
         self
     }
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -9224,7 +9241,7 @@ impl<'a> ActivityListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9249,7 +9266,7 @@ impl<'a> ActivityListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9269,9 +9286,9 @@ impl<'a> ActivityListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ActivityListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9303,7 +9320,7 @@ impl<'a> ActivityListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9313,10 +9330,10 @@ impl<'a> ActivityListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaptionDeleteCall<'a>
-    where  {
+pub struct CaptionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
@@ -9325,9 +9342,15 @@ pub struct CaptionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaptionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CaptionDeleteCall<'a, S> {}
 
-impl<'a> CaptionDeleteCall<'a> {
+impl<'a, S> CaptionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9443,21 +9466,21 @@ impl<'a> CaptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CaptionDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CaptionDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is be on behalf of
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDeleteCall<'a> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDeleteCall<'a, S> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -9467,7 +9490,7 @@ impl<'a> CaptionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9492,7 +9515,7 @@ impl<'a> CaptionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9512,9 +9535,9 @@ impl<'a> CaptionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaptionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9549,7 +9572,7 @@ impl<'a> CaptionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9561,10 +9584,10 @@ impl<'a> CaptionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaptionDownloadCall<'a>
-    where  {
+pub struct CaptionDownloadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _tlang: Option<String>,
     _tfmt: Option<String>,
@@ -9575,9 +9598,15 @@ pub struct CaptionDownloadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaptionDownloadCall<'a> {}
+impl<'a, S> client::CallBuilder for CaptionDownloadCall<'a, S> {}
 
-impl<'a> CaptionDownloadCall<'a> {
+impl<'a, S> CaptionDownloadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9721,35 +9750,35 @@ impl<'a> CaptionDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CaptionDownloadCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// tlang is the language code; machine translate the captions into this language.
     ///
     /// Sets the *tlang* query property to the given value.
-    pub fn tlang(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
+    pub fn tlang(mut self, new_value: &str) -> CaptionDownloadCall<'a, S> {
         self._tlang = Some(new_value.to_string());
         self
     }
     /// Convert the captions into this format. Supported options are sbv, srt, and vtt.
     ///
     /// Sets the *tfmt* query property to the given value.
-    pub fn tfmt(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
+    pub fn tfmt(mut self, new_value: &str) -> CaptionDownloadCall<'a, S> {
         self._tfmt = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDownloadCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is be on behalf of
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDownloadCall<'a, S> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -9759,7 +9788,7 @@ impl<'a> CaptionDownloadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDownloadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDownloadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9784,7 +9813,7 @@ impl<'a> CaptionDownloadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionDownloadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionDownloadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9804,9 +9833,9 @@ impl<'a> CaptionDownloadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionDownloadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaptionDownloadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9840,7 +9869,7 @@ impl<'a> CaptionDownloadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9856,10 +9885,10 @@ impl<'a> CaptionDownloadCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct CaptionInsertCall<'a>
-    where  {
+pub struct CaptionInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Caption,
     _part: Vec<String>,
     _sync: Option<bool>,
@@ -9870,9 +9899,15 @@ pub struct CaptionInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaptionInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CaptionInsertCall<'a, S> {}
 
-impl<'a> CaptionInsertCall<'a> {
+impl<'a, S> CaptionInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10136,7 +10171,7 @@ impl<'a> CaptionInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Caption) -> CaptionInsertCall<'a> {
+    pub fn request(mut self, new_value: Caption) -> CaptionInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10150,28 +10185,28 @@ impl<'a> CaptionInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CaptionInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CaptionInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Extra parameter to allow automatically syncing the uploaded caption/transcript with the audio.
     ///
     /// Sets the *sync* query property to the given value.
-    pub fn sync(mut self, new_value: bool) -> CaptionInsertCall<'a> {
+    pub fn sync(mut self, new_value: bool) -> CaptionInsertCall<'a, S> {
         self._sync = Some(new_value);
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is be on behalf of
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionInsertCall<'a> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionInsertCall<'a, S> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -10181,7 +10216,7 @@ impl<'a> CaptionInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10206,7 +10241,7 @@ impl<'a> CaptionInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10226,9 +10261,9 @@ impl<'a> CaptionInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaptionInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10274,7 +10309,7 @@ impl<'a> CaptionInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10285,10 +10320,10 @@ impl<'a> CaptionInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaptionListCall<'a>
-    where  {
+pub struct CaptionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
@@ -10299,9 +10334,15 @@ pub struct CaptionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaptionListCall<'a> {}
+impl<'a, S> client::CallBuilder for CaptionListCall<'a, S> {}
 
-impl<'a> CaptionListCall<'a> {
+impl<'a, S> CaptionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10445,7 +10486,7 @@ impl<'a> CaptionListCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> CaptionListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CaptionListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -10455,21 +10496,21 @@ impl<'a> CaptionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn video_id(mut self, new_value: &str) -> CaptionListCall<'a> {
+    pub fn video_id(mut self, new_value: &str) -> CaptionListCall<'a, S> {
         self._video_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is on behalf of.
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionListCall<'a> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionListCall<'a, S> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -10477,7 +10518,7 @@ impl<'a> CaptionListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> CaptionListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> CaptionListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
@@ -10487,7 +10528,7 @@ impl<'a> CaptionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10512,7 +10553,7 @@ impl<'a> CaptionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10532,9 +10573,9 @@ impl<'a> CaptionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaptionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10582,7 +10623,7 @@ impl<'a> CaptionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10600,10 +10641,10 @@ impl<'a> CaptionListCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct CaptionUpdateCall<'a>
-    where  {
+pub struct CaptionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Caption,
     _part: Vec<String>,
     _sync: Option<bool>,
@@ -10614,9 +10655,15 @@ pub struct CaptionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaptionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CaptionUpdateCall<'a, S> {}
 
-impl<'a> CaptionUpdateCall<'a> {
+impl<'a, S> CaptionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10885,7 +10932,7 @@ impl<'a> CaptionUpdateCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn request(mut self, new_value: Caption) -> CaptionUpdateCall<'a> {
+    pub fn request(mut self, new_value: Caption) -> CaptionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10904,28 +10951,28 @@ impl<'a> CaptionUpdateCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> CaptionUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CaptionUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Extra parameter to allow automatically syncing the uploaded caption/transcript with the audio.
     ///
     /// Sets the *sync* query property to the given value.
-    pub fn sync(mut self, new_value: bool) -> CaptionUpdateCall<'a> {
+    pub fn sync(mut self, new_value: bool) -> CaptionUpdateCall<'a, S> {
         self._sync = Some(new_value);
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is on behalf of.
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionUpdateCall<'a> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionUpdateCall<'a, S> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -10935,7 +10982,7 @@ impl<'a> CaptionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10960,7 +11007,7 @@ impl<'a> CaptionUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10980,9 +11027,9 @@ impl<'a> CaptionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaptionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11016,7 +11063,7 @@ impl<'a> CaptionUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11032,10 +11079,10 @@ impl<'a> CaptionUpdateCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ChannelBannerInsertCall<'a>
-    where  {
+pub struct ChannelBannerInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: ChannelBannerResource,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -11045,9 +11092,15 @@ pub struct ChannelBannerInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelBannerInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelBannerInsertCall<'a, S> {}
 
-impl<'a> ChannelBannerInsertCall<'a> {
+impl<'a, S> ChannelBannerInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11303,28 +11356,28 @@ impl<'a> ChannelBannerInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ChannelBannerResource) -> ChannelBannerInsertCall<'a> {
+    pub fn request(mut self, new_value: ChannelBannerResource) -> ChannelBannerInsertCall<'a, S> {
         self._request = new_value;
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelBannerInsertCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Unused, channel_id is currently derived from the security context of the requestor.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ChannelBannerInsertCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -11334,7 +11387,7 @@ impl<'a> ChannelBannerInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelBannerInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelBannerInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11359,7 +11412,7 @@ impl<'a> ChannelBannerInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11379,9 +11432,9 @@ impl<'a> ChannelBannerInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelBannerInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelBannerInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11413,7 +11466,7 @@ impl<'a> ChannelBannerInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11422,10 +11475,10 @@ impl<'a> ChannelBannerInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionDeleteCall<'a>
-    where  {
+pub struct ChannelSectionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11433,9 +11486,15 @@ pub struct ChannelSectionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelSectionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelSectionDeleteCall<'a, S> {}
 
-impl<'a> ChannelSectionDeleteCall<'a> {
+impl<'a, S> ChannelSectionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11548,14 +11607,14 @@ impl<'a> ChannelSectionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -11565,7 +11624,7 @@ impl<'a> ChannelSectionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11590,7 +11649,7 @@ impl<'a> ChannelSectionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11610,9 +11669,9 @@ impl<'a> ChannelSectionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelSectionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11660,7 +11719,7 @@ impl<'a> ChannelSectionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11677,10 +11736,10 @@ impl<'a> ChannelSectionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionInsertCall<'a>
-    where  {
+pub struct ChannelSectionInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: ChannelSection,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -11690,9 +11749,15 @@ pub struct ChannelSectionInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelSectionInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelSectionInsertCall<'a, S> {}
 
-impl<'a> ChannelSectionInsertCall<'a> {
+impl<'a, S> ChannelSectionInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11845,7 +11910,7 @@ impl<'a> ChannelSectionInsertCall<'a> {
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionInsertCall<'a> {
+    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11864,21 +11929,21 @@ impl<'a> ChannelSectionInsertCall<'a> {
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn add_part(mut self, new_value: &str) -> ChannelSectionInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -11888,7 +11953,7 @@ impl<'a> ChannelSectionInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11913,7 +11978,7 @@ impl<'a> ChannelSectionInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11933,9 +11998,9 @@ impl<'a> ChannelSectionInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelSectionInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11984,7 +12049,7 @@ impl<'a> ChannelSectionInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11997,10 +12062,10 @@ impl<'a> ChannelSectionInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionListCall<'a>
-    where  {
+pub struct ChannelSectionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
     _mine: Option<bool>,
@@ -12012,9 +12077,15 @@ pub struct ChannelSectionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelSectionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelSectionListCall<'a, S> {}
 
-impl<'a> ChannelSectionListCall<'a> {
+impl<'a, S> ChannelSectionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12164,21 +12235,21 @@ impl<'a> ChannelSectionListCall<'a> {
     /// * *id*
     /// * *snippet*
     /// * *contentDetails*
-    pub fn add_part(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelSectionListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the ChannelSections owned by the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
@@ -12186,21 +12257,21 @@ impl<'a> ChannelSectionListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Return content in specified language
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> ChannelSectionListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the ChannelSections owned by the specified channel ID.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -12210,7 +12281,7 @@ impl<'a> ChannelSectionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12235,7 +12306,7 @@ impl<'a> ChannelSectionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12255,9 +12326,9 @@ impl<'a> ChannelSectionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelSectionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12305,7 +12376,7 @@ impl<'a> ChannelSectionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12321,10 +12392,10 @@ impl<'a> ChannelSectionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionUpdateCall<'a>
-    where  {
+pub struct ChannelSectionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: ChannelSection,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -12333,9 +12404,15 @@ pub struct ChannelSectionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelSectionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelSectionUpdateCall<'a, S> {}
 
-impl<'a> ChannelSectionUpdateCall<'a> {
+impl<'a, S> ChannelSectionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12485,7 +12562,7 @@ impl<'a> ChannelSectionUpdateCall<'a> {
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionUpdateCall<'a> {
+    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12504,14 +12581,14 @@ impl<'a> ChannelSectionUpdateCall<'a> {
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn add_part(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -12521,7 +12598,7 @@ impl<'a> ChannelSectionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12546,7 +12623,7 @@ impl<'a> ChannelSectionUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12566,9 +12643,9 @@ impl<'a> ChannelSectionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelSectionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12600,7 +12677,7 @@ impl<'a> ChannelSectionUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12618,10 +12695,10 @@ impl<'a> ChannelSectionUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelListCall<'a>
-    where  {
+pub struct ChannelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -12638,9 +12715,15 @@ pub struct ChannelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelListCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelListCall<'a, S> {}
 
-impl<'a> ChannelListCall<'a> {
+impl<'a, S> ChannelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12799,49 +12882,49 @@ impl<'a> ChannelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the channels subscribed to the authenticated user
     ///
     /// Sets the *my subscribers* query property to the given value.
-    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a> {
+    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a, S> {
         self._my_subscribers = Some(new_value);
         self
     }
     /// Return the ids of channels owned by the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Return the channels managed by the authenticated user.
     ///
     /// Sets the *managed by me* query property to the given value.
-    pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a> {
+    pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a, S> {
         self._managed_by_me = Some(new_value);
         self
     }
@@ -12849,28 +12932,28 @@ impl<'a> ChannelListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Stands for "host language". Specifies the localization language of the metadata to be filled into snippet.localized. The field is filled with the default metadata if there is no localization in the specified language. The parameter value must be a language code included in the list returned by the i18nLanguages.list method (e.g. en_US, es_MX).
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the channel associated with a YouTube username.
     ///
     /// Sets the *for username* query property to the given value.
-    pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._for_username = Some(new_value.to_string());
         self
     }
     /// Return the channels within the specified guide category ID.
     ///
     /// Sets the *category id* query property to the given value.
-    pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a> {
+    pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a, S> {
         self._category_id = Some(new_value.to_string());
         self
     }
@@ -12880,7 +12963,7 @@ impl<'a> ChannelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12905,7 +12988,7 @@ impl<'a> ChannelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12925,9 +13008,9 @@ impl<'a> ChannelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12960,7 +13043,7 @@ impl<'a> ChannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12974,10 +13057,10 @@ impl<'a> ChannelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelUpdateCall<'a>
-    where  {
+pub struct ChannelUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Channel,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -12986,9 +13069,15 @@ pub struct ChannelUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelUpdateCall<'a, S> {}
 
-impl<'a> ChannelUpdateCall<'a> {
+impl<'a, S> ChannelUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13133,7 +13222,7 @@ impl<'a> ChannelUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelUpdateCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ChannelUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13147,14 +13236,14 @@ impl<'a> ChannelUpdateCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> ChannelUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *onBehalfOfContentOwner* parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -13164,7 +13253,7 @@ impl<'a> ChannelUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13189,7 +13278,7 @@ impl<'a> ChannelUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13209,9 +13298,9 @@ impl<'a> ChannelUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13244,7 +13333,7 @@ impl<'a> ChannelUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13257,10 +13346,10 @@ impl<'a> ChannelUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentThreadInsertCall<'a>
-    where  {
+pub struct CommentThreadInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: CommentThread,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13268,9 +13357,15 @@ pub struct CommentThreadInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentThreadInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentThreadInsertCall<'a, S> {}
 
-impl<'a> CommentThreadInsertCall<'a> {
+impl<'a, S> CommentThreadInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13412,7 +13507,7 @@ impl<'a> CommentThreadInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommentThread) -> CommentThreadInsertCall<'a> {
+    pub fn request(mut self, new_value: CommentThread) -> CommentThreadInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13426,7 +13521,7 @@ impl<'a> CommentThreadInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentThreadInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CommentThreadInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -13436,7 +13531,7 @@ impl<'a> CommentThreadInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13461,7 +13556,7 @@ impl<'a> CommentThreadInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13481,9 +13576,9 @@ impl<'a> CommentThreadInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentThreadInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13515,7 +13610,7 @@ impl<'a> CommentThreadInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13533,10 +13628,10 @@ impl<'a> CommentThreadInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentThreadListCall<'a>
-    where  {
+pub struct CommentThreadListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _video_id: Option<String>,
     _text_format: Option<String>,
@@ -13553,9 +13648,15 @@ pub struct CommentThreadListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentThreadListCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentThreadListCall<'a, S> {}
 
-impl<'a> CommentThreadListCall<'a> {
+impl<'a, S> CommentThreadListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13714,55 +13815,55 @@ impl<'a> CommentThreadListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Returns the comment threads of the specified video.
     ///
     /// Sets the *video id* query property to the given value.
-    pub fn video_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn video_id(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._video_id = Some(new_value.to_string());
         self
     }
     /// The requested text format for the returned comments.
     ///
     /// Sets the *text format* query property to the given value.
-    pub fn text_format(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn text_format(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._text_format = Some(new_value.to_string());
         self
     }
     /// Limits the returned comment threads to those matching the specified key words. Not compatible with the 'id' filter.
     ///
     /// Sets the *search terms* query property to the given value.
-    pub fn search_terms(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn search_terms(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._search_terms = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn order(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._order = Some(new_value.to_string());
         self
     }
     /// Limits the returned comment threads to those with the specified moderation status. Not compatible with the 'id' filter. Valid values: published, heldForReview, likelySpam.
     ///
     /// Sets the *moderation status* query property to the given value.
-    pub fn moderation_status(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn moderation_status(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._moderation_status = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentThreadListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> CommentThreadListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -13770,21 +13871,21 @@ impl<'a> CommentThreadListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Returns the comment threads for all the channel comments (ie does not include comments left on videos).
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
     /// Returns the comment threads of all videos of the channel and the channel comments as well.
     ///
     /// Sets the *all threads related to channel id* query property to the given value.
-    pub fn all_threads_related_to_channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
+    pub fn all_threads_related_to_channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a, S> {
         self._all_threads_related_to_channel_id = Some(new_value.to_string());
         self
     }
@@ -13794,7 +13895,7 @@ impl<'a> CommentThreadListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13819,7 +13920,7 @@ impl<'a> CommentThreadListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13839,9 +13940,9 @@ impl<'a> CommentThreadListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentThreadListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13873,7 +13974,7 @@ impl<'a> CommentThreadListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13881,19 +13982,25 @@ impl<'a> CommentThreadListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a>
-    where  {
+pub struct CommentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentDeleteCall<'a, S> {}
 
-impl<'a> CommentDeleteCall<'a> {
+impl<'a, S> CommentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14003,7 +14110,7 @@ impl<'a> CommentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CommentDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -14013,7 +14120,7 @@ impl<'a> CommentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14038,7 +14145,7 @@ impl<'a> CommentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14058,9 +14165,9 @@ impl<'a> CommentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14093,7 +14200,7 @@ impl<'a> CommentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14106,10 +14213,10 @@ impl<'a> CommentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentInsertCall<'a>
-    where  {
+pub struct CommentInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Comment,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14117,9 +14224,15 @@ pub struct CommentInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentInsertCall<'a, S> {}
 
-impl<'a> CommentInsertCall<'a> {
+impl<'a, S> CommentInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14261,7 +14374,7 @@ impl<'a> CommentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentInsertCall<'a> {
+    pub fn request(mut self, new_value: Comment) -> CommentInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14275,7 +14388,7 @@ impl<'a> CommentInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CommentInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -14285,7 +14398,7 @@ impl<'a> CommentInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14310,7 +14423,7 @@ impl<'a> CommentInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14330,9 +14443,9 @@ impl<'a> CommentInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14364,7 +14477,7 @@ impl<'a> CommentInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14377,10 +14490,10 @@ impl<'a> CommentInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListCall<'a>
-    where  {
+pub struct CommentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _text_format: Option<String>,
     _parent_id: Option<String>,
@@ -14392,9 +14505,15 @@ pub struct CommentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentListCall<'a, S> {}
 
-impl<'a> CommentListCall<'a> {
+impl<'a, S> CommentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14538,35 +14657,35 @@ impl<'a> CommentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The requested text format for the returned comments.
     ///
     /// Sets the *text format* query property to the given value.
-    pub fn text_format(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn text_format(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._text_format = Some(new_value.to_string());
         self
     }
     /// Returns replies to the specified comment. Note, currently YouTube features only one level of replies (ie replies to top level comments). However replies to replies may be supported in the future.
     ///
     /// Sets the *parent id* query property to the given value.
-    pub fn parent_id(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn parent_id(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._parent_id = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -14574,7 +14693,7 @@ impl<'a> CommentListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
@@ -14584,7 +14703,7 @@ impl<'a> CommentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14609,7 +14728,7 @@ impl<'a> CommentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14629,9 +14748,9 @@ impl<'a> CommentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14663,7 +14782,7 @@ impl<'a> CommentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14671,19 +14790,25 @@ impl<'a> CommentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentMarkAsSpamCall<'a>
-    where  {
+pub struct CommentMarkAsSpamCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentMarkAsSpamCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentMarkAsSpamCall<'a, S> {}
 
-impl<'a> CommentMarkAsSpamCall<'a> {
+impl<'a, S> CommentMarkAsSpamCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14799,7 +14924,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
@@ -14809,7 +14934,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentMarkAsSpamCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentMarkAsSpamCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14834,7 +14959,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14854,9 +14979,9 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentMarkAsSpamCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentMarkAsSpamCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14888,7 +15013,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14897,10 +15022,10 @@ impl<'a> CommentMarkAsSpamCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentSetModerationStatuCall<'a>
-    where  {
+pub struct CommentSetModerationStatuCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: Vec<String>,
     _moderation_status: String,
     _ban_author: Option<bool>,
@@ -14909,9 +15034,15 @@ pub struct CommentSetModerationStatuCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentSetModerationStatuCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentSetModerationStatuCall<'a, S> {}
 
-impl<'a> CommentSetModerationStatuCall<'a> {
+impl<'a, S> CommentSetModerationStatuCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15031,7 +15162,7 @@ impl<'a> CommentSetModerationStatuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_id(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
@@ -15041,14 +15172,14 @@ impl<'a> CommentSetModerationStatuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn moderation_status(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a> {
+    pub fn moderation_status(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, S> {
         self._moderation_status = new_value.to_string();
         self
     }
     /// If set to true the author of the comment gets added to the ban list. This means all future comments of the author will autmomatically be rejected. Only valid in combination with STATUS_REJECTED.
     ///
     /// Sets the *ban author* query property to the given value.
-    pub fn ban_author(mut self, new_value: bool) -> CommentSetModerationStatuCall<'a> {
+    pub fn ban_author(mut self, new_value: bool) -> CommentSetModerationStatuCall<'a, S> {
         self._ban_author = Some(new_value);
         self
     }
@@ -15058,7 +15189,7 @@ impl<'a> CommentSetModerationStatuCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentSetModerationStatuCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentSetModerationStatuCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15083,7 +15214,7 @@ impl<'a> CommentSetModerationStatuCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentSetModerationStatuCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentSetModerationStatuCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15103,9 +15234,9 @@ impl<'a> CommentSetModerationStatuCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentSetModerationStatuCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentSetModerationStatuCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15138,7 +15269,7 @@ impl<'a> CommentSetModerationStatuCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15151,10 +15282,10 @@ impl<'a> CommentSetModerationStatuCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentUpdateCall<'a>
-    where  {
+pub struct CommentUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Comment,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15162,9 +15293,15 @@ pub struct CommentUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentUpdateCall<'a, S> {}
 
-impl<'a> CommentUpdateCall<'a> {
+impl<'a, S> CommentUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15306,7 +15443,7 @@ impl<'a> CommentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a> {
+    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15320,7 +15457,7 @@ impl<'a> CommentUpdateCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> CommentUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -15330,7 +15467,7 @@ impl<'a> CommentUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15355,7 +15492,7 @@ impl<'a> CommentUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15375,9 +15512,9 @@ impl<'a> CommentUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15409,7 +15546,7 @@ impl<'a> CommentUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15418,10 +15555,10 @@ impl<'a> CommentUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct I18nLanguageListCall<'a>
-    where  {
+pub struct I18nLanguageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15429,9 +15566,15 @@ pub struct I18nLanguageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for I18nLanguageListCall<'a> {}
+impl<'a, S> client::CallBuilder for I18nLanguageListCall<'a, S> {}
 
-impl<'a> I18nLanguageListCall<'a> {
+impl<'a, S> I18nLanguageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15561,13 +15704,13 @@ impl<'a> I18nLanguageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> I18nLanguageListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> I18nLanguageListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -15577,7 +15720,7 @@ impl<'a> I18nLanguageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nLanguageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nLanguageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15602,7 +15745,7 @@ impl<'a> I18nLanguageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15622,9 +15765,9 @@ impl<'a> I18nLanguageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> I18nLanguageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> I18nLanguageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15656,7 +15799,7 @@ impl<'a> I18nLanguageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15665,10 +15808,10 @@ impl<'a> I18nLanguageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct I18nRegionListCall<'a>
-    where  {
+pub struct I18nRegionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15676,9 +15819,15 @@ pub struct I18nRegionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for I18nRegionListCall<'a> {}
+impl<'a, S> client::CallBuilder for I18nRegionListCall<'a, S> {}
 
-impl<'a> I18nRegionListCall<'a> {
+impl<'a, S> I18nRegionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15808,13 +15957,13 @@ impl<'a> I18nRegionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> I18nRegionListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> I18nRegionListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -15824,7 +15973,7 @@ impl<'a> I18nRegionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nRegionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nRegionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15849,7 +15998,7 @@ impl<'a> I18nRegionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15869,9 +16018,9 @@ impl<'a> I18nRegionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> I18nRegionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> I18nRegionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15919,7 +16068,7 @@ impl<'a> I18nRegionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15930,10 +16079,10 @@ impl<'a> I18nRegionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastBindCall<'a>
-    where  {
+pub struct LiveBroadcastBindCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _part: Vec<String>,
     _stream_id: Option<String>,
@@ -15944,9 +16093,15 @@ pub struct LiveBroadcastBindCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveBroadcastBindCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveBroadcastBindCall<'a, S> {}
 
-impl<'a> LiveBroadcastBindCall<'a> {
+impl<'a, S> LiveBroadcastBindCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16082,7 +16237,7 @@ impl<'a> LiveBroadcastBindCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -16100,28 +16255,28 @@ impl<'a> LiveBroadcastBindCall<'a> {
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Stream to bind, if not set unbind the current one.
     ///
     /// Sets the *stream id* query property to the given value.
-    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
+    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, S> {
         self._stream_id = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16131,7 +16286,7 @@ impl<'a> LiveBroadcastBindCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastBindCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastBindCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16156,7 +16311,7 @@ impl<'a> LiveBroadcastBindCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16176,9 +16331,9 @@ impl<'a> LiveBroadcastBindCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastBindCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveBroadcastBindCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16210,7 +16365,7 @@ impl<'a> LiveBroadcastBindCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16220,10 +16375,10 @@ impl<'a> LiveBroadcastBindCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastDeleteCall<'a>
-    where  {
+pub struct LiveBroadcastDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -16232,9 +16387,15 @@ pub struct LiveBroadcastDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveBroadcastDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveBroadcastDeleteCall<'a, S> {}
 
-impl<'a> LiveBroadcastDeleteCall<'a> {
+impl<'a, S> LiveBroadcastDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16351,21 +16512,21 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16375,7 +16536,7 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16400,7 +16561,7 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16420,9 +16581,9 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveBroadcastDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16471,7 +16632,7 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16490,10 +16651,10 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastInsertCall<'a>
-    where  {
+pub struct LiveBroadcastInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveBroadcast,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -16503,9 +16664,15 @@ pub struct LiveBroadcastInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveBroadcastInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveBroadcastInsertCall<'a, S> {}
 
-impl<'a> LiveBroadcastInsertCall<'a> {
+impl<'a, S> LiveBroadcastInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16660,7 +16827,7 @@ impl<'a> LiveBroadcastInsertCall<'a> {
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastInsertCall<'a> {
+    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16681,21 +16848,21 @@ impl<'a> LiveBroadcastInsertCall<'a> {
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16705,7 +16872,7 @@ impl<'a> LiveBroadcastInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16730,7 +16897,7 @@ impl<'a> LiveBroadcastInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16750,9 +16917,9 @@ impl<'a> LiveBroadcastInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveBroadcastInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16802,7 +16969,7 @@ impl<'a> LiveBroadcastInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16818,10 +16985,10 @@ impl<'a> LiveBroadcastInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastListCall<'a>
-    where  {
+pub struct LiveBroadcastListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -16836,9 +17003,15 @@ pub struct LiveBroadcastListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveBroadcastListCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveBroadcastListCall<'a, S> {}
 
-impl<'a> LiveBroadcastListCall<'a> {
+impl<'a, S> LiveBroadcastListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16999,41 +17172,41 @@ impl<'a> LiveBroadcastListCall<'a> {
     /// * *contentDetails*
     /// * *status*
     /// * *statistics*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -17041,21 +17214,21 @@ impl<'a> LiveBroadcastListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Return only broadcasts with the selected type.
     ///
     /// Sets the *broadcast type* query property to the given value.
-    pub fn broadcast_type(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn broadcast_type(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._broadcast_type = Some(new_value.to_string());
         self
     }
     /// Return broadcasts with a certain status, e.g. active broadcasts.
     ///
     /// Sets the *broadcast status* query property to the given value.
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
+    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a, S> {
         self._broadcast_status = Some(new_value.to_string());
         self
     }
@@ -17065,7 +17238,7 @@ impl<'a> LiveBroadcastListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17090,7 +17263,7 @@ impl<'a> LiveBroadcastListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17110,9 +17283,9 @@ impl<'a> LiveBroadcastListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveBroadcastListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17160,7 +17333,7 @@ impl<'a> LiveBroadcastListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17170,10 +17343,10 @@ impl<'a> LiveBroadcastListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastTransitionCall<'a>
-    where  {
+pub struct LiveBroadcastTransitionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _broadcast_status: String,
     _id: String,
     _part: Vec<String>,
@@ -17184,9 +17357,15 @@ pub struct LiveBroadcastTransitionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveBroadcastTransitionCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveBroadcastTransitionCall<'a, S> {}
 
-impl<'a> LiveBroadcastTransitionCall<'a> {
+impl<'a, S> LiveBroadcastTransitionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17320,7 +17499,7 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
+    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, S> {
         self._broadcast_status = new_value.to_string();
         self
     }
@@ -17330,7 +17509,7 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -17348,21 +17527,21 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17372,7 +17551,7 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastTransitionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastTransitionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17397,7 +17576,7 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17417,9 +17596,9 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastTransitionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveBroadcastTransitionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17468,7 +17647,7 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17487,10 +17666,10 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastUpdateCall<'a>
-    where  {
+pub struct LiveBroadcastUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveBroadcast,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -17500,9 +17679,15 @@ pub struct LiveBroadcastUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveBroadcastUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveBroadcastUpdateCall<'a, S> {}
 
-impl<'a> LiveBroadcastUpdateCall<'a> {
+impl<'a, S> LiveBroadcastUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17657,7 +17842,7 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastUpdateCall<'a> {
+    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17678,21 +17863,21 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17702,7 +17887,7 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17727,7 +17912,7 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17747,9 +17932,9 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveBroadcastUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17781,7 +17966,7 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17789,19 +17974,25 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatBanDeleteCall<'a>
-    where  {
+pub struct LiveChatBanDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatBanDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatBanDeleteCall<'a, S> {}
 
-impl<'a> LiveChatBanDeleteCall<'a> {
+impl<'a, S> LiveChatBanDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17911,7 +18102,7 @@ impl<'a> LiveChatBanDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveChatBanDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveChatBanDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -17921,7 +18112,7 @@ impl<'a> LiveChatBanDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17946,7 +18137,7 @@ impl<'a> LiveChatBanDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17966,9 +18157,9 @@ impl<'a> LiveChatBanDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatBanDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatBanDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18001,7 +18192,7 @@ impl<'a> LiveChatBanDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18014,10 +18205,10 @@ impl<'a> LiveChatBanDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatBanInsertCall<'a>
-    where  {
+pub struct LiveChatBanInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveChatBan,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18025,9 +18216,15 @@ pub struct LiveChatBanInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatBanInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatBanInsertCall<'a, S> {}
 
-impl<'a> LiveChatBanInsertCall<'a> {
+impl<'a, S> LiveChatBanInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18169,7 +18366,7 @@ impl<'a> LiveChatBanInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiveChatBan) -> LiveChatBanInsertCall<'a> {
+    pub fn request(mut self, new_value: LiveChatBan) -> LiveChatBanInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18183,7 +18380,7 @@ impl<'a> LiveChatBanInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> LiveChatBanInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatBanInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -18193,7 +18390,7 @@ impl<'a> LiveChatBanInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18218,7 +18415,7 @@ impl<'a> LiveChatBanInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18238,9 +18435,9 @@ impl<'a> LiveChatBanInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatBanInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatBanInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18272,7 +18469,7 @@ impl<'a> LiveChatBanInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18280,19 +18477,25 @@ impl<'a> LiveChatBanInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatMessageDeleteCall<'a>
-    where  {
+pub struct LiveChatMessageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatMessageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatMessageDeleteCall<'a, S> {}
 
-impl<'a> LiveChatMessageDeleteCall<'a> {
+impl<'a, S> LiveChatMessageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18402,7 +18605,7 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveChatMessageDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveChatMessageDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -18412,7 +18615,7 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18437,7 +18640,7 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18457,9 +18660,9 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatMessageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18492,7 +18695,7 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18505,10 +18708,10 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatMessageInsertCall<'a>
-    where  {
+pub struct LiveChatMessageInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveChatMessage,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18516,9 +18719,15 @@ pub struct LiveChatMessageInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatMessageInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatMessageInsertCall<'a, S> {}
 
-impl<'a> LiveChatMessageInsertCall<'a> {
+impl<'a, S> LiveChatMessageInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18660,7 +18869,7 @@ impl<'a> LiveChatMessageInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiveChatMessage) -> LiveChatMessageInsertCall<'a> {
+    pub fn request(mut self, new_value: LiveChatMessage) -> LiveChatMessageInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18674,7 +18883,7 @@ impl<'a> LiveChatMessageInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -18684,7 +18893,7 @@ impl<'a> LiveChatMessageInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18709,7 +18918,7 @@ impl<'a> LiveChatMessageInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18729,9 +18938,9 @@ impl<'a> LiveChatMessageInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatMessageInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18778,7 +18987,7 @@ impl<'a> LiveChatMessageInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18790,10 +18999,10 @@ impl<'a> LiveChatMessageInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatMessageListCall<'a>
-    where  {
+pub struct LiveChatMessageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _live_chat_id: String,
     _part: Vec<String>,
     _profile_image_size: Option<u32>,
@@ -18805,9 +19014,15 @@ pub struct LiveChatMessageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatMessageListCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatMessageListCall<'a, S> {}
 
-impl<'a> LiveChatMessageListCall<'a> {
+impl<'a, S> LiveChatMessageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18946,7 +19161,7 @@ impl<'a> LiveChatMessageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
+    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatMessageListCall<'a, S> {
         self._live_chat_id = new_value.to_string();
         self
     }
@@ -18962,35 +19177,35 @@ impl<'a> LiveChatMessageListCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Specifies the size of the profile image that should be returned for each user.
     ///
     /// Sets the *profile image size* query property to the given value.
-    pub fn profile_image_size(mut self, new_value: u32) -> LiveChatMessageListCall<'a> {
+    pub fn profile_image_size(mut self, new_value: u32) -> LiveChatMessageListCall<'a, S> {
         self._profile_image_size = Some(new_value);
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken property identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LiveChatMessageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveChatMessageListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LiveChatMessageListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Specifies the localization language in which the system messages should be returned.
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> LiveChatMessageListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -19000,7 +19215,7 @@ impl<'a> LiveChatMessageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19025,7 +19240,7 @@ impl<'a> LiveChatMessageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19045,9 +19260,9 @@ impl<'a> LiveChatMessageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatMessageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19079,7 +19294,7 @@ impl<'a> LiveChatMessageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19087,19 +19302,25 @@ impl<'a> LiveChatMessageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatModeratorDeleteCall<'a>
-    where  {
+pub struct LiveChatModeratorDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatModeratorDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatModeratorDeleteCall<'a, S> {}
 
-impl<'a> LiveChatModeratorDeleteCall<'a> {
+impl<'a, S> LiveChatModeratorDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19209,7 +19430,7 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveChatModeratorDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveChatModeratorDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -19219,7 +19440,7 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19244,7 +19465,7 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19264,9 +19485,9 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatModeratorDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19299,7 +19520,7 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19312,10 +19533,10 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatModeratorInsertCall<'a>
-    where  {
+pub struct LiveChatModeratorInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveChatModerator,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19323,9 +19544,15 @@ pub struct LiveChatModeratorInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatModeratorInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatModeratorInsertCall<'a, S> {}
 
-impl<'a> LiveChatModeratorInsertCall<'a> {
+impl<'a, S> LiveChatModeratorInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19467,7 +19694,7 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiveChatModerator) -> LiveChatModeratorInsertCall<'a> {
+    pub fn request(mut self, new_value: LiveChatModerator) -> LiveChatModeratorInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19481,7 +19708,7 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -19491,7 +19718,7 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19516,7 +19743,7 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19536,9 +19763,9 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatModeratorInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19585,7 +19812,7 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19595,10 +19822,10 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatModeratorListCall<'a>
-    where  {
+pub struct LiveChatModeratorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _live_chat_id: String,
     _part: Vec<String>,
     _page_token: Option<String>,
@@ -19608,9 +19835,15 @@ pub struct LiveChatModeratorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveChatModeratorListCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveChatModeratorListCall<'a, S> {}
 
-impl<'a> LiveChatModeratorListCall<'a> {
+impl<'a, S> LiveChatModeratorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19743,7 +19976,7 @@ impl<'a> LiveChatModeratorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatModeratorListCall<'a> {
+    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatModeratorListCall<'a, S> {
         self._live_chat_id = new_value.to_string();
         self
     }
@@ -19759,21 +19992,21 @@ impl<'a> LiveChatModeratorListCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveChatModeratorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LiveChatModeratorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveChatModeratorListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LiveChatModeratorListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -19783,7 +20016,7 @@ impl<'a> LiveChatModeratorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19808,7 +20041,7 @@ impl<'a> LiveChatModeratorListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19828,9 +20061,9 @@ impl<'a> LiveChatModeratorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveChatModeratorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19862,7 +20095,7 @@ impl<'a> LiveChatModeratorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19872,10 +20105,10 @@ impl<'a> LiveChatModeratorListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamDeleteCall<'a>
-    where  {
+pub struct LiveStreamDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -19884,9 +20117,15 @@ pub struct LiveStreamDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveStreamDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveStreamDeleteCall<'a, S> {}
 
-impl<'a> LiveStreamDeleteCall<'a> {
+impl<'a, S> LiveStreamDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20002,21 +20241,21 @@ impl<'a> LiveStreamDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -20026,7 +20265,7 @@ impl<'a> LiveStreamDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20051,7 +20290,7 @@ impl<'a> LiveStreamDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20071,9 +20310,9 @@ impl<'a> LiveStreamDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveStreamDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20123,7 +20362,7 @@ impl<'a> LiveStreamDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20142,10 +20381,10 @@ impl<'a> LiveStreamDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamInsertCall<'a>
-    where  {
+pub struct LiveStreamInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveStream,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -20155,9 +20394,15 @@ pub struct LiveStreamInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveStreamInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveStreamInsertCall<'a, S> {}
 
-impl<'a> LiveStreamInsertCall<'a> {
+impl<'a, S> LiveStreamInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20313,7 +20558,7 @@ impl<'a> LiveStreamInsertCall<'a> {
     /// * *cdn*
     /// * *content_details*
     /// * *status*
-    pub fn request(mut self, new_value: LiveStream) -> LiveStreamInsertCall<'a> {
+    pub fn request(mut self, new_value: LiveStream) -> LiveStreamInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20335,21 +20580,21 @@ impl<'a> LiveStreamInsertCall<'a> {
     /// * *cdn*
     /// * *content_details*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveStreamInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveStreamInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -20359,7 +20604,7 @@ impl<'a> LiveStreamInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20384,7 +20629,7 @@ impl<'a> LiveStreamInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20404,9 +20649,9 @@ impl<'a> LiveStreamInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveStreamInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20455,7 +20700,7 @@ impl<'a> LiveStreamInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20469,10 +20714,10 @@ impl<'a> LiveStreamInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamListCall<'a>
-    where  {
+pub struct LiveStreamListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -20485,9 +20730,15 @@ pub struct LiveStreamListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveStreamListCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveStreamListCall<'a, S> {}
 
-impl<'a> LiveStreamListCall<'a> {
+impl<'a, S> LiveStreamListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20641,41 +20892,41 @@ impl<'a> LiveStreamListCall<'a> {
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveStreamListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveStreamListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -20683,7 +20934,7 @@ impl<'a> LiveStreamListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> LiveStreamListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> LiveStreamListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
@@ -20693,7 +20944,7 @@ impl<'a> LiveStreamListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20718,7 +20969,7 @@ impl<'a> LiveStreamListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20738,9 +20989,9 @@ impl<'a> LiveStreamListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveStreamListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20789,7 +21040,7 @@ impl<'a> LiveStreamListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20808,10 +21059,10 @@ impl<'a> LiveStreamListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamUpdateCall<'a>
-    where  {
+pub struct LiveStreamUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: LiveStream,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -20821,9 +21072,15 @@ pub struct LiveStreamUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiveStreamUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for LiveStreamUpdateCall<'a, S> {}
 
-impl<'a> LiveStreamUpdateCall<'a> {
+impl<'a, S> LiveStreamUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20978,7 +21235,7 @@ impl<'a> LiveStreamUpdateCall<'a> {
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    pub fn request(mut self, new_value: LiveStream) -> LiveStreamUpdateCall<'a> {
+    pub fn request(mut self, new_value: LiveStream) -> LiveStreamUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20999,21 +21256,21 @@ impl<'a> LiveStreamUpdateCall<'a> {
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveStreamUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -21023,7 +21280,7 @@ impl<'a> LiveStreamUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21048,7 +21305,7 @@ impl<'a> LiveStreamUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21068,9 +21325,9 @@ impl<'a> LiveStreamUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiveStreamUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21102,7 +21359,7 @@ impl<'a> LiveStreamUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21115,10 +21372,10 @@ impl<'a> LiveStreamUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MemberListCall<'a>
-    where  {
+pub struct MemberListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _mode: Option<String>,
@@ -21130,9 +21387,15 @@ pub struct MemberListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MemberListCall<'a> {}
+impl<'a, S> client::CallBuilder for MemberListCall<'a, S> {}
 
-impl<'a> MemberListCall<'a> {
+impl<'a, S> MemberListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21274,42 +21537,42 @@ impl<'a> MemberListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> MemberListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> MemberListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Parameter that specifies which channel members to return.
     ///
     /// Sets the *mode* query property to the given value.
-    pub fn mode(mut self, new_value: &str) -> MemberListCall<'a> {
+    pub fn mode(mut self, new_value: &str) -> MemberListCall<'a, S> {
         self._mode = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MemberListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> MemberListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Filter members in the results set to the ones that have access to a level.
     ///
     /// Sets the *has access to level* query property to the given value.
-    pub fn has_access_to_level(mut self, new_value: &str) -> MemberListCall<'a> {
+    pub fn has_access_to_level(mut self, new_value: &str) -> MemberListCall<'a, S> {
         self._has_access_to_level = Some(new_value.to_string());
         self
     }
     /// Comma separated list of channel IDs. Only data about members that are part of this list will be included in the response.
     ///
     /// Sets the *filter by member channel id* query property to the given value.
-    pub fn filter_by_member_channel_id(mut self, new_value: &str) -> MemberListCall<'a> {
+    pub fn filter_by_member_channel_id(mut self, new_value: &str) -> MemberListCall<'a, S> {
         self._filter_by_member_channel_id = Some(new_value.to_string());
         self
     }
@@ -21319,7 +21582,7 @@ impl<'a> MemberListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MemberListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MemberListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21344,7 +21607,7 @@ impl<'a> MemberListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21364,9 +21627,9 @@ impl<'a> MemberListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MemberListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21409,7 +21672,7 @@ impl<'a> MemberListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21417,19 +21680,25 @@ impl<'a> MemberListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MembershipsLevelListCall<'a>
-    where  {
+pub struct MembershipsLevelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MembershipsLevelListCall<'a> {}
+impl<'a, S> client::CallBuilder for MembershipsLevelListCall<'a, S> {}
 
-impl<'a> MembershipsLevelListCall<'a> {
+impl<'a, S> MembershipsLevelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21561,7 +21830,7 @@ impl<'a> MembershipsLevelListCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> MembershipsLevelListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> MembershipsLevelListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -21571,7 +21840,7 @@ impl<'a> MembershipsLevelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MembershipsLevelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MembershipsLevelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21596,7 +21865,7 @@ impl<'a> MembershipsLevelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MembershipsLevelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MembershipsLevelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21616,9 +21885,9 @@ impl<'a> MembershipsLevelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MembershipsLevelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MembershipsLevelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21650,7 +21919,7 @@ impl<'a> MembershipsLevelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21659,10 +21928,10 @@ impl<'a> MembershipsLevelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemDeleteCall<'a>
-    where  {
+pub struct PlaylistItemDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21670,9 +21939,15 @@ pub struct PlaylistItemDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistItemDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistItemDeleteCall<'a, S> {}
 
-impl<'a> PlaylistItemDeleteCall<'a> {
+impl<'a, S> PlaylistItemDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21785,14 +22060,14 @@ impl<'a> PlaylistItemDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -21802,7 +22077,7 @@ impl<'a> PlaylistItemDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21827,7 +22102,7 @@ impl<'a> PlaylistItemDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21847,9 +22122,9 @@ impl<'a> PlaylistItemDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistItemDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21882,7 +22157,7 @@ impl<'a> PlaylistItemDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21896,10 +22171,10 @@ impl<'a> PlaylistItemDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemInsertCall<'a>
-    where  {
+pub struct PlaylistItemInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: PlaylistItem,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -21908,9 +22183,15 @@ pub struct PlaylistItemInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistItemInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistItemInsertCall<'a, S> {}
 
-impl<'a> PlaylistItemInsertCall<'a> {
+impl<'a, S> PlaylistItemInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22055,7 +22336,7 @@ impl<'a> PlaylistItemInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemInsertCall<'a> {
+    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22069,14 +22350,14 @@ impl<'a> PlaylistItemInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistItemInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -22086,7 +22367,7 @@ impl<'a> PlaylistItemInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22111,7 +22392,7 @@ impl<'a> PlaylistItemInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22131,9 +22412,9 @@ impl<'a> PlaylistItemInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistItemInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22165,7 +22446,7 @@ impl<'a> PlaylistItemInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22179,10 +22460,10 @@ impl<'a> PlaylistItemInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemListCall<'a>
-    where  {
+pub struct PlaylistItemListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _video_id: Option<String>,
     _playlist_id: Option<String>,
@@ -22195,9 +22476,15 @@ pub struct PlaylistItemListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistItemListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistItemListCall<'a, S> {}
 
-impl<'a> PlaylistItemListCall<'a> {
+impl<'a, S> PlaylistItemListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22344,49 +22631,49 @@ impl<'a> PlaylistItemListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistItemListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Return the playlist items associated with the given video ID.
     ///
     /// Sets the *video id* query property to the given value.
-    pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
+    pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, S> {
         self._video_id = Some(new_value.to_string());
         self
     }
     /// Return the playlist items within the given playlist.
     ///
     /// Sets the *playlist id* query property to the given value.
-    pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
+    pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, S> {
         self._playlist_id = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
@@ -22396,7 +22683,7 @@ impl<'a> PlaylistItemListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22421,7 +22708,7 @@ impl<'a> PlaylistItemListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22441,9 +22728,9 @@ impl<'a> PlaylistItemListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistItemListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22476,7 +22763,7 @@ impl<'a> PlaylistItemListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22490,10 +22777,10 @@ impl<'a> PlaylistItemListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemUpdateCall<'a>
-    where  {
+pub struct PlaylistItemUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: PlaylistItem,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -22502,9 +22789,15 @@ pub struct PlaylistItemUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistItemUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistItemUpdateCall<'a, S> {}
 
-impl<'a> PlaylistItemUpdateCall<'a> {
+impl<'a, S> PlaylistItemUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22649,7 +22942,7 @@ impl<'a> PlaylistItemUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemUpdateCall<'a> {
+    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22663,14 +22956,14 @@ impl<'a> PlaylistItemUpdateCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -22680,7 +22973,7 @@ impl<'a> PlaylistItemUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22705,7 +22998,7 @@ impl<'a> PlaylistItemUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22725,9 +23018,9 @@ impl<'a> PlaylistItemUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistItemUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22759,7 +23052,7 @@ impl<'a> PlaylistItemUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22768,10 +23061,10 @@ impl<'a> PlaylistItemUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistDeleteCall<'a>
-    where  {
+pub struct PlaylistDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22779,9 +23072,15 @@ pub struct PlaylistDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistDeleteCall<'a, S> {}
 
-impl<'a> PlaylistDeleteCall<'a> {
+impl<'a, S> PlaylistDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22894,14 +23193,14 @@ impl<'a> PlaylistDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -22911,7 +23210,7 @@ impl<'a> PlaylistDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22936,7 +23235,7 @@ impl<'a> PlaylistDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22956,9 +23255,9 @@ impl<'a> PlaylistDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22991,7 +23290,7 @@ impl<'a> PlaylistDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23006,10 +23305,10 @@ impl<'a> PlaylistDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistInsertCall<'a>
-    where  {
+pub struct PlaylistInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Playlist,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -23019,9 +23318,15 @@ pub struct PlaylistInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistInsertCall<'a, S> {}
 
-impl<'a> PlaylistInsertCall<'a> {
+impl<'a, S> PlaylistInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23169,7 +23474,7 @@ impl<'a> PlaylistInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Playlist) -> PlaylistInsertCall<'a> {
+    pub fn request(mut self, new_value: Playlist) -> PlaylistInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23183,21 +23488,21 @@ impl<'a> PlaylistInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -23207,7 +23512,7 @@ impl<'a> PlaylistInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23232,7 +23537,7 @@ impl<'a> PlaylistInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23252,9 +23557,9 @@ impl<'a> PlaylistInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23286,7 +23591,7 @@ impl<'a> PlaylistInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23302,10 +23607,10 @@ impl<'a> PlaylistInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistListCall<'a>
-    where  {
+pub struct PlaylistListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -23320,9 +23625,15 @@ pub struct PlaylistListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistListCall<'a, S> {}
 
-impl<'a> PlaylistListCall<'a> {
+impl<'a, S> PlaylistListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23475,42 +23786,42 @@ impl<'a> PlaylistListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the playlists owned by the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -23518,21 +23829,21 @@ impl<'a> PlaylistListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Returen content in specified language
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the playlists owned by the specified channel ID.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -23542,7 +23853,7 @@ impl<'a> PlaylistListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23567,7 +23878,7 @@ impl<'a> PlaylistListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23587,9 +23898,9 @@ impl<'a> PlaylistListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23622,7 +23933,7 @@ impl<'a> PlaylistListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23636,10 +23947,10 @@ impl<'a> PlaylistListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistUpdateCall<'a>
-    where  {
+pub struct PlaylistUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Playlist,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -23648,9 +23959,15 @@ pub struct PlaylistUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlaylistUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaylistUpdateCall<'a, S> {}
 
-impl<'a> PlaylistUpdateCall<'a> {
+impl<'a, S> PlaylistUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23795,7 +24112,7 @@ impl<'a> PlaylistUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Playlist) -> PlaylistUpdateCall<'a> {
+    pub fn request(mut self, new_value: Playlist) -> PlaylistUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23809,14 +24126,14 @@ impl<'a> PlaylistUpdateCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -23826,7 +24143,7 @@ impl<'a> PlaylistUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23851,7 +24168,7 @@ impl<'a> PlaylistUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23871,9 +24188,9 @@ impl<'a> PlaylistUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlaylistUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23905,7 +24222,7 @@ impl<'a> PlaylistUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23943,10 +24260,10 @@ impl<'a> PlaylistUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SearchListCall<'a>
-    where  {
+pub struct SearchListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _video_type: Option<String>,
     _video_syndicated: Option<String>,
@@ -23983,9 +24300,15 @@ pub struct SearchListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SearchListCall<'a> {}
+impl<'a, S> client::CallBuilder for SearchListCall<'a, S> {}
 
-impl<'a> SearchListCall<'a> {
+impl<'a, S> SearchListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24204,70 +24527,70 @@ impl<'a> SearchListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Filter on videos of a specific type.
     ///
     /// Sets the *video type* query property to the given value.
-    pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_type = Some(new_value.to_string());
         self
     }
     /// Filter on syndicated videos.
     ///
     /// Sets the *video syndicated* query property to the given value.
-    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_syndicated = Some(new_value.to_string());
         self
     }
     /// Filter on the license of the videos.
     ///
     /// Sets the *video license* query property to the given value.
-    pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_license = Some(new_value.to_string());
         self
     }
     /// Filter on embeddable videos.
     ///
     /// Sets the *video embeddable* query property to the given value.
-    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_embeddable = Some(new_value.to_string());
         self
     }
     /// Filter on the duration of the videos.
     ///
     /// Sets the *video duration* query property to the given value.
-    pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_duration = Some(new_value.to_string());
         self
     }
     /// Filter on 3d videos.
     ///
     /// Sets the *video dimension* query property to the given value.
-    pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_dimension = Some(new_value.to_string());
         self
     }
     /// Filter on the definition of the videos.
     ///
     /// Sets the *video definition* query property to the given value.
-    pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_definition = Some(new_value.to_string());
         self
     }
     /// Filter on videos in a specific category.
     ///
     /// Sets the *video category id* query property to the given value.
-    pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
     /// Filter on the presence of captions on the videos.
     ///
     /// Sets the *video caption* query property to the given value.
-    pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._video_caption = Some(new_value.to_string());
         self
     }
@@ -24275,147 +24598,147 @@ impl<'a> SearchListCall<'a> {
     ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_type(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn add_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._type_.push(new_value.to_string());
         self
     }
     /// Restrict results to a particular topic.
     ///
     /// Sets the *topic id* query property to the given value.
-    pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._topic_id = Some(new_value.to_string());
         self
     }
     /// Indicates whether the search results should include restricted content as well as standard content.
     ///
     /// Sets the *safe search* query property to the given value.
-    pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._safe_search = Some(new_value.to_string());
         self
     }
     /// Return results relevant to this language.
     ///
     /// Sets the *relevance language* query property to the given value.
-    pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._relevance_language = Some(new_value.to_string());
         self
     }
     /// Search related to a resource.
     ///
     /// Sets the *related to video id* query property to the given value.
-    pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._related_to_video_id = Some(new_value.to_string());
         self
     }
     /// Display the content as seen by viewers in this country.
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._region_code = Some(new_value.to_string());
         self
     }
     /// Textual search terms to match.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Filter on resources published before this date.
     ///
     /// Sets the *published before* query property to the given value.
-    pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._published_before = Some(new_value.to_string());
         self
     }
     /// Filter on resources published after this date.
     ///
     /// Sets the *published after* query property to the given value.
-    pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._published_after = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sort order of the results.
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn order(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._order = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Filter on distance from the location (specified above).
     ///
     /// Sets the *location radius* query property to the given value.
-    pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._location_radius = Some(new_value.to_string());
         self
     }
     /// Filter on location of the video
     ///
     /// Sets the *location* query property to the given value.
-    pub fn location(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn location(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._location = Some(new_value.to_string());
         self
     }
     /// Search for the private videos of the authenticated user.
     ///
     /// Sets the *for mine* query property to the given value.
-    pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a> {
+    pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a, S> {
         self._for_mine = Some(new_value);
         self
     }
     /// Restrict the search to only retrieve videos uploaded using the project id of the authenticated user.
     ///
     /// Sets the *for developer* query property to the given value.
-    pub fn for_developer(mut self, new_value: bool) -> SearchListCall<'a> {
+    pub fn for_developer(mut self, new_value: bool) -> SearchListCall<'a, S> {
         self._for_developer = Some(new_value);
         self
     }
     /// Search owned by a content owner.
     ///
     /// Sets the *for content owner* query property to the given value.
-    pub fn for_content_owner(mut self, new_value: bool) -> SearchListCall<'a> {
+    pub fn for_content_owner(mut self, new_value: bool) -> SearchListCall<'a, S> {
         self._for_content_owner = Some(new_value);
         self
     }
     /// Filter on the livestream status of the videos.
     ///
     /// Sets the *event type* query property to the given value.
-    pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._event_type = Some(new_value.to_string());
         self
     }
     /// Add a filter on the channel search.
     ///
     /// Sets the *channel type* query property to the given value.
-    pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._channel_type = Some(new_value.to_string());
         self
     }
     /// Filter on resources belonging to this channelId.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -24425,7 +24748,7 @@ impl<'a> SearchListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24450,7 +24773,7 @@ impl<'a> SearchListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SearchListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SearchListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24470,9 +24793,9 @@ impl<'a> SearchListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SearchListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SearchListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24504,7 +24827,7 @@ impl<'a> SearchListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24512,19 +24835,25 @@ impl<'a> SearchListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionDeleteCall<'a>
-    where  {
+pub struct SubscriptionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionDeleteCall<'a, S> {}
 
-impl<'a> SubscriptionDeleteCall<'a> {
+impl<'a, S> SubscriptionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24634,7 +24963,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -24644,7 +24973,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24669,7 +24998,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24689,9 +25018,9 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24724,7 +25053,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24737,10 +25066,10 @@ impl<'a> SubscriptionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionInsertCall<'a>
-    where  {
+pub struct SubscriptionInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Subscription,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -24748,9 +25077,15 @@ pub struct SubscriptionInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionInsertCall<'a, S> {}
 
-impl<'a> SubscriptionInsertCall<'a> {
+impl<'a, S> SubscriptionInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24892,7 +25227,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a> {
+    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24906,7 +25241,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> SubscriptionInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> SubscriptionInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -24916,7 +25251,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24941,7 +25276,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24961,9 +25296,9 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24995,7 +25330,7 @@ impl<'a> SubscriptionInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25014,10 +25349,10 @@ impl<'a> SubscriptionInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionListCall<'a>
-    where  {
+pub struct SubscriptionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _order: Option<String>,
@@ -25035,9 +25370,15 @@ pub struct SubscriptionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionListCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionListCall<'a, S> {}
 
-impl<'a> SubscriptionListCall<'a> {
+impl<'a, S> SubscriptionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25199,62 +25540,62 @@ impl<'a> SubscriptionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order of the returned subscriptions
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._order = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the subscribers of the given channel owner.
     ///
     /// Sets the *my subscribers* query property to the given value.
-    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a> {
+    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, S> {
         self._my_subscribers = Some(new_value);
         self
     }
     ///
     /// Sets the *my recent subscribers* query property to the given value.
-    pub fn my_recent_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a> {
+    pub fn my_recent_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, S> {
         self._my_recent_subscribers = Some(new_value);
         self
     }
     /// Flag for returning the subscriptions of the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a> {
+    pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a, S> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -25262,21 +25603,21 @@ impl<'a> SubscriptionListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Return the subscriptions to the subset of these channels that the authenticated user is subscribed to.
     ///
     /// Sets the *for channel id* query property to the given value.
-    pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._for_channel_id = Some(new_value.to_string());
         self
     }
     /// Return the subscriptions of the given channel owner.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -25286,7 +25627,7 @@ impl<'a> SubscriptionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25311,7 +25652,7 @@ impl<'a> SubscriptionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25331,9 +25672,9 @@ impl<'a> SubscriptionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25365,7 +25706,7 @@ impl<'a> SubscriptionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25376,10 +25717,10 @@ impl<'a> SubscriptionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SuperChatEventListCall<'a>
-    where  {
+pub struct SuperChatEventListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -25389,9 +25730,15 @@ pub struct SuperChatEventListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SuperChatEventListCall<'a> {}
+impl<'a, S> client::CallBuilder for SuperChatEventListCall<'a, S> {}
 
-impl<'a> SuperChatEventListCall<'a> {
+impl<'a, S> SuperChatEventListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25527,28 +25874,28 @@ impl<'a> SuperChatEventListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> SuperChatEventListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> SuperChatEventListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SuperChatEventListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SuperChatEventListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SuperChatEventListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> SuperChatEventListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Return rendered funding amounts in specified language.
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> SuperChatEventListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> SuperChatEventListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -25558,7 +25905,7 @@ impl<'a> SuperChatEventListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SuperChatEventListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SuperChatEventListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25583,7 +25930,7 @@ impl<'a> SuperChatEventListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SuperChatEventListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SuperChatEventListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25603,9 +25950,9 @@ impl<'a> SuperChatEventListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SuperChatEventListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SuperChatEventListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25638,7 +25985,7 @@ impl<'a> SuperChatEventListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25652,10 +25999,10 @@ impl<'a> SuperChatEventListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TestInsertCall<'a>
-    where  {
+pub struct TestInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: TestItem,
     _part: Vec<String>,
     _external_channel_id: Option<String>,
@@ -25664,9 +26011,15 @@ pub struct TestInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TestInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TestInsertCall<'a, S> {}
 
-impl<'a> TestInsertCall<'a> {
+impl<'a, S> TestInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25811,7 +26164,7 @@ impl<'a> TestInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestItem) -> TestInsertCall<'a> {
+    pub fn request(mut self, new_value: TestItem) -> TestInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25824,13 +26177,13 @@ impl<'a> TestInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> TestInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> TestInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *external channel id* query property to the given value.
-    pub fn external_channel_id(mut self, new_value: &str) -> TestInsertCall<'a> {
+    pub fn external_channel_id(mut self, new_value: &str) -> TestInsertCall<'a, S> {
         self._external_channel_id = Some(new_value.to_string());
         self
     }
@@ -25840,7 +26193,7 @@ impl<'a> TestInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25865,7 +26218,7 @@ impl<'a> TestInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TestInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TestInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25885,9 +26238,9 @@ impl<'a> TestInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TestInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TestInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25919,7 +26272,7 @@ impl<'a> TestInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25929,10 +26282,10 @@ impl<'a> TestInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkDeleteCall<'a>
-    where  {
+pub struct ThirdPartyLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _linking_token: String,
     _type_: String,
     _part: Vec<String>,
@@ -25941,9 +26294,15 @@ pub struct ThirdPartyLinkDeleteCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThirdPartyLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ThirdPartyLinkDeleteCall<'a, S> {}
 
-impl<'a> ThirdPartyLinkDeleteCall<'a> {
+impl<'a, S> ThirdPartyLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26057,7 +26416,7 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
+    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
         self._linking_token = new_value.to_string();
         self
     }
@@ -26067,7 +26426,7 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
         self._type_ = new_value.to_string();
         self
     }
@@ -26075,14 +26434,14 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
     ///
     /// Append the given value to the *part* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Channel ID to which changes should be applied, for delegation.
     ///
     /// Sets the *external channel id* query property to the given value.
-    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
+    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, S> {
         self._external_channel_id = Some(new_value.to_string());
         self
     }
@@ -26092,7 +26451,7 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26117,7 +26476,7 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26156,7 +26515,7 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26173,10 +26532,10 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkInsertCall<'a>
-    where  {
+pub struct ThirdPartyLinkInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: ThirdPartyLink,
     _part: Vec<String>,
     _external_channel_id: Option<String>,
@@ -26184,9 +26543,15 @@ pub struct ThirdPartyLinkInsertCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThirdPartyLinkInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ThirdPartyLinkInsertCall<'a, S> {}
 
-impl<'a> ThirdPartyLinkInsertCall<'a> {
+impl<'a, S> ThirdPartyLinkInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26331,7 +26696,7 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a> {
+    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26351,14 +26716,14 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Channel ID to which changes should be applied, for delegation.
     ///
     /// Sets the *external channel id* query property to the given value.
-    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkInsertCall<'a> {
+    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkInsertCall<'a, S> {
         self._external_channel_id = Some(new_value.to_string());
         self
     }
@@ -26368,7 +26733,7 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26393,7 +26758,7 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26431,7 +26796,7 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26442,10 +26807,10 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkListCall<'a>
-    where  {
+pub struct ThirdPartyLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _type_: Option<String>,
     _linking_token: Option<String>,
@@ -26454,9 +26819,15 @@ pub struct ThirdPartyLinkListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThirdPartyLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for ThirdPartyLinkListCall<'a, S> {}
 
-impl<'a> ThirdPartyLinkListCall<'a> {
+impl<'a, S> ThirdPartyLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26592,28 +26963,28 @@ impl<'a> ThirdPartyLinkListCall<'a> {
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Get a third party link of the given type.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, S> {
         self._type_ = Some(new_value.to_string());
         self
     }
     /// Get a third party link with the given linking token.
     ///
     /// Sets the *linking token* query property to the given value.
-    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
+    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, S> {
         self._linking_token = Some(new_value.to_string());
         self
     }
     /// Channel ID to which changes should be applied, for delegation.
     ///
     /// Sets the *external channel id* query property to the given value.
-    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
+    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, S> {
         self._external_channel_id = Some(new_value.to_string());
         self
     }
@@ -26623,7 +26994,7 @@ impl<'a> ThirdPartyLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26648,7 +27019,7 @@ impl<'a> ThirdPartyLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26687,7 +27058,7 @@ impl<'a> ThirdPartyLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26704,10 +27075,10 @@ impl<'a> ThirdPartyLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkUpdateCall<'a>
-    where  {
+pub struct ThirdPartyLinkUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: ThirdPartyLink,
     _part: Vec<String>,
     _external_channel_id: Option<String>,
@@ -26715,9 +27086,15 @@ pub struct ThirdPartyLinkUpdateCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThirdPartyLinkUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ThirdPartyLinkUpdateCall<'a, S> {}
 
-impl<'a> ThirdPartyLinkUpdateCall<'a> {
+impl<'a, S> ThirdPartyLinkUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26862,7 +27239,7 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a> {
+    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26882,14 +27259,14 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Channel ID to which changes should be applied, for delegation.
     ///
     /// Sets the *external channel id* query property to the given value.
-    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkUpdateCall<'a> {
+    pub fn external_channel_id(mut self, new_value: &str) -> ThirdPartyLinkUpdateCall<'a, S> {
         self._external_channel_id = Some(new_value.to_string());
         self
     }
@@ -26899,7 +27276,7 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26924,7 +27301,7 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26956,7 +27333,7 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -26965,10 +27342,10 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ThumbnailSetCall<'a>
-    where  {
+pub struct ThumbnailSetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -26976,9 +27353,15 @@ pub struct ThumbnailSetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ThumbnailSetCall<'a> {}
+impl<'a, S> client::CallBuilder for ThumbnailSetCall<'a, S> {}
 
-impl<'a> ThumbnailSetCall<'a> {
+impl<'a, S> ThumbnailSetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27211,14 +27594,14 @@ impl<'a> ThumbnailSetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a> {
+    pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a, S> {
         self._video_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -27228,7 +27611,7 @@ impl<'a> ThumbnailSetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThumbnailSetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThumbnailSetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27253,7 +27636,7 @@ impl<'a> ThumbnailSetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27273,9 +27656,9 @@ impl<'a> ThumbnailSetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ThumbnailSetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ThumbnailSetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27322,7 +27705,7 @@ impl<'a> ThumbnailSetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27331,10 +27714,10 @@ impl<'a> ThumbnailSetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoAbuseReportReasonListCall<'a>
-    where  {
+pub struct VideoAbuseReportReasonListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27342,9 +27725,15 @@ pub struct VideoAbuseReportReasonListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoAbuseReportReasonListCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoAbuseReportReasonListCall<'a, S> {}
 
-impl<'a> VideoAbuseReportReasonListCall<'a> {
+impl<'a, S> VideoAbuseReportReasonListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27479,13 +27868,13 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -27495,7 +27884,7 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAbuseReportReasonListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAbuseReportReasonListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27520,7 +27909,7 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoAbuseReportReasonListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoAbuseReportReasonListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27540,9 +27929,9 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoAbuseReportReasonListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoAbuseReportReasonListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27574,7 +27963,7 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27585,10 +27974,10 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoCategoryListCall<'a>
-    where  {
+pub struct VideoCategoryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _region_code: Option<String>,
     _id: Vec<String>,
@@ -27598,9 +27987,15 @@ pub struct VideoCategoryListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoCategoryListCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoCategoryListCall<'a, S> {}
 
-impl<'a> VideoCategoryListCall<'a> {
+impl<'a, S> VideoCategoryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27738,13 +28133,13 @@ impl<'a> VideoCategoryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> VideoCategoryListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
+    pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a, S> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -27752,13 +28147,13 @@ impl<'a> VideoCategoryListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> VideoCategoryListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -27768,7 +28163,7 @@ impl<'a> VideoCategoryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoCategoryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoCategoryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27793,7 +28188,7 @@ impl<'a> VideoCategoryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27813,9 +28208,9 @@ impl<'a> VideoCategoryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoCategoryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoCategoryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27847,7 +28242,7 @@ impl<'a> VideoCategoryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27856,10 +28251,10 @@ impl<'a> VideoCategoryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoDeleteCall<'a>
-    where  {
+pub struct VideoDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27867,9 +28262,15 @@ pub struct VideoDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoDeleteCall<'a, S> {}
 
-impl<'a> VideoDeleteCall<'a> {
+impl<'a, S> VideoDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27982,14 +28383,14 @@ impl<'a> VideoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -27999,7 +28400,7 @@ impl<'a> VideoDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28024,7 +28425,7 @@ impl<'a> VideoDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28044,9 +28445,9 @@ impl<'a> VideoDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28078,7 +28479,7 @@ impl<'a> VideoDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28087,10 +28488,10 @@ impl<'a> VideoDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoGetRatingCall<'a>
-    where  {
+pub struct VideoGetRatingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28098,9 +28499,15 @@ pub struct VideoGetRatingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoGetRatingCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoGetRatingCall<'a, S> {}
 
-impl<'a> VideoGetRatingCall<'a> {
+impl<'a, S> VideoGetRatingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28229,14 +28636,14 @@ impl<'a> VideoGetRatingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_id(mut self, new_value: &str) -> VideoGetRatingCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> VideoGetRatingCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -28246,7 +28653,7 @@ impl<'a> VideoGetRatingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoGetRatingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoGetRatingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28271,7 +28678,7 @@ impl<'a> VideoGetRatingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28291,9 +28698,9 @@ impl<'a> VideoGetRatingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoGetRatingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoGetRatingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28327,7 +28734,7 @@ impl<'a> VideoGetRatingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28345,10 +28752,10 @@ impl<'a> VideoGetRatingCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct VideoInsertCall<'a>
-    where  {
+pub struct VideoInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Video,
     _part: Vec<String>,
     _stabilize: Option<bool>,
@@ -28361,9 +28768,15 @@ pub struct VideoInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoInsertCall<'a, S> {}
 
-impl<'a> VideoInsertCall<'a> {
+impl<'a, S> VideoInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28633,7 +29046,7 @@ impl<'a> VideoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Video) -> VideoInsertCall<'a> {
+    pub fn request(mut self, new_value: Video) -> VideoInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -28647,42 +29060,42 @@ impl<'a> VideoInsertCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> VideoInsertCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> VideoInsertCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Should stabilize be applied to the upload.
     ///
     /// Sets the *stabilize* query property to the given value.
-    pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a> {
+    pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a, S> {
         self._stabilize = Some(new_value);
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCall<'a> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCall<'a, S> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Notify the channel subscribers about the new video. As default, the notification is enabled.
     ///
     /// Sets the *notify subscribers* query property to the given value.
-    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a> {
+    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a, S> {
         self._notify_subscribers = Some(new_value);
         self
     }
     /// Should auto-levels be applied to the upload.
     ///
     /// Sets the *auto levels* query property to the given value.
-    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a> {
+    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a, S> {
         self._auto_levels = Some(new_value);
         self
     }
@@ -28692,7 +29105,7 @@ impl<'a> VideoInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28717,7 +29130,7 @@ impl<'a> VideoInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28737,9 +29150,9 @@ impl<'a> VideoInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28771,7 +29184,7 @@ impl<'a> VideoInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28791,10 +29204,10 @@ impl<'a> VideoInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoListCall<'a>
-    where  {
+pub struct VideoListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _part: Vec<String>,
     _video_category_id: Option<String>,
     _region_code: Option<String>,
@@ -28813,9 +29226,15 @@ pub struct VideoListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoListCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoListCall<'a, S> {}
 
-impl<'a> VideoListCall<'a> {
+impl<'a, S> VideoListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28980,68 +29399,68 @@ impl<'a> VideoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// Use chart that is specific to the specified video category
     ///
     /// Sets the *video category id* query property to the given value.
-    pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
     /// Use a chart that is specific to the specified region
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._region_code = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved. *Note:* This parameter is supported for use in conjunction with the myRating and chart parameters, but it is not supported for use in conjunction with the id parameter.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return videos liked/disliked by the authenticated user. Does not support RateType.RATED_TYPE_NONE.
     ///
     /// Sets the *my rating* query property to the given value.
-    pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._my_rating = Some(new_value.to_string());
         self
     }
     /// Return the player with maximum height specified in
     ///
     /// Sets the *max width* query property to the given value.
-    pub fn max_width(mut self, new_value: i32) -> VideoListCall<'a> {
+    pub fn max_width(mut self, new_value: i32) -> VideoListCall<'a, S> {
         self._max_width = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set. *Note:* This parameter is supported for use in conjunction with the myRating and chart parameters, but it is not supported for use in conjunction with the id parameter.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *max height* query property to the given value.
-    pub fn max_height(mut self, new_value: i32) -> VideoListCall<'a> {
+    pub fn max_height(mut self, new_value: i32) -> VideoListCall<'a, S> {
         self._max_height = Some(new_value);
         self
     }
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -29049,21 +29468,21 @@ impl<'a> VideoListCall<'a> {
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn add_id(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._id.push(new_value.to_string());
         self
     }
     /// Stands for "host language". Specifies the localization language of the metadata to be filled into snippet.localized. The field is filled with the default metadata if there is no localization in the specified language. The parameter value must be a language code included in the list returned by the i18nLanguages.list method (e.g. en_US, es_MX).
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn hl(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the videos that are in the specified chart.
     ///
     /// Sets the *chart* query property to the given value.
-    pub fn chart(mut self, new_value: &str) -> VideoListCall<'a> {
+    pub fn chart(mut self, new_value: &str) -> VideoListCall<'a, S> {
         self._chart = Some(new_value.to_string());
         self
     }
@@ -29073,7 +29492,7 @@ impl<'a> VideoListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29098,7 +29517,7 @@ impl<'a> VideoListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29118,9 +29537,9 @@ impl<'a> VideoListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29152,7 +29571,7 @@ impl<'a> VideoListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29160,10 +29579,10 @@ impl<'a> VideoListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoRateCall<'a>
-    where  {
+pub struct VideoRateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _id: String,
     _rating: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29171,9 +29590,15 @@ pub struct VideoRateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoRateCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoRateCall<'a, S> {}
 
-impl<'a> VideoRateCall<'a> {
+impl<'a, S> VideoRateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29284,7 +29709,7 @@ impl<'a> VideoRateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> VideoRateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> VideoRateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -29293,7 +29718,7 @@ impl<'a> VideoRateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a> {
+    pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a, S> {
         self._rating = new_value.to_string();
         self
     }
@@ -29303,7 +29728,7 @@ impl<'a> VideoRateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoRateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoRateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29328,7 +29753,7 @@ impl<'a> VideoRateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoRateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoRateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29348,9 +29773,9 @@ impl<'a> VideoRateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoRateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoRateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29383,7 +29808,7 @@ impl<'a> VideoRateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29397,10 +29822,10 @@ impl<'a> VideoRateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoReportAbuseCall<'a>
-    where  {
+pub struct VideoReportAbuseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: VideoAbuseReport,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29408,9 +29833,15 @@ pub struct VideoReportAbuseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoReportAbuseCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoReportAbuseCall<'a, S> {}
 
-impl<'a> VideoReportAbuseCall<'a> {
+impl<'a, S> VideoReportAbuseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29536,14 +29967,14 @@ impl<'a> VideoReportAbuseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: VideoAbuseReport) -> VideoReportAbuseCall<'a> {
+    pub fn request(mut self, new_value: VideoAbuseReport) -> VideoReportAbuseCall<'a, S> {
         self._request = new_value;
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoReportAbuseCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoReportAbuseCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -29553,7 +29984,7 @@ impl<'a> VideoReportAbuseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoReportAbuseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoReportAbuseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29578,7 +30009,7 @@ impl<'a> VideoReportAbuseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoReportAbuseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoReportAbuseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29598,9 +30029,9 @@ impl<'a> VideoReportAbuseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoReportAbuseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoReportAbuseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29633,7 +30064,7 @@ impl<'a> VideoReportAbuseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29647,10 +30078,10 @@ impl<'a> VideoReportAbuseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoUpdateCall<'a>
-    where  {
+pub struct VideoUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: Video,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -29659,9 +30090,15 @@ pub struct VideoUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoUpdateCall<'a, S> {}
 
-impl<'a> VideoUpdateCall<'a> {
+impl<'a, S> VideoUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29806,7 +30243,7 @@ impl<'a> VideoUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Video) -> VideoUpdateCall<'a> {
+    pub fn request(mut self, new_value: Video) -> VideoUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29820,14 +30257,14 @@ impl<'a> VideoUpdateCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> VideoUpdateCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> VideoUpdateCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -29837,7 +30274,7 @@ impl<'a> VideoUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29862,7 +30299,7 @@ impl<'a> VideoUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29882,9 +30319,9 @@ impl<'a> VideoUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29918,7 +30355,7 @@ impl<'a> VideoUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29932,10 +30369,10 @@ impl<'a> VideoUpdateCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct WatermarkSetCall<'a>
-    where  {
+pub struct WatermarkSetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: InvideoBranding,
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
@@ -29944,9 +30381,15 @@ pub struct WatermarkSetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WatermarkSetCall<'a> {}
+impl<'a, S> client::CallBuilder for WatermarkSetCall<'a, S> {}
 
-impl<'a> WatermarkSetCall<'a> {
+impl<'a, S> WatermarkSetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30186,7 +30629,7 @@ impl<'a> WatermarkSetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InvideoBranding) -> WatermarkSetCall<'a> {
+    pub fn request(mut self, new_value: InvideoBranding) -> WatermarkSetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -30195,14 +30638,14 @@ impl<'a> WatermarkSetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a, S> {
         self._channel_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -30212,7 +30655,7 @@ impl<'a> WatermarkSetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkSetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkSetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30237,7 +30680,7 @@ impl<'a> WatermarkSetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30257,9 +30700,9 @@ impl<'a> WatermarkSetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WatermarkSetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WatermarkSetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30291,7 +30734,7 @@ impl<'a> WatermarkSetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30300,10 +30743,10 @@ impl<'a> WatermarkSetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WatermarkUnsetCall<'a>
-    where  {
+pub struct WatermarkUnsetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -30311,9 +30754,15 @@ pub struct WatermarkUnsetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WatermarkUnsetCall<'a> {}
+impl<'a, S> client::CallBuilder for WatermarkUnsetCall<'a, S> {}
 
-impl<'a> WatermarkUnsetCall<'a> {
+impl<'a, S> WatermarkUnsetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30426,14 +30875,14 @@ impl<'a> WatermarkUnsetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a, S> {
         self._channel_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a, S> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -30443,7 +30892,7 @@ impl<'a> WatermarkUnsetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkUnsetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkUnsetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30468,7 +30917,7 @@ impl<'a> WatermarkUnsetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30488,9 +30937,9 @@ impl<'a> WatermarkUnsetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WatermarkUnsetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WatermarkUnsetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30523,7 +30972,7 @@ impl<'a> WatermarkUnsetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30537,19 +30986,25 @@ impl<'a> WatermarkUnsetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct YoutubeV3UpdateCommentThreadCall<'a>
-    where  {
+pub struct YoutubeV3UpdateCommentThreadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a YouTube<>,
+    hub: &'a YouTube<S>,
     _request: CommentThread,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for YoutubeV3UpdateCommentThreadCall<'a> {}
+impl<'a, S> client::CallBuilder for YoutubeV3UpdateCommentThreadCall<'a, S> {}
 
-impl<'a> YoutubeV3UpdateCommentThreadCall<'a> {
+impl<'a, S> YoutubeV3UpdateCommentThreadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30685,7 +31140,7 @@ impl<'a> YoutubeV3UpdateCommentThreadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommentThread) -> YoutubeV3UpdateCommentThreadCall<'a> {
+    pub fn request(mut self, new_value: CommentThread) -> YoutubeV3UpdateCommentThreadCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -30699,7 +31154,7 @@ impl<'a> YoutubeV3UpdateCommentThreadCall<'a> {
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> YoutubeV3UpdateCommentThreadCall<'a> {
+    pub fn add_part(mut self, new_value: &str) -> YoutubeV3UpdateCommentThreadCall<'a, S> {
         self._part.push(new_value.to_string());
         self
     }
@@ -30709,7 +31164,7 @@ impl<'a> YoutubeV3UpdateCommentThreadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> YoutubeV3UpdateCommentThreadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> YoutubeV3UpdateCommentThreadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30734,7 +31189,7 @@ impl<'a> YoutubeV3UpdateCommentThreadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> YoutubeV3UpdateCommentThreadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> YoutubeV3UpdateCommentThreadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

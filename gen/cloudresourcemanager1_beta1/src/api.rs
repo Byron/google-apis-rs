@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,37 +109,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudResourceManager<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudResourceManager<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudResourceManager<> {}
+impl<'a, S> client::Hub for CloudResourceManager<S> {}
 
-impl<'a, > CloudResourceManager<> {
+impl<'a, S> CloudResourceManager<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudResourceManager<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudResourceManager<S> {
         CloudResourceManager {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
             _root_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
         }
     }
 
-    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -612,22 +617,22 @@ impl client::RequestValue for UndeleteProjectRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a>
-    where  {
+pub struct OrganizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
 
-impl<'a> OrganizationMethods<'a> {
+impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -636,7 +641,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the Organization to fetch. This is the organization's relative path in the API, formatted as "organizations/[organizationId]". For example, "organizations/1234".
-    pub fn get(&self, name: &str) -> OrganizationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OrganizationGetCall<'a, S> {
         OrganizationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -655,7 +660,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> OrganizationGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> OrganizationGetIamPolicyCall<'a, S> {
         OrganizationGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -669,7 +674,7 @@ impl<'a> OrganizationMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists Organization resources that are visible to the user and satisfy the specified filter. This method returns Organizations in an unspecified order. New Organizations do not necessarily appear at the end of the list.
-    pub fn list(&self) -> OrganizationListCall<'a> {
+    pub fn list(&self) -> OrganizationListCall<'a, S> {
         OrganizationListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -689,7 +694,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> OrganizationSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> OrganizationSetIamPolicyCall<'a, S> {
         OrganizationSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -708,7 +713,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> OrganizationTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> OrganizationTestIamPermissionCall<'a, S> {
         OrganizationTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -727,7 +732,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the organization. This is the organization's relative path in the API. Its format is "organizations/[organization_id]". For example, "organizations/1234".
-    pub fn update(&self, request: Organization, name: &str) -> OrganizationUpdateCall<'a> {
+    pub fn update(&self, request: Organization, name: &str) -> OrganizationUpdateCall<'a, S> {
         OrganizationUpdateCall {
             hub: self.hub,
             _request: request,
@@ -762,22 +767,22 @@ impl<'a> OrganizationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)`, `get(...)`, `get_ancestry(...)`, `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `undelete(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -786,7 +791,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Project) -> ProjectCreateCall<'a> {
+    pub fn create(&self, request: Project) -> ProjectCreateCall<'a, S> {
         ProjectCreateCall {
             hub: self.hub,
             _request: request,
@@ -804,7 +809,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - The Project ID (for example, `foo-bar-123`).
-    pub fn delete(&self, project_id: &str) -> ProjectDeleteCall<'a> {
+    pub fn delete(&self, project_id: &str) -> ProjectDeleteCall<'a, S> {
         ProjectDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -821,7 +826,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The Project ID (for example, `my-project-123`).
-    pub fn get(&self, project_id: &str) -> ProjectGetCall<'a> {
+    pub fn get(&self, project_id: &str) -> ProjectGetCall<'a, S> {
         ProjectGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -839,7 +844,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The Project ID (for example, `my-project-123`).
-    pub fn get_ancestry(&self, request: GetAncestryRequest, project_id: &str) -> ProjectGetAncestryCall<'a> {
+    pub fn get_ancestry(&self, request: GetAncestryRequest, project_id: &str) -> ProjectGetAncestryCall<'a, S> {
         ProjectGetAncestryCall {
             hub: self.hub,
             _request: request,
@@ -858,7 +863,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectGetIamPolicyCall<'a, S> {
         ProjectGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -872,7 +877,7 @@ impl<'a> ProjectMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists Projects that the caller has the `resourcemanager.projects.get` permission on and satisfy the specified filter. This method returns Projects in an unspecified order. This method is eventually consistent with project mutations; this means that a newly created project may not appear in the results or recent updates to an existing project may not be reflected in the results. To retrieve the latest state of a project, use the GetProject method. NOTE: If the request filter contains a `parent.type` and `parent.id` and the caller has the `resourcemanager.projects.list` permission on the parent, the results will be drawn from an alternate index which provides more consistent results. In future versions of this API, this List method will be split into List and Search to properly capture the behavioral difference.
-    pub fn list(&self) -> ProjectListCall<'a> {
+    pub fn list(&self) -> ProjectListCall<'a, S> {
         ProjectListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -892,7 +897,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSetIamPolicyCall<'a, S> {
         ProjectSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -911,7 +916,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTestIamPermissionCall<'a, S> {
         ProjectTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -930,7 +935,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The project ID (for example, `foo-bar-123`).
-    pub fn undelete(&self, request: UndeleteProjectRequest, project_id: &str) -> ProjectUndeleteCall<'a> {
+    pub fn undelete(&self, request: UndeleteProjectRequest, project_id: &str) -> ProjectUndeleteCall<'a, S> {
         ProjectUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -949,7 +954,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - The project ID (for example, `my-project-123`).
-    pub fn update(&self, request: Project, project_id: &str) -> ProjectUpdateCall<'a> {
+    pub fn update(&self, request: Project, project_id: &str) -> ProjectUpdateCall<'a, S> {
         ProjectUpdateCall {
             hub: self.hub,
             _request: request,
@@ -991,7 +996,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1000,10 +1005,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationGetCall<'a>
-    where  {
+pub struct OrganizationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _name: String,
     _organization_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1011,9 +1016,15 @@ pub struct OrganizationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationGetCall<'a, S> {}
 
-impl<'a> OrganizationGetCall<'a> {
+impl<'a, S> OrganizationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1163,14 +1174,14 @@ impl<'a> OrganizationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The id of the Organization resource to fetch. This field is deprecated and will be removed in v1. Use name instead.
     ///
     /// Sets the *organization id* query property to the given value.
-    pub fn organization_id(mut self, new_value: &str) -> OrganizationGetCall<'a> {
+    pub fn organization_id(mut self, new_value: &str) -> OrganizationGetCall<'a, S> {
         self._organization_id = Some(new_value.to_string());
         self
     }
@@ -1180,7 +1191,7 @@ impl<'a> OrganizationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1205,7 +1216,7 @@ impl<'a> OrganizationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1225,9 +1236,9 @@ impl<'a> OrganizationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1260,7 +1271,7 @@ impl<'a> OrganizationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1273,10 +1284,10 @@ impl<'a> OrganizationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationGetIamPolicyCall<'a>
-    where  {
+pub struct OrganizationGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1284,9 +1295,15 @@ pub struct OrganizationGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationGetIamPolicyCall<'a, S> {}
 
-impl<'a> OrganizationGetIamPolicyCall<'a> {
+impl<'a, S> OrganizationGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1446,7 +1463,7 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> OrganizationGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> OrganizationGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1456,7 +1473,7 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -1466,7 +1483,7 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1491,7 +1508,7 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1511,9 +1528,9 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1545,7 +1562,7 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1556,10 +1573,10 @@ impl<'a> OrganizationGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationListCall<'a>
-    where  {
+pub struct OrganizationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -1568,9 +1585,15 @@ pub struct OrganizationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationListCall<'a, S> {}
 
-impl<'a> OrganizationListCall<'a> {
+impl<'a, S> OrganizationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1697,21 +1720,21 @@ impl<'a> OrganizationListCall<'a> {
     /// A pagination token returned from a previous call to `ListOrganizations` that indicates from where listing should continue. This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Organizations to return in the response. This field is optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An optional query string used to filter the Organizations to return in the response. Filter rules are case-insensitive. Organizations may be filtered by `owner.directoryCustomerId` or by `domain`, where the domain is a G Suite domain, for example: * Filter `owner.directorycustomerid:123456789` returns Organization resources with `owner.directory_customer_id` equal to `123456789`. * Filter `domain:google.com` returns Organization resources corresponding to the domain `google.com`. This field is optional.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OrganizationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OrganizationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1721,7 +1744,7 @@ impl<'a> OrganizationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1746,7 +1769,7 @@ impl<'a> OrganizationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1766,9 +1789,9 @@ impl<'a> OrganizationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1801,7 +1824,7 @@ impl<'a> OrganizationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1814,10 +1837,10 @@ impl<'a> OrganizationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationSetIamPolicyCall<'a>
-    where  {
+pub struct OrganizationSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1825,9 +1848,15 @@ pub struct OrganizationSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationSetIamPolicyCall<'a, S> {}
 
-impl<'a> OrganizationSetIamPolicyCall<'a> {
+impl<'a, S> OrganizationSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1987,7 +2016,7 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> OrganizationSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> OrganizationSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1997,7 +2026,7 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -2007,7 +2036,7 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2032,7 +2061,7 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2052,9 +2081,9 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2087,7 +2116,7 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2100,10 +2129,10 @@ impl<'a> OrganizationSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationTestIamPermissionCall<'a>
-    where  {
+pub struct OrganizationTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2111,9 +2140,15 @@ pub struct OrganizationTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationTestIamPermissionCall<'a, S> {}
 
-impl<'a> OrganizationTestIamPermissionCall<'a> {
+impl<'a, S> OrganizationTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2273,7 +2308,7 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> OrganizationTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> OrganizationTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2283,7 +2318,7 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -2293,7 +2328,7 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2318,7 +2353,7 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2338,9 +2373,9 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2373,7 +2408,7 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2386,10 +2421,10 @@ impl<'a> OrganizationTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationUpdateCall<'a>
-    where  {
+pub struct OrganizationUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: Organization,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2397,9 +2432,15 @@ pub struct OrganizationUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationUpdateCall<'a, S> {}
 
-impl<'a> OrganizationUpdateCall<'a> {
+impl<'a, S> OrganizationUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2559,7 +2600,7 @@ impl<'a> OrganizationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Organization) -> OrganizationUpdateCall<'a> {
+    pub fn request(mut self, new_value: Organization) -> OrganizationUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2569,7 +2610,7 @@ impl<'a> OrganizationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2579,7 +2620,7 @@ impl<'a> OrganizationUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2604,7 +2645,7 @@ impl<'a> OrganizationUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2624,9 +2665,9 @@ impl<'a> OrganizationUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2659,7 +2700,7 @@ impl<'a> OrganizationUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2673,10 +2714,10 @@ impl<'a> OrganizationUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectCreateCall<'a>
-    where  {
+pub struct ProjectCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: Project,
     _use_legacy_stack: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2684,9 +2725,15 @@ pub struct ProjectCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectCreateCall<'a, S> {}
 
-impl<'a> ProjectCreateCall<'a> {
+impl<'a, S> ProjectCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2823,14 +2870,14 @@ impl<'a> ProjectCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Project) -> ProjectCreateCall<'a> {
+    pub fn request(mut self, new_value: Project) -> ProjectCreateCall<'a, S> {
         self._request = new_value;
         self
     }
     /// A now unused experiment opt-out option.
     ///
     /// Sets the *use legacy stack* query property to the given value.
-    pub fn use_legacy_stack(mut self, new_value: bool) -> ProjectCreateCall<'a> {
+    pub fn use_legacy_stack(mut self, new_value: bool) -> ProjectCreateCall<'a, S> {
         self._use_legacy_stack = Some(new_value);
         self
     }
@@ -2840,7 +2887,7 @@ impl<'a> ProjectCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2865,7 +2912,7 @@ impl<'a> ProjectCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2885,9 +2932,9 @@ impl<'a> ProjectCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2919,7 +2966,7 @@ impl<'a> ProjectCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2927,19 +2974,25 @@ impl<'a> ProjectCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectDeleteCall<'a>
-    where  {
+pub struct ProjectDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectDeleteCall<'a, S> {}
 
-impl<'a> ProjectDeleteCall<'a> {
+impl<'a, S> ProjectDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3082,7 +3135,7 @@ impl<'a> ProjectDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -3092,7 +3145,7 @@ impl<'a> ProjectDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3117,7 +3170,7 @@ impl<'a> ProjectDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3137,9 +3190,9 @@ impl<'a> ProjectDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3171,7 +3224,7 @@ impl<'a> ProjectDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3179,19 +3232,25 @@ impl<'a> ProjectDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetCall<'a>
-    where  {
+pub struct ProjectGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetCall<'a, S> {}
 
-impl<'a> ProjectGetCall<'a> {
+impl<'a, S> ProjectGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3334,7 +3393,7 @@ impl<'a> ProjectGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -3344,7 +3403,7 @@ impl<'a> ProjectGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3369,7 +3428,7 @@ impl<'a> ProjectGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3389,9 +3448,9 @@ impl<'a> ProjectGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3424,7 +3483,7 @@ impl<'a> ProjectGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3437,10 +3496,10 @@ impl<'a> ProjectGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetAncestryCall<'a>
-    where  {
+pub struct ProjectGetAncestryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: GetAncestryRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3448,9 +3507,15 @@ pub struct ProjectGetAncestryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetAncestryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetAncestryCall<'a, S> {}
 
-impl<'a> ProjectGetAncestryCall<'a> {
+impl<'a, S> ProjectGetAncestryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3606,7 +3671,7 @@ impl<'a> ProjectGetAncestryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetAncestryRequest) -> ProjectGetAncestryCall<'a> {
+    pub fn request(mut self, new_value: GetAncestryRequest) -> ProjectGetAncestryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3616,7 +3681,7 @@ impl<'a> ProjectGetAncestryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectGetAncestryCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectGetAncestryCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -3626,7 +3691,7 @@ impl<'a> ProjectGetAncestryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAncestryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAncestryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3651,7 +3716,7 @@ impl<'a> ProjectGetAncestryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAncestryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAncestryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3671,9 +3736,9 @@ impl<'a> ProjectGetAncestryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetAncestryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetAncestryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3706,7 +3771,7 @@ impl<'a> ProjectGetAncestryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3719,10 +3784,10 @@ impl<'a> ProjectGetAncestryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3730,9 +3795,15 @@ pub struct ProjectGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectGetIamPolicyCall<'a> {
+impl<'a, S> ProjectGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3888,7 +3959,7 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3898,7 +3969,7 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3908,7 +3979,7 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3933,7 +4004,7 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3953,9 +4024,9 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3987,7 +4058,7 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3998,10 +4069,10 @@ impl<'a> ProjectGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectListCall<'a>
-    where  {
+pub struct ProjectListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -4010,9 +4081,15 @@ pub struct ProjectListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectListCall<'a, S> {}
 
-impl<'a> ProjectListCall<'a> {
+impl<'a, S> ProjectListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4139,21 +4216,21 @@ impl<'a> ProjectListCall<'a> {
     /// A pagination token returned from a previous call to ListProjects that indicates from where listing should continue. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Projects to return in the response. The server can return fewer Projects than requested. If unspecified, server picks an appropriate default. Optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An expression for filtering the results of the request. Filter rules are case insensitive. If multiple fields are included in a filter query, the query will return results that match any of the fields. Some eligible fields for filtering are: + `name` + `id` + `labels.` (where *key* is the name of a label) + `parent.type` + `parent.id` Some examples of using labels as filters: | Filter | Description | |------------------|-----------------------------------------------------| | name:how* | The project's name starts with "how". | | name:Howl | The project's name is `Howl` or `howl`. | | name:HOWL | Equivalent to above. | | NAME:howl | Equivalent to above. | | labels.color:* | The project has the label `color`. | | labels.color:red | The project's label `color` has the value `red`. | | labels.color:red labels.size:big |The project's label `color` has the value `red` and its label `size` has the value `big`. | If no filter is specified, the call will return projects for which the user has the `resourcemanager.projects.get` permission. NOTE: To perform a by-parent query (eg., what projects are directly in a Folder), the caller must have the `resourcemanager.projects.list` permission on the parent and the filter must contain both a `parent.type` and a `parent.id` restriction (example: "parent.type:folder parent.id:123"). In this case an alternate search index is used which provides more consistent results. Optional.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4163,7 +4240,7 @@ impl<'a> ProjectListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4188,7 +4265,7 @@ impl<'a> ProjectListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4208,9 +4285,9 @@ impl<'a> ProjectListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4243,7 +4320,7 @@ impl<'a> ProjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4256,10 +4333,10 @@ impl<'a> ProjectListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4267,9 +4344,15 @@ pub struct ProjectSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectSetIamPolicyCall<'a> {
+impl<'a, S> ProjectSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4425,7 +4508,7 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4435,7 +4518,7 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4445,7 +4528,7 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4470,7 +4553,7 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4490,9 +4573,9 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4525,7 +4608,7 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4538,10 +4621,10 @@ impl<'a> ProjectSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4549,9 +4632,15 @@ pub struct ProjectTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectTestIamPermissionCall<'a> {
+impl<'a, S> ProjectTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4707,7 +4796,7 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4717,7 +4806,7 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4727,7 +4816,7 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4752,7 +4841,7 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4772,9 +4861,9 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4807,7 +4896,7 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4820,10 +4909,10 @@ impl<'a> ProjectTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUndeleteCall<'a>
-    where  {
+pub struct ProjectUndeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: UndeleteProjectRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4831,9 +4920,15 @@ pub struct ProjectUndeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectUndeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectUndeleteCall<'a, S> {}
 
-impl<'a> ProjectUndeleteCall<'a> {
+impl<'a, S> ProjectUndeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4989,7 +5084,7 @@ impl<'a> ProjectUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteProjectRequest) -> ProjectUndeleteCall<'a> {
+    pub fn request(mut self, new_value: UndeleteProjectRequest) -> ProjectUndeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4999,7 +5094,7 @@ impl<'a> ProjectUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectUndeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectUndeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5009,7 +5104,7 @@ impl<'a> ProjectUndeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUndeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUndeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5034,7 +5129,7 @@ impl<'a> ProjectUndeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUndeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUndeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5054,9 +5149,9 @@ impl<'a> ProjectUndeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUndeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectUndeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5089,7 +5184,7 @@ impl<'a> ProjectUndeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5102,10 +5197,10 @@ impl<'a> ProjectUndeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUpdateCall<'a>
-    where  {
+pub struct ProjectUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudResourceManager<>,
+    hub: &'a CloudResourceManager<S>,
     _request: Project,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5113,9 +5208,15 @@ pub struct ProjectUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectUpdateCall<'a, S> {}
 
-impl<'a> ProjectUpdateCall<'a> {
+impl<'a, S> ProjectUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5271,7 +5372,7 @@ impl<'a> ProjectUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Project) -> ProjectUpdateCall<'a> {
+    pub fn request(mut self, new_value: Project) -> ProjectUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5281,7 +5382,7 @@ impl<'a> ProjectUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5291,7 +5392,7 @@ impl<'a> ProjectUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5316,7 +5417,7 @@ impl<'a> ProjectUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5336,9 +5437,9 @@ impl<'a> ProjectUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

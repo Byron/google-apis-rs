@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,37 +108,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudIAP<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudIAP<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudIAP<> {}
+impl<'a, S> client::Hub for CloudIAP<S> {}
 
-impl<'a, > CloudIAP<> {
+impl<'a, S> CloudIAP<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudIAP<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudIAP<S> {
         CloudIAP {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://iap.googleapis.com/".to_string(),
             _root_url: "https://iap.googleapis.com/".to_string(),
         }
     }
 
-    pub fn methods(&'a self) -> MethodMethods<'a> {
+    pub fn methods(&'a self) -> MethodMethods<'a, S> {
         MethodMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -684,22 +689,22 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `brands_create(...)`, `brands_get(...)`, `brands_identity_aware_proxy_clients_create(...)`, `brands_identity_aware_proxy_clients_delete(...)`, `brands_identity_aware_proxy_clients_get(...)`, `brands_identity_aware_proxy_clients_list(...)`, `brands_identity_aware_proxy_clients_reset_secret(...)` and `brands_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -709,7 +714,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Path to create the client in. In the following format: projects/{project_number/id}/brands/{brand}. The project must belong to a G Suite account.
-    pub fn brands_identity_aware_proxy_clients_create(&self, request: IdentityAwareProxyClient, parent: &str) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
+    pub fn brands_identity_aware_proxy_clients_create(&self, request: IdentityAwareProxyClient, parent: &str) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S> {
         ProjectBrandIdentityAwareProxyClientCreateCall {
             hub: self.hub,
             _request: request,
@@ -727,7 +732,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the Identity Aware Proxy client to be deleted. In the following format: projects/{project_number/id}/brands/{brand}/identityAwareProxyClients/{client_id}.
-    pub fn brands_identity_aware_proxy_clients_delete(&self, name: &str) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
+    pub fn brands_identity_aware_proxy_clients_delete(&self, name: &str) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S> {
         ProjectBrandIdentityAwareProxyClientDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -744,7 +749,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the Identity Aware Proxy client to be fetched. In the following format: projects/{project_number/id}/brands/{brand}/identityAwareProxyClients/{client_id}.
-    pub fn brands_identity_aware_proxy_clients_get(&self, name: &str) -> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
+    pub fn brands_identity_aware_proxy_clients_get(&self, name: &str) -> ProjectBrandIdentityAwareProxyClientGetCall<'a, S> {
         ProjectBrandIdentityAwareProxyClientGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -761,7 +766,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Full brand path. In the following format: projects/{project_number/id}/brands/{brand}.
-    pub fn brands_identity_aware_proxy_clients_list(&self, parent: &str) -> ProjectBrandIdentityAwareProxyClientListCall<'a> {
+    pub fn brands_identity_aware_proxy_clients_list(&self, parent: &str) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S> {
         ProjectBrandIdentityAwareProxyClientListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -781,7 +786,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the Identity Aware Proxy client to that will have its secret reset. In the following format: projects/{project_number/id}/brands/{brand}/identityAwareProxyClients/{client_id}.
-    pub fn brands_identity_aware_proxy_clients_reset_secret(&self, request: ResetIdentityAwareProxyClientSecretRequest, name: &str) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
+    pub fn brands_identity_aware_proxy_clients_reset_secret(&self, request: ResetIdentityAwareProxyClientSecretRequest, name: &str) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S> {
         ProjectBrandIdentityAwareProxyClientResetSecretCall {
             hub: self.hub,
             _request: request,
@@ -800,7 +805,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. GCP Project number/id under which the brand is to be created. In the following format: projects/{project_number/id}.
-    pub fn brands_create(&self, request: Brand, parent: &str) -> ProjectBrandCreateCall<'a> {
+    pub fn brands_create(&self, request: Brand, parent: &str) -> ProjectBrandCreateCall<'a, S> {
         ProjectBrandCreateCall {
             hub: self.hub,
             _request: request,
@@ -818,7 +823,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the brand to be fetched. In the following format: projects/{project_number/id}/brands/{brand}.
-    pub fn brands_get(&self, name: &str) -> ProjectBrandGetCall<'a> {
+    pub fn brands_get(&self, name: &str) -> ProjectBrandGetCall<'a, S> {
         ProjectBrandGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -835,7 +840,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. GCP Project number/id. In the following format: projects/{project_number/id}.
-    pub fn brands_list(&self, parent: &str) -> ProjectBrandListCall<'a> {
+    pub fn brands_list(&self, parent: &str) -> ProjectBrandListCall<'a, S> {
         ProjectBrandListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -869,22 +874,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_iam_policy(...)`, `get_iap_settings(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update_iap_settings(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a>
-    where  {
+pub struct MethodMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
 
-impl<'a> MethodMethods<'a> {
+impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -894,7 +899,7 @@ impl<'a> MethodMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> MethodGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> MethodGetIamPolicyCall<'a, S> {
         MethodGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -912,7 +917,7 @@ impl<'a> MethodMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name for which to retrieve the settings. Authorization: Requires the `getSettings` permission for the associated resource.
-    pub fn get_iap_settings(&self, name: &str) -> MethodGetIapSettingCall<'a> {
+    pub fn get_iap_settings(&self, name: &str) -> MethodGetIapSettingCall<'a, S> {
         MethodGetIapSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -930,7 +935,7 @@ impl<'a> MethodMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> MethodSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> MethodSetIamPolicyCall<'a, S> {
         MethodSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -949,7 +954,7 @@ impl<'a> MethodMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> MethodTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> MethodTestIamPermissionCall<'a, S> {
         MethodTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -968,7 +973,7 @@ impl<'a> MethodMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the IAP protected resource.
-    pub fn update_iap_settings(&self, request: IapSettings, name: &str) -> MethodUpdateIapSettingCall<'a> {
+    pub fn update_iap_settings(&self, request: IapSettings, name: &str) -> MethodUpdateIapSettingCall<'a, S> {
         MethodUpdateIapSettingCall {
             hub: self.hub,
             _request: request,
@@ -1012,7 +1017,7 @@ impl<'a> MethodMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1025,10 +1030,10 @@ impl<'a> MethodMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandIdentityAwareProxyClientCreateCall<'a>
-    where  {
+pub struct ProjectBrandIdentityAwareProxyClientCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: IdentityAwareProxyClient,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1036,9 +1041,15 @@ pub struct ProjectBrandIdentityAwareProxyClientCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandIdentityAwareProxyClientCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandIdentityAwareProxyClientCreateCall<'a, S> {}
 
-impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
+impl<'a, S> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1198,7 +1209,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentityAwareProxyClient) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
+    pub fn request(mut self, new_value: IdentityAwareProxyClient) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1208,7 +1219,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1218,7 +1229,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1243,7 +1254,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1263,9 +1274,9 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1297,7 +1308,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1305,19 +1316,25 @@ impl<'a> ProjectBrandIdentityAwareProxyClientCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandIdentityAwareProxyClientDeleteCall<'a>
-    where  {
+pub struct ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S> {}
 
-impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
+impl<'a, S> ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1464,7 +1481,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1474,7 +1491,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1499,7 +1516,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1519,9 +1536,9 @@ impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1553,7 +1570,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1561,19 +1578,25 @@ impl<'a> ProjectBrandIdentityAwareProxyClientDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandIdentityAwareProxyClientGetCall<'a>
-    where  {
+pub struct ProjectBrandIdentityAwareProxyClientGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandIdentityAwareProxyClientGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandIdentityAwareProxyClientGetCall<'a, S> {}
 
-impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
+impl<'a, S> ProjectBrandIdentityAwareProxyClientGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1720,7 +1743,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1730,7 +1753,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1755,7 +1778,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1775,9 +1798,9 @@ impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1809,7 +1832,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1819,10 +1842,10 @@ impl<'a> ProjectBrandIdentityAwareProxyClientGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandIdentityAwareProxyClientListCall<'a>
-    where  {
+pub struct ProjectBrandIdentityAwareProxyClientListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1831,9 +1854,15 @@ pub struct ProjectBrandIdentityAwareProxyClientListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandIdentityAwareProxyClientListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandIdentityAwareProxyClientListCall<'a, S> {}
 
-impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
+impl<'a, S> ProjectBrandIdentityAwareProxyClientListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1986,21 +2015,21 @@ impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListIdentityAwareProxyClients` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListIdentityAwareProxyClients` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of clients to return. The service may return fewer than this value. If unspecified, at most 100 clients will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectBrandIdentityAwareProxyClientListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2010,7 +2039,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2035,7 +2064,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2055,9 +2084,9 @@ impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2090,7 +2119,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2103,10 +2132,10 @@ impl<'a> ProjectBrandIdentityAwareProxyClientListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandIdentityAwareProxyClientResetSecretCall<'a>
-    where  {
+pub struct ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: ResetIdentityAwareProxyClientSecretRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2114,9 +2143,15 @@ pub struct ProjectBrandIdentityAwareProxyClientResetSecretCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S> {}
 
-impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
+impl<'a, S> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2276,7 +2311,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResetIdentityAwareProxyClientSecretRequest) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
+    pub fn request(mut self, new_value: ResetIdentityAwareProxyClientSecretRequest) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2286,7 +2321,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2296,7 +2331,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2321,7 +2356,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2341,9 +2376,9 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2376,7 +2411,7 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2389,10 +2424,10 @@ impl<'a> ProjectBrandIdentityAwareProxyClientResetSecretCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandCreateCall<'a>
-    where  {
+pub struct ProjectBrandCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: Brand,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2400,9 +2435,15 @@ pub struct ProjectBrandCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandCreateCall<'a, S> {}
 
-impl<'a> ProjectBrandCreateCall<'a> {
+impl<'a, S> ProjectBrandCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2562,7 +2603,7 @@ impl<'a> ProjectBrandCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Brand) -> ProjectBrandCreateCall<'a> {
+    pub fn request(mut self, new_value: Brand) -> ProjectBrandCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2572,7 +2613,7 @@ impl<'a> ProjectBrandCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectBrandCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectBrandCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2582,7 +2623,7 @@ impl<'a> ProjectBrandCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2607,7 +2648,7 @@ impl<'a> ProjectBrandCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2627,9 +2668,9 @@ impl<'a> ProjectBrandCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2661,7 +2702,7 @@ impl<'a> ProjectBrandCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2669,19 +2710,25 @@ impl<'a> ProjectBrandCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandGetCall<'a>
-    where  {
+pub struct ProjectBrandGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandGetCall<'a, S> {}
 
-impl<'a> ProjectBrandGetCall<'a> {
+impl<'a, S> ProjectBrandGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2828,7 +2875,7 @@ impl<'a> ProjectBrandGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectBrandGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectBrandGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2838,7 +2885,7 @@ impl<'a> ProjectBrandGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2863,7 +2910,7 @@ impl<'a> ProjectBrandGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2883,9 +2930,9 @@ impl<'a> ProjectBrandGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2917,7 +2964,7 @@ impl<'a> ProjectBrandGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2925,19 +2972,25 @@ impl<'a> ProjectBrandGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBrandListCall<'a>
-    where  {
+pub struct ProjectBrandListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBrandListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBrandListCall<'a, S> {}
 
-impl<'a> ProjectBrandListCall<'a> {
+impl<'a, S> ProjectBrandListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3084,7 +3137,7 @@ impl<'a> ProjectBrandListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectBrandListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectBrandListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3094,7 +3147,7 @@ impl<'a> ProjectBrandListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBrandListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3119,7 +3172,7 @@ impl<'a> ProjectBrandListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBrandListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3139,9 +3192,9 @@ impl<'a> ProjectBrandListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBrandListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBrandListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3174,7 +3227,7 @@ impl<'a> ProjectBrandListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3187,10 +3240,10 @@ impl<'a> ProjectBrandListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetIamPolicyCall<'a>
-    where  {
+pub struct MethodGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3198,9 +3251,15 @@ pub struct MethodGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetIamPolicyCall<'a, S> {}
 
-impl<'a> MethodGetIamPolicyCall<'a> {
+impl<'a, S> MethodGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3360,7 +3419,7 @@ impl<'a> MethodGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> MethodGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> MethodGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3370,7 +3429,7 @@ impl<'a> MethodGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> MethodGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> MethodGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3380,7 +3439,7 @@ impl<'a> MethodGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3405,7 +3464,7 @@ impl<'a> MethodGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3425,9 +3484,9 @@ impl<'a> MethodGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3459,7 +3518,7 @@ impl<'a> MethodGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3467,19 +3526,25 @@ impl<'a> MethodGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetIapSettingCall<'a>
-    where  {
+pub struct MethodGetIapSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodGetIapSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetIapSettingCall<'a, S> {}
 
-impl<'a> MethodGetIapSettingCall<'a> {
+impl<'a, S> MethodGetIapSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3626,7 +3691,7 @@ impl<'a> MethodGetIapSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> MethodGetIapSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> MethodGetIapSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3636,7 +3701,7 @@ impl<'a> MethodGetIapSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIapSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIapSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3661,7 +3726,7 @@ impl<'a> MethodGetIapSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIapSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIapSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3681,9 +3746,9 @@ impl<'a> MethodGetIapSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetIapSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodGetIapSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3716,7 +3781,7 @@ impl<'a> MethodGetIapSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3729,10 +3794,10 @@ impl<'a> MethodGetIapSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodSetIamPolicyCall<'a>
-    where  {
+pub struct MethodSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3740,9 +3805,15 @@ pub struct MethodSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodSetIamPolicyCall<'a, S> {}
 
-impl<'a> MethodSetIamPolicyCall<'a> {
+impl<'a, S> MethodSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3902,7 +3973,7 @@ impl<'a> MethodSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> MethodSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> MethodSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3912,7 +3983,7 @@ impl<'a> MethodSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> MethodSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> MethodSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3922,7 +3993,7 @@ impl<'a> MethodSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3947,7 +4018,7 @@ impl<'a> MethodSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3967,9 +4038,9 @@ impl<'a> MethodSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4002,7 +4073,7 @@ impl<'a> MethodSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4015,10 +4086,10 @@ impl<'a> MethodSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodTestIamPermissionCall<'a>
-    where  {
+pub struct MethodTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4026,9 +4097,15 @@ pub struct MethodTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodTestIamPermissionCall<'a, S> {}
 
-impl<'a> MethodTestIamPermissionCall<'a> {
+impl<'a, S> MethodTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4188,7 +4265,7 @@ impl<'a> MethodTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> MethodTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> MethodTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4198,7 +4275,7 @@ impl<'a> MethodTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> MethodTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> MethodTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4208,7 +4285,7 @@ impl<'a> MethodTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4233,7 +4310,7 @@ impl<'a> MethodTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4253,9 +4330,9 @@ impl<'a> MethodTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4288,7 +4365,7 @@ impl<'a> MethodTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4302,10 +4379,10 @@ impl<'a> MethodTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodUpdateIapSettingCall<'a>
-    where  {
+pub struct MethodUpdateIapSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudIAP<>,
+    hub: &'a CloudIAP<S>,
     _request: IapSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -4314,9 +4391,15 @@ pub struct MethodUpdateIapSettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodUpdateIapSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodUpdateIapSettingCall<'a, S> {}
 
-impl<'a> MethodUpdateIapSettingCall<'a> {
+impl<'a, S> MethodUpdateIapSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4479,7 +4562,7 @@ impl<'a> MethodUpdateIapSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IapSettings) -> MethodUpdateIapSettingCall<'a> {
+    pub fn request(mut self, new_value: IapSettings) -> MethodUpdateIapSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4489,14 +4572,14 @@ impl<'a> MethodUpdateIapSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> MethodUpdateIapSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> MethodUpdateIapSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The field mask specifying which IAP settings should be updated. If omitted, the all of the settings are updated. See https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> MethodUpdateIapSettingCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> MethodUpdateIapSettingCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4506,7 +4589,7 @@ impl<'a> MethodUpdateIapSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateIapSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateIapSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4531,7 +4614,7 @@ impl<'a> MethodUpdateIapSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateIapSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateIapSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4551,9 +4634,9 @@ impl<'a> MethodUpdateIapSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodUpdateIapSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodUpdateIapSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

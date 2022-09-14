@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,43 +108,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PolicySimulator<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PolicySimulator<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PolicySimulator<> {}
+impl<'a, S> client::Hub for PolicySimulator<S> {}
 
-impl<'a, > PolicySimulator<> {
+impl<'a, S> PolicySimulator<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PolicySimulator<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PolicySimulator<S> {
         PolicySimulator {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://policysimulator.googleapis.com/".to_string(),
             _root_url: "https://policysimulator.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a> {
+    pub fn folders(&'a self) -> FolderMethods<'a, S> {
         FolderMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -625,22 +630,22 @@ impl client::Part for GoogleTypeExpr {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_replays_create(...)`, `locations_replays_get(...)` and `locations_replays_results_list(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a>
-    where  {
+pub struct FolderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
 }
 
-impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FolderMethods<'a, S> {}
 
-impl<'a> FolderMethods<'a> {
+impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -649,7 +654,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Replay whose results are listed, in the following format: `{projects|folders|organizations}/{resource-id}/locations/global/replays/{replay-id}` Example: `projects/my-project/locations/global/replays/506a5f7f-38ce-4d7d-8e03-479ce1833c36`
-    pub fn locations_replays_results_list(&self, parent: &str) -> FolderLocationReplayResultListCall<'a> {
+    pub fn locations_replays_results_list(&self, parent: &str) -> FolderLocationReplayResultListCall<'a, S> {
         FolderLocationReplayResultListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -669,7 +674,7 @@ impl<'a> FolderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this Replay will be created. This resource must be a project, folder, or organization with a location. Example: `projects/my-example-project/locations/global`
-    pub fn locations_replays_create(&self, request: GoogleCloudPolicysimulatorV1Replay, parent: &str) -> FolderLocationReplayCreateCall<'a> {
+    pub fn locations_replays_create(&self, request: GoogleCloudPolicysimulatorV1Replay, parent: &str) -> FolderLocationReplayCreateCall<'a, S> {
         FolderLocationReplayCreateCall {
             hub: self.hub,
             _request: request,
@@ -687,7 +692,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Replay to retrieve, in the following format: `{projects|folders|organizations}/{resource-id}/locations/global/replays/{replay-id}`, where `{resource-id}` is the ID of the project, folder, or organization that owns the `Replay`. Example: `projects/my-example-project/locations/global/replays/506a5f7f-38ce-4d7d-8e03-479ce1833c36`
-    pub fn locations_replays_get(&self, name: &str) -> FolderLocationReplayGetCall<'a> {
+    pub fn locations_replays_get(&self, name: &str) -> FolderLocationReplayGetCall<'a, S> {
         FolderLocationReplayGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -721,22 +726,22 @@ impl<'a> FolderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -745,7 +750,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -758,7 +763,7 @@ impl<'a> OperationMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
-    pub fn list(&self) -> OperationListCall<'a> {
+    pub fn list(&self) -> OperationListCall<'a, S> {
         OperationListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -795,22 +800,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_replays_create(...)`, `locations_replays_get(...)` and `locations_replays_results_list(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a>
-    where  {
+pub struct OrganizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
 
-impl<'a> OrganizationMethods<'a> {
+impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -819,7 +824,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Replay whose results are listed, in the following format: `{projects|folders|organizations}/{resource-id}/locations/global/replays/{replay-id}` Example: `projects/my-project/locations/global/replays/506a5f7f-38ce-4d7d-8e03-479ce1833c36`
-    pub fn locations_replays_results_list(&self, parent: &str) -> OrganizationLocationReplayResultListCall<'a> {
+    pub fn locations_replays_results_list(&self, parent: &str) -> OrganizationLocationReplayResultListCall<'a, S> {
         OrganizationLocationReplayResultListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -839,7 +844,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this Replay will be created. This resource must be a project, folder, or organization with a location. Example: `projects/my-example-project/locations/global`
-    pub fn locations_replays_create(&self, request: GoogleCloudPolicysimulatorV1Replay, parent: &str) -> OrganizationLocationReplayCreateCall<'a> {
+    pub fn locations_replays_create(&self, request: GoogleCloudPolicysimulatorV1Replay, parent: &str) -> OrganizationLocationReplayCreateCall<'a, S> {
         OrganizationLocationReplayCreateCall {
             hub: self.hub,
             _request: request,
@@ -857,7 +862,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Replay to retrieve, in the following format: `{projects|folders|organizations}/{resource-id}/locations/global/replays/{replay-id}`, where `{resource-id}` is the ID of the project, folder, or organization that owns the `Replay`. Example: `projects/my-example-project/locations/global/replays/506a5f7f-38ce-4d7d-8e03-479ce1833c36`
-    pub fn locations_replays_get(&self, name: &str) -> OrganizationLocationReplayGetCall<'a> {
+    pub fn locations_replays_get(&self, name: &str) -> OrganizationLocationReplayGetCall<'a, S> {
         OrganizationLocationReplayGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -891,22 +896,22 @@ impl<'a> OrganizationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_replays_create(...)`, `locations_replays_get(...)` and `locations_replays_results_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -915,7 +920,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Replay whose results are listed, in the following format: `{projects|folders|organizations}/{resource-id}/locations/global/replays/{replay-id}` Example: `projects/my-project/locations/global/replays/506a5f7f-38ce-4d7d-8e03-479ce1833c36`
-    pub fn locations_replays_results_list(&self, parent: &str) -> ProjectLocationReplayResultListCall<'a> {
+    pub fn locations_replays_results_list(&self, parent: &str) -> ProjectLocationReplayResultListCall<'a, S> {
         ProjectLocationReplayResultListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -935,7 +940,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this Replay will be created. This resource must be a project, folder, or organization with a location. Example: `projects/my-example-project/locations/global`
-    pub fn locations_replays_create(&self, request: GoogleCloudPolicysimulatorV1Replay, parent: &str) -> ProjectLocationReplayCreateCall<'a> {
+    pub fn locations_replays_create(&self, request: GoogleCloudPolicysimulatorV1Replay, parent: &str) -> ProjectLocationReplayCreateCall<'a, S> {
         ProjectLocationReplayCreateCall {
             hub: self.hub,
             _request: request,
@@ -953,7 +958,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Replay to retrieve, in the following format: `{projects|folders|organizations}/{resource-id}/locations/global/replays/{replay-id}`, where `{resource-id}` is the ID of the project, folder, or organization that owns the `Replay`. Example: `projects/my-example-project/locations/global/replays/506a5f7f-38ce-4d7d-8e03-479ce1833c36`
-    pub fn locations_replays_get(&self, name: &str) -> ProjectLocationReplayGetCall<'a> {
+    pub fn locations_replays_get(&self, name: &str) -> ProjectLocationReplayGetCall<'a, S> {
         ProjectLocationReplayGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -994,7 +999,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1004,10 +1009,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationReplayResultListCall<'a>
-    where  {
+pub struct FolderLocationReplayResultListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1016,9 +1021,15 @@ pub struct FolderLocationReplayResultListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderLocationReplayResultListCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderLocationReplayResultListCall<'a, S> {}
 
-impl<'a> FolderLocationReplayResultListCall<'a> {
+impl<'a, S> FolderLocationReplayResultListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1171,21 +1182,21 @@ impl<'a> FolderLocationReplayResultListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderLocationReplayResultListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderLocationReplayResultListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous Simulator.ListReplayResults call. Provide this token to retrieve the next page of results. When paginating, all other parameters provided to [Simulator.ListReplayResults[] must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderLocationReplayResultListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> FolderLocationReplayResultListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ReplayResult objects to return. Defaults to 5000. The maximum value is 5000; values above 5000 are rounded down to 5000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderLocationReplayResultListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> FolderLocationReplayResultListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1195,7 +1206,7 @@ impl<'a> FolderLocationReplayResultListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationReplayResultListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationReplayResultListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1220,7 +1231,7 @@ impl<'a> FolderLocationReplayResultListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationReplayResultListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationReplayResultListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1240,9 +1251,9 @@ impl<'a> FolderLocationReplayResultListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationReplayResultListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderLocationReplayResultListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1275,7 +1286,7 @@ impl<'a> FolderLocationReplayResultListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1288,10 +1299,10 @@ impl<'a> FolderLocationReplayResultListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationReplayCreateCall<'a>
-    where  {
+pub struct FolderLocationReplayCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _request: GoogleCloudPolicysimulatorV1Replay,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1299,9 +1310,15 @@ pub struct FolderLocationReplayCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderLocationReplayCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderLocationReplayCreateCall<'a, S> {}
 
-impl<'a> FolderLocationReplayCreateCall<'a> {
+impl<'a, S> FolderLocationReplayCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1461,7 +1478,7 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPolicysimulatorV1Replay) -> FolderLocationReplayCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPolicysimulatorV1Replay) -> FolderLocationReplayCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1471,7 +1488,7 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderLocationReplayCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderLocationReplayCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1481,7 +1498,7 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationReplayCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationReplayCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1506,7 +1523,7 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationReplayCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationReplayCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1526,9 +1543,9 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationReplayCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderLocationReplayCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1560,7 +1577,7 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1568,19 +1585,25 @@ impl<'a> FolderLocationReplayCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationReplayGetCall<'a>
-    where  {
+pub struct FolderLocationReplayGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderLocationReplayGetCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderLocationReplayGetCall<'a, S> {}
 
-impl<'a> FolderLocationReplayGetCall<'a> {
+impl<'a, S> FolderLocationReplayGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1727,7 +1750,7 @@ impl<'a> FolderLocationReplayGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationReplayGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationReplayGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1737,7 +1760,7 @@ impl<'a> FolderLocationReplayGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationReplayGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationReplayGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1762,7 +1785,7 @@ impl<'a> FolderLocationReplayGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationReplayGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationReplayGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1782,9 +1805,9 @@ impl<'a> FolderLocationReplayGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationReplayGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderLocationReplayGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1816,7 +1839,7 @@ impl<'a> FolderLocationReplayGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1824,19 +1847,25 @@ impl<'a> FolderLocationReplayGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1983,7 +2012,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1993,7 +2022,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2018,7 +2047,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2038,9 +2067,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2072,7 +2101,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2084,10 +2113,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a>
-    where  {
+pub struct OperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
@@ -2097,9 +2126,15 @@ pub struct OperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationListCall<'a, S> {}
 
-impl<'a> OperationListCall<'a> {
+impl<'a, S> OperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2229,28 +2264,28 @@ impl<'a> OperationListCall<'a> {
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The name of the operation's parent resource.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2260,7 +2295,7 @@ impl<'a> OperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2285,7 +2320,7 @@ impl<'a> OperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2305,9 +2340,9 @@ impl<'a> OperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2339,7 +2374,7 @@ impl<'a> OperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2349,10 +2384,10 @@ impl<'a> OperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationReplayResultListCall<'a>
-    where  {
+pub struct OrganizationLocationReplayResultListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2361,9 +2396,15 @@ pub struct OrganizationLocationReplayResultListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationReplayResultListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationReplayResultListCall<'a, S> {}
 
-impl<'a> OrganizationLocationReplayResultListCall<'a> {
+impl<'a, S> OrganizationLocationReplayResultListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2516,21 +2557,21 @@ impl<'a> OrganizationLocationReplayResultListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationReplayResultListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationLocationReplayResultListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous Simulator.ListReplayResults call. Provide this token to retrieve the next page of results. When paginating, all other parameters provided to [Simulator.ListReplayResults[] must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationReplayResultListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationReplayResultListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ReplayResult objects to return. Defaults to 5000. The maximum value is 5000; values above 5000 are rounded down to 5000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationReplayResultListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationReplayResultListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2540,7 +2581,7 @@ impl<'a> OrganizationLocationReplayResultListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationReplayResultListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationReplayResultListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2565,7 +2606,7 @@ impl<'a> OrganizationLocationReplayResultListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationReplayResultListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationReplayResultListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2585,9 +2626,9 @@ impl<'a> OrganizationLocationReplayResultListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationReplayResultListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationReplayResultListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2620,7 +2661,7 @@ impl<'a> OrganizationLocationReplayResultListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2633,10 +2674,10 @@ impl<'a> OrganizationLocationReplayResultListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationReplayCreateCall<'a>
-    where  {
+pub struct OrganizationLocationReplayCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _request: GoogleCloudPolicysimulatorV1Replay,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2644,9 +2685,15 @@ pub struct OrganizationLocationReplayCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationReplayCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationReplayCreateCall<'a, S> {}
 
-impl<'a> OrganizationLocationReplayCreateCall<'a> {
+impl<'a, S> OrganizationLocationReplayCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2806,7 +2853,7 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPolicysimulatorV1Replay) -> OrganizationLocationReplayCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPolicysimulatorV1Replay) -> OrganizationLocationReplayCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2816,7 +2863,7 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationReplayCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationLocationReplayCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2826,7 +2873,7 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationReplayCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationReplayCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2851,7 +2898,7 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationReplayCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationReplayCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2871,9 +2918,9 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationReplayCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationReplayCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2905,7 +2952,7 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2913,19 +2960,25 @@ impl<'a> OrganizationLocationReplayCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationReplayGetCall<'a>
-    where  {
+pub struct OrganizationLocationReplayGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationLocationReplayGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationLocationReplayGetCall<'a, S> {}
 
-impl<'a> OrganizationLocationReplayGetCall<'a> {
+impl<'a, S> OrganizationLocationReplayGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3072,7 +3125,7 @@ impl<'a> OrganizationLocationReplayGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationReplayGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationReplayGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3082,7 +3135,7 @@ impl<'a> OrganizationLocationReplayGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationReplayGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationReplayGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3107,7 +3160,7 @@ impl<'a> OrganizationLocationReplayGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationReplayGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationReplayGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3127,9 +3180,9 @@ impl<'a> OrganizationLocationReplayGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationReplayGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationLocationReplayGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3161,7 +3214,7 @@ impl<'a> OrganizationLocationReplayGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3171,10 +3224,10 @@ impl<'a> OrganizationLocationReplayGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReplayResultListCall<'a>
-    where  {
+pub struct ProjectLocationReplayResultListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3183,9 +3236,15 @@ pub struct ProjectLocationReplayResultListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReplayResultListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReplayResultListCall<'a, S> {}
 
-impl<'a> ProjectLocationReplayResultListCall<'a> {
+impl<'a, S> ProjectLocationReplayResultListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3338,21 +3397,21 @@ impl<'a> ProjectLocationReplayResultListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationReplayResultListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationReplayResultListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous Simulator.ListReplayResults call. Provide this token to retrieve the next page of results. When paginating, all other parameters provided to [Simulator.ListReplayResults[] must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationReplayResultListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationReplayResultListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ReplayResult objects to return. Defaults to 5000. The maximum value is 5000; values above 5000 are rounded down to 5000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationReplayResultListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationReplayResultListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3362,7 +3421,7 @@ impl<'a> ProjectLocationReplayResultListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReplayResultListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReplayResultListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3387,7 +3446,7 @@ impl<'a> ProjectLocationReplayResultListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReplayResultListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReplayResultListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3407,9 +3466,9 @@ impl<'a> ProjectLocationReplayResultListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReplayResultListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReplayResultListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3442,7 +3501,7 @@ impl<'a> ProjectLocationReplayResultListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3455,10 +3514,10 @@ impl<'a> ProjectLocationReplayResultListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReplayCreateCall<'a>
-    where  {
+pub struct ProjectLocationReplayCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _request: GoogleCloudPolicysimulatorV1Replay,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3466,9 +3525,15 @@ pub struct ProjectLocationReplayCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReplayCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReplayCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationReplayCreateCall<'a> {
+impl<'a, S> ProjectLocationReplayCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3628,7 +3693,7 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPolicysimulatorV1Replay) -> ProjectLocationReplayCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPolicysimulatorV1Replay) -> ProjectLocationReplayCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3638,7 +3703,7 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationReplayCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationReplayCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3648,7 +3713,7 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReplayCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReplayCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3673,7 +3738,7 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReplayCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReplayCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3693,9 +3758,9 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReplayCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReplayCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3727,7 +3792,7 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PolicySimulator::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3735,19 +3800,25 @@ impl<'a> ProjectLocationReplayCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReplayGetCall<'a>
-    where  {
+pub struct ProjectLocationReplayGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PolicySimulator<>,
+    hub: &'a PolicySimulator<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReplayGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReplayGetCall<'a, S> {}
 
-impl<'a> ProjectLocationReplayGetCall<'a> {
+impl<'a, S> ProjectLocationReplayGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3894,7 +3965,7 @@ impl<'a> ProjectLocationReplayGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationReplayGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationReplayGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3904,7 +3975,7 @@ impl<'a> ProjectLocationReplayGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReplayGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReplayGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3929,7 +4000,7 @@ impl<'a> ProjectLocationReplayGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReplayGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReplayGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3949,9 +4020,9 @@ impl<'a> ProjectLocationReplayGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReplayGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReplayGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

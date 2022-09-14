@@ -1,4 +1,4 @@
-site_name: cloudlatencytest v3.1.0+20160309
+site_name: cloudlatencytest v4.0.1+20160309
 site_url: http://byron.github.io/google-apis-rs/google-cloudlatencytest2-cli
 site_description: A complete library to interact with cloudlatencytest (protocol v2)
 

@@ -1,6 +1,6 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/LICENSE.md.mako'
+This file was generated automatically from 'src/generator/templates/LICENSE.md.mako'
 DO NOT EDIT !
 -->
 The MIT License (MIT)

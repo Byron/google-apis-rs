@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -78,7 +83,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -105,34 +110,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ChromeManagement<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ChromeManagement<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ChromeManagement<> {}
+impl<'a, S> client::Hub for ChromeManagement<S> {}
 
-impl<'a, > ChromeManagement<> {
+impl<'a, S> ChromeManagement<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ChromeManagement<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ChromeManagement<S> {
         ChromeManagement {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://chromemanagement.googleapis.com/".to_string(),
             _root_url: "https://chromemanagement.googleapis.com/".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a> {
+    pub fn customers(&'a self) -> CustomerMethods<'a, S> {
         CustomerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1090,22 +1095,22 @@ impl client::Part for GoogleTypeDate {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `apps_android_get(...)`, `apps_chrome_get(...)`, `apps_count_chrome_app_requests(...)`, `apps_web_get(...)`, `reports_count_chrome_versions(...)`, `reports_count_installed_apps(...)`, `reports_find_installed_app_devices(...)` and `telemetry_devices_list(...)`
 /// // to build up your call.
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a>
-    where  {
+pub struct CustomerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for CustomerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CustomerMethods<'a, S> {}
 
-impl<'a> CustomerMethods<'a> {
+impl<'a, S> CustomerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1114,7 +1119,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The app for which details are being queried. Examples: "customers/my_customer/apps/chrome/gmbmikajjgmnabiglmofipeabaddhgne@2.1.2" for the Save to Google Drive Chrome extension version 2.1.2, "customers/my_customer/apps/android/com.google.android.apps.docs" for the Google Drive Android app's latest version.
-    pub fn apps_android_get(&self, name: &str) -> CustomerAppAndroidGetCall<'a> {
+    pub fn apps_android_get(&self, name: &str) -> CustomerAppAndroidGetCall<'a, S> {
         CustomerAppAndroidGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1131,7 +1136,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The app for which details are being queried. Examples: "customers/my_customer/apps/chrome/gmbmikajjgmnabiglmofipeabaddhgne@2.1.2" for the Save to Google Drive Chrome extension version 2.1.2, "customers/my_customer/apps/android/com.google.android.apps.docs" for the Google Drive Android app's latest version.
-    pub fn apps_chrome_get(&self, name: &str) -> CustomerAppChromeGetCall<'a> {
+    pub fn apps_chrome_get(&self, name: &str) -> CustomerAppChromeGetCall<'a, S> {
         CustomerAppChromeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1148,7 +1153,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The app for which details are being queried. Examples: "customers/my_customer/apps/chrome/gmbmikajjgmnabiglmofipeabaddhgne@2.1.2" for the Save to Google Drive Chrome extension version 2.1.2, "customers/my_customer/apps/android/com.google.android.apps.docs" for the Google Drive Android app's latest version.
-    pub fn apps_web_get(&self, name: &str) -> CustomerAppWebGetCall<'a> {
+    pub fn apps_web_get(&self, name: &str) -> CustomerAppWebGetCall<'a, S> {
         CustomerAppWebGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1165,7 +1170,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `customer` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
-    pub fn apps_count_chrome_app_requests(&self, customer: &str) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn apps_count_chrome_app_requests(&self, customer: &str) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         CustomerAppCountChromeAppRequestCall {
             hub: self.hub,
             _customer: customer.to_string(),
@@ -1186,7 +1191,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `customer` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
-    pub fn reports_count_chrome_versions(&self, customer: &str) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn reports_count_chrome_versions(&self, customer: &str) -> CustomerReportCountChromeVersionCall<'a, S> {
         CustomerReportCountChromeVersionCall {
             hub: self.hub,
             _customer: customer.to_string(),
@@ -1207,7 +1212,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `customer` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
-    pub fn reports_count_installed_apps(&self, customer: &str) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn reports_count_installed_apps(&self, customer: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         CustomerReportCountInstalledAppCall {
             hub: self.hub,
             _customer: customer.to_string(),
@@ -1229,7 +1234,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `customer` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
-    pub fn reports_find_installed_app_devices(&self, customer: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn reports_find_installed_app_devices(&self, customer: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         CustomerReportFindInstalledAppDeviceCall {
             hub: self.hub,
             _customer: customer.to_string(),
@@ -1253,7 +1258,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Customer id or "my_customer" to use the customer associated to the account making the request.
-    pub fn telemetry_devices_list(&self, parent: &str) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn telemetry_devices_list(&self, parent: &str) -> CustomerTelemetryDeviceListCall<'a, S> {
         CustomerTelemetryDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1298,7 +1303,7 @@ impl<'a> CustomerMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1306,19 +1311,25 @@ impl<'a> CustomerMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerAppAndroidGetCall<'a>
-    where  {
+pub struct CustomerAppAndroidGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerAppAndroidGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerAppAndroidGetCall<'a, S> {}
 
-impl<'a> CustomerAppAndroidGetCall<'a> {
+impl<'a, S> CustomerAppAndroidGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1465,7 +1476,7 @@ impl<'a> CustomerAppAndroidGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerAppAndroidGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerAppAndroidGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1475,7 +1486,7 @@ impl<'a> CustomerAppAndroidGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppAndroidGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppAndroidGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1500,7 +1511,7 @@ impl<'a> CustomerAppAndroidGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppAndroidGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppAndroidGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1520,9 +1531,9 @@ impl<'a> CustomerAppAndroidGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerAppAndroidGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerAppAndroidGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1554,7 +1565,7 @@ impl<'a> CustomerAppAndroidGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1562,19 +1573,25 @@ impl<'a> CustomerAppAndroidGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerAppChromeGetCall<'a>
-    where  {
+pub struct CustomerAppChromeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerAppChromeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerAppChromeGetCall<'a, S> {}
 
-impl<'a> CustomerAppChromeGetCall<'a> {
+impl<'a, S> CustomerAppChromeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1721,7 +1738,7 @@ impl<'a> CustomerAppChromeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerAppChromeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerAppChromeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1731,7 +1748,7 @@ impl<'a> CustomerAppChromeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppChromeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppChromeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1756,7 +1773,7 @@ impl<'a> CustomerAppChromeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppChromeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppChromeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1776,9 +1793,9 @@ impl<'a> CustomerAppChromeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerAppChromeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerAppChromeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1810,7 +1827,7 @@ impl<'a> CustomerAppChromeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1818,19 +1835,25 @@ impl<'a> CustomerAppChromeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerAppWebGetCall<'a>
-    where  {
+pub struct CustomerAppWebGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerAppWebGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerAppWebGetCall<'a, S> {}
 
-impl<'a> CustomerAppWebGetCall<'a> {
+impl<'a, S> CustomerAppWebGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1977,7 +2000,7 @@ impl<'a> CustomerAppWebGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerAppWebGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerAppWebGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1987,7 +2010,7 @@ impl<'a> CustomerAppWebGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppWebGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppWebGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2012,7 +2035,7 @@ impl<'a> CustomerAppWebGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppWebGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppWebGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2032,9 +2055,9 @@ impl<'a> CustomerAppWebGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerAppWebGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerAppWebGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2066,7 +2089,7 @@ impl<'a> CustomerAppWebGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2078,10 +2101,10 @@ impl<'a> CustomerAppWebGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerAppCountChromeAppRequestCall<'a>
-    where  {
+pub struct CustomerAppCountChromeAppRequestCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _customer: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2092,9 +2115,15 @@ pub struct CustomerAppCountChromeAppRequestCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerAppCountChromeAppRequestCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerAppCountChromeAppRequestCall<'a, S> {}
 
-impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
+impl<'a, S> CustomerAppCountChromeAppRequestCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2253,35 +2282,35 @@ impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
     /// Token to specify the page of the request to be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return. Maximum and default are 50, anything above will be coerced to 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The ID of the organizational unit.
     ///
     /// Sets the *org unit id* query property to the given value.
-    pub fn org_unit_id(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn org_unit_id(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
     /// Field used to order results. Supported fields: * request_count * latest_request_time
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -2291,7 +2320,7 @@ impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppCountChromeAppRequestCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerAppCountChromeAppRequestCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2316,7 +2345,7 @@ impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppCountChromeAppRequestCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerAppCountChromeAppRequestCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2336,9 +2365,9 @@ impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerAppCountChromeAppRequestCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerAppCountChromeAppRequestCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2370,7 +2399,7 @@ impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2382,10 +2411,10 @@ impl<'a> CustomerAppCountChromeAppRequestCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerReportCountChromeVersionCall<'a>
-    where  {
+pub struct CustomerReportCountChromeVersionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _customer: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2396,9 +2425,15 @@ pub struct CustomerReportCountChromeVersionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerReportCountChromeVersionCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerReportCountChromeVersionCall<'a, S> {}
 
-impl<'a> CustomerReportCountChromeVersionCall<'a> {
+impl<'a, S> CustomerReportCountChromeVersionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2557,35 +2592,35 @@ impl<'a> CustomerReportCountChromeVersionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
     /// Token to specify the page of the request to be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return. Maximum and default are 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerReportCountChromeVersionCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The ID of the organizational unit.
     ///
     /// Sets the *org unit id* query property to the given value.
-    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a, S> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
     /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Supported filter fields: * last_active_date
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerReportCountChromeVersionCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2595,7 +2630,7 @@ impl<'a> CustomerReportCountChromeVersionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountChromeVersionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountChromeVersionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2620,7 +2655,7 @@ impl<'a> CustomerReportCountChromeVersionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountChromeVersionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountChromeVersionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2640,9 +2675,9 @@ impl<'a> CustomerReportCountChromeVersionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerReportCountChromeVersionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerReportCountChromeVersionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2674,7 +2709,7 @@ impl<'a> CustomerReportCountChromeVersionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2687,10 +2722,10 @@ impl<'a> CustomerReportCountChromeVersionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerReportCountInstalledAppCall<'a>
-    where  {
+pub struct CustomerReportCountInstalledAppCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _customer: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2702,9 +2737,15 @@ pub struct CustomerReportCountInstalledAppCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerReportCountInstalledAppCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerReportCountInstalledAppCall<'a, S> {}
 
-impl<'a> CustomerReportCountInstalledAppCall<'a> {
+impl<'a, S> CustomerReportCountInstalledAppCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2866,42 +2907,42 @@ impl<'a> CustomerReportCountInstalledAppCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
     /// Token to specify the page of the request to be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return. Maximum and default are 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The ID of the organizational unit.
     ///
     /// Sets the *org unit id* query property to the given value.
-    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
     /// Field used to order results. Supported order by fields: * app_name * app_type * install_type * number_of_permissions * total_install_count
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Supported filter fields: * app_name * app_type * install_type * number_of_permissions * total_install_count * latest_profile_active_date * permission_name
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2911,7 +2952,7 @@ impl<'a> CustomerReportCountInstalledAppCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountInstalledAppCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportCountInstalledAppCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2936,7 +2977,7 @@ impl<'a> CustomerReportCountInstalledAppCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountInstalledAppCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportCountInstalledAppCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2956,9 +2997,9 @@ impl<'a> CustomerReportCountInstalledAppCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerReportCountInstalledAppCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerReportCountInstalledAppCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2990,7 +3031,7 @@ impl<'a> CustomerReportCountInstalledAppCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3005,10 +3046,10 @@ impl<'a> CustomerReportCountInstalledAppCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerReportFindInstalledAppDeviceCall<'a>
-    where  {
+pub struct CustomerReportFindInstalledAppDeviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _customer: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3022,9 +3063,15 @@ pub struct CustomerReportFindInstalledAppDeviceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerReportFindInstalledAppDeviceCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerReportFindInstalledAppDeviceCall<'a, S> {}
 
-impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
+impl<'a, S> CustomerReportFindInstalledAppDeviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3192,56 +3239,56 @@ impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
     /// Token to specify the page of the request to be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return. Maximum and default are 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The ID of the organizational unit.
     ///
     /// Sets the *org unit id* query property to the given value.
-    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn org_unit_id(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._org_unit_id = Some(new_value.to_string());
         self
     }
     /// Field used to order results. Supported order by fields: * machine * device_id
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Query string to filter results, AND-separated fields in EBNF syntax. Note: OR operations are not supported in this filter. Supported filter fields: * last_active_date
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Type of the app.
     ///
     /// Sets the *app type* query property to the given value.
-    pub fn app_type(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn app_type(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._app_type = Some(new_value.to_string());
         self
     }
     /// Unique identifier of the app. For Chrome apps and extensions, the 32-character id (e.g. ehoadneljpdggcbbknedodolkkjodefl). For Android apps, the package name (e.g. com.evernote).
     ///
     /// Sets the *app id* query property to the given value.
-    pub fn app_id(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn app_id(mut self, new_value: &str) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._app_id = Some(new_value.to_string());
         self
     }
@@ -3251,7 +3298,7 @@ impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportFindInstalledAppDeviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerReportFindInstalledAppDeviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3276,7 +3323,7 @@ impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportFindInstalledAppDeviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerReportFindInstalledAppDeviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3296,9 +3343,9 @@ impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerReportFindInstalledAppDeviceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerReportFindInstalledAppDeviceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3330,7 +3377,7 @@ impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3342,10 +3389,10 @@ impl<'a> CustomerReportFindInstalledAppDeviceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerTelemetryDeviceListCall<'a>
-    where  {
+pub struct CustomerTelemetryDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeManagement<>,
+    hub: &'a ChromeManagement<S>,
     _parent: String,
     _read_mask: Option<String>,
     _page_token: Option<String>,
@@ -3356,9 +3403,15 @@ pub struct CustomerTelemetryDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerTelemetryDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerTelemetryDeviceListCall<'a, S> {}
 
-impl<'a> CustomerTelemetryDeviceListCall<'a> {
+impl<'a, S> CustomerTelemetryDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3517,35 +3570,35 @@ impl<'a> CustomerTelemetryDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Read mask to specify which fields to return.
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Token to specify next page in the list.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return. Default value is 100. Maximum value is 200.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerTelemetryDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Only include resources that match the filter. Supported filter fields: - org_unit_id - serial_number 
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerTelemetryDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3555,7 +3608,7 @@ impl<'a> CustomerTelemetryDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerTelemetryDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3580,7 +3633,7 @@ impl<'a> CustomerTelemetryDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerTelemetryDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3600,9 +3653,9 @@ impl<'a> CustomerTelemetryDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerTelemetryDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerTelemetryDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

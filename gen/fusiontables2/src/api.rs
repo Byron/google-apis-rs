@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -104,49 +109,49 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Fusiontables<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Fusiontables<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Fusiontables<> {}
+impl<'a, S> client::Hub for Fusiontables<S> {}
 
-impl<'a, > Fusiontables<> {
+impl<'a, S> Fusiontables<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Fusiontables<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Fusiontables<S> {
         Fusiontables {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/fusiontables/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn column(&'a self) -> ColumnMethods<'a> {
+    pub fn column(&'a self) -> ColumnMethods<'a, S> {
         ColumnMethods { hub: &self }
     }
-    pub fn query(&'a self) -> QueryMethods<'a> {
+    pub fn query(&'a self) -> QueryMethods<'a, S> {
         QueryMethods { hub: &self }
     }
-    pub fn style(&'a self) -> StyleMethods<'a> {
+    pub fn style(&'a self) -> StyleMethods<'a, S> {
         StyleMethods { hub: &self }
     }
-    pub fn table(&'a self) -> TableMethods<'a> {
+    pub fn table(&'a self) -> TableMethods<'a, S> {
         TableMethods { hub: &self }
     }
-    pub fn task(&'a self) -> TaskMethods<'a> {
+    pub fn task(&'a self) -> TaskMethods<'a, S> {
         TaskMethods { hub: &self }
     }
-    pub fn template(&'a self) -> TemplateMethods<'a> {
+    pub fn template(&'a self) -> TemplateMethods<'a, S> {
         TemplateMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -759,22 +764,22 @@ impl client::Part for StyleFunctionGradientColors {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.column();
 /// # }
 /// ```
-pub struct ColumnMethods<'a>
-    where  {
+pub struct ColumnMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
 }
 
-impl<'a> client::MethodsBuilder for ColumnMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ColumnMethods<'a, S> {}
 
-impl<'a> ColumnMethods<'a> {
+impl<'a, S> ColumnMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -784,7 +789,7 @@ impl<'a> ColumnMethods<'a> {
     ///
     /// * `tableId` - Table from which the column is being deleted.
     /// * `columnId` - Name or identifier for the column being deleted.
-    pub fn delete(&self, table_id: &str, column_id: &str) -> ColumnDeleteCall<'a> {
+    pub fn delete(&self, table_id: &str, column_id: &str) -> ColumnDeleteCall<'a, S> {
         ColumnDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -803,7 +808,7 @@ impl<'a> ColumnMethods<'a> {
     ///
     /// * `tableId` - Table to which the column belongs.
     /// * `columnId` - Name or identifier for the column that is being requested.
-    pub fn get(&self, table_id: &str, column_id: &str) -> ColumnGetCall<'a> {
+    pub fn get(&self, table_id: &str, column_id: &str) -> ColumnGetCall<'a, S> {
         ColumnGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -822,7 +827,7 @@ impl<'a> ColumnMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - Table for which a new column is being added.
-    pub fn insert(&self, request: Column, table_id: &str) -> ColumnInsertCall<'a> {
+    pub fn insert(&self, request: Column, table_id: &str) -> ColumnInsertCall<'a, S> {
         ColumnInsertCall {
             hub: self.hub,
             _request: request,
@@ -840,7 +845,7 @@ impl<'a> ColumnMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose columns are being listed.
-    pub fn list(&self, table_id: &str) -> ColumnListCall<'a> {
+    pub fn list(&self, table_id: &str) -> ColumnListCall<'a, S> {
         ColumnListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -861,7 +866,7 @@ impl<'a> ColumnMethods<'a> {
     /// * `request` - No description provided.
     /// * `tableId` - Table for which the column is being updated.
     /// * `columnId` - Name or identifier for the column that is being updated.
-    pub fn patch(&self, request: Column, table_id: &str, column_id: &str) -> ColumnPatchCall<'a> {
+    pub fn patch(&self, request: Column, table_id: &str, column_id: &str) -> ColumnPatchCall<'a, S> {
         ColumnPatchCall {
             hub: self.hub,
             _request: request,
@@ -882,7 +887,7 @@ impl<'a> ColumnMethods<'a> {
     /// * `request` - No description provided.
     /// * `tableId` - Table for which the column is being updated.
     /// * `columnId` - Name or identifier for the column that is being updated.
-    pub fn update(&self, request: Column, table_id: &str, column_id: &str) -> ColumnUpdateCall<'a> {
+    pub fn update(&self, request: Column, table_id: &str, column_id: &str) -> ColumnUpdateCall<'a, S> {
         ColumnUpdateCall {
             hub: self.hub,
             _request: request,
@@ -918,22 +923,22 @@ impl<'a> ColumnMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `sql(...)` and `sql_get(...)`
 /// // to build up your call.
 /// let rb = hub.query();
 /// # }
 /// ```
-pub struct QueryMethods<'a>
-    where  {
+pub struct QueryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
 }
 
-impl<'a> client::MethodsBuilder for QueryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for QueryMethods<'a, S> {}
 
-impl<'a> QueryMethods<'a> {
+impl<'a, S> QueryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -956,7 +961,7 @@ impl<'a> QueryMethods<'a> {
     ///           - SHOW
     ///           - DESCRIBE
     ///           - CREATE
-    pub fn sql(&self, sql: &str) -> QuerySqlCall<'a> {
+    pub fn sql(&self, sql: &str) -> QuerySqlCall<'a, S> {
         QuerySqlCall {
             hub: self.hub,
             _sql: sql.to_string(),
@@ -981,7 +986,7 @@ impl<'a> QueryMethods<'a> {
     ///           - SELECT
     ///           - SHOW
     ///           - DESCRIBE
-    pub fn sql_get(&self, sql: &str) -> QuerySqlGetCall<'a> {
+    pub fn sql_get(&self, sql: &str) -> QuerySqlGetCall<'a, S> {
         QuerySqlGetCall {
             hub: self.hub,
             _sql: sql.to_string(),
@@ -1017,22 +1022,22 @@ impl<'a> QueryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.style();
 /// # }
 /// ```
-pub struct StyleMethods<'a>
-    where  {
+pub struct StyleMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
 }
 
-impl<'a> client::MethodsBuilder for StyleMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for StyleMethods<'a, S> {}
 
-impl<'a> StyleMethods<'a> {
+impl<'a, S> StyleMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1042,7 +1047,7 @@ impl<'a> StyleMethods<'a> {
     ///
     /// * `tableId` - Table from which the style is being deleted
     /// * `styleId` - Identifier (within a table) for the style being deleted
-    pub fn delete(&self, table_id: &str, style_id: i32) -> StyleDeleteCall<'a> {
+    pub fn delete(&self, table_id: &str, style_id: i32) -> StyleDeleteCall<'a, S> {
         StyleDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1061,7 +1066,7 @@ impl<'a> StyleMethods<'a> {
     ///
     /// * `tableId` - Table to which the requested style belongs
     /// * `styleId` - Identifier (integer) for a specific style in a table
-    pub fn get(&self, table_id: &str, style_id: i32) -> StyleGetCall<'a> {
+    pub fn get(&self, table_id: &str, style_id: i32) -> StyleGetCall<'a, S> {
         StyleGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1080,7 +1085,7 @@ impl<'a> StyleMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - Table for which a new style is being added
-    pub fn insert(&self, request: StyleSetting, table_id: &str) -> StyleInsertCall<'a> {
+    pub fn insert(&self, request: StyleSetting, table_id: &str) -> StyleInsertCall<'a, S> {
         StyleInsertCall {
             hub: self.hub,
             _request: request,
@@ -1098,7 +1103,7 @@ impl<'a> StyleMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose styles are being listed
-    pub fn list(&self, table_id: &str) -> StyleListCall<'a> {
+    pub fn list(&self, table_id: &str) -> StyleListCall<'a, S> {
         StyleListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1119,7 +1124,7 @@ impl<'a> StyleMethods<'a> {
     /// * `request` - No description provided.
     /// * `tableId` - Table whose style is being updated.
     /// * `styleId` - Identifier (within a table) for the style being updated.
-    pub fn patch(&self, request: StyleSetting, table_id: &str, style_id: i32) -> StylePatchCall<'a> {
+    pub fn patch(&self, request: StyleSetting, table_id: &str, style_id: i32) -> StylePatchCall<'a, S> {
         StylePatchCall {
             hub: self.hub,
             _request: request,
@@ -1140,7 +1145,7 @@ impl<'a> StyleMethods<'a> {
     /// * `request` - No description provided.
     /// * `tableId` - Table whose style is being updated.
     /// * `styleId` - Identifier (within a table) for the style being updated.
-    pub fn update(&self, request: StyleSetting, table_id: &str, style_id: i32) -> StyleUpdateCall<'a> {
+    pub fn update(&self, request: StyleSetting, table_id: &str, style_id: i32) -> StyleUpdateCall<'a, S> {
         StyleUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1176,22 +1181,22 @@ impl<'a> StyleMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `copy(...)`, `delete(...)`, `get(...)`, `import_rows(...)`, `import_table(...)`, `insert(...)`, `list(...)`, `patch(...)`, `refetch_sheet(...)`, `replace_rows(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.table();
 /// # }
 /// ```
-pub struct TableMethods<'a>
-    where  {
+pub struct TableMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
 }
 
-impl<'a> client::MethodsBuilder for TableMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TableMethods<'a, S> {}
 
-impl<'a> TableMethods<'a> {
+impl<'a, S> TableMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1200,7 +1205,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - ID of the table that is being copied.
-    pub fn copy(&self, table_id: &str) -> TableCopyCall<'a> {
+    pub fn copy(&self, table_id: &str) -> TableCopyCall<'a, S> {
         TableCopyCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1218,7 +1223,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - ID of the table to be deleted.
-    pub fn delete(&self, table_id: &str) -> TableDeleteCall<'a> {
+    pub fn delete(&self, table_id: &str) -> TableDeleteCall<'a, S> {
         TableDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1235,7 +1240,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Identifier for the table being requested.
-    pub fn get(&self, table_id: &str) -> TableGetCall<'a> {
+    pub fn get(&self, table_id: &str) -> TableGetCall<'a, S> {
         TableGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1252,7 +1257,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - The table into which new rows are being imported.
-    pub fn import_rows(&self, table_id: &str) -> TableImportRowCall<'a> {
+    pub fn import_rows(&self, table_id: &str) -> TableImportRowCall<'a, S> {
         TableImportRowCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1274,7 +1279,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name to be assigned to the new table.
-    pub fn import_table(&self, name: &str) -> TableImportTableCall<'a> {
+    pub fn import_table(&self, name: &str) -> TableImportTableCall<'a, S> {
         TableImportTableCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1293,7 +1298,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Table) -> TableInsertCall<'a> {
+    pub fn insert(&self, request: Table) -> TableInsertCall<'a, S> {
         TableInsertCall {
             hub: self.hub,
             _request: request,
@@ -1306,7 +1311,7 @@ impl<'a> TableMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of tables a user owns.
-    pub fn list(&self) -> TableListCall<'a> {
+    pub fn list(&self) -> TableListCall<'a, S> {
         TableListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1325,7 +1330,7 @@ impl<'a> TableMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - ID of the table that is being updated.
-    pub fn patch(&self, request: Table, table_id: &str) -> TablePatchCall<'a> {
+    pub fn patch(&self, request: Table, table_id: &str) -> TablePatchCall<'a, S> {
         TablePatchCall {
             hub: self.hub,
             _request: request,
@@ -1344,7 +1349,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose rows will be replaced from the spreadsheet.
-    pub fn refetch_sheet(&self, table_id: &str) -> TableRefetchSheetCall<'a> {
+    pub fn refetch_sheet(&self, table_id: &str) -> TableRefetchSheetCall<'a, S> {
         TableRefetchSheetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1361,7 +1366,7 @@ impl<'a> TableMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose rows will be replaced.
-    pub fn replace_rows(&self, table_id: &str) -> TableReplaceRowCall<'a> {
+    pub fn replace_rows(&self, table_id: &str) -> TableReplaceRowCall<'a, S> {
         TableReplaceRowCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1384,7 +1389,7 @@ impl<'a> TableMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - ID of the table that is being updated.
-    pub fn update(&self, request: Table, table_id: &str) -> TableUpdateCall<'a> {
+    pub fn update(&self, request: Table, table_id: &str) -> TableUpdateCall<'a, S> {
         TableUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1420,22 +1425,22 @@ impl<'a> TableMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.task();
 /// # }
 /// ```
-pub struct TaskMethods<'a>
-    where  {
+pub struct TaskMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
 }
 
-impl<'a> client::MethodsBuilder for TaskMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TaskMethods<'a, S> {}
 
-impl<'a> TaskMethods<'a> {
+impl<'a, S> TaskMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1445,7 +1450,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `tableId` - Table from which the task is being deleted.
     /// * `taskId` - The identifier of the task to delete.
-    pub fn delete(&self, table_id: &str, task_id: &str) -> TaskDeleteCall<'a> {
+    pub fn delete(&self, table_id: &str, task_id: &str) -> TaskDeleteCall<'a, S> {
         TaskDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1464,7 +1469,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `tableId` - Table to which the task belongs.
     /// * `taskId` - The identifier of the task to get.
-    pub fn get(&self, table_id: &str, task_id: &str) -> TaskGetCall<'a> {
+    pub fn get(&self, table_id: &str, task_id: &str) -> TaskGetCall<'a, S> {
         TaskGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1482,7 +1487,7 @@ impl<'a> TaskMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Table whose tasks are being listed.
-    pub fn list(&self, table_id: &str) -> TaskListCall<'a> {
+    pub fn list(&self, table_id: &str) -> TaskListCall<'a, S> {
         TaskListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1519,22 +1524,22 @@ impl<'a> TaskMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.template();
 /// # }
 /// ```
-pub struct TemplateMethods<'a>
-    where  {
+pub struct TemplateMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
 }
 
-impl<'a> client::MethodsBuilder for TemplateMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TemplateMethods<'a, S> {}
 
-impl<'a> TemplateMethods<'a> {
+impl<'a, S> TemplateMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1544,7 +1549,7 @@ impl<'a> TemplateMethods<'a> {
     ///
     /// * `tableId` - Table from which the template is being deleted
     /// * `templateId` - Identifier for the template which is being deleted
-    pub fn delete(&self, table_id: &str, template_id: i32) -> TemplateDeleteCall<'a> {
+    pub fn delete(&self, table_id: &str, template_id: i32) -> TemplateDeleteCall<'a, S> {
         TemplateDeleteCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1563,7 +1568,7 @@ impl<'a> TemplateMethods<'a> {
     ///
     /// * `tableId` - Table to which the template belongs
     /// * `templateId` - Identifier for the template that is being requested
-    pub fn get(&self, table_id: &str, template_id: i32) -> TemplateGetCall<'a> {
+    pub fn get(&self, table_id: &str, template_id: i32) -> TemplateGetCall<'a, S> {
         TemplateGetCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1582,7 +1587,7 @@ impl<'a> TemplateMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `tableId` - Table for which a new template is being created
-    pub fn insert(&self, request: Template, table_id: &str) -> TemplateInsertCall<'a> {
+    pub fn insert(&self, request: Template, table_id: &str) -> TemplateInsertCall<'a, S> {
         TemplateInsertCall {
             hub: self.hub,
             _request: request,
@@ -1600,7 +1605,7 @@ impl<'a> TemplateMethods<'a> {
     /// # Arguments
     ///
     /// * `tableId` - Identifier for the table whose templates are being requested
-    pub fn list(&self, table_id: &str) -> TemplateListCall<'a> {
+    pub fn list(&self, table_id: &str) -> TemplateListCall<'a, S> {
         TemplateListCall {
             hub: self.hub,
             _table_id: table_id.to_string(),
@@ -1621,7 +1626,7 @@ impl<'a> TemplateMethods<'a> {
     /// * `request` - No description provided.
     /// * `tableId` - Table to which the updated template belongs
     /// * `templateId` - Identifier for the template that is being updated
-    pub fn patch(&self, request: Template, table_id: &str, template_id: i32) -> TemplatePatchCall<'a> {
+    pub fn patch(&self, request: Template, table_id: &str, template_id: i32) -> TemplatePatchCall<'a, S> {
         TemplatePatchCall {
             hub: self.hub,
             _request: request,
@@ -1642,7 +1647,7 @@ impl<'a> TemplateMethods<'a> {
     /// * `request` - No description provided.
     /// * `tableId` - Table to which the updated template belongs
     /// * `templateId` - Identifier for the template that is being updated
-    pub fn update(&self, request: Template, table_id: &str, template_id: i32) -> TemplateUpdateCall<'a> {
+    pub fn update(&self, request: Template, table_id: &str, template_id: i32) -> TemplateUpdateCall<'a, S> {
         TemplateUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1685,7 +1690,7 @@ impl<'a> TemplateMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1693,10 +1698,10 @@ impl<'a> TemplateMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColumnDeleteCall<'a>
-    where  {
+pub struct ColumnDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _column_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1704,9 +1709,15 @@ pub struct ColumnDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColumnDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ColumnDeleteCall<'a, S> {}
 
-impl<'a> ColumnDeleteCall<'a> {
+impl<'a, S> ColumnDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1839,7 +1850,7 @@ impl<'a> ColumnDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> ColumnDeleteCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -1849,7 +1860,7 @@ impl<'a> ColumnDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn column_id(mut self, new_value: &str) -> ColumnDeleteCall<'a> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, S> {
         self._column_id = new_value.to_string();
         self
     }
@@ -1859,7 +1870,7 @@ impl<'a> ColumnDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1880,7 +1891,7 @@ impl<'a> ColumnDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1900,9 +1911,9 @@ impl<'a> ColumnDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColumnDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColumnDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1934,7 +1945,7 @@ impl<'a> ColumnDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1942,10 +1953,10 @@ impl<'a> ColumnDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColumnGetCall<'a>
-    where  {
+pub struct ColumnGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _column_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1953,9 +1964,15 @@ pub struct ColumnGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColumnGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ColumnGetCall<'a, S> {}
 
-impl<'a> ColumnGetCall<'a> {
+impl<'a, S> ColumnGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2099,7 +2116,7 @@ impl<'a> ColumnGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> ColumnGetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnGetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2109,7 +2126,7 @@ impl<'a> ColumnGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn column_id(mut self, new_value: &str) -> ColumnGetCall<'a> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnGetCall<'a, S> {
         self._column_id = new_value.to_string();
         self
     }
@@ -2119,7 +2136,7 @@ impl<'a> ColumnGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2140,7 +2157,7 @@ impl<'a> ColumnGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2160,9 +2177,9 @@ impl<'a> ColumnGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColumnGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColumnGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2195,7 +2212,7 @@ impl<'a> ColumnGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2208,10 +2225,10 @@ impl<'a> ColumnGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColumnInsertCall<'a>
-    where  {
+pub struct ColumnInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Column,
     _table_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2219,9 +2236,15 @@ pub struct ColumnInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColumnInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ColumnInsertCall<'a, S> {}
 
-impl<'a> ColumnInsertCall<'a> {
+impl<'a, S> ColumnInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2377,7 +2400,7 @@ impl<'a> ColumnInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Column) -> ColumnInsertCall<'a> {
+    pub fn request(mut self, new_value: Column) -> ColumnInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2387,7 +2410,7 @@ impl<'a> ColumnInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> ColumnInsertCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnInsertCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2397,7 +2420,7 @@ impl<'a> ColumnInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2418,7 +2441,7 @@ impl<'a> ColumnInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2438,9 +2461,9 @@ impl<'a> ColumnInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColumnInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColumnInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2472,7 +2495,7 @@ impl<'a> ColumnInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2482,10 +2505,10 @@ impl<'a> ColumnInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColumnListCall<'a>
-    where  {
+pub struct ColumnListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -2494,9 +2517,15 @@ pub struct ColumnListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColumnListCall<'a> {}
+impl<'a, S> client::CallBuilder for ColumnListCall<'a, S> {}
 
-impl<'a> ColumnListCall<'a> {
+impl<'a, S> ColumnListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2645,21 +2674,21 @@ impl<'a> ColumnListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> ColumnListCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnListCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Continuation token specifying which result page to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ColumnListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ColumnListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of columns to return. Default is 5.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ColumnListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ColumnListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -2669,7 +2698,7 @@ impl<'a> ColumnListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2690,7 +2719,7 @@ impl<'a> ColumnListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2710,9 +2739,9 @@ impl<'a> ColumnListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColumnListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColumnListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2745,7 +2774,7 @@ impl<'a> ColumnListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2758,10 +2787,10 @@ impl<'a> ColumnListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColumnPatchCall<'a>
-    where  {
+pub struct ColumnPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Column,
     _table_id: String,
     _column_id: String,
@@ -2770,9 +2799,15 @@ pub struct ColumnPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColumnPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ColumnPatchCall<'a, S> {}
 
-impl<'a> ColumnPatchCall<'a> {
+impl<'a, S> ColumnPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2929,7 +2964,7 @@ impl<'a> ColumnPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Column) -> ColumnPatchCall<'a> {
+    pub fn request(mut self, new_value: Column) -> ColumnPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2939,7 +2974,7 @@ impl<'a> ColumnPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> ColumnPatchCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnPatchCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -2949,7 +2984,7 @@ impl<'a> ColumnPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn column_id(mut self, new_value: &str) -> ColumnPatchCall<'a> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnPatchCall<'a, S> {
         self._column_id = new_value.to_string();
         self
     }
@@ -2959,7 +2994,7 @@ impl<'a> ColumnPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2980,7 +3015,7 @@ impl<'a> ColumnPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3000,9 +3035,9 @@ impl<'a> ColumnPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColumnPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColumnPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3035,7 +3070,7 @@ impl<'a> ColumnPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3048,10 +3083,10 @@ impl<'a> ColumnPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColumnUpdateCall<'a>
-    where  {
+pub struct ColumnUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Column,
     _table_id: String,
     _column_id: String,
@@ -3060,9 +3095,15 @@ pub struct ColumnUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColumnUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ColumnUpdateCall<'a, S> {}
 
-impl<'a> ColumnUpdateCall<'a> {
+impl<'a, S> ColumnUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3219,7 +3260,7 @@ impl<'a> ColumnUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Column) -> ColumnUpdateCall<'a> {
+    pub fn request(mut self, new_value: Column) -> ColumnUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3229,7 +3270,7 @@ impl<'a> ColumnUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> ColumnUpdateCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -3239,7 +3280,7 @@ impl<'a> ColumnUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn column_id(mut self, new_value: &str) -> ColumnUpdateCall<'a> {
+    pub fn column_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, S> {
         self._column_id = new_value.to_string();
         self
     }
@@ -3249,7 +3290,7 @@ impl<'a> ColumnUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColumnUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3270,7 +3311,7 @@ impl<'a> ColumnUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColumnUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColumnUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3290,9 +3331,9 @@ impl<'a> ColumnUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColumnUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColumnUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3336,7 +3377,7 @@ impl<'a> ColumnUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3346,10 +3387,10 @@ impl<'a> ColumnUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QuerySqlCall<'a>
-    where  {
+pub struct QuerySqlCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _sql: String,
     _typed: Option<bool>,
     _hdrs: Option<bool>,
@@ -3358,9 +3399,15 @@ pub struct QuerySqlCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QuerySqlCall<'a> {}
+impl<'a, S> client::CallBuilder for QuerySqlCall<'a, S> {}
 
-impl<'a> QuerySqlCall<'a> {
+impl<'a, S> QuerySqlCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3511,21 +3558,21 @@ impl<'a> QuerySqlCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sql(mut self, new_value: &str) -> QuerySqlCall<'a> {
+    pub fn sql(mut self, new_value: &str) -> QuerySqlCall<'a, S> {
         self._sql = new_value.to_string();
         self
     }
     /// Whether typed values are returned in the (JSON) response: numbers for numeric values and parsed geometries for KML values. Default is true.
     ///
     /// Sets the *typed* query property to the given value.
-    pub fn typed(mut self, new_value: bool) -> QuerySqlCall<'a> {
+    pub fn typed(mut self, new_value: bool) -> QuerySqlCall<'a, S> {
         self._typed = Some(new_value);
         self
     }
     /// Whether column names are included in the first row. Default is true.
     ///
     /// Sets the *hdrs* query property to the given value.
-    pub fn hdrs(mut self, new_value: bool) -> QuerySqlCall<'a> {
+    pub fn hdrs(mut self, new_value: bool) -> QuerySqlCall<'a, S> {
         self._hdrs = Some(new_value);
         self
     }
@@ -3535,7 +3582,7 @@ impl<'a> QuerySqlCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QuerySqlCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QuerySqlCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3556,7 +3603,7 @@ impl<'a> QuerySqlCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3576,9 +3623,9 @@ impl<'a> QuerySqlCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QuerySqlCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QuerySqlCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3618,7 +3665,7 @@ impl<'a> QuerySqlCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3628,10 +3675,10 @@ impl<'a> QuerySqlCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QuerySqlGetCall<'a>
-    where  {
+pub struct QuerySqlGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _sql: String,
     _typed: Option<bool>,
     _hdrs: Option<bool>,
@@ -3640,9 +3687,15 @@ pub struct QuerySqlGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QuerySqlGetCall<'a> {}
+impl<'a, S> client::CallBuilder for QuerySqlGetCall<'a, S> {}
 
-impl<'a> QuerySqlGetCall<'a> {
+impl<'a, S> QuerySqlGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3789,21 +3842,21 @@ impl<'a> QuerySqlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sql(mut self, new_value: &str) -> QuerySqlGetCall<'a> {
+    pub fn sql(mut self, new_value: &str) -> QuerySqlGetCall<'a, S> {
         self._sql = new_value.to_string();
         self
     }
     /// Whether typed values are returned in the (JSON) response: numbers for numeric values and parsed geometries for KML values. Default is true.
     ///
     /// Sets the *typed* query property to the given value.
-    pub fn typed(mut self, new_value: bool) -> QuerySqlGetCall<'a> {
+    pub fn typed(mut self, new_value: bool) -> QuerySqlGetCall<'a, S> {
         self._typed = Some(new_value);
         self
     }
     /// Whether column names are included (in the first row). Default is true.
     ///
     /// Sets the *hdrs* query property to the given value.
-    pub fn hdrs(mut self, new_value: bool) -> QuerySqlGetCall<'a> {
+    pub fn hdrs(mut self, new_value: bool) -> QuerySqlGetCall<'a, S> {
         self._hdrs = Some(new_value);
         self
     }
@@ -3813,7 +3866,7 @@ impl<'a> QuerySqlGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QuerySqlGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QuerySqlGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3834,7 +3887,7 @@ impl<'a> QuerySqlGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QuerySqlGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3854,9 +3907,9 @@ impl<'a> QuerySqlGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QuerySqlGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QuerySqlGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3888,7 +3941,7 @@ impl<'a> QuerySqlGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3896,10 +3949,10 @@ impl<'a> QuerySqlGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StyleDeleteCall<'a>
-    where  {
+pub struct StyleDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _style_id: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3907,9 +3960,15 @@ pub struct StyleDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StyleDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for StyleDeleteCall<'a, S> {}
 
-impl<'a> StyleDeleteCall<'a> {
+impl<'a, S> StyleDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4042,7 +4101,7 @@ impl<'a> StyleDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> StyleDeleteCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> StyleDeleteCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4052,7 +4111,7 @@ impl<'a> StyleDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn style_id(mut self, new_value: i32) -> StyleDeleteCall<'a> {
+    pub fn style_id(mut self, new_value: i32) -> StyleDeleteCall<'a, S> {
         self._style_id = new_value;
         self
     }
@@ -4062,7 +4121,7 @@ impl<'a> StyleDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4083,7 +4142,7 @@ impl<'a> StyleDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4103,9 +4162,9 @@ impl<'a> StyleDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StyleDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StyleDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4137,7 +4196,7 @@ impl<'a> StyleDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4145,10 +4204,10 @@ impl<'a> StyleDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StyleGetCall<'a>
-    where  {
+pub struct StyleGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _style_id: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4156,9 +4215,15 @@ pub struct StyleGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StyleGetCall<'a> {}
+impl<'a, S> client::CallBuilder for StyleGetCall<'a, S> {}
 
-impl<'a> StyleGetCall<'a> {
+impl<'a, S> StyleGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4302,7 +4367,7 @@ impl<'a> StyleGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> StyleGetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> StyleGetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4312,7 +4377,7 @@ impl<'a> StyleGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn style_id(mut self, new_value: i32) -> StyleGetCall<'a> {
+    pub fn style_id(mut self, new_value: i32) -> StyleGetCall<'a, S> {
         self._style_id = new_value;
         self
     }
@@ -4322,7 +4387,7 @@ impl<'a> StyleGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4343,7 +4408,7 @@ impl<'a> StyleGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4363,9 +4428,9 @@ impl<'a> StyleGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StyleGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StyleGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4398,7 +4463,7 @@ impl<'a> StyleGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4411,10 +4476,10 @@ impl<'a> StyleGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StyleInsertCall<'a>
-    where  {
+pub struct StyleInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: StyleSetting,
     _table_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4422,9 +4487,15 @@ pub struct StyleInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StyleInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for StyleInsertCall<'a, S> {}
 
-impl<'a> StyleInsertCall<'a> {
+impl<'a, S> StyleInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4580,7 +4651,7 @@ impl<'a> StyleInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StyleSetting) -> StyleInsertCall<'a> {
+    pub fn request(mut self, new_value: StyleSetting) -> StyleInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4590,7 +4661,7 @@ impl<'a> StyleInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> StyleInsertCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> StyleInsertCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -4600,7 +4671,7 @@ impl<'a> StyleInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4621,7 +4692,7 @@ impl<'a> StyleInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4641,9 +4712,9 @@ impl<'a> StyleInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StyleInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StyleInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4675,7 +4746,7 @@ impl<'a> StyleInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4685,10 +4756,10 @@ impl<'a> StyleInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StyleListCall<'a>
-    where  {
+pub struct StyleListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -4697,9 +4768,15 @@ pub struct StyleListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StyleListCall<'a> {}
+impl<'a, S> client::CallBuilder for StyleListCall<'a, S> {}
 
-impl<'a> StyleListCall<'a> {
+impl<'a, S> StyleListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4848,21 +4925,21 @@ impl<'a> StyleListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> StyleListCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> StyleListCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Continuation token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> StyleListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> StyleListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of styles to return. Optional. Default is 5.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> StyleListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> StyleListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4872,7 +4949,7 @@ impl<'a> StyleListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4893,7 +4970,7 @@ impl<'a> StyleListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4913,9 +4990,9 @@ impl<'a> StyleListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StyleListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StyleListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4948,7 +5025,7 @@ impl<'a> StyleListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4961,10 +5038,10 @@ impl<'a> StyleListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StylePatchCall<'a>
-    where  {
+pub struct StylePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: StyleSetting,
     _table_id: String,
     _style_id: i32,
@@ -4973,9 +5050,15 @@ pub struct StylePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StylePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for StylePatchCall<'a, S> {}
 
-impl<'a> StylePatchCall<'a> {
+impl<'a, S> StylePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5132,7 +5215,7 @@ impl<'a> StylePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StyleSetting) -> StylePatchCall<'a> {
+    pub fn request(mut self, new_value: StyleSetting) -> StylePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5142,7 +5225,7 @@ impl<'a> StylePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> StylePatchCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> StylePatchCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5152,7 +5235,7 @@ impl<'a> StylePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn style_id(mut self, new_value: i32) -> StylePatchCall<'a> {
+    pub fn style_id(mut self, new_value: i32) -> StylePatchCall<'a, S> {
         self._style_id = new_value;
         self
     }
@@ -5162,7 +5245,7 @@ impl<'a> StylePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StylePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StylePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5183,7 +5266,7 @@ impl<'a> StylePatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StylePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StylePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5203,9 +5286,9 @@ impl<'a> StylePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StylePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StylePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5238,7 +5321,7 @@ impl<'a> StylePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5251,10 +5334,10 @@ impl<'a> StylePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StyleUpdateCall<'a>
-    where  {
+pub struct StyleUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: StyleSetting,
     _table_id: String,
     _style_id: i32,
@@ -5263,9 +5346,15 @@ pub struct StyleUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StyleUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for StyleUpdateCall<'a, S> {}
 
-impl<'a> StyleUpdateCall<'a> {
+impl<'a, S> StyleUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5422,7 +5511,7 @@ impl<'a> StyleUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StyleSetting) -> StyleUpdateCall<'a> {
+    pub fn request(mut self, new_value: StyleSetting) -> StyleUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5432,7 +5521,7 @@ impl<'a> StyleUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> StyleUpdateCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> StyleUpdateCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5442,7 +5531,7 @@ impl<'a> StyleUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn style_id(mut self, new_value: i32) -> StyleUpdateCall<'a> {
+    pub fn style_id(mut self, new_value: i32) -> StyleUpdateCall<'a, S> {
         self._style_id = new_value;
         self
     }
@@ -5452,7 +5541,7 @@ impl<'a> StyleUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StyleUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5473,7 +5562,7 @@ impl<'a> StyleUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StyleUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StyleUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5493,9 +5582,9 @@ impl<'a> StyleUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StyleUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StyleUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5527,7 +5616,7 @@ impl<'a> StyleUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5536,10 +5625,10 @@ impl<'a> StyleUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableCopyCall<'a>
-    where  {
+pub struct TableCopyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _copy_presentation: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5547,9 +5636,15 @@ pub struct TableCopyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableCopyCall<'a> {}
+impl<'a, S> client::CallBuilder for TableCopyCall<'a, S> {}
 
-impl<'a> TableCopyCall<'a> {
+impl<'a, S> TableCopyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5695,14 +5790,14 @@ impl<'a> TableCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableCopyCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableCopyCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Whether to also copy tabs, styles, and templates. Default is false.
     ///
     /// Sets the *copy presentation* query property to the given value.
-    pub fn copy_presentation(mut self, new_value: bool) -> TableCopyCall<'a> {
+    pub fn copy_presentation(mut self, new_value: bool) -> TableCopyCall<'a, S> {
         self._copy_presentation = Some(new_value);
         self
     }
@@ -5712,7 +5807,7 @@ impl<'a> TableCopyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableCopyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableCopyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5733,7 +5828,7 @@ impl<'a> TableCopyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableCopyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableCopyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5753,9 +5848,9 @@ impl<'a> TableCopyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableCopyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableCopyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5787,7 +5882,7 @@ impl<'a> TableCopyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5795,19 +5890,25 @@ impl<'a> TableCopyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableDeleteCall<'a>
-    where  {
+pub struct TableDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TableDeleteCall<'a, S> {}
 
-impl<'a> TableDeleteCall<'a> {
+impl<'a, S> TableDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5939,7 +6040,7 @@ impl<'a> TableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -5949,7 +6050,7 @@ impl<'a> TableDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5970,7 +6071,7 @@ impl<'a> TableDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5990,9 +6091,9 @@ impl<'a> TableDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6024,7 +6125,7 @@ impl<'a> TableDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6032,19 +6133,25 @@ impl<'a> TableDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableGetCall<'a>
-    where  {
+pub struct TableGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TableGetCall<'a, S> {}
 
-impl<'a> TableGetCall<'a> {
+impl<'a, S> TableGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6187,7 +6294,7 @@ impl<'a> TableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -6197,7 +6304,7 @@ impl<'a> TableGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6218,7 +6325,7 @@ impl<'a> TableGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6238,9 +6345,9 @@ impl<'a> TableGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6273,7 +6380,7 @@ impl<'a> TableGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -6286,10 +6393,10 @@ impl<'a> TableGetCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct TableImportRowCall<'a>
-    where  {
+pub struct TableImportRowCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _start_line: Option<i32>,
     _is_strict: Option<bool>,
@@ -6301,9 +6408,15 @@ pub struct TableImportRowCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableImportRowCall<'a> {}
+impl<'a, S> client::CallBuilder for TableImportRowCall<'a, S> {}
 
-impl<'a> TableImportRowCall<'a> {
+impl<'a, S> TableImportRowCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6569,42 +6682,42 @@ impl<'a> TableImportRowCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableImportRowCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableImportRowCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// The index of the first line from which to start importing, inclusive. Default is 0.
     ///
     /// Sets the *start line* query property to the given value.
-    pub fn start_line(mut self, new_value: i32) -> TableImportRowCall<'a> {
+    pub fn start_line(mut self, new_value: i32) -> TableImportRowCall<'a, S> {
         self._start_line = Some(new_value);
         self
     }
     /// Whether the imported CSV must have the same number of values for each row. If false, rows with fewer values will be padded with empty values. Default is true.
     ///
     /// Sets the *is strict* query property to the given value.
-    pub fn is_strict(mut self, new_value: bool) -> TableImportRowCall<'a> {
+    pub fn is_strict(mut self, new_value: bool) -> TableImportRowCall<'a, S> {
         self._is_strict = Some(new_value);
         self
     }
     /// The index of the line up to which data will be imported. Default is to import the entire file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.
     ///
     /// Sets the *end line* query property to the given value.
-    pub fn end_line(mut self, new_value: i32) -> TableImportRowCall<'a> {
+    pub fn end_line(mut self, new_value: i32) -> TableImportRowCall<'a, S> {
         self._end_line = Some(new_value);
         self
     }
     /// The encoding of the content. Default is UTF-8. Use auto-detect if you are unsure of the encoding.
     ///
     /// Sets the *encoding* query property to the given value.
-    pub fn encoding(mut self, new_value: &str) -> TableImportRowCall<'a> {
+    pub fn encoding(mut self, new_value: &str) -> TableImportRowCall<'a, S> {
         self._encoding = Some(new_value.to_string());
         self
     }
     /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
     ///
     /// Sets the *delimiter* query property to the given value.
-    pub fn delimiter(mut self, new_value: &str) -> TableImportRowCall<'a> {
+    pub fn delimiter(mut self, new_value: &str) -> TableImportRowCall<'a, S> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -6614,7 +6727,7 @@ impl<'a> TableImportRowCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableImportRowCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableImportRowCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6635,7 +6748,7 @@ impl<'a> TableImportRowCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableImportRowCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableImportRowCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6655,9 +6768,9 @@ impl<'a> TableImportRowCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableImportRowCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableImportRowCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6690,7 +6803,7 @@ impl<'a> TableImportRowCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -6700,10 +6813,10 @@ impl<'a> TableImportRowCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct TableImportTableCall<'a>
-    where  {
+pub struct TableImportTableCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _name: String,
     _encoding: Option<String>,
     _delimiter: Option<String>,
@@ -6712,9 +6825,15 @@ pub struct TableImportTableCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableImportTableCall<'a> {}
+impl<'a, S> client::CallBuilder for TableImportTableCall<'a, S> {}
 
-impl<'a> TableImportTableCall<'a> {
+impl<'a, S> TableImportTableCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6950,21 +7069,21 @@ impl<'a> TableImportTableCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TableImportTableCall<'a> {
+    pub fn name(mut self, new_value: &str) -> TableImportTableCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The encoding of the content. Default is UTF-8. Use auto-detect if you are unsure of the encoding.
     ///
     /// Sets the *encoding* query property to the given value.
-    pub fn encoding(mut self, new_value: &str) -> TableImportTableCall<'a> {
+    pub fn encoding(mut self, new_value: &str) -> TableImportTableCall<'a, S> {
         self._encoding = Some(new_value.to_string());
         self
     }
     /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
     ///
     /// Sets the *delimiter* query property to the given value.
-    pub fn delimiter(mut self, new_value: &str) -> TableImportTableCall<'a> {
+    pub fn delimiter(mut self, new_value: &str) -> TableImportTableCall<'a, S> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -6974,7 +7093,7 @@ impl<'a> TableImportTableCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableImportTableCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableImportTableCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6995,7 +7114,7 @@ impl<'a> TableImportTableCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableImportTableCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableImportTableCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7015,9 +7134,9 @@ impl<'a> TableImportTableCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableImportTableCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableImportTableCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7050,7 +7169,7 @@ impl<'a> TableImportTableCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7063,19 +7182,25 @@ impl<'a> TableImportTableCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableInsertCall<'a>
-    where  {
+pub struct TableInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Table,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TableInsertCall<'a, S> {}
 
-impl<'a> TableInsertCall<'a> {
+impl<'a, S> TableInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7209,7 +7334,7 @@ impl<'a> TableInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Table) -> TableInsertCall<'a> {
+    pub fn request(mut self, new_value: Table) -> TableInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7219,7 +7344,7 @@ impl<'a> TableInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7240,7 +7365,7 @@ impl<'a> TableInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7260,9 +7385,9 @@ impl<'a> TableInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7294,7 +7419,7 @@ impl<'a> TableInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7304,10 +7429,10 @@ impl<'a> TableInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableListCall<'a>
-    where  {
+pub struct TableListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7315,9 +7440,15 @@ pub struct TableListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableListCall<'a> {}
+impl<'a, S> client::CallBuilder for TableListCall<'a, S> {}
 
-impl<'a> TableListCall<'a> {
+impl<'a, S> TableListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7441,14 +7572,14 @@ impl<'a> TableListCall<'a> {
     /// Continuation token specifying which result page to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of tables to return. Default is 5.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -7458,7 +7589,7 @@ impl<'a> TableListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7479,7 +7610,7 @@ impl<'a> TableListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7499,9 +7630,9 @@ impl<'a> TableListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7534,7 +7665,7 @@ impl<'a> TableListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7548,10 +7679,10 @@ impl<'a> TableListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TablePatchCall<'a>
-    where  {
+pub struct TablePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Table,
     _table_id: String,
     _replace_view_definition: Option<bool>,
@@ -7560,9 +7691,15 @@ pub struct TablePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TablePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TablePatchCall<'a, S> {}
 
-impl<'a> TablePatchCall<'a> {
+impl<'a, S> TablePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7721,7 +7858,7 @@ impl<'a> TablePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Table) -> TablePatchCall<'a> {
+    pub fn request(mut self, new_value: Table) -> TablePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7731,14 +7868,14 @@ impl<'a> TablePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Whether the view definition is also updated. The specified view definition replaces the existing one. Only a view can be updated with a new definition.
     ///
     /// Sets the *replace view definition* query property to the given value.
-    pub fn replace_view_definition(mut self, new_value: bool) -> TablePatchCall<'a> {
+    pub fn replace_view_definition(mut self, new_value: bool) -> TablePatchCall<'a, S> {
         self._replace_view_definition = Some(new_value);
         self
     }
@@ -7748,7 +7885,7 @@ impl<'a> TablePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TablePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TablePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7769,7 +7906,7 @@ impl<'a> TablePatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7789,9 +7926,9 @@ impl<'a> TablePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TablePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TablePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7823,7 +7960,7 @@ impl<'a> TablePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7831,19 +7968,25 @@ impl<'a> TablePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRefetchSheetCall<'a>
-    where  {
+pub struct TableRefetchSheetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableRefetchSheetCall<'a> {}
+impl<'a, S> client::CallBuilder for TableRefetchSheetCall<'a, S> {}
 
-impl<'a> TableRefetchSheetCall<'a> {
+impl<'a, S> TableRefetchSheetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7986,7 +8129,7 @@ impl<'a> TableRefetchSheetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableRefetchSheetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableRefetchSheetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -7996,7 +8139,7 @@ impl<'a> TableRefetchSheetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRefetchSheetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRefetchSheetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8017,7 +8160,7 @@ impl<'a> TableRefetchSheetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableRefetchSheetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRefetchSheetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8037,9 +8180,9 @@ impl<'a> TableRefetchSheetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRefetchSheetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableRefetchSheetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8072,7 +8215,7 @@ impl<'a> TableRefetchSheetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -8085,10 +8228,10 @@ impl<'a> TableRefetchSheetCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct TableReplaceRowCall<'a>
-    where  {
+pub struct TableReplaceRowCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _start_line: Option<i32>,
     _is_strict: Option<bool>,
@@ -8100,9 +8243,15 @@ pub struct TableReplaceRowCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableReplaceRowCall<'a> {}
+impl<'a, S> client::CallBuilder for TableReplaceRowCall<'a, S> {}
 
-impl<'a> TableReplaceRowCall<'a> {
+impl<'a, S> TableReplaceRowCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8368,42 +8517,42 @@ impl<'a> TableReplaceRowCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableReplaceRowCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableReplaceRowCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// The index of the first line from which to start importing, inclusive. Default is 0.
     ///
     /// Sets the *start line* query property to the given value.
-    pub fn start_line(mut self, new_value: i32) -> TableReplaceRowCall<'a> {
+    pub fn start_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, S> {
         self._start_line = Some(new_value);
         self
     }
     /// Whether the imported CSV must have the same number of column values for each row. If true, throws an exception if the CSV does not have the same number of columns. If false, rows with fewer column values will be padded with empty values. Default is true.
     ///
     /// Sets the *is strict* query property to the given value.
-    pub fn is_strict(mut self, new_value: bool) -> TableReplaceRowCall<'a> {
+    pub fn is_strict(mut self, new_value: bool) -> TableReplaceRowCall<'a, S> {
         self._is_strict = Some(new_value);
         self
     }
     /// The index of the line up to which data will be imported. Default is to import the entire file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.
     ///
     /// Sets the *end line* query property to the given value.
-    pub fn end_line(mut self, new_value: i32) -> TableReplaceRowCall<'a> {
+    pub fn end_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, S> {
         self._end_line = Some(new_value);
         self
     }
     /// The encoding of the content. Default is UTF-8. Use 'auto-detect' if you are unsure of the encoding.
     ///
     /// Sets the *encoding* query property to the given value.
-    pub fn encoding(mut self, new_value: &str) -> TableReplaceRowCall<'a> {
+    pub fn encoding(mut self, new_value: &str) -> TableReplaceRowCall<'a, S> {
         self._encoding = Some(new_value.to_string());
         self
     }
     /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
     ///
     /// Sets the *delimiter* query property to the given value.
-    pub fn delimiter(mut self, new_value: &str) -> TableReplaceRowCall<'a> {
+    pub fn delimiter(mut self, new_value: &str) -> TableReplaceRowCall<'a, S> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -8413,7 +8562,7 @@ impl<'a> TableReplaceRowCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableReplaceRowCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableReplaceRowCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8434,7 +8583,7 @@ impl<'a> TableReplaceRowCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableReplaceRowCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableReplaceRowCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8454,9 +8603,9 @@ impl<'a> TableReplaceRowCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableReplaceRowCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableReplaceRowCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8489,7 +8638,7 @@ impl<'a> TableReplaceRowCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8503,10 +8652,10 @@ impl<'a> TableReplaceRowCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableUpdateCall<'a>
-    where  {
+pub struct TableUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Table,
     _table_id: String,
     _replace_view_definition: Option<bool>,
@@ -8515,9 +8664,15 @@ pub struct TableUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TableUpdateCall<'a, S> {}
 
-impl<'a> TableUpdateCall<'a> {
+impl<'a, S> TableUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8676,7 +8831,7 @@ impl<'a> TableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Table) -> TableUpdateCall<'a> {
+    pub fn request(mut self, new_value: Table) -> TableUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8686,14 +8841,14 @@ impl<'a> TableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Whether the view definition is also updated. The specified view definition replaces the existing one. Only a view can be updated with a new definition.
     ///
     /// Sets the *replace view definition* query property to the given value.
-    pub fn replace_view_definition(mut self, new_value: bool) -> TableUpdateCall<'a> {
+    pub fn replace_view_definition(mut self, new_value: bool) -> TableUpdateCall<'a, S> {
         self._replace_view_definition = Some(new_value);
         self
     }
@@ -8703,7 +8858,7 @@ impl<'a> TableUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8724,7 +8879,7 @@ impl<'a> TableUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8744,9 +8899,9 @@ impl<'a> TableUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8778,7 +8933,7 @@ impl<'a> TableUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8786,10 +8941,10 @@ impl<'a> TableUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a>
-    where  {
+pub struct TaskDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _task_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8797,9 +8952,15 @@ pub struct TaskDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskDeleteCall<'a, S> {}
 
-impl<'a> TaskDeleteCall<'a> {
+impl<'a, S> TaskDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8932,7 +9093,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -8942,7 +9103,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task_id(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn task_id(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._task_id = new_value.to_string();
         self
     }
@@ -8952,7 +9113,7 @@ impl<'a> TaskDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8973,7 +9134,7 @@ impl<'a> TaskDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8993,9 +9154,9 @@ impl<'a> TaskDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9027,7 +9188,7 @@ impl<'a> TaskDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9035,10 +9196,10 @@ impl<'a> TaskDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskGetCall<'a>
-    where  {
+pub struct TaskGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _task_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9046,9 +9207,15 @@ pub struct TaskGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskGetCall<'a, S> {}
 
-impl<'a> TaskGetCall<'a> {
+impl<'a, S> TaskGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9192,7 +9359,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -9202,7 +9369,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task_id(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn task_id(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._task_id = new_value.to_string();
         self
     }
@@ -9212,7 +9379,7 @@ impl<'a> TaskGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9233,7 +9400,7 @@ impl<'a> TaskGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9253,9 +9420,9 @@ impl<'a> TaskGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9287,7 +9454,7 @@ impl<'a> TaskGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9298,10 +9465,10 @@ impl<'a> TaskGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskListCall<'a>
-    where  {
+pub struct TaskListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _start_index: Option<u32>,
     _page_token: Option<String>,
@@ -9311,9 +9478,15 @@ pub struct TaskListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskListCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskListCall<'a, S> {}
 
-impl<'a> TaskListCall<'a> {
+impl<'a, S> TaskListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9465,28 +9638,28 @@ impl<'a> TaskListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Index of the first result returned in the current page.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> TaskListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> TaskListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// Continuation token specifying which result page to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of tasks to return. Default is 5.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TaskListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TaskListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -9496,7 +9669,7 @@ impl<'a> TaskListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9517,7 +9690,7 @@ impl<'a> TaskListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9537,9 +9710,9 @@ impl<'a> TaskListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9571,7 +9744,7 @@ impl<'a> TaskListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9579,10 +9752,10 @@ impl<'a> TaskListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateDeleteCall<'a>
-    where  {
+pub struct TemplateDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _template_id: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9590,9 +9763,15 @@ pub struct TemplateDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TemplateDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TemplateDeleteCall<'a, S> {}
 
-impl<'a> TemplateDeleteCall<'a> {
+impl<'a, S> TemplateDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9725,7 +9904,7 @@ impl<'a> TemplateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TemplateDeleteCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -9735,7 +9914,7 @@ impl<'a> TemplateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_id(mut self, new_value: i32) -> TemplateDeleteCall<'a> {
+    pub fn template_id(mut self, new_value: i32) -> TemplateDeleteCall<'a, S> {
         self._template_id = new_value;
         self
     }
@@ -9745,7 +9924,7 @@ impl<'a> TemplateDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9766,7 +9945,7 @@ impl<'a> TemplateDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9786,9 +9965,9 @@ impl<'a> TemplateDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TemplateDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9820,7 +9999,7 @@ impl<'a> TemplateDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9828,10 +10007,10 @@ impl<'a> TemplateDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateGetCall<'a>
-    where  {
+pub struct TemplateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _template_id: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9839,9 +10018,15 @@ pub struct TemplateGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TemplateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TemplateGetCall<'a, S> {}
 
-impl<'a> TemplateGetCall<'a> {
+impl<'a, S> TemplateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9985,7 +10170,7 @@ impl<'a> TemplateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TemplateGetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateGetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -9995,7 +10180,7 @@ impl<'a> TemplateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_id(mut self, new_value: i32) -> TemplateGetCall<'a> {
+    pub fn template_id(mut self, new_value: i32) -> TemplateGetCall<'a, S> {
         self._template_id = new_value;
         self
     }
@@ -10005,7 +10190,7 @@ impl<'a> TemplateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10026,7 +10211,7 @@ impl<'a> TemplateGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10046,9 +10231,9 @@ impl<'a> TemplateGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TemplateGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10081,7 +10266,7 @@ impl<'a> TemplateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10094,10 +10279,10 @@ impl<'a> TemplateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateInsertCall<'a>
-    where  {
+pub struct TemplateInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Template,
     _table_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10105,9 +10290,15 @@ pub struct TemplateInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TemplateInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TemplateInsertCall<'a, S> {}
 
-impl<'a> TemplateInsertCall<'a> {
+impl<'a, S> TemplateInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10263,7 +10454,7 @@ impl<'a> TemplateInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Template) -> TemplateInsertCall<'a> {
+    pub fn request(mut self, new_value: Template) -> TemplateInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10273,7 +10464,7 @@ impl<'a> TemplateInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TemplateInsertCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateInsertCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -10283,7 +10474,7 @@ impl<'a> TemplateInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10304,7 +10495,7 @@ impl<'a> TemplateInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10324,9 +10515,9 @@ impl<'a> TemplateInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TemplateInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10358,7 +10549,7 @@ impl<'a> TemplateInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10368,10 +10559,10 @@ impl<'a> TemplateInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateListCall<'a>
-    where  {
+pub struct TemplateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _table_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -10380,9 +10571,15 @@ pub struct TemplateListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TemplateListCall<'a> {}
+impl<'a, S> client::CallBuilder for TemplateListCall<'a, S> {}
 
-impl<'a> TemplateListCall<'a> {
+impl<'a, S> TemplateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10531,21 +10728,21 @@ impl<'a> TemplateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TemplateListCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateListCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Continuation token specifying which results page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of templates to return. Optional. Default is 5.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TemplateListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TemplateListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -10555,7 +10752,7 @@ impl<'a> TemplateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10576,7 +10773,7 @@ impl<'a> TemplateListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10596,9 +10793,9 @@ impl<'a> TemplateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TemplateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10631,7 +10828,7 @@ impl<'a> TemplateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10644,10 +10841,10 @@ impl<'a> TemplateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplatePatchCall<'a>
-    where  {
+pub struct TemplatePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Template,
     _table_id: String,
     _template_id: i32,
@@ -10656,9 +10853,15 @@ pub struct TemplatePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TemplatePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TemplatePatchCall<'a, S> {}
 
-impl<'a> TemplatePatchCall<'a> {
+impl<'a, S> TemplatePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10815,7 +11018,7 @@ impl<'a> TemplatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Template) -> TemplatePatchCall<'a> {
+    pub fn request(mut self, new_value: Template) -> TemplatePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10825,7 +11028,7 @@ impl<'a> TemplatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TemplatePatchCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TemplatePatchCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -10835,7 +11038,7 @@ impl<'a> TemplatePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_id(mut self, new_value: i32) -> TemplatePatchCall<'a> {
+    pub fn template_id(mut self, new_value: i32) -> TemplatePatchCall<'a, S> {
         self._template_id = new_value;
         self
     }
@@ -10845,7 +11048,7 @@ impl<'a> TemplatePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplatePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplatePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10866,7 +11069,7 @@ impl<'a> TemplatePatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplatePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplatePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10886,9 +11089,9 @@ impl<'a> TemplatePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplatePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TemplatePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10921,7 +11124,7 @@ impl<'a> TemplatePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fusiontables::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10934,10 +11137,10 @@ impl<'a> TemplatePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateUpdateCall<'a>
-    where  {
+pub struct TemplateUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fusiontables<>,
+    hub: &'a Fusiontables<S>,
     _request: Template,
     _table_id: String,
     _template_id: i32,
@@ -10946,9 +11149,15 @@ pub struct TemplateUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TemplateUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TemplateUpdateCall<'a, S> {}
 
-impl<'a> TemplateUpdateCall<'a> {
+impl<'a, S> TemplateUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11105,7 +11314,7 @@ impl<'a> TemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Template) -> TemplateUpdateCall<'a> {
+    pub fn request(mut self, new_value: Template) -> TemplateUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11115,7 +11324,7 @@ impl<'a> TemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TemplateUpdateCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TemplateUpdateCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -11125,7 +11334,7 @@ impl<'a> TemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_id(mut self, new_value: i32) -> TemplateUpdateCall<'a> {
+    pub fn template_id(mut self, new_value: i32) -> TemplateUpdateCall<'a, S> {
         self._template_id = new_value;
         self
     }
@@ -11135,7 +11344,7 @@ impl<'a> TemplateUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11156,7 +11365,7 @@ impl<'a> TemplateUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11176,9 +11385,9 @@ impl<'a> TemplateUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TemplateUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

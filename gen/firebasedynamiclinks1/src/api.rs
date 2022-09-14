@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,40 +108,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct FirebaseDynamicLinks<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct FirebaseDynamicLinks<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for FirebaseDynamicLinks<> {}
+impl<'a, S> client::Hub for FirebaseDynamicLinks<S> {}
 
-impl<'a, > FirebaseDynamicLinks<> {
+impl<'a, S> FirebaseDynamicLinks<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseDynamicLinks<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> FirebaseDynamicLinks<S> {
         FirebaseDynamicLinks {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
             _root_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
         }
     }
 
-    pub fn managed_short_links(&'a self) -> ManagedShortLinkMethods<'a> {
+    pub fn managed_short_links(&'a self) -> ManagedShortLinkMethods<'a, S> {
         ManagedShortLinkMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a> {
+    pub fn methods(&'a self) -> MethodMethods<'a, S> {
         MethodMethods { hub: &self }
     }
-    pub fn short_links(&'a self) -> ShortLinkMethods<'a> {
+    pub fn short_links(&'a self) -> ShortLinkMethods<'a, S> {
         ShortLinkMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -803,22 +808,22 @@ impl client::Part for Suffix {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`
 /// // to build up your call.
 /// let rb = hub.managed_short_links();
 /// # }
 /// ```
-pub struct ManagedShortLinkMethods<'a>
-    where  {
+pub struct ManagedShortLinkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
 }
 
-impl<'a> client::MethodsBuilder for ManagedShortLinkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ManagedShortLinkMethods<'a, S> {}
 
-impl<'a> ManagedShortLinkMethods<'a> {
+impl<'a, S> ManagedShortLinkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -827,7 +832,7 @@ impl<'a> ManagedShortLinkMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a> {
+    pub fn create(&self, request: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a, S> {
         ManagedShortLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -861,22 +866,22 @@ impl<'a> ManagedShortLinkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`
 /// // to build up your call.
 /// let rb = hub.short_links();
 /// # }
 /// ```
-pub struct ShortLinkMethods<'a>
-    where  {
+pub struct ShortLinkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
 }
 
-impl<'a> client::MethodsBuilder for ShortLinkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ShortLinkMethods<'a, S> {}
 
-impl<'a> ShortLinkMethods<'a> {
+impl<'a, S> ShortLinkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -885,7 +890,7 @@ impl<'a> ShortLinkMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a> {
+    pub fn create(&self, request: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a, S> {
         ShortLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -919,22 +924,22 @@ impl<'a> ShortLinkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_link_stats(...)`, `install_attribution(...)` and `reopen_attribution(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a>
-    where  {
+pub struct MethodMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
 }
 
-impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
 
-impl<'a> MethodMethods<'a> {
+impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -943,7 +948,7 @@ impl<'a> MethodMethods<'a> {
     /// # Arguments
     ///
     /// * `dynamicLink` - Dynamic Link URL. e.g. https://abcd.app.goo.gl/wxyz
-    pub fn get_link_stats(&self, dynamic_link: &str) -> MethodGetLinkStatCall<'a> {
+    pub fn get_link_stats(&self, dynamic_link: &str) -> MethodGetLinkStatCall<'a, S> {
         MethodGetLinkStatCall {
             hub: self.hub,
             _dynamic_link: dynamic_link.to_string(),
@@ -962,7 +967,7 @@ impl<'a> MethodMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn install_attribution(&self, request: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a> {
+    pub fn install_attribution(&self, request: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a, S> {
         MethodInstallAttributionCall {
             hub: self.hub,
             _request: request,
@@ -979,7 +984,7 @@ impl<'a> MethodMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reopen_attribution(&self, request: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a> {
+    pub fn reopen_attribution(&self, request: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a, S> {
         MethodReopenAttributionCall {
             hub: self.hub,
             _request: request,
@@ -1021,7 +1026,7 @@ impl<'a> MethodMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1034,19 +1039,25 @@ impl<'a> MethodMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ManagedShortLinkCreateCall<'a>
-    where  {
+pub struct ManagedShortLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
     _request: CreateManagedShortLinkRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ManagedShortLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ManagedShortLinkCreateCall<'a, S> {}
 
-impl<'a> ManagedShortLinkCreateCall<'a> {
+impl<'a, S> ManagedShortLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1180,7 +1191,7 @@ impl<'a> ManagedShortLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1190,7 +1201,7 @@ impl<'a> ManagedShortLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedShortLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedShortLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1215,7 +1226,7 @@ impl<'a> ManagedShortLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedShortLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedShortLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1235,9 +1246,9 @@ impl<'a> ManagedShortLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedShortLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ManagedShortLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1270,7 +1281,7 @@ impl<'a> ManagedShortLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1283,19 +1294,25 @@ impl<'a> ManagedShortLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShortLinkCreateCall<'a>
-    where  {
+pub struct ShortLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
     _request: CreateShortDynamicLinkRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShortLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ShortLinkCreateCall<'a, S> {}
 
-impl<'a> ShortLinkCreateCall<'a> {
+impl<'a, S> ShortLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1429,7 +1446,7 @@ impl<'a> ShortLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1439,7 +1456,7 @@ impl<'a> ShortLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShortLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShortLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1464,7 +1481,7 @@ impl<'a> ShortLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShortLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShortLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1484,9 +1501,9 @@ impl<'a> ShortLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShortLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShortLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1518,7 +1535,7 @@ impl<'a> ShortLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1528,10 +1545,10 @@ impl<'a> ShortLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetLinkStatCall<'a>
-    where  {
+pub struct MethodGetLinkStatCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
     _dynamic_link: String,
     _sdk_version: Option<String>,
     _duration_days: Option<String>,
@@ -1540,9 +1557,15 @@ pub struct MethodGetLinkStatCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodGetLinkStatCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetLinkStatCall<'a, S> {}
 
-impl<'a> MethodGetLinkStatCall<'a> {
+impl<'a, S> MethodGetLinkStatCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1691,21 +1714,21 @@ impl<'a> MethodGetLinkStatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dynamic_link(mut self, new_value: &str) -> MethodGetLinkStatCall<'a> {
+    pub fn dynamic_link(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, S> {
         self._dynamic_link = new_value.to_string();
         self
     }
     /// Google SDK version. Version takes the form "$major.$minor.$patch"
     ///
     /// Sets the *sdk version* query property to the given value.
-    pub fn sdk_version(mut self, new_value: &str) -> MethodGetLinkStatCall<'a> {
+    pub fn sdk_version(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, S> {
         self._sdk_version = Some(new_value.to_string());
         self
     }
     /// The span of time requested in days.
     ///
     /// Sets the *duration days* query property to the given value.
-    pub fn duration_days(mut self, new_value: &str) -> MethodGetLinkStatCall<'a> {
+    pub fn duration_days(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, S> {
         self._duration_days = Some(new_value.to_string());
         self
     }
@@ -1715,7 +1738,7 @@ impl<'a> MethodGetLinkStatCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetLinkStatCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetLinkStatCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1740,7 +1763,7 @@ impl<'a> MethodGetLinkStatCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetLinkStatCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetLinkStatCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1760,9 +1783,9 @@ impl<'a> MethodGetLinkStatCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetLinkStatCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodGetLinkStatCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1795,7 +1818,7 @@ impl<'a> MethodGetLinkStatCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1808,19 +1831,25 @@ impl<'a> MethodGetLinkStatCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodInstallAttributionCall<'a>
-    where  {
+pub struct MethodInstallAttributionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
     _request: GetIosPostInstallAttributionRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodInstallAttributionCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodInstallAttributionCall<'a, S> {}
 
-impl<'a> MethodInstallAttributionCall<'a> {
+impl<'a, S> MethodInstallAttributionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1954,7 +1983,7 @@ impl<'a> MethodInstallAttributionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a> {
+    pub fn request(mut self, new_value: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1964,7 +1993,7 @@ impl<'a> MethodInstallAttributionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodInstallAttributionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodInstallAttributionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1989,7 +2018,7 @@ impl<'a> MethodInstallAttributionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodInstallAttributionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodInstallAttributionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2009,9 +2038,9 @@ impl<'a> MethodInstallAttributionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodInstallAttributionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodInstallAttributionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2044,7 +2073,7 @@ impl<'a> MethodInstallAttributionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2057,19 +2086,25 @@ impl<'a> MethodInstallAttributionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodReopenAttributionCall<'a>
-    where  {
+pub struct MethodReopenAttributionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseDynamicLinks<>,
+    hub: &'a FirebaseDynamicLinks<S>,
     _request: GetIosReopenAttributionRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodReopenAttributionCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodReopenAttributionCall<'a, S> {}
 
-impl<'a> MethodReopenAttributionCall<'a> {
+impl<'a, S> MethodReopenAttributionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2203,7 +2238,7 @@ impl<'a> MethodReopenAttributionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a> {
+    pub fn request(mut self, new_value: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2213,7 +2248,7 @@ impl<'a> MethodReopenAttributionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodReopenAttributionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodReopenAttributionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2238,7 +2273,7 @@ impl<'a> MethodReopenAttributionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodReopenAttributionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodReopenAttributionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2258,9 +2293,9 @@ impl<'a> MethodReopenAttributionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodReopenAttributionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodReopenAttributionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

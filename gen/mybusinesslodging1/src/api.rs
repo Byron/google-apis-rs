@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -82,34 +87,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct MyBusinessLodging<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct MyBusinessLodging<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for MyBusinessLodging<> {}
+impl<'a, S> client::Hub for MyBusinessLodging<S> {}
 
-impl<'a, > MyBusinessLodging<> {
+impl<'a, S> MyBusinessLodging<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusinessLodging<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusinessLodging<S> {
         MyBusinessLodging {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://mybusinesslodging.googleapis.com/".to_string(),
             _root_url: "https://mybusinesslodging.googleapis.com/".to_string(),
         }
     }
 
-    pub fn locations(&'a self) -> LocationMethods<'a> {
+    pub fn locations(&'a self) -> LocationMethods<'a, S> {
         LocationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2332,22 +2337,22 @@ impl client::Part for Wellness {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_lodging(...)`, `lodging_get_google_updated(...)` and `update_lodging(...)`
 /// // to build up your call.
 /// let rb = hub.locations();
 /// # }
 /// ```
-pub struct LocationMethods<'a>
-    where  {
+pub struct LocationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessLodging<>,
+    hub: &'a MyBusinessLodging<S>,
 }
 
-impl<'a> client::MethodsBuilder for LocationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LocationMethods<'a, S> {}
 
-impl<'a> LocationMethods<'a> {
+impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2356,7 +2361,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Google identifier for this location in the form: `accounts/{account_id}/locations/{location_id}/lodging`
-    pub fn lodging_get_google_updated(&self, name: &str) -> LocationLodgingGetGoogleUpdatedCall<'a> {
+    pub fn lodging_get_google_updated(&self, name: &str) -> LocationLodgingGetGoogleUpdatedCall<'a, S> {
         LocationLodgingGetGoogleUpdatedCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2373,7 +2378,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Google identifier for this location in the form: `locations/{location_id}/lodging`
-    pub fn get_lodging(&self, name: &str) -> LocationGetLodgingCall<'a> {
+    pub fn get_lodging(&self, name: &str) -> LocationGetLodgingCall<'a, S> {
         LocationGetLodgingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2391,7 +2396,7 @@ impl<'a> LocationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Google identifier for this location in the form: `locations/{location_id}/lodging`
-    pub fn update_lodging(&self, request: Lodging, name: &str) -> LocationUpdateLodgingCall<'a> {
+    pub fn update_lodging(&self, request: Lodging, name: &str) -> LocationUpdateLodgingCall<'a, S> {
         LocationUpdateLodgingCall {
             hub: self.hub,
             _request: request,
@@ -2433,7 +2438,7 @@ impl<'a> LocationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2442,19 +2447,25 @@ impl<'a> LocationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationLodgingGetGoogleUpdatedCall<'a>
-    where  {
+pub struct LocationLodgingGetGoogleUpdatedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessLodging<>,
+    hub: &'a MyBusinessLodging<S>,
     _name: String,
     _read_mask: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationLodgingGetGoogleUpdatedCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationLodgingGetGoogleUpdatedCall<'a, S> {}
 
-impl<'a> LocationLodgingGetGoogleUpdatedCall<'a> {
+impl<'a, S> LocationLodgingGetGoogleUpdatedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2598,14 +2609,14 @@ impl<'a> LocationLodgingGetGoogleUpdatedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationLodgingGetGoogleUpdatedCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationLodgingGetGoogleUpdatedCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields to return. Use "*" to include all fields. Repeated field items cannot be individually specified.
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> LocationLodgingGetGoogleUpdatedCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> LocationLodgingGetGoogleUpdatedCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
@@ -2615,7 +2626,7 @@ impl<'a> LocationLodgingGetGoogleUpdatedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationLodgingGetGoogleUpdatedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationLodgingGetGoogleUpdatedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2640,7 +2651,7 @@ impl<'a> LocationLodgingGetGoogleUpdatedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationLodgingGetGoogleUpdatedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationLodgingGetGoogleUpdatedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2671,7 +2682,7 @@ impl<'a> LocationLodgingGetGoogleUpdatedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2680,19 +2691,25 @@ impl<'a> LocationLodgingGetGoogleUpdatedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationGetLodgingCall<'a>
-    where  {
+pub struct LocationGetLodgingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessLodging<>,
+    hub: &'a MyBusinessLodging<S>,
     _name: String,
     _read_mask: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationGetLodgingCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationGetLodgingCall<'a, S> {}
 
-impl<'a> LocationGetLodgingCall<'a> {
+impl<'a, S> LocationGetLodgingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2836,14 +2853,14 @@ impl<'a> LocationGetLodgingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationGetLodgingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationGetLodgingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields to return. Use "*" to include all fields. Repeated field items cannot be individually specified.
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> LocationGetLodgingCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> LocationGetLodgingCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
@@ -2853,7 +2870,7 @@ impl<'a> LocationGetLodgingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetLodgingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetLodgingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2878,7 +2895,7 @@ impl<'a> LocationGetLodgingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationGetLodgingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationGetLodgingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2910,7 +2927,7 @@ impl<'a> LocationGetLodgingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessLodging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2924,10 +2941,10 @@ impl<'a> LocationGetLodgingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationUpdateLodgingCall<'a>
-    where  {
+pub struct LocationUpdateLodgingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessLodging<>,
+    hub: &'a MyBusinessLodging<S>,
     _request: Lodging,
     _name: String,
     _update_mask: Option<String>,
@@ -2935,9 +2952,15 @@ pub struct LocationUpdateLodgingCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationUpdateLodgingCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationUpdateLodgingCall<'a, S> {}
 
-impl<'a> LocationUpdateLodgingCall<'a> {
+impl<'a, S> LocationUpdateLodgingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3094,7 +3117,7 @@ impl<'a> LocationUpdateLodgingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Lodging) -> LocationUpdateLodgingCall<'a> {
+    pub fn request(mut self, new_value: Lodging) -> LocationUpdateLodgingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3104,14 +3127,14 @@ impl<'a> LocationUpdateLodgingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationUpdateLodgingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationUpdateLodgingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields to update. Use "*" to update all fields, which may include unsetting empty fields in the request. Repeated field items cannot be individually updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> LocationUpdateLodgingCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> LocationUpdateLodgingCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3121,7 +3144,7 @@ impl<'a> LocationUpdateLodgingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationUpdateLodgingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationUpdateLodgingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3146,7 +3169,7 @@ impl<'a> LocationUpdateLodgingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationUpdateLodgingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationUpdateLodgingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

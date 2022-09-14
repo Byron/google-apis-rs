@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -100,46 +105,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct RemoteBuildExecution<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct RemoteBuildExecution<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for RemoteBuildExecution<> {}
+impl<'a, S> client::Hub for RemoteBuildExecution<S> {}
 
-impl<'a, > RemoteBuildExecution<> {
+impl<'a, S> RemoteBuildExecution<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> RemoteBuildExecution<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> RemoteBuildExecution<S> {
         RemoteBuildExecution {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://remotebuildexecution.googleapis.com/".to_string(),
             _root_url: "https://remotebuildexecution.googleapis.com/".to_string(),
         }
     }
 
-    pub fn action_results(&'a self) -> ActionResultMethods<'a> {
+    pub fn action_results(&'a self) -> ActionResultMethods<'a, S> {
         ActionResultMethods { hub: &self }
     }
-    pub fn actions(&'a self) -> ActionMethods<'a> {
+    pub fn actions(&'a self) -> ActionMethods<'a, S> {
         ActionMethods { hub: &self }
     }
-    pub fn blobs(&'a self) -> BlobMethods<'a> {
+    pub fn blobs(&'a self) -> BlobMethods<'a, S> {
         BlobMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a> {
+    pub fn methods(&'a self) -> MethodMethods<'a, S> {
         MethodMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -904,22 +909,22 @@ impl client::Part for GoogleRpcStatus {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.action_results();
 /// # }
 /// ```
-pub struct ActionResultMethods<'a>
-    where  {
+pub struct ActionResultMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
 }
 
-impl<'a> client::MethodsBuilder for ActionResultMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ActionResultMethods<'a, S> {}
 
-impl<'a> ActionResultMethods<'a> {
+impl<'a, S> ActionResultMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -930,7 +935,7 @@ impl<'a> ActionResultMethods<'a> {
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
     /// * `hash` - The hash. In the case of SHA-256, it will always be a lowercase hex string exactly 64 characters long.
     /// * `sizeBytes` - The size of the blob, in bytes.
-    pub fn get(&self, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultGetCall<'a> {
+    pub fn get(&self, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultGetCall<'a, S> {
         ActionResultGetCall {
             hub: self.hub,
             _instance_name: instance_name.to_string(),
@@ -955,7 +960,7 @@ impl<'a> ActionResultMethods<'a> {
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
     /// * `hash` - The hash. In the case of SHA-256, it will always be a lowercase hex string exactly 64 characters long.
     /// * `sizeBytes` - The size of the blob, in bytes.
-    pub fn update(&self, request: BuildBazelRemoteExecutionV2ActionResult, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultUpdateCall<'a> {
+    pub fn update(&self, request: BuildBazelRemoteExecutionV2ActionResult, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultUpdateCall<'a, S> {
         ActionResultUpdateCall {
             hub: self.hub,
             _request: request,
@@ -993,22 +998,22 @@ impl<'a> ActionResultMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `execute(...)`
 /// // to build up your call.
 /// let rb = hub.actions();
 /// # }
 /// ```
-pub struct ActionMethods<'a>
-    where  {
+pub struct ActionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
 }
 
-impl<'a> client::MethodsBuilder for ActionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ActionMethods<'a, S> {}
 
-impl<'a> ActionMethods<'a> {
+impl<'a, S> ActionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1018,7 +1023,7 @@ impl<'a> ActionMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn execute(&self, request: BuildBazelRemoteExecutionV2ExecuteRequest, instance_name: &str) -> ActionExecuteCall<'a> {
+    pub fn execute(&self, request: BuildBazelRemoteExecutionV2ExecuteRequest, instance_name: &str) -> ActionExecuteCall<'a, S> {
         ActionExecuteCall {
             hub: self.hub,
             _request: request,
@@ -1053,22 +1058,22 @@ impl<'a> ActionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_read(...)`, `batch_update(...)`, `find_missing(...)` and `get_tree(...)`
 /// // to build up your call.
 /// let rb = hub.blobs();
 /// # }
 /// ```
-pub struct BlobMethods<'a>
-    where  {
+pub struct BlobMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
 }
 
-impl<'a> client::MethodsBuilder for BlobMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BlobMethods<'a, S> {}
 
-impl<'a> BlobMethods<'a> {
+impl<'a, S> BlobMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1078,7 +1083,7 @@ impl<'a> BlobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn batch_read(&self, request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest, instance_name: &str) -> BlobBatchReadCall<'a> {
+    pub fn batch_read(&self, request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest, instance_name: &str) -> BlobBatchReadCall<'a, S> {
         BlobBatchReadCall {
             hub: self.hub,
             _request: request,
@@ -1097,7 +1102,7 @@ impl<'a> BlobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn batch_update(&self, request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest, instance_name: &str) -> BlobBatchUpdateCall<'a> {
+    pub fn batch_update(&self, request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest, instance_name: &str) -> BlobBatchUpdateCall<'a, S> {
         BlobBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1116,7 +1121,7 @@ impl<'a> BlobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn find_missing(&self, request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest, instance_name: &str) -> BlobFindMissingCall<'a> {
+    pub fn find_missing(&self, request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest, instance_name: &str) -> BlobFindMissingCall<'a, S> {
         BlobFindMissingCall {
             hub: self.hub,
             _request: request,
@@ -1136,7 +1141,7 @@ impl<'a> BlobMethods<'a> {
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
     /// * `hash` - The hash. In the case of SHA-256, it will always be a lowercase hex string exactly 64 characters long.
     /// * `sizeBytes` - The size of the blob, in bytes.
-    pub fn get_tree(&self, instance_name: &str, hash: &str, size_bytes: &str) -> BlobGetTreeCall<'a> {
+    pub fn get_tree(&self, instance_name: &str, hash: &str, size_bytes: &str) -> BlobGetTreeCall<'a, S> {
         BlobGetTreeCall {
             hub: self.hub,
             _instance_name: instance_name.to_string(),
@@ -1174,22 +1179,22 @@ impl<'a> BlobMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `wait_execution(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1199,7 +1204,7 @@ impl<'a> OperationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the Operation returned by Execute.
-    pub fn wait_execution(&self, request: BuildBazelRemoteExecutionV2WaitExecutionRequest, name: &str) -> OperationWaitExecutionCall<'a> {
+    pub fn wait_execution(&self, request: BuildBazelRemoteExecutionV2WaitExecutionRequest, name: &str) -> OperationWaitExecutionCall<'a, S> {
         OperationWaitExecutionCall {
             hub: self.hub,
             _request: request,
@@ -1234,22 +1239,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_capabilities(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a>
-    where  {
+pub struct MethodMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
 }
 
-impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
 
-impl<'a> MethodMethods<'a> {
+impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1258,7 +1263,7 @@ impl<'a> MethodMethods<'a> {
     /// # Arguments
     ///
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn get_capabilities(&self, instance_name: &str) -> MethodGetCapabilityCall<'a> {
+    pub fn get_capabilities(&self, instance_name: &str) -> MethodGetCapabilityCall<'a, S> {
         MethodGetCapabilityCall {
             hub: self.hub,
             _instance_name: instance_name.to_string(),
@@ -1299,7 +1304,7 @@ impl<'a> MethodMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1310,10 +1315,10 @@ impl<'a> MethodMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActionResultGetCall<'a>
-    where  {
+pub struct ActionResultGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _instance_name: String,
     _hash: String,
     _size_bytes: String,
@@ -1325,9 +1330,15 @@ pub struct ActionResultGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ActionResultGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ActionResultGetCall<'a, S> {}
 
-impl<'a> ActionResultGetCall<'a> {
+impl<'a, S> ActionResultGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1487,7 +1498,7 @@ impl<'a> ActionResultGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> ActionResultGetCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> ActionResultGetCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -1497,7 +1508,7 @@ impl<'a> ActionResultGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hash(mut self, new_value: &str) -> ActionResultGetCall<'a> {
+    pub fn hash(mut self, new_value: &str) -> ActionResultGetCall<'a, S> {
         self._hash = new_value.to_string();
         self
     }
@@ -1507,21 +1518,21 @@ impl<'a> ActionResultGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn size_bytes(mut self, new_value: &str) -> ActionResultGetCall<'a> {
+    pub fn size_bytes(mut self, new_value: &str) -> ActionResultGetCall<'a, S> {
         self._size_bytes = new_value.to_string();
         self
     }
     /// A hint to the server to request inlining stdout in the ActionResult message.
     ///
     /// Sets the *inline stdout* query property to the given value.
-    pub fn inline_stdout(mut self, new_value: bool) -> ActionResultGetCall<'a> {
+    pub fn inline_stdout(mut self, new_value: bool) -> ActionResultGetCall<'a, S> {
         self._inline_stdout = Some(new_value);
         self
     }
     /// A hint to the server to request inlining stderr in the ActionResult message.
     ///
     /// Sets the *inline stderr* query property to the given value.
-    pub fn inline_stderr(mut self, new_value: bool) -> ActionResultGetCall<'a> {
+    pub fn inline_stderr(mut self, new_value: bool) -> ActionResultGetCall<'a, S> {
         self._inline_stderr = Some(new_value);
         self
     }
@@ -1529,7 +1540,7 @@ impl<'a> ActionResultGetCall<'a> {
     ///
     /// Append the given value to the *inline output files* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_inline_output_files(mut self, new_value: &str) -> ActionResultGetCall<'a> {
+    pub fn add_inline_output_files(mut self, new_value: &str) -> ActionResultGetCall<'a, S> {
         self._inline_output_files.push(new_value.to_string());
         self
     }
@@ -1539,7 +1550,7 @@ impl<'a> ActionResultGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1564,7 +1575,7 @@ impl<'a> ActionResultGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActionResultGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ActionResultGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1584,9 +1595,9 @@ impl<'a> ActionResultGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActionResultGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ActionResultGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1619,7 +1630,7 @@ impl<'a> ActionResultGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1633,10 +1644,10 @@ impl<'a> ActionResultGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActionResultUpdateCall<'a>
-    where  {
+pub struct ActionResultUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _request: BuildBazelRemoteExecutionV2ActionResult,
     _instance_name: String,
     _hash: String,
@@ -1647,9 +1658,15 @@ pub struct ActionResultUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ActionResultUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ActionResultUpdateCall<'a, S> {}
 
-impl<'a> ActionResultUpdateCall<'a> {
+impl<'a, S> ActionResultUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1814,7 +1831,7 @@ impl<'a> ActionResultUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ActionResult) -> ActionResultUpdateCall<'a> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ActionResult) -> ActionResultUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1824,7 +1841,7 @@ impl<'a> ActionResultUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> ActionResultUpdateCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> ActionResultUpdateCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -1834,7 +1851,7 @@ impl<'a> ActionResultUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hash(mut self, new_value: &str) -> ActionResultUpdateCall<'a> {
+    pub fn hash(mut self, new_value: &str) -> ActionResultUpdateCall<'a, S> {
         self._hash = new_value.to_string();
         self
     }
@@ -1844,14 +1861,14 @@ impl<'a> ActionResultUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn size_bytes(mut self, new_value: &str) -> ActionResultUpdateCall<'a> {
+    pub fn size_bytes(mut self, new_value: &str) -> ActionResultUpdateCall<'a, S> {
         self._size_bytes = new_value.to_string();
         self
     }
     /// The priority (relative importance) of this content in the overall cache. Generally, a lower value means a longer retention time or other advantage, but the interpretation of a given value is server-dependent. A priority of 0 means a *default* value, decided by the server. The particular semantics of this field is up to the server. In particular, every server will have their own supported range of priorities, and will decide how these map into retention/eviction policy.
     ///
     /// Sets the *results cache policy.priority* query property to the given value.
-    pub fn results_cache_policy_priority(mut self, new_value: i32) -> ActionResultUpdateCall<'a> {
+    pub fn results_cache_policy_priority(mut self, new_value: i32) -> ActionResultUpdateCall<'a, S> {
         self._results_cache_policy_priority = Some(new_value);
         self
     }
@@ -1861,7 +1878,7 @@ impl<'a> ActionResultUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1886,7 +1903,7 @@ impl<'a> ActionResultUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActionResultUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ActionResultUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1906,9 +1923,9 @@ impl<'a> ActionResultUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActionResultUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ActionResultUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1941,7 +1958,7 @@ impl<'a> ActionResultUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1954,10 +1971,10 @@ impl<'a> ActionResultUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActionExecuteCall<'a>
-    where  {
+pub struct ActionExecuteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _request: BuildBazelRemoteExecutionV2ExecuteRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1965,9 +1982,15 @@ pub struct ActionExecuteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ActionExecuteCall<'a> {}
+impl<'a, S> client::CallBuilder for ActionExecuteCall<'a, S> {}
 
-impl<'a> ActionExecuteCall<'a> {
+impl<'a, S> ActionExecuteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2127,7 +2150,7 @@ impl<'a> ActionExecuteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ExecuteRequest) -> ActionExecuteCall<'a> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ExecuteRequest) -> ActionExecuteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2137,7 +2160,7 @@ impl<'a> ActionExecuteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> ActionExecuteCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> ActionExecuteCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -2147,7 +2170,7 @@ impl<'a> ActionExecuteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionExecuteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionExecuteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2172,7 +2195,7 @@ impl<'a> ActionExecuteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActionExecuteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ActionExecuteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2192,9 +2215,9 @@ impl<'a> ActionExecuteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActionExecuteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ActionExecuteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2227,7 +2250,7 @@ impl<'a> ActionExecuteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2240,10 +2263,10 @@ impl<'a> ActionExecuteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobBatchReadCall<'a>
-    where  {
+pub struct BlobBatchReadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2251,9 +2274,15 @@ pub struct BlobBatchReadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlobBatchReadCall<'a> {}
+impl<'a, S> client::CallBuilder for BlobBatchReadCall<'a, S> {}
 
-impl<'a> BlobBatchReadCall<'a> {
+impl<'a, S> BlobBatchReadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2413,7 +2442,7 @@ impl<'a> BlobBatchReadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchReadBlobsRequest) -> BlobBatchReadCall<'a> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchReadBlobsRequest) -> BlobBatchReadCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2423,7 +2452,7 @@ impl<'a> BlobBatchReadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobBatchReadCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobBatchReadCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -2433,7 +2462,7 @@ impl<'a> BlobBatchReadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchReadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchReadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2458,7 +2487,7 @@ impl<'a> BlobBatchReadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchReadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchReadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2478,9 +2507,9 @@ impl<'a> BlobBatchReadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobBatchReadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlobBatchReadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2513,7 +2542,7 @@ impl<'a> BlobBatchReadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2526,10 +2555,10 @@ impl<'a> BlobBatchReadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobBatchUpdateCall<'a>
-    where  {
+pub struct BlobBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2537,9 +2566,15 @@ pub struct BlobBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlobBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for BlobBatchUpdateCall<'a, S> {}
 
-impl<'a> BlobBatchUpdateCall<'a> {
+impl<'a, S> BlobBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2699,7 +2734,7 @@ impl<'a> BlobBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest) -> BlobBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest) -> BlobBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2709,7 +2744,7 @@ impl<'a> BlobBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobBatchUpdateCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobBatchUpdateCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -2719,7 +2754,7 @@ impl<'a> BlobBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2744,7 +2779,7 @@ impl<'a> BlobBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2764,9 +2799,9 @@ impl<'a> BlobBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlobBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2799,7 +2834,7 @@ impl<'a> BlobBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2812,10 +2847,10 @@ impl<'a> BlobBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobFindMissingCall<'a>
-    where  {
+pub struct BlobFindMissingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2823,9 +2858,15 @@ pub struct BlobFindMissingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlobFindMissingCall<'a> {}
+impl<'a, S> client::CallBuilder for BlobFindMissingCall<'a, S> {}
 
-impl<'a> BlobFindMissingCall<'a> {
+impl<'a, S> BlobFindMissingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2985,7 +3026,7 @@ impl<'a> BlobFindMissingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2FindMissingBlobsRequest) -> BlobFindMissingCall<'a> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2FindMissingBlobsRequest) -> BlobFindMissingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2995,7 +3036,7 @@ impl<'a> BlobFindMissingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobFindMissingCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobFindMissingCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -3005,7 +3046,7 @@ impl<'a> BlobFindMissingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobFindMissingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobFindMissingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3030,7 +3071,7 @@ impl<'a> BlobFindMissingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobFindMissingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobFindMissingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3050,9 +3091,9 @@ impl<'a> BlobFindMissingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobFindMissingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlobFindMissingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3084,7 +3125,7 @@ impl<'a> BlobFindMissingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3094,10 +3135,10 @@ impl<'a> BlobFindMissingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobGetTreeCall<'a>
-    where  {
+pub struct BlobGetTreeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _instance_name: String,
     _hash: String,
     _size_bytes: String,
@@ -3108,9 +3149,15 @@ pub struct BlobGetTreeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlobGetTreeCall<'a> {}
+impl<'a, S> client::CallBuilder for BlobGetTreeCall<'a, S> {}
 
-impl<'a> BlobGetTreeCall<'a> {
+impl<'a, S> BlobGetTreeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3265,7 +3312,7 @@ impl<'a> BlobGetTreeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobGetTreeCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -3275,7 +3322,7 @@ impl<'a> BlobGetTreeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hash(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
+    pub fn hash(mut self, new_value: &str) -> BlobGetTreeCall<'a, S> {
         self._hash = new_value.to_string();
         self
     }
@@ -3285,21 +3332,21 @@ impl<'a> BlobGetTreeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn size_bytes(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
+    pub fn size_bytes(mut self, new_value: &str) -> BlobGetTreeCall<'a, S> {
         self._size_bytes = new_value.to_string();
         self
     }
     /// A page token, which must be a value received in a previous GetTreeResponse. If present, the server will use that token as an offset, returning only that page and the ones that succeed it.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BlobGetTreeCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// A maximum page size to request. If present, the server will request no more than this many items. Regardless of whether a page size is specified, the server may place its own limit on the number of items to be returned and require the client to retrieve more items using a subsequent request.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BlobGetTreeCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BlobGetTreeCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3309,7 +3356,7 @@ impl<'a> BlobGetTreeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobGetTreeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobGetTreeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3334,7 +3381,7 @@ impl<'a> BlobGetTreeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobGetTreeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobGetTreeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3354,9 +3401,9 @@ impl<'a> BlobGetTreeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobGetTreeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlobGetTreeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3389,7 +3436,7 @@ impl<'a> BlobGetTreeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3402,10 +3449,10 @@ impl<'a> BlobGetTreeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationWaitExecutionCall<'a>
-    where  {
+pub struct OperationWaitExecutionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _request: BuildBazelRemoteExecutionV2WaitExecutionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3413,9 +3460,15 @@ pub struct OperationWaitExecutionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationWaitExecutionCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationWaitExecutionCall<'a, S> {}
 
-impl<'a> OperationWaitExecutionCall<'a> {
+impl<'a, S> OperationWaitExecutionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3575,7 +3628,7 @@ impl<'a> OperationWaitExecutionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2WaitExecutionRequest) -> OperationWaitExecutionCall<'a> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2WaitExecutionRequest) -> OperationWaitExecutionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3585,7 +3638,7 @@ impl<'a> OperationWaitExecutionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationWaitExecutionCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationWaitExecutionCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3595,7 +3648,7 @@ impl<'a> OperationWaitExecutionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationWaitExecutionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationWaitExecutionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3620,7 +3673,7 @@ impl<'a> OperationWaitExecutionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationWaitExecutionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationWaitExecutionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3640,9 +3693,9 @@ impl<'a> OperationWaitExecutionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationWaitExecutionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationWaitExecutionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3674,7 +3727,7 @@ impl<'a> OperationWaitExecutionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RemoteBuildExecution::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3682,19 +3735,25 @@ impl<'a> OperationWaitExecutionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetCapabilityCall<'a>
-    where  {
+pub struct MethodGetCapabilityCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RemoteBuildExecution<>,
+    hub: &'a RemoteBuildExecution<S>,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodGetCapabilityCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetCapabilityCall<'a, S> {}
 
-impl<'a> MethodGetCapabilityCall<'a> {
+impl<'a, S> MethodGetCapabilityCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3841,7 +3900,7 @@ impl<'a> MethodGetCapabilityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> MethodGetCapabilityCall<'a> {
+    pub fn instance_name(mut self, new_value: &str) -> MethodGetCapabilityCall<'a, S> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -3851,7 +3910,7 @@ impl<'a> MethodGetCapabilityCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetCapabilityCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetCapabilityCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3876,7 +3935,7 @@ impl<'a> MethodGetCapabilityCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetCapabilityCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetCapabilityCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3896,9 +3955,9 @@ impl<'a> MethodGetCapabilityCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetCapabilityCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodGetCapabilityCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

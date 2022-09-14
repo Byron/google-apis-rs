@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -99,43 +104,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Storagetransfer<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Storagetransfer<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Storagetransfer<> {}
+impl<'a, S> client::Hub for Storagetransfer<S> {}
 
-impl<'a, > Storagetransfer<> {
+impl<'a, S> Storagetransfer<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Storagetransfer<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Storagetransfer<S> {
         Storagetransfer {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://storagetransfer.googleapis.com/".to_string(),
             _root_url: "https://storagetransfer.googleapis.com/".to_string(),
         }
     }
 
-    pub fn google_service_accounts(&'a self) -> GoogleServiceAccountMethods<'a> {
+    pub fn google_service_accounts(&'a self) -> GoogleServiceAccountMethods<'a, S> {
         GoogleServiceAccountMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn transfer_jobs(&'a self) -> TransferJobMethods<'a> {
+    pub fn transfer_jobs(&'a self) -> TransferJobMethods<'a, S> {
         TransferJobMethods { hub: &self }
     }
-    pub fn transfer_operations(&'a self) -> TransferOperationMethods<'a> {
+    pub fn transfer_operations(&'a self) -> TransferOperationMethods<'a, S> {
         TransferOperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1050,22 +1055,22 @@ impl client::RequestValue for UpdateTransferJobRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.google_service_accounts();
 /// # }
 /// ```
-pub struct GoogleServiceAccountMethods<'a>
-    where  {
+pub struct GoogleServiceAccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
 }
 
-impl<'a> client::MethodsBuilder for GoogleServiceAccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GoogleServiceAccountMethods<'a, S> {}
 
-impl<'a> GoogleServiceAccountMethods<'a> {
+impl<'a, S> GoogleServiceAccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1074,7 +1079,7 @@ impl<'a> GoogleServiceAccountMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud project that the Google service account is associated with.
-    pub fn get(&self, project_id: &str) -> GoogleServiceAccountGetCall<'a> {
+    pub fn get(&self, project_id: &str) -> GoogleServiceAccountGetCall<'a, S> {
         GoogleServiceAccountGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1108,22 +1113,22 @@ impl<'a> GoogleServiceAccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `agent_pools_create(...)`, `agent_pools_delete(...)`, `agent_pools_get(...)`, `agent_pools_list(...)` and `agent_pools_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1133,7 +1138,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud project that owns the agent pool.
-    pub fn agent_pools_create(&self, request: AgentPool, project_id: &str) -> ProjectAgentPoolCreateCall<'a> {
+    pub fn agent_pools_create(&self, request: AgentPool, project_id: &str) -> ProjectAgentPoolCreateCall<'a, S> {
         ProjectAgentPoolCreateCall {
             hub: self.hub,
             _request: request,
@@ -1152,7 +1157,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the agent pool to delete.
-    pub fn agent_pools_delete(&self, name: &str) -> ProjectAgentPoolDeleteCall<'a> {
+    pub fn agent_pools_delete(&self, name: &str) -> ProjectAgentPoolDeleteCall<'a, S> {
         ProjectAgentPoolDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1169,7 +1174,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the agent pool to get.
-    pub fn agent_pools_get(&self, name: &str) -> ProjectAgentPoolGetCall<'a> {
+    pub fn agent_pools_get(&self, name: &str) -> ProjectAgentPoolGetCall<'a, S> {
         ProjectAgentPoolGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1186,7 +1191,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud project that owns the job.
-    pub fn agent_pools_list(&self, project_id: &str) -> ProjectAgentPoolListCall<'a> {
+    pub fn agent_pools_list(&self, project_id: &str) -> ProjectAgentPoolListCall<'a, S> {
         ProjectAgentPoolListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1207,7 +1212,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Specifies a unique string that identifies the agent pool. Format: `projects/{project_id}/agentPools/{agent_pool_id}`
-    pub fn agent_pools_patch(&self, request: AgentPool, name: &str) -> ProjectAgentPoolPatchCall<'a> {
+    pub fn agent_pools_patch(&self, request: AgentPool, name: &str) -> ProjectAgentPoolPatchCall<'a, S> {
         ProjectAgentPoolPatchCall {
             hub: self.hub,
             _request: request,
@@ -1243,22 +1248,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `get(...)`, `list(...)`, `patch(...)` and `run(...)`
 /// // to build up your call.
 /// let rb = hub.transfer_jobs();
 /// # }
 /// ```
-pub struct TransferJobMethods<'a>
-    where  {
+pub struct TransferJobMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
 }
 
-impl<'a> client::MethodsBuilder for TransferJobMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TransferJobMethods<'a, S> {}
 
-impl<'a> TransferJobMethods<'a> {
+impl<'a, S> TransferJobMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1267,7 +1272,7 @@ impl<'a> TransferJobMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: TransferJob) -> TransferJobCreateCall<'a> {
+    pub fn create(&self, request: TransferJob) -> TransferJobCreateCall<'a, S> {
         TransferJobCreateCall {
             hub: self.hub,
             _request: request,
@@ -1285,7 +1290,7 @@ impl<'a> TransferJobMethods<'a> {
     ///
     /// * `jobName` - Required. The job to get.
     /// * `projectId` - Required. The ID of the Google Cloud project that owns the job.
-    pub fn get(&self, job_name: &str, project_id: &str) -> TransferJobGetCall<'a> {
+    pub fn get(&self, job_name: &str, project_id: &str) -> TransferJobGetCall<'a, S> {
         TransferJobGetCall {
             hub: self.hub,
             _job_name: job_name.to_string(),
@@ -1303,7 +1308,7 @@ impl<'a> TransferJobMethods<'a> {
     /// # Arguments
     ///
     /// * `filter` - Required. A list of query parameters specified as JSON text in the form of: `{"projectId":"my_project_id", "jobNames":["jobid1","jobid2",...], "jobStatuses":["status1","status2",...]}` Since `jobNames` and `jobStatuses` support multiple values, their values must be specified with array notation. `projectId` is required. `jobNames` and `jobStatuses` are optional. The valid values for `jobStatuses` are case-insensitive: ENABLED, DISABLED, and DELETED.
-    pub fn list(&self, filter: &str) -> TransferJobListCall<'a> {
+    pub fn list(&self, filter: &str) -> TransferJobListCall<'a, S> {
         TransferJobListCall {
             hub: self.hub,
             _filter: filter.to_string(),
@@ -1323,7 +1328,7 @@ impl<'a> TransferJobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `jobName` - Required. The name of job to update.
-    pub fn patch(&self, request: UpdateTransferJobRequest, job_name: &str) -> TransferJobPatchCall<'a> {
+    pub fn patch(&self, request: UpdateTransferJobRequest, job_name: &str) -> TransferJobPatchCall<'a, S> {
         TransferJobPatchCall {
             hub: self.hub,
             _request: request,
@@ -1342,7 +1347,7 @@ impl<'a> TransferJobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `jobName` - Required. The name of the transfer job.
-    pub fn run(&self, request: RunTransferJobRequest, job_name: &str) -> TransferJobRunCall<'a> {
+    pub fn run(&self, request: RunTransferJobRequest, job_name: &str) -> TransferJobRunCall<'a, S> {
         TransferJobRunCall {
             hub: self.hub,
             _request: request,
@@ -1377,22 +1382,22 @@ impl<'a> TransferJobMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `get(...)`, `list(...)`, `pause(...)` and `resume(...)`
 /// // to build up your call.
 /// let rb = hub.transfer_operations();
 /// # }
 /// ```
-pub struct TransferOperationMethods<'a>
-    where  {
+pub struct TransferOperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
 }
 
-impl<'a> client::MethodsBuilder for TransferOperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TransferOperationMethods<'a, S> {}
 
-impl<'a> TransferOperationMethods<'a> {
+impl<'a, S> TransferOperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1402,7 +1407,7 @@ impl<'a> TransferOperationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> TransferOperationCancelCall<'a> {
+    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> TransferOperationCancelCall<'a, S> {
         TransferOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1420,7 +1425,7 @@ impl<'a> TransferOperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> TransferOperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> TransferOperationGetCall<'a, S> {
         TransferOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1438,7 +1443,7 @@ impl<'a> TransferOperationMethods<'a> {
     ///
     /// * `name` - Required. The name of the type being listed; must be `transferOperations`.
     /// * `filter` - Required. A list of query parameters specified as JSON text in the form of: `{"projectId":"my_project_id", "jobNames":["jobid1","jobid2",...], "operationNames":["opid1","opid2",...], "transferStatuses":["status1","status2",...]}` Since `jobNames`, `operationNames`, and `transferStatuses` support multiple values, they must be specified with array notation. `projectId` is required. `jobNames`, `operationNames`, and `transferStatuses` are optional. The valid values for `transferStatuses` are case-insensitive: IN_PROGRESS, PAUSED, SUCCESS, FAILED, and ABORTED.
-    pub fn list(&self, name: &str, filter: &str) -> TransferOperationListCall<'a> {
+    pub fn list(&self, name: &str, filter: &str) -> TransferOperationListCall<'a, S> {
         TransferOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1459,7 +1464,7 @@ impl<'a> TransferOperationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the transfer operation.
-    pub fn pause(&self, request: PauseTransferOperationRequest, name: &str) -> TransferOperationPauseCall<'a> {
+    pub fn pause(&self, request: PauseTransferOperationRequest, name: &str) -> TransferOperationPauseCall<'a, S> {
         TransferOperationPauseCall {
             hub: self.hub,
             _request: request,
@@ -1478,7 +1483,7 @@ impl<'a> TransferOperationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the transfer operation.
-    pub fn resume(&self, request: ResumeTransferOperationRequest, name: &str) -> TransferOperationResumeCall<'a> {
+    pub fn resume(&self, request: ResumeTransferOperationRequest, name: &str) -> TransferOperationResumeCall<'a, S> {
         TransferOperationResumeCall {
             hub: self.hub,
             _request: request,
@@ -1520,7 +1525,7 @@ impl<'a> TransferOperationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1528,19 +1533,25 @@ impl<'a> TransferOperationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GoogleServiceAccountGetCall<'a>
-    where  {
+pub struct GoogleServiceAccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GoogleServiceAccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for GoogleServiceAccountGetCall<'a, S> {}
 
-impl<'a> GoogleServiceAccountGetCall<'a> {
+impl<'a, S> GoogleServiceAccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1683,7 +1694,7 @@ impl<'a> GoogleServiceAccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> GoogleServiceAccountGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> GoogleServiceAccountGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1693,7 +1704,7 @@ impl<'a> GoogleServiceAccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleServiceAccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleServiceAccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1718,7 +1729,7 @@ impl<'a> GoogleServiceAccountGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GoogleServiceAccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GoogleServiceAccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1738,9 +1749,9 @@ impl<'a> GoogleServiceAccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleServiceAccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GoogleServiceAccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1773,7 +1784,7 @@ impl<'a> GoogleServiceAccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1787,10 +1798,10 @@ impl<'a> GoogleServiceAccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAgentPoolCreateCall<'a>
-    where  {
+pub struct ProjectAgentPoolCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: AgentPool,
     _project_id: String,
     _agent_pool_id: Option<String>,
@@ -1799,9 +1810,15 @@ pub struct ProjectAgentPoolCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAgentPoolCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAgentPoolCreateCall<'a, S> {}
 
-impl<'a> ProjectAgentPoolCreateCall<'a> {
+impl<'a, S> ProjectAgentPoolCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1964,7 +1981,7 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AgentPool) -> ProjectAgentPoolCreateCall<'a> {
+    pub fn request(mut self, new_value: AgentPool) -> ProjectAgentPoolCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1974,14 +1991,14 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectAgentPoolCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectAgentPoolCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// Required. The ID of the agent pool to create. The `agent_pool_id` must meet the following requirements: * Length of 128 characters or less. * Not start with the string `goog`. * Start with a lowercase ASCII character, followed by: * Zero or more: lowercase Latin alphabet characters, numerals, hyphens (`-`), periods (`.`), underscores (`_`), or tildes (`~`). * One or more numerals or lowercase ASCII characters. As expressed by the regular expression: `^(?!goog)[a-z]([a-z0-9-._~]*[a-z0-9])?$`.
     ///
     /// Sets the *agent pool id* query property to the given value.
-    pub fn agent_pool_id(mut self, new_value: &str) -> ProjectAgentPoolCreateCall<'a> {
+    pub fn agent_pool_id(mut self, new_value: &str) -> ProjectAgentPoolCreateCall<'a, S> {
         self._agent_pool_id = Some(new_value.to_string());
         self
     }
@@ -1991,7 +2008,7 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2016,7 +2033,7 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2036,9 +2053,9 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentPoolCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAgentPoolCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2070,7 +2087,7 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2078,19 +2095,25 @@ impl<'a> ProjectAgentPoolCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAgentPoolDeleteCall<'a>
-    where  {
+pub struct ProjectAgentPoolDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAgentPoolDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAgentPoolDeleteCall<'a, S> {}
 
-impl<'a> ProjectAgentPoolDeleteCall<'a> {
+impl<'a, S> ProjectAgentPoolDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2237,7 +2260,7 @@ impl<'a> ProjectAgentPoolDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAgentPoolDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAgentPoolDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2247,7 +2270,7 @@ impl<'a> ProjectAgentPoolDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2272,7 +2295,7 @@ impl<'a> ProjectAgentPoolDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2292,9 +2315,9 @@ impl<'a> ProjectAgentPoolDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentPoolDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAgentPoolDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2326,7 +2349,7 @@ impl<'a> ProjectAgentPoolDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2334,19 +2357,25 @@ impl<'a> ProjectAgentPoolDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAgentPoolGetCall<'a>
-    where  {
+pub struct ProjectAgentPoolGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAgentPoolGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAgentPoolGetCall<'a, S> {}
 
-impl<'a> ProjectAgentPoolGetCall<'a> {
+impl<'a, S> ProjectAgentPoolGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2493,7 +2522,7 @@ impl<'a> ProjectAgentPoolGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAgentPoolGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAgentPoolGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2503,7 +2532,7 @@ impl<'a> ProjectAgentPoolGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2528,7 +2557,7 @@ impl<'a> ProjectAgentPoolGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2548,9 +2577,9 @@ impl<'a> ProjectAgentPoolGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentPoolGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAgentPoolGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2582,7 +2611,7 @@ impl<'a> ProjectAgentPoolGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2593,10 +2622,10 @@ impl<'a> ProjectAgentPoolGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAgentPoolListCall<'a>
-    where  {
+pub struct ProjectAgentPoolListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _project_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2606,9 +2635,15 @@ pub struct ProjectAgentPoolListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAgentPoolListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAgentPoolListCall<'a, S> {}
 
-impl<'a> ProjectAgentPoolListCall<'a> {
+impl<'a, S> ProjectAgentPoolListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2764,28 +2799,28 @@ impl<'a> ProjectAgentPoolListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectAgentPoolListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectAgentPoolListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// The list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAgentPoolListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectAgentPoolListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The max allowed value is `256`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAgentPoolListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectAgentPoolListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An optional list of query parameters specified as JSON text in the form of: `{"agentPoolNames":["agentpool1","agentpool2",...]}` Since `agentPoolNames` support multiple values, its values must be specified with array notation. When the filter is either empty or not provided, the list returns all agent pools for the project.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectAgentPoolListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectAgentPoolListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2795,7 +2830,7 @@ impl<'a> ProjectAgentPoolListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2820,7 +2855,7 @@ impl<'a> ProjectAgentPoolListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2840,9 +2875,9 @@ impl<'a> ProjectAgentPoolListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentPoolListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAgentPoolListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2875,7 +2910,7 @@ impl<'a> ProjectAgentPoolListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2889,10 +2924,10 @@ impl<'a> ProjectAgentPoolListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAgentPoolPatchCall<'a>
-    where  {
+pub struct ProjectAgentPoolPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: AgentPool,
     _name: String,
     _update_mask: Option<String>,
@@ -2901,9 +2936,15 @@ pub struct ProjectAgentPoolPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAgentPoolPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAgentPoolPatchCall<'a, S> {}
 
-impl<'a> ProjectAgentPoolPatchCall<'a> {
+impl<'a, S> ProjectAgentPoolPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3066,7 +3107,7 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AgentPool) -> ProjectAgentPoolPatchCall<'a> {
+    pub fn request(mut self, new_value: AgentPool) -> ProjectAgentPoolPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3076,14 +3117,14 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAgentPoolPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAgentPoolPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The [field mask] (https://developers.google.com/protocol-buffers/docs/reference/google.protobuf) of the fields in `agentPool` to update in this request. The following `agentPool` fields can be updated: * display_name * bandwidth_limit
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAgentPoolPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAgentPoolPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3093,7 +3134,7 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAgentPoolPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3118,7 +3159,7 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAgentPoolPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3138,9 +3179,9 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAgentPoolPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAgentPoolPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3173,7 +3214,7 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3186,19 +3227,25 @@ impl<'a> ProjectAgentPoolPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobCreateCall<'a>
-    where  {
+pub struct TransferJobCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: TransferJob,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferJobCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferJobCreateCall<'a, S> {}
 
-impl<'a> TransferJobCreateCall<'a> {
+impl<'a, S> TransferJobCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3332,7 +3379,7 @@ impl<'a> TransferJobCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TransferJob) -> TransferJobCreateCall<'a> {
+    pub fn request(mut self, new_value: TransferJob) -> TransferJobCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3342,7 +3389,7 @@ impl<'a> TransferJobCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3367,7 +3414,7 @@ impl<'a> TransferJobCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3387,9 +3434,9 @@ impl<'a> TransferJobCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferJobCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3421,7 +3468,7 @@ impl<'a> TransferJobCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3429,10 +3476,10 @@ impl<'a> TransferJobCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobGetCall<'a>
-    where  {
+pub struct TransferJobGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _job_name: String,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3440,9 +3487,15 @@ pub struct TransferJobGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferJobGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferJobGetCall<'a, S> {}
 
-impl<'a> TransferJobGetCall<'a> {
+impl<'a, S> TransferJobGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3590,7 +3643,7 @@ impl<'a> TransferJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobGetCall<'a> {
+    pub fn job_name(mut self, new_value: &str) -> TransferJobGetCall<'a, S> {
         self._job_name = new_value.to_string();
         self
     }
@@ -3600,7 +3653,7 @@ impl<'a> TransferJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -3610,7 +3663,7 @@ impl<'a> TransferJobGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3635,7 +3688,7 @@ impl<'a> TransferJobGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3655,9 +3708,9 @@ impl<'a> TransferJobGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferJobGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3689,7 +3742,7 @@ impl<'a> TransferJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3699,10 +3752,10 @@ impl<'a> TransferJobGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobListCall<'a>
-    where  {
+pub struct TransferJobListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _filter: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3711,9 +3764,15 @@ pub struct TransferJobListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferJobListCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferJobListCall<'a, S> {}
 
-impl<'a> TransferJobListCall<'a> {
+impl<'a, S> TransferJobListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3841,21 +3900,21 @@ impl<'a> TransferJobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter(mut self, new_value: &str) -> TransferJobListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> TransferJobListCall<'a, S> {
         self._filter = new_value.to_string();
         self
     }
     /// The list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TransferJobListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TransferJobListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The max allowed value is 256.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TransferJobListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> TransferJobListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3865,7 +3924,7 @@ impl<'a> TransferJobListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3890,7 +3949,7 @@ impl<'a> TransferJobListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3910,9 +3969,9 @@ impl<'a> TransferJobListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferJobListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3945,7 +4004,7 @@ impl<'a> TransferJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3958,10 +4017,10 @@ impl<'a> TransferJobListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobPatchCall<'a>
-    where  {
+pub struct TransferJobPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: UpdateTransferJobRequest,
     _job_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3969,9 +4028,15 @@ pub struct TransferJobPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferJobPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferJobPatchCall<'a, S> {}
 
-impl<'a> TransferJobPatchCall<'a> {
+impl<'a, S> TransferJobPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4131,7 +4196,7 @@ impl<'a> TransferJobPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateTransferJobRequest) -> TransferJobPatchCall<'a> {
+    pub fn request(mut self, new_value: UpdateTransferJobRequest) -> TransferJobPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4141,7 +4206,7 @@ impl<'a> TransferJobPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobPatchCall<'a> {
+    pub fn job_name(mut self, new_value: &str) -> TransferJobPatchCall<'a, S> {
         self._job_name = new_value.to_string();
         self
     }
@@ -4151,7 +4216,7 @@ impl<'a> TransferJobPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4176,7 +4241,7 @@ impl<'a> TransferJobPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4196,9 +4261,9 @@ impl<'a> TransferJobPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferJobPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4231,7 +4296,7 @@ impl<'a> TransferJobPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4244,10 +4309,10 @@ impl<'a> TransferJobPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobRunCall<'a>
-    where  {
+pub struct TransferJobRunCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: RunTransferJobRequest,
     _job_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4255,9 +4320,15 @@ pub struct TransferJobRunCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferJobRunCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferJobRunCall<'a, S> {}
 
-impl<'a> TransferJobRunCall<'a> {
+impl<'a, S> TransferJobRunCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4417,7 +4488,7 @@ impl<'a> TransferJobRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunTransferJobRequest) -> TransferJobRunCall<'a> {
+    pub fn request(mut self, new_value: RunTransferJobRequest) -> TransferJobRunCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4427,7 +4498,7 @@ impl<'a> TransferJobRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobRunCall<'a> {
+    pub fn job_name(mut self, new_value: &str) -> TransferJobRunCall<'a, S> {
         self._job_name = new_value.to_string();
         self
     }
@@ -4437,7 +4508,7 @@ impl<'a> TransferJobRunCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobRunCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobRunCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4462,7 +4533,7 @@ impl<'a> TransferJobRunCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobRunCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobRunCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4482,9 +4553,9 @@ impl<'a> TransferJobRunCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobRunCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferJobRunCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4517,7 +4588,7 @@ impl<'a> TransferJobRunCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4530,10 +4601,10 @@ impl<'a> TransferJobRunCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationCancelCall<'a>
-    where  {
+pub struct TransferOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4541,9 +4612,15 @@ pub struct TransferOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferOperationCancelCall<'a, S> {}
 
-impl<'a> TransferOperationCancelCall<'a> {
+impl<'a, S> TransferOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4703,7 +4780,7 @@ impl<'a> TransferOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> TransferOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> TransferOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4713,7 +4790,7 @@ impl<'a> TransferOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4723,7 +4800,7 @@ impl<'a> TransferOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4748,7 +4825,7 @@ impl<'a> TransferOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4768,9 +4845,9 @@ impl<'a> TransferOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4802,7 +4879,7 @@ impl<'a> TransferOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4810,19 +4887,25 @@ impl<'a> TransferOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationGetCall<'a>
-    where  {
+pub struct TransferOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferOperationGetCall<'a, S> {}
 
-impl<'a> TransferOperationGetCall<'a> {
+impl<'a, S> TransferOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4969,7 +5052,7 @@ impl<'a> TransferOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4979,7 +5062,7 @@ impl<'a> TransferOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5004,7 +5087,7 @@ impl<'a> TransferOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5024,9 +5107,9 @@ impl<'a> TransferOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5058,7 +5141,7 @@ impl<'a> TransferOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5068,10 +5151,10 @@ impl<'a> TransferOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationListCall<'a>
-    where  {
+pub struct TransferOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _name: String,
     _filter: String,
     _page_token: Option<String>,
@@ -5081,9 +5164,15 @@ pub struct TransferOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferOperationListCall<'a, S> {}
 
-impl<'a> TransferOperationListCall<'a> {
+impl<'a, S> TransferOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5237,7 +5326,7 @@ impl<'a> TransferOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5247,21 +5336,21 @@ impl<'a> TransferOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter(mut self, new_value: &str) -> TransferOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> TransferOperationListCall<'a, S> {
         self._filter = new_value.to_string();
         self
     }
     /// The list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TransferOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TransferOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The max allowed value is 256.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TransferOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> TransferOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5271,7 +5360,7 @@ impl<'a> TransferOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5296,7 +5385,7 @@ impl<'a> TransferOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5316,9 +5405,9 @@ impl<'a> TransferOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5351,7 +5440,7 @@ impl<'a> TransferOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5364,10 +5453,10 @@ impl<'a> TransferOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationPauseCall<'a>
-    where  {
+pub struct TransferOperationPauseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: PauseTransferOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5375,9 +5464,15 @@ pub struct TransferOperationPauseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferOperationPauseCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferOperationPauseCall<'a, S> {}
 
-impl<'a> TransferOperationPauseCall<'a> {
+impl<'a, S> TransferOperationPauseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5537,7 +5632,7 @@ impl<'a> TransferOperationPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PauseTransferOperationRequest) -> TransferOperationPauseCall<'a> {
+    pub fn request(mut self, new_value: PauseTransferOperationRequest) -> TransferOperationPauseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5547,7 +5642,7 @@ impl<'a> TransferOperationPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationPauseCall<'a> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationPauseCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5557,7 +5652,7 @@ impl<'a> TransferOperationPauseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationPauseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationPauseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5582,7 +5677,7 @@ impl<'a> TransferOperationPauseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationPauseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationPauseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5602,9 +5697,9 @@ impl<'a> TransferOperationPauseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationPauseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferOperationPauseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5637,7 +5732,7 @@ impl<'a> TransferOperationPauseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storagetransfer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5650,10 +5745,10 @@ impl<'a> TransferOperationPauseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationResumeCall<'a>
-    where  {
+pub struct TransferOperationResumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storagetransfer<>,
+    hub: &'a Storagetransfer<S>,
     _request: ResumeTransferOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5661,9 +5756,15 @@ pub struct TransferOperationResumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TransferOperationResumeCall<'a> {}
+impl<'a, S> client::CallBuilder for TransferOperationResumeCall<'a, S> {}
 
-impl<'a> TransferOperationResumeCall<'a> {
+impl<'a, S> TransferOperationResumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5823,7 +5924,7 @@ impl<'a> TransferOperationResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResumeTransferOperationRequest) -> TransferOperationResumeCall<'a> {
+    pub fn request(mut self, new_value: ResumeTransferOperationRequest) -> TransferOperationResumeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5833,7 +5934,7 @@ impl<'a> TransferOperationResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationResumeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationResumeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5843,7 +5944,7 @@ impl<'a> TransferOperationResumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationResumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationResumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5868,7 +5969,7 @@ impl<'a> TransferOperationResumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationResumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationResumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5888,9 +5989,9 @@ impl<'a> TransferOperationResumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationResumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TransferOperationResumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

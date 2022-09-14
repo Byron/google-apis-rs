@@ -1,4 +1,4 @@
-site_name: Fcmdata v3.1.0+20220305
+site_name: Fcmdata v4.0.1+20220305
 site_url: http://byron.github.io/google-apis-rs/google-fcmdata1_beta1-cli
 site_description: A complete library to interact with Fcmdata (protocol v1beta1)
 

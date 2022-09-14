@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,43 +109,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ShoppingContent<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ShoppingContent<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ShoppingContent<> {}
+impl<'a, S> client::Hub for ShoppingContent<S> {}
 
-impl<'a, > ShoppingContent<> {
+impl<'a, S> ShoppingContent<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ShoppingContent<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ShoppingContent<S> {
         ShoppingContent {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/content/v2sandbox/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a> {
+    pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a, S> {
         OrderinvoiceMethods { hub: &self }
     }
-    pub fn orderpayments(&'a self) -> OrderpaymentMethods<'a> {
+    pub fn orderpayments(&'a self) -> OrderpaymentMethods<'a, S> {
         OrderpaymentMethods { hub: &self }
     }
-    pub fn orderreturns(&'a self) -> OrderreturnMethods<'a> {
+    pub fn orderreturns(&'a self) -> OrderreturnMethods<'a, S> {
         OrderreturnMethods { hub: &self }
     }
-    pub fn orders(&'a self) -> OrderMethods<'a> {
+    pub fn orders(&'a self) -> OrderMethods<'a, S> {
         OrderMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2979,22 +2984,22 @@ impl client::Part for UnitInvoiceTaxLine {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `createchargeinvoice(...)` and `createrefundinvoice(...)`
 /// // to build up your call.
 /// let rb = hub.orderinvoices();
 /// # }
 /// ```
-pub struct OrderinvoiceMethods<'a>
-    where  {
+pub struct OrderinvoiceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderinvoiceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderinvoiceMethods<'a, S> {}
 
-impl<'a> OrderinvoiceMethods<'a> {
+impl<'a, S> OrderinvoiceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3005,7 +3010,7 @@ impl<'a> OrderinvoiceMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         OrderinvoiceCreatechargeinvoiceCall {
             hub: self.hub,
             _request: request,
@@ -3026,7 +3031,7 @@ impl<'a> OrderinvoiceMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         OrderinvoiceCreaterefundinvoiceCall {
             hub: self.hub,
             _request: request,
@@ -3062,22 +3067,22 @@ impl<'a> OrderinvoiceMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `notifyauthapproved(...)`, `notifyauthdeclined(...)`, `notifycharge(...)` and `notifyrefund(...)`
 /// // to build up your call.
 /// let rb = hub.orderpayments();
 /// # }
 /// ```
-pub struct OrderpaymentMethods<'a>
-    where  {
+pub struct OrderpaymentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderpaymentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderpaymentMethods<'a, S> {}
 
-impl<'a> OrderpaymentMethods<'a> {
+impl<'a, S> OrderpaymentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3088,7 +3093,7 @@ impl<'a> OrderpaymentMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for for which payment authorization is happening.
-    pub fn notifyauthapproved(&self, request: OrderpaymentsNotifyAuthApprovedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthapprovedCall<'a> {
+    pub fn notifyauthapproved(&self, request: OrderpaymentsNotifyAuthApprovedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthapprovedCall<'a, S> {
         OrderpaymentNotifyauthapprovedCall {
             hub: self.hub,
             _request: request,
@@ -3109,7 +3114,7 @@ impl<'a> OrderpaymentMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for which payment authorization was declined.
-    pub fn notifyauthdeclined(&self, request: OrderpaymentsNotifyAuthDeclinedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthdeclinedCall<'a> {
+    pub fn notifyauthdeclined(&self, request: OrderpaymentsNotifyAuthDeclinedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, S> {
         OrderpaymentNotifyauthdeclinedCall {
             hub: self.hub,
             _request: request,
@@ -3130,7 +3135,7 @@ impl<'a> OrderpaymentMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for which charge is happening.
-    pub fn notifycharge(&self, request: OrderpaymentsNotifyChargeRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifychargeCall<'a> {
+    pub fn notifycharge(&self, request: OrderpaymentsNotifyChargeRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifychargeCall<'a, S> {
         OrderpaymentNotifychargeCall {
             hub: self.hub,
             _request: request,
@@ -3151,7 +3156,7 @@ impl<'a> OrderpaymentMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for which charge is happening.
-    pub fn notifyrefund(&self, request: OrderpaymentsNotifyRefundRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyrefundCall<'a> {
+    pub fn notifyrefund(&self, request: OrderpaymentsNotifyRefundRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyrefundCall<'a, S> {
         OrderpaymentNotifyrefundCall {
             hub: self.hub,
             _request: request,
@@ -3187,22 +3192,22 @@ impl<'a> OrderpaymentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.orderreturns();
 /// # }
 /// ```
-pub struct OrderreturnMethods<'a>
-    where  {
+pub struct OrderreturnMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderreturnMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderreturnMethods<'a, S> {}
 
-impl<'a> OrderreturnMethods<'a> {
+impl<'a, S> OrderreturnMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3212,7 +3217,7 @@ impl<'a> OrderreturnMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `returnId` - Merchant order return ID generated by Google.
-    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a, S> {
         OrderreturnGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3230,7 +3235,7 @@ impl<'a> OrderreturnMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> OrderreturnListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> OrderreturnListCall<'a, S> {
         OrderreturnListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3269,22 +3274,22 @@ impl<'a> OrderreturnMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `acknowledge(...)`, `advancetestorder(...)`, `cancel(...)`, `cancellineitem(...)`, `canceltestorderbycustomer(...)`, `createtestorder(...)`, `createtestreturn(...)`, `custombatch(...)`, `get(...)`, `getbymerchantorderid(...)`, `gettestordertemplate(...)`, `instorerefundlineitem(...)`, `list(...)`, `refund(...)`, `rejectreturnlineitem(...)`, `returnlineitem(...)`, `returnrefundlineitem(...)`, `setlineitemmetadata(...)`, `shiplineitems(...)`, `updatelineitemshippingdetails(...)`, `updatemerchantorderid(...)` and `updateshipment(...)`
 /// // to build up your call.
 /// let rb = hub.orders();
 /// # }
 /// ```
-pub struct OrderMethods<'a>
-    where  {
+pub struct OrderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderMethods<'a, S> {}
 
-impl<'a> OrderMethods<'a> {
+impl<'a, S> OrderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3295,7 +3300,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a> {
+    pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a, S> {
         OrderAcknowledgeCall {
             hub: self.hub,
             _request: request,
@@ -3315,7 +3320,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to modify.
-    pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a> {
+    pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a, S> {
         OrderAdvancetestorderCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3335,7 +3340,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to cancel.
-    pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a> {
+    pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a, S> {
         OrderCancelCall {
             hub: self.hub,
             _request: request,
@@ -3356,7 +3361,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a> {
+    pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a, S> {
         OrderCancellineitemCall {
             hub: self.hub,
             _request: request,
@@ -3377,7 +3382,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to cancel.
-    pub fn canceltestorderbycustomer(&self, request: OrdersCancelTestOrderByCustomerRequest, merchant_id: &str, order_id: &str) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn canceltestorderbycustomer(&self, request: OrdersCancelTestOrderByCustomerRequest, merchant_id: &str, order_id: &str) -> OrderCanceltestorderbycustomerCall<'a, S> {
         OrderCanceltestorderbycustomerCall {
             hub: self.hub,
             _request: request,
@@ -3397,7 +3402,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
-    pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a> {
+    pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a, S> {
         OrderCreatetestorderCall {
             hub: self.hub,
             _request: request,
@@ -3417,7 +3422,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createtestreturn(&self, request: OrdersCreateTestReturnRequest, merchant_id: &str, order_id: &str) -> OrderCreatetestreturnCall<'a> {
+    pub fn createtestreturn(&self, request: OrdersCreateTestReturnRequest, merchant_id: &str, order_id: &str) -> OrderCreatetestreturnCall<'a, S> {
         OrderCreatetestreturnCall {
             hub: self.hub,
             _request: request,
@@ -3436,7 +3441,7 @@ impl<'a> OrderMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a> {
+    pub fn custombatch(&self, request: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a, S> {
         OrderCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -3454,7 +3459,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a, S> {
         OrderGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3473,7 +3478,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `merchantOrderId` - The merchant order id to be looked for.
-    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, S> {
         OrderGetbymerchantorderidCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3492,7 +3497,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
     /// * `templateName` - The name of the template to retrieve.
-    pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a, S> {
         OrderGettestordertemplateCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3513,7 +3518,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a, S> {
         OrderInstorerefundlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3532,7 +3537,7 @@ impl<'a> OrderMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> OrderListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> OrderListCall<'a, S> {
         OrderListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3558,7 +3563,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to refund.
-    pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a> {
+    pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a, S> {
         OrderRefundCall {
             hub: self.hub,
             _request: request,
@@ -3579,7 +3584,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a, S> {
         OrderRejectreturnlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3600,7 +3605,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a> {
+    pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a, S> {
         OrderReturnlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3621,7 +3626,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn returnrefundlineitem(&self, request: OrdersReturnRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn returnrefundlineitem(&self, request: OrdersReturnRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnrefundlineitemCall<'a, S> {
         OrderReturnrefundlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3642,7 +3647,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a, S> {
         OrderSetlineitemmetadataCall {
             hub: self.hub,
             _request: request,
@@ -3663,7 +3668,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a> {
+    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a, S> {
         OrderShiplineitemCall {
             hub: self.hub,
             _request: request,
@@ -3684,7 +3689,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         OrderUpdatelineitemshippingdetailCall {
             hub: self.hub,
             _request: request,
@@ -3705,7 +3710,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a, S> {
         OrderUpdatemerchantorderidCall {
             hub: self.hub,
             _request: request,
@@ -3726,7 +3731,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a> {
+    pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a, S> {
         OrderUpdateshipmentCall {
             hub: self.hub,
             _request: request,
@@ -3770,7 +3775,7 @@ impl<'a> OrderMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3783,10 +3788,10 @@ impl<'a> OrderMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderinvoiceCreatechargeinvoiceCall<'a>
-    where  {
+pub struct OrderinvoiceCreatechargeinvoiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderinvoicesCreateChargeInvoiceRequest,
     _merchant_id: String,
     _order_id: String,
@@ -3795,9 +3800,15 @@ pub struct OrderinvoiceCreatechargeinvoiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a, S> {}
 
-impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
+impl<'a, S> OrderinvoiceCreatechargeinvoiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3954,7 +3965,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3964,7 +3975,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -3974,7 +3985,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -3984,7 +3995,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4005,7 +4016,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4025,9 +4036,9 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4060,7 +4071,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4073,10 +4084,10 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderinvoiceCreaterefundinvoiceCall<'a>
-    where  {
+pub struct OrderinvoiceCreaterefundinvoiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderinvoicesCreateRefundInvoiceRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4085,9 +4096,15 @@ pub struct OrderinvoiceCreaterefundinvoiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a, S> {}
 
-impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
+impl<'a, S> OrderinvoiceCreaterefundinvoiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4244,7 +4261,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4254,7 +4271,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -4264,7 +4281,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -4274,7 +4291,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4295,7 +4312,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4315,9 +4332,9 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4350,7 +4367,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4363,10 +4380,10 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifyauthapprovedCall<'a>
-    where  {
+pub struct OrderpaymentNotifyauthapprovedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderpaymentsNotifyAuthApprovedRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4375,9 +4392,15 @@ pub struct OrderpaymentNotifyauthapprovedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderpaymentNotifyauthapprovedCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderpaymentNotifyauthapprovedCall<'a, S> {}
 
-impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
+impl<'a, S> OrderpaymentNotifyauthapprovedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4534,7 +4557,7 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthApprovedRequest) -> OrderpaymentNotifyauthapprovedCall<'a> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthApprovedRequest) -> OrderpaymentNotifyauthapprovedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4544,7 +4567,7 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -4554,7 +4577,7 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -4564,7 +4587,7 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthapprovedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthapprovedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4585,7 +4608,7 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthapprovedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthapprovedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4605,9 +4628,9 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthapprovedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderpaymentNotifyauthapprovedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4640,7 +4663,7 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4653,10 +4676,10 @@ impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifyauthdeclinedCall<'a>
-    where  {
+pub struct OrderpaymentNotifyauthdeclinedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderpaymentsNotifyAuthDeclinedRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4665,9 +4688,15 @@ pub struct OrderpaymentNotifyauthdeclinedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderpaymentNotifyauthdeclinedCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderpaymentNotifyauthdeclinedCall<'a, S> {}
 
-impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
+impl<'a, S> OrderpaymentNotifyauthdeclinedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4824,7 +4853,7 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthDeclinedRequest) -> OrderpaymentNotifyauthdeclinedCall<'a> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthDeclinedRequest) -> OrderpaymentNotifyauthdeclinedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4834,7 +4863,7 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -4844,7 +4873,7 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -4854,7 +4883,7 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthdeclinedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthdeclinedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4875,7 +4904,7 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthdeclinedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthdeclinedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4895,9 +4924,9 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthdeclinedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderpaymentNotifyauthdeclinedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4930,7 +4959,7 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4943,10 +4972,10 @@ impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifychargeCall<'a>
-    where  {
+pub struct OrderpaymentNotifychargeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderpaymentsNotifyChargeRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4955,9 +4984,15 @@ pub struct OrderpaymentNotifychargeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderpaymentNotifychargeCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderpaymentNotifychargeCall<'a, S> {}
 
-impl<'a> OrderpaymentNotifychargeCall<'a> {
+impl<'a, S> OrderpaymentNotifychargeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5114,7 +5149,7 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyChargeRequest) -> OrderpaymentNotifychargeCall<'a> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyChargeRequest) -> OrderpaymentNotifychargeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5124,7 +5159,7 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -5134,7 +5169,7 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -5144,7 +5179,7 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifychargeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifychargeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5165,7 +5200,7 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifychargeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifychargeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5185,9 +5220,9 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifychargeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderpaymentNotifychargeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5220,7 +5255,7 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5233,10 +5268,10 @@ impl<'a> OrderpaymentNotifychargeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifyrefundCall<'a>
-    where  {
+pub struct OrderpaymentNotifyrefundCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderpaymentsNotifyRefundRequest,
     _merchant_id: String,
     _order_id: String,
@@ -5245,9 +5280,15 @@ pub struct OrderpaymentNotifyrefundCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderpaymentNotifyrefundCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderpaymentNotifyrefundCall<'a, S> {}
 
-impl<'a> OrderpaymentNotifyrefundCall<'a> {
+impl<'a, S> OrderpaymentNotifyrefundCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5404,7 +5445,7 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyRefundRequest) -> OrderpaymentNotifyrefundCall<'a> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyRefundRequest) -> OrderpaymentNotifyrefundCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5414,7 +5455,7 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -5424,7 +5465,7 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -5434,7 +5475,7 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyrefundCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyrefundCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5455,7 +5496,7 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyrefundCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyrefundCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5475,9 +5516,9 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyrefundCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderpaymentNotifyrefundCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5509,7 +5550,7 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5517,10 +5558,10 @@ impl<'a> OrderpaymentNotifyrefundCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreturnGetCall<'a>
-    where  {
+pub struct OrderreturnGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _return_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5528,9 +5569,15 @@ pub struct OrderreturnGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderreturnGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderreturnGetCall<'a, S> {}
 
-impl<'a> OrderreturnGetCall<'a> {
+impl<'a, S> OrderreturnGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5674,7 +5721,7 @@ impl<'a> OrderreturnGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -5684,7 +5731,7 @@ impl<'a> OrderreturnGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a> {
+    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, S> {
         self._return_id = new_value.to_string();
         self
     }
@@ -5694,7 +5741,7 @@ impl<'a> OrderreturnGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5715,7 +5762,7 @@ impl<'a> OrderreturnGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5735,9 +5782,9 @@ impl<'a> OrderreturnGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderreturnGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5769,7 +5816,7 @@ impl<'a> OrderreturnGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5782,10 +5829,10 @@ impl<'a> OrderreturnGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreturnListCall<'a>
-    where  {
+pub struct OrderreturnListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -5797,9 +5844,15 @@ pub struct OrderreturnListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderreturnListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderreturnListCall<'a, S> {}
 
-impl<'a> OrderreturnListCall<'a> {
+impl<'a, S> OrderreturnListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5957,42 +6010,42 @@ impl<'a> OrderreturnListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Return the results in the specified order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of order returns to return in the response, used for paging. The default value is 25 returns per page, and the maximum allowed value is 250 returns per page.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderreturnListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OrderreturnListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Obtains order returns created after this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *created start date* query property to the given value.
-    pub fn created_start_date(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn created_start_date(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._created_start_date = Some(new_value.to_string());
         self
     }
     /// Obtains order returns created before this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *created end date* query property to the given value.
-    pub fn created_end_date(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn created_end_date(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._created_end_date = Some(new_value.to_string());
         self
     }
@@ -6002,7 +6055,7 @@ impl<'a> OrderreturnListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6023,7 +6076,7 @@ impl<'a> OrderreturnListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6043,9 +6096,9 @@ impl<'a> OrderreturnListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderreturnListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6078,7 +6131,7 @@ impl<'a> OrderreturnListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6091,10 +6144,10 @@ impl<'a> OrderreturnListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderAcknowledgeCall<'a>
-    where  {
+pub struct OrderAcknowledgeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersAcknowledgeRequest,
     _merchant_id: String,
     _order_id: String,
@@ -6103,9 +6156,15 @@ pub struct OrderAcknowledgeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderAcknowledgeCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderAcknowledgeCall<'a, S> {}
 
-impl<'a> OrderAcknowledgeCall<'a> {
+impl<'a, S> OrderAcknowledgeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6262,7 +6321,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersAcknowledgeRequest) -> OrderAcknowledgeCall<'a> {
+    pub fn request(mut self, new_value: OrdersAcknowledgeRequest) -> OrderAcknowledgeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6272,7 +6331,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -6282,7 +6341,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -6292,7 +6351,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAcknowledgeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAcknowledgeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6313,7 +6372,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderAcknowledgeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderAcknowledgeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6333,9 +6392,9 @@ impl<'a> OrderAcknowledgeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAcknowledgeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderAcknowledgeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6367,7 +6426,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6375,10 +6434,10 @@ impl<'a> OrderAcknowledgeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderAdvancetestorderCall<'a>
-    where  {
+pub struct OrderAdvancetestorderCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6386,9 +6445,15 @@ pub struct OrderAdvancetestorderCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderAdvancetestorderCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderAdvancetestorderCall<'a, S> {}
 
-impl<'a> OrderAdvancetestorderCall<'a> {
+impl<'a, S> OrderAdvancetestorderCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6532,7 +6597,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -6542,7 +6607,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -6552,7 +6617,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAdvancetestorderCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAdvancetestorderCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6573,7 +6638,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderAdvancetestorderCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderAdvancetestorderCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6593,9 +6658,9 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAdvancetestorderCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderAdvancetestorderCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6628,7 +6693,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6641,10 +6706,10 @@ impl<'a> OrderAdvancetestorderCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCancelCall<'a>
-    where  {
+pub struct OrderCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCancelRequest,
     _merchant_id: String,
     _order_id: String,
@@ -6653,9 +6718,15 @@ pub struct OrderCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCancelCall<'a, S> {}
 
-impl<'a> OrderCancelCall<'a> {
+impl<'a, S> OrderCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6812,7 +6883,7 @@ impl<'a> OrderCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelRequest) -> OrderCancelCall<'a> {
+    pub fn request(mut self, new_value: OrdersCancelRequest) -> OrderCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6822,7 +6893,7 @@ impl<'a> OrderCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCancelCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCancelCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -6832,7 +6903,7 @@ impl<'a> OrderCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCancelCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCancelCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -6842,7 +6913,7 @@ impl<'a> OrderCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6863,7 +6934,7 @@ impl<'a> OrderCancelCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6883,9 +6954,9 @@ impl<'a> OrderCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6918,7 +6989,7 @@ impl<'a> OrderCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6931,10 +7002,10 @@ impl<'a> OrderCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCancellineitemCall<'a>
-    where  {
+pub struct OrderCancellineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCancelLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -6943,9 +7014,15 @@ pub struct OrderCancellineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCancellineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCancellineitemCall<'a, S> {}
 
-impl<'a> OrderCancellineitemCall<'a> {
+impl<'a, S> OrderCancellineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7102,7 +7179,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelLineItemRequest) -> OrderCancellineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersCancelLineItemRequest) -> OrderCancellineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7112,7 +7189,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7122,7 +7199,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -7132,7 +7209,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancellineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancellineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7153,7 +7230,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCancellineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCancellineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7173,9 +7250,9 @@ impl<'a> OrderCancellineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancellineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCancellineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7208,7 +7285,7 @@ impl<'a> OrderCancellineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7221,10 +7298,10 @@ impl<'a> OrderCancellineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCanceltestorderbycustomerCall<'a>
-    where  {
+pub struct OrderCanceltestorderbycustomerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCancelTestOrderByCustomerRequest,
     _merchant_id: String,
     _order_id: String,
@@ -7233,9 +7310,15 @@ pub struct OrderCanceltestorderbycustomerCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCanceltestorderbycustomerCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCanceltestorderbycustomerCall<'a, S> {}
 
-impl<'a> OrderCanceltestorderbycustomerCall<'a> {
+impl<'a, S> OrderCanceltestorderbycustomerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7392,7 +7475,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelTestOrderByCustomerRequest) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn request(mut self, new_value: OrdersCancelTestOrderByCustomerRequest) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7402,7 +7485,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7412,7 +7495,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -7422,7 +7505,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7443,7 +7526,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCanceltestorderbycustomerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCanceltestorderbycustomerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7463,9 +7546,9 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCanceltestorderbycustomerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCanceltestorderbycustomerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7498,7 +7581,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7511,10 +7594,10 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCreatetestorderCall<'a>
-    where  {
+pub struct OrderCreatetestorderCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCreateTestOrderRequest,
     _merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7522,9 +7605,15 @@ pub struct OrderCreatetestorderCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCreatetestorderCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCreatetestorderCall<'a, S> {}
 
-impl<'a> OrderCreatetestorderCall<'a> {
+impl<'a, S> OrderCreatetestorderCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7680,7 +7769,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCreateTestOrderRequest) -> OrderCreatetestorderCall<'a> {
+    pub fn request(mut self, new_value: OrdersCreateTestOrderRequest) -> OrderCreatetestorderCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7690,7 +7779,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestorderCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestorderCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7700,7 +7789,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestorderCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestorderCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7721,7 +7810,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestorderCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestorderCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7741,9 +7830,9 @@ impl<'a> OrderCreatetestorderCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestorderCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCreatetestorderCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7776,7 +7865,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7789,10 +7878,10 @@ impl<'a> OrderCreatetestorderCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCreatetestreturnCall<'a>
-    where  {
+pub struct OrderCreatetestreturnCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCreateTestReturnRequest,
     _merchant_id: String,
     _order_id: String,
@@ -7801,9 +7890,15 @@ pub struct OrderCreatetestreturnCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCreatetestreturnCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCreatetestreturnCall<'a, S> {}
 
-impl<'a> OrderCreatetestreturnCall<'a> {
+impl<'a, S> OrderCreatetestreturnCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7960,7 +8055,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCreateTestReturnRequest) -> OrderCreatetestreturnCall<'a> {
+    pub fn request(mut self, new_value: OrdersCreateTestReturnRequest) -> OrderCreatetestreturnCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7970,7 +8065,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7980,7 +8075,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -7990,7 +8085,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestreturnCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestreturnCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8011,7 +8106,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestreturnCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestreturnCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8031,9 +8126,9 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestreturnCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCreatetestreturnCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8066,7 +8161,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8079,19 +8174,25 @@ impl<'a> OrderCreatetestreturnCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCustombatchCall<'a>
-    where  {
+pub struct OrderCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCustomBatchRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCustombatchCall<'a, S> {}
 
-impl<'a> OrderCustombatchCall<'a> {
+impl<'a, S> OrderCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8225,7 +8326,7 @@ impl<'a> OrderCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a> {
+    pub fn request(mut self, new_value: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8235,7 +8336,7 @@ impl<'a> OrderCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8256,7 +8357,7 @@ impl<'a> OrderCustombatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8276,9 +8377,9 @@ impl<'a> OrderCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8310,7 +8411,7 @@ impl<'a> OrderCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8318,10 +8419,10 @@ impl<'a> OrderCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGetCall<'a>
-    where  {
+pub struct OrderGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8329,9 +8430,15 @@ pub struct OrderGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderGetCall<'a, S> {}
 
-impl<'a> OrderGetCall<'a> {
+impl<'a, S> OrderGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8475,7 +8582,7 @@ impl<'a> OrderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -8485,7 +8592,7 @@ impl<'a> OrderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -8495,7 +8602,7 @@ impl<'a> OrderGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8516,7 +8623,7 @@ impl<'a> OrderGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8536,9 +8643,9 @@ impl<'a> OrderGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8570,7 +8677,7 @@ impl<'a> OrderGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8578,10 +8685,10 @@ impl<'a> OrderGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGetbymerchantorderidCall<'a>
-    where  {
+pub struct OrderGetbymerchantorderidCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _merchant_order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8589,9 +8696,15 @@ pub struct OrderGetbymerchantorderidCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderGetbymerchantorderidCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderGetbymerchantorderidCall<'a, S> {}
 
-impl<'a> OrderGetbymerchantorderidCall<'a> {
+impl<'a, S> OrderGetbymerchantorderidCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8735,7 +8848,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -8745,7 +8858,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, S> {
         self._merchant_order_id = new_value.to_string();
         self
     }
@@ -8755,7 +8868,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetbymerchantorderidCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8776,7 +8889,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8796,9 +8909,9 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8830,7 +8943,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8839,10 +8952,10 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGettestordertemplateCall<'a>
-    where  {
+pub struct OrderGettestordertemplateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _template_name: String,
     _country: Option<String>,
@@ -8851,9 +8964,15 @@ pub struct OrderGettestordertemplateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderGettestordertemplateCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderGettestordertemplateCall<'a, S> {}
 
-impl<'a> OrderGettestordertemplateCall<'a> {
+impl<'a, S> OrderGettestordertemplateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9000,7 +9119,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9010,14 +9129,14 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
         self._template_name = new_value.to_string();
         self
     }
     /// The country of the template to retrieve. Defaults to US.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -9027,7 +9146,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGettestordertemplateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGettestordertemplateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9048,7 +9167,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGettestordertemplateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGettestordertemplateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9068,9 +9187,9 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGettestordertemplateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderGettestordertemplateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9103,7 +9222,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9116,10 +9235,10 @@ impl<'a> OrderGettestordertemplateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderInstorerefundlineitemCall<'a>
-    where  {
+pub struct OrderInstorerefundlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersInStoreRefundLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -9128,9 +9247,15 @@ pub struct OrderInstorerefundlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderInstorerefundlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderInstorerefundlineitemCall<'a, S> {}
 
-impl<'a> OrderInstorerefundlineitemCall<'a> {
+impl<'a, S> OrderInstorerefundlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9287,7 +9412,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9297,7 +9422,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9307,7 +9432,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -9317,7 +9442,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderInstorerefundlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9338,7 +9463,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9358,9 +9483,9 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9392,7 +9517,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9407,10 +9532,10 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderListCall<'a>
-    where  {
+pub struct OrderListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _statuses: Vec<String>,
     _placed_date_start: Option<String>,
@@ -9424,9 +9549,15 @@ pub struct OrderListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderListCall<'a, S> {}
 
-impl<'a> OrderListCall<'a> {
+impl<'a, S> OrderListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9592,7 +9723,7 @@ impl<'a> OrderListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9600,35 +9731,35 @@ impl<'a> OrderListCall<'a> {
     ///
     /// Append the given value to the *statuses* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._statuses.push(new_value.to_string());
         self
     }
     /// Obtains orders placed after this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *placed date start* query property to the given value.
-    pub fn placed_date_start(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn placed_date_start(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._placed_date_start = Some(new_value.to_string());
         self
     }
     /// Obtains orders placed before this date (exclusively), in ISO 8601 format.
     ///
     /// Sets the *placed date end* query property to the given value.
-    pub fn placed_date_end(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn placed_date_end(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._placed_date_end = Some(new_value.to_string());
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The ordering of the returned list. The only supported value are placedDate desc and placedDate asc for now, which returns orders sorted by placement date. "placedDate desc" stands for listing orders by placement date, from oldest to most recent. "placedDate asc" stands for listing orders by placement date, from most recent to oldest. In future releases we'll support other sorting criteria.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -9636,7 +9767,7 @@ impl<'a> OrderListCall<'a> {
     /// Known issue: All List calls will return all Orders without limit regardless of the value of this field.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -9644,7 +9775,7 @@ impl<'a> OrderListCall<'a> {
     /// We recommend using this filter set to false, in conjunction with the acknowledge call, such that only un-acknowledged orders are returned.
     ///
     /// Sets the *acknowledged* query property to the given value.
-    pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a> {
+    pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a, S> {
         self._acknowledged = Some(new_value);
         self
     }
@@ -9654,7 +9785,7 @@ impl<'a> OrderListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9675,7 +9806,7 @@ impl<'a> OrderListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9695,9 +9826,9 @@ impl<'a> OrderListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9730,7 +9861,7 @@ impl<'a> OrderListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9743,10 +9874,10 @@ impl<'a> OrderListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRefundCall<'a>
-    where  {
+pub struct OrderRefundCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersRefundRequest,
     _merchant_id: String,
     _order_id: String,
@@ -9755,9 +9886,15 @@ pub struct OrderRefundCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderRefundCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderRefundCall<'a, S> {}
 
-impl<'a> OrderRefundCall<'a> {
+impl<'a, S> OrderRefundCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9914,7 +10051,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersRefundRequest) -> OrderRefundCall<'a> {
+    pub fn request(mut self, new_value: OrdersRefundRequest) -> OrderRefundCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9924,7 +10061,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderRefundCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9934,7 +10071,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -9944,7 +10081,7 @@ impl<'a> OrderRefundCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9965,7 +10102,7 @@ impl<'a> OrderRefundCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9985,9 +10122,9 @@ impl<'a> OrderRefundCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRefundCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderRefundCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10020,7 +10157,7 @@ impl<'a> OrderRefundCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10033,10 +10170,10 @@ impl<'a> OrderRefundCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRejectreturnlineitemCall<'a>
-    where  {
+pub struct OrderRejectreturnlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersRejectReturnLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10045,9 +10182,15 @@ pub struct OrderRejectreturnlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderRejectreturnlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderRejectreturnlineitemCall<'a, S> {}
 
-impl<'a> OrderRejectreturnlineitemCall<'a> {
+impl<'a, S> OrderRejectreturnlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10204,7 +10347,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersRejectReturnLineItemRequest) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersRejectReturnLineItemRequest) -> OrderRejectreturnlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10214,7 +10357,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10224,7 +10367,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10234,7 +10377,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRejectreturnlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10255,7 +10398,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRejectreturnlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRejectreturnlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10275,9 +10418,9 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10310,7 +10453,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10323,10 +10466,10 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderReturnlineitemCall<'a>
-    where  {
+pub struct OrderReturnlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersReturnLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10335,9 +10478,15 @@ pub struct OrderReturnlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderReturnlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderReturnlineitemCall<'a, S> {}
 
-impl<'a> OrderReturnlineitemCall<'a> {
+impl<'a, S> OrderReturnlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10494,7 +10643,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersReturnLineItemRequest) -> OrderReturnlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersReturnLineItemRequest) -> OrderReturnlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10504,7 +10653,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10514,7 +10663,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10524,7 +10673,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10545,7 +10694,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10565,9 +10714,9 @@ impl<'a> OrderReturnlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderReturnlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10600,7 +10749,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10613,10 +10762,10 @@ impl<'a> OrderReturnlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderReturnrefundlineitemCall<'a>
-    where  {
+pub struct OrderReturnrefundlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersReturnRefundLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10625,9 +10774,15 @@ pub struct OrderReturnrefundlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderReturnrefundlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderReturnrefundlineitemCall<'a, S> {}
 
-impl<'a> OrderReturnrefundlineitemCall<'a> {
+impl<'a, S> OrderReturnrefundlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10784,7 +10939,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersReturnRefundLineItemRequest) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersReturnRefundLineItemRequest) -> OrderReturnrefundlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10794,7 +10949,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10804,7 +10959,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10814,7 +10969,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnrefundlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10835,7 +10990,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnrefundlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnrefundlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10855,9 +11010,9 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnrefundlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderReturnrefundlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10890,7 +11045,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10903,10 +11058,10 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderSetlineitemmetadataCall<'a>
-    where  {
+pub struct OrderSetlineitemmetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersSetLineItemMetadataRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10915,9 +11070,15 @@ pub struct OrderSetlineitemmetadataCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderSetlineitemmetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderSetlineitemmetadataCall<'a, S> {}
 
-impl<'a> OrderSetlineitemmetadataCall<'a> {
+impl<'a, S> OrderSetlineitemmetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11074,7 +11235,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11084,7 +11245,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11094,7 +11255,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11104,7 +11265,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderSetlineitemmetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11125,7 +11286,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11145,9 +11306,9 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11180,7 +11341,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11193,10 +11354,10 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderShiplineitemCall<'a>
-    where  {
+pub struct OrderShiplineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersShipLineItemsRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11205,9 +11366,15 @@ pub struct OrderShiplineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderShiplineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderShiplineitemCall<'a, S> {}
 
-impl<'a> OrderShiplineitemCall<'a> {
+impl<'a, S> OrderShiplineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11364,7 +11531,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11374,7 +11541,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11384,7 +11551,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11394,7 +11561,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderShiplineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderShiplineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11415,7 +11582,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11435,9 +11602,9 @@ impl<'a> OrderShiplineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderShiplineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderShiplineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11470,7 +11637,7 @@ impl<'a> OrderShiplineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11483,10 +11650,10 @@ impl<'a> OrderShiplineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdatelineitemshippingdetailCall<'a>
-    where  {
+pub struct OrderUpdatelineitemshippingdetailCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersUpdateLineItemShippingDetailsRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11495,9 +11662,15 @@ pub struct OrderUpdatelineitemshippingdetailCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderUpdatelineitemshippingdetailCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderUpdatelineitemshippingdetailCall<'a, S> {}
 
-impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
+impl<'a, S> OrderUpdatelineitemshippingdetailCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11654,7 +11827,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11664,7 +11837,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11674,7 +11847,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11684,7 +11857,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11705,7 +11878,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11725,9 +11898,9 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11760,7 +11933,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11773,10 +11946,10 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdatemerchantorderidCall<'a>
-    where  {
+pub struct OrderUpdatemerchantorderidCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersUpdateMerchantOrderIdRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11785,9 +11958,15 @@ pub struct OrderUpdatemerchantorderidCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderUpdatemerchantorderidCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderUpdatemerchantorderidCall<'a, S> {}
 
-impl<'a> OrderUpdatemerchantorderidCall<'a> {
+impl<'a, S> OrderUpdatemerchantorderidCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11944,7 +12123,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateMerchantOrderIdRequest) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn request(mut self, new_value: OrdersUpdateMerchantOrderIdRequest) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11954,7 +12133,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11964,7 +12143,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11974,7 +12153,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11995,7 +12174,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatemerchantorderidCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatemerchantorderidCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12015,9 +12194,9 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatemerchantorderidCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderUpdatemerchantorderidCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12050,7 +12229,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12063,10 +12242,10 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdateshipmentCall<'a>
-    where  {
+pub struct OrderUpdateshipmentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersUpdateShipmentRequest,
     _merchant_id: String,
     _order_id: String,
@@ -12075,9 +12254,15 @@ pub struct OrderUpdateshipmentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderUpdateshipmentCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderUpdateshipmentCall<'a, S> {}
 
-impl<'a> OrderUpdateshipmentCall<'a> {
+impl<'a, S> OrderUpdateshipmentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12234,7 +12419,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateShipmentRequest) -> OrderUpdateshipmentCall<'a> {
+    pub fn request(mut self, new_value: OrdersUpdateShipmentRequest) -> OrderUpdateshipmentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12244,7 +12429,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -12254,7 +12439,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -12264,7 +12449,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdateshipmentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdateshipmentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12285,7 +12470,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdateshipmentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdateshipmentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12305,9 +12490,9 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdateshipmentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderUpdateshipmentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

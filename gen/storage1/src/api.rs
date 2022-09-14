@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -87,7 +92,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -135,55 +140,55 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Storage<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Storage<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Storage<> {}
+impl<'a, S> client::Hub for Storage<S> {}
 
-impl<'a, > Storage<> {
+impl<'a, S> Storage<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Storage<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Storage<S> {
         Storage {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://storage.googleapis.com/storage/v1/".to_string(),
             _root_url: "https://storage.googleapis.com/".to_string(),
         }
     }
 
-    pub fn bucket_access_controls(&'a self) -> BucketAccessControlMethods<'a> {
+    pub fn bucket_access_controls(&'a self) -> BucketAccessControlMethods<'a, S> {
         BucketAccessControlMethods { hub: &self }
     }
-    pub fn buckets(&'a self) -> BucketMethods<'a> {
+    pub fn buckets(&'a self) -> BucketMethods<'a, S> {
         BucketMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, S> {
         ChannelMethods { hub: &self }
     }
-    pub fn default_object_access_controls(&'a self) -> DefaultObjectAccessControlMethods<'a> {
+    pub fn default_object_access_controls(&'a self) -> DefaultObjectAccessControlMethods<'a, S> {
         DefaultObjectAccessControlMethods { hub: &self }
     }
-    pub fn notifications(&'a self) -> NotificationMethods<'a> {
+    pub fn notifications(&'a self) -> NotificationMethods<'a, S> {
         NotificationMethods { hub: &self }
     }
-    pub fn object_access_controls(&'a self) -> ObjectAccessControlMethods<'a> {
+    pub fn object_access_controls(&'a self) -> ObjectAccessControlMethods<'a, S> {
         ObjectAccessControlMethods { hub: &self }
     }
-    pub fn objects(&'a self) -> ObjectMethods<'a> {
+    pub fn objects(&'a self) -> ObjectMethods<'a, S> {
         ObjectMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1468,22 +1473,22 @@ impl client::Part for PolicyBindings {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.bucket_access_controls();
 /// # }
 /// ```
-pub struct BucketAccessControlMethods<'a>
-    where  {
+pub struct BucketAccessControlMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for BucketAccessControlMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BucketAccessControlMethods<'a, S> {}
 
-impl<'a> BucketAccessControlMethods<'a> {
+impl<'a, S> BucketAccessControlMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1493,7 +1498,7 @@ impl<'a> BucketAccessControlMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn delete(&self, bucket: &str, entity: &str) -> BucketAccessControlDeleteCall<'a> {
+    pub fn delete(&self, bucket: &str, entity: &str) -> BucketAccessControlDeleteCall<'a, S> {
         BucketAccessControlDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1514,7 +1519,7 @@ impl<'a> BucketAccessControlMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, entity: &str) -> BucketAccessControlGetCall<'a> {
+    pub fn get(&self, bucket: &str, entity: &str) -> BucketAccessControlGetCall<'a, S> {
         BucketAccessControlGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1535,7 +1540,7 @@ impl<'a> BucketAccessControlMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn insert(&self, request: BucketAccessControl, bucket: &str) -> BucketAccessControlInsertCall<'a> {
+    pub fn insert(&self, request: BucketAccessControl, bucket: &str) -> BucketAccessControlInsertCall<'a, S> {
         BucketAccessControlInsertCall {
             hub: self.hub,
             _request: request,
@@ -1555,7 +1560,7 @@ impl<'a> BucketAccessControlMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn list(&self, bucket: &str) -> BucketAccessControlListCall<'a> {
+    pub fn list(&self, bucket: &str) -> BucketAccessControlListCall<'a, S> {
         BucketAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1576,7 +1581,7 @@ impl<'a> BucketAccessControlMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn patch(&self, request: BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlPatchCall<'a> {
+    pub fn patch(&self, request: BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlPatchCall<'a, S> {
         BucketAccessControlPatchCall {
             hub: self.hub,
             _request: request,
@@ -1599,7 +1604,7 @@ impl<'a> BucketAccessControlMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlUpdateCall<'a> {
+    pub fn update(&self, request: BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlUpdateCall<'a, S> {
         BucketAccessControlUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1637,22 +1642,22 @@ impl<'a> BucketAccessControlMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `lock_retention_policy(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.buckets();
 /// # }
 /// ```
-pub struct BucketMethods<'a>
-    where  {
+pub struct BucketMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for BucketMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BucketMethods<'a, S> {}
 
-impl<'a> BucketMethods<'a> {
+impl<'a, S> BucketMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1661,7 +1666,7 @@ impl<'a> BucketMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn delete(&self, bucket: &str) -> BucketDeleteCall<'a> {
+    pub fn delete(&self, bucket: &str) -> BucketDeleteCall<'a, S> {
         BucketDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1682,7 +1687,7 @@ impl<'a> BucketMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn get(&self, bucket: &str) -> BucketGetCall<'a> {
+    pub fn get(&self, bucket: &str) -> BucketGetCall<'a, S> {
         BucketGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1704,7 +1709,7 @@ impl<'a> BucketMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn get_iam_policy(&self, bucket: &str) -> BucketGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, bucket: &str) -> BucketGetIamPolicyCall<'a, S> {
         BucketGetIamPolicyCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1725,7 +1730,7 @@ impl<'a> BucketMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - A valid API project identifier.
-    pub fn insert(&self, request: Bucket, project: &str) -> BucketInsertCall<'a> {
+    pub fn insert(&self, request: Bucket, project: &str) -> BucketInsertCall<'a, S> {
         BucketInsertCall {
             hub: self.hub,
             _request: request,
@@ -1748,7 +1753,7 @@ impl<'a> BucketMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - A valid API project identifier.
-    pub fn list(&self, project: &str) -> BucketListCall<'a> {
+    pub fn list(&self, project: &str) -> BucketListCall<'a, S> {
         BucketListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1772,7 +1777,7 @@ impl<'a> BucketMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `ifMetagenerationMatch` - Makes the operation conditional on whether bucket's current metageneration matches the given value.
-    pub fn lock_retention_policy(&self, bucket: &str, if_metageneration_match: &str) -> BucketLockRetentionPolicyCall<'a> {
+    pub fn lock_retention_policy(&self, bucket: &str, if_metageneration_match: &str) -> BucketLockRetentionPolicyCall<'a, S> {
         BucketLockRetentionPolicyCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1793,7 +1798,7 @@ impl<'a> BucketMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn patch(&self, request: Bucket, bucket: &str) -> BucketPatchCall<'a> {
+    pub fn patch(&self, request: Bucket, bucket: &str) -> BucketPatchCall<'a, S> {
         BucketPatchCall {
             hub: self.hub,
             _request: request,
@@ -1819,7 +1824,7 @@ impl<'a> BucketMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn set_iam_policy(&self, request: Policy, bucket: &str) -> BucketSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: Policy, bucket: &str) -> BucketSetIamPolicyCall<'a, S> {
         BucketSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1840,7 +1845,7 @@ impl<'a> BucketMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `permissions` - Permissions to test.
-    pub fn test_iam_permissions(&self, bucket: &str, permissions: &Vec<String>) -> BucketTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, bucket: &str, permissions: &Vec<String>) -> BucketTestIamPermissionCall<'a, S> {
         BucketTestIamPermissionCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -1861,7 +1866,7 @@ impl<'a> BucketMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn update(&self, request: Bucket, bucket: &str) -> BucketUpdateCall<'a> {
+    pub fn update(&self, request: Bucket, bucket: &str) -> BucketUpdateCall<'a, S> {
         BucketUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1903,22 +1908,22 @@ impl<'a> BucketMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `stop(...)`
 /// // to build up your call.
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a>
-    where  {
+pub struct ChannelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChannelMethods<'a, S> {}
 
-impl<'a> ChannelMethods<'a> {
+impl<'a, S> ChannelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1927,7 +1932,7 @@ impl<'a> ChannelMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a> {
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, S> {
         ChannelStopCall {
             hub: self.hub,
             _request: request,
@@ -1961,22 +1966,22 @@ impl<'a> ChannelMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.default_object_access_controls();
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlMethods<'a>
-    where  {
+pub struct DefaultObjectAccessControlMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for DefaultObjectAccessControlMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DefaultObjectAccessControlMethods<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlMethods<'a> {
+impl<'a, S> DefaultObjectAccessControlMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1986,7 +1991,7 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn delete(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlDeleteCall<'a> {
+    pub fn delete(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlDeleteCall<'a, S> {
         DefaultObjectAccessControlDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2007,7 +2012,7 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlGetCall<'a> {
+    pub fn get(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlGetCall<'a, S> {
         DefaultObjectAccessControlGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2028,7 +2033,7 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    pub fn insert(&self, request: ObjectAccessControl, bucket: &str) -> DefaultObjectAccessControlInsertCall<'a> {
+    pub fn insert(&self, request: ObjectAccessControl, bucket: &str) -> DefaultObjectAccessControlInsertCall<'a, S> {
         DefaultObjectAccessControlInsertCall {
             hub: self.hub,
             _request: request,
@@ -2048,7 +2053,7 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    pub fn list(&self, bucket: &str) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn list(&self, bucket: &str) -> DefaultObjectAccessControlListCall<'a, S> {
         DefaultObjectAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2071,7 +2076,7 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn patch(&self, request: ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn patch(&self, request: ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlPatchCall<'a, S> {
         DefaultObjectAccessControlPatchCall {
             hub: self.hub,
             _request: request,
@@ -2094,7 +2099,7 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn update(&self, request: ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         DefaultObjectAccessControlUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2132,22 +2137,22 @@ impl<'a> DefaultObjectAccessControlMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.notifications();
 /// # }
 /// ```
-pub struct NotificationMethods<'a>
-    where  {
+pub struct NotificationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for NotificationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for NotificationMethods<'a, S> {}
 
-impl<'a> NotificationMethods<'a> {
+impl<'a, S> NotificationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2157,7 +2162,7 @@ impl<'a> NotificationMethods<'a> {
     ///
     /// * `bucket` - The parent bucket of the notification.
     /// * `notification` - ID of the notification to delete.
-    pub fn delete(&self, bucket: &str, notification: &str) -> NotificationDeleteCall<'a> {
+    pub fn delete(&self, bucket: &str, notification: &str) -> NotificationDeleteCall<'a, S> {
         NotificationDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2178,7 +2183,7 @@ impl<'a> NotificationMethods<'a> {
     ///
     /// * `bucket` - The parent bucket of the notification.
     /// * `notification` - Notification ID
-    pub fn get(&self, bucket: &str, notification: &str) -> NotificationGetCall<'a> {
+    pub fn get(&self, bucket: &str, notification: &str) -> NotificationGetCall<'a, S> {
         NotificationGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2199,7 +2204,7 @@ impl<'a> NotificationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - The parent bucket of the notification.
-    pub fn insert(&self, request: Notification, bucket: &str) -> NotificationInsertCall<'a> {
+    pub fn insert(&self, request: Notification, bucket: &str) -> NotificationInsertCall<'a, S> {
         NotificationInsertCall {
             hub: self.hub,
             _request: request,
@@ -2219,7 +2224,7 @@ impl<'a> NotificationMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a Google Cloud Storage bucket.
-    pub fn list(&self, bucket: &str) -> NotificationListCall<'a> {
+    pub fn list(&self, bucket: &str) -> NotificationListCall<'a, S> {
         NotificationListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2255,22 +2260,22 @@ impl<'a> NotificationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.object_access_controls();
 /// # }
 /// ```
-pub struct ObjectAccessControlMethods<'a>
-    where  {
+pub struct ObjectAccessControlMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for ObjectAccessControlMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ObjectAccessControlMethods<'a, S> {}
 
-impl<'a> ObjectAccessControlMethods<'a> {
+impl<'a, S> ObjectAccessControlMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2281,7 +2286,7 @@ impl<'a> ObjectAccessControlMethods<'a> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn delete(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn delete(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         ObjectAccessControlDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2305,7 +2310,7 @@ impl<'a> ObjectAccessControlMethods<'a> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, S> {
         ObjectAccessControlGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2329,7 +2334,7 @@ impl<'a> ObjectAccessControlMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn insert(&self, request: ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a> {
+    pub fn insert(&self, request: ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, S> {
         ObjectAccessControlInsertCall {
             hub: self.hub,
             _request: request,
@@ -2352,7 +2357,7 @@ impl<'a> ObjectAccessControlMethods<'a> {
     ///
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn list(&self, bucket: &str, object: &str) -> ObjectAccessControlListCall<'a> {
+    pub fn list(&self, bucket: &str, object: &str) -> ObjectAccessControlListCall<'a, S> {
         ObjectAccessControlListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2376,7 +2381,7 @@ impl<'a> ObjectAccessControlMethods<'a> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn patch(&self, request: ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn patch(&self, request: ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlPatchCall<'a, S> {
         ObjectAccessControlPatchCall {
             hub: self.hub,
             _request: request,
@@ -2402,7 +2407,7 @@ impl<'a> ObjectAccessControlMethods<'a> {
     /// * `bucket` - Name of a bucket.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
-    pub fn update(&self, request: ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn update(&self, request: ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         ObjectAccessControlUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2442,22 +2447,22 @@ impl<'a> ObjectAccessControlMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `compose(...)`, `copy(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `rewrite(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `update(...)` and `watch_all(...)`
 /// // to build up your call.
 /// let rb = hub.objects();
 /// # }
 /// ```
-pub struct ObjectMethods<'a>
-    where  {
+pub struct ObjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for ObjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ObjectMethods<'a, S> {}
 
-impl<'a> ObjectMethods<'a> {
+impl<'a, S> ObjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2468,7 +2473,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `destinationBucket` - Name of the bucket containing the source objects. The destination object is stored in this bucket.
     /// * `destinationObject` - Name of the new object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn compose(&self, request: ComposeRequest, destination_bucket: &str, destination_object: &str) -> ObjectComposeCall<'a> {
+    pub fn compose(&self, request: ComposeRequest, destination_bucket: &str, destination_object: &str) -> ObjectComposeCall<'a, S> {
         ObjectComposeCall {
             hub: self.hub,
             _request: request,
@@ -2497,7 +2502,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `sourceObject` - Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
-    pub fn copy(&self, request: Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectCopyCall<'a> {
+    pub fn copy(&self, request: Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectCopyCall<'a, S> {
         ObjectCopyCall {
             hub: self.hub,
             _request: request,
@@ -2533,7 +2538,7 @@ impl<'a> ObjectMethods<'a> {
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn delete(&self, bucket: &str, object: &str) -> ObjectDeleteCall<'a> {
+    pub fn delete(&self, bucket: &str, object: &str) -> ObjectDeleteCall<'a, S> {
         ObjectDeleteCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2559,7 +2564,7 @@ impl<'a> ObjectMethods<'a> {
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn get(&self, bucket: &str, object: &str) -> ObjectGetCall<'a> {
+    pub fn get(&self, bucket: &str, object: &str) -> ObjectGetCall<'a, S> {
         ObjectGetCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2586,7 +2591,7 @@ impl<'a> ObjectMethods<'a> {
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn get_iam_policy(&self, bucket: &str, object: &str) -> ObjectGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, bucket: &str, object: &str) -> ObjectGetIamPolicyCall<'a, S> {
         ObjectGetIamPolicyCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2608,7 +2613,7 @@ impl<'a> ObjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
-    pub fn insert(&self, request: Object, bucket: &str) -> ObjectInsertCall<'a> {
+    pub fn insert(&self, request: Object, bucket: &str) -> ObjectInsertCall<'a, S> {
         ObjectInsertCall {
             hub: self.hub,
             _request: request,
@@ -2637,7 +2642,7 @@ impl<'a> ObjectMethods<'a> {
     /// # Arguments
     ///
     /// * `bucket` - Name of the bucket in which to look for objects.
-    pub fn list(&self, bucket: &str) -> ObjectListCall<'a> {
+    pub fn list(&self, bucket: &str) -> ObjectListCall<'a, S> {
         ObjectListCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2667,7 +2672,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn patch(&self, request: Object, bucket: &str, object: &str) -> ObjectPatchCall<'a> {
+    pub fn patch(&self, request: Object, bucket: &str, object: &str) -> ObjectPatchCall<'a, S> {
         ObjectPatchCall {
             hub: self.hub,
             _request: request,
@@ -2699,7 +2704,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `sourceObject` - Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn rewrite(&self, request: Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectRewriteCall<'a> {
+    pub fn rewrite(&self, request: Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectRewriteCall<'a, S> {
         ObjectRewriteCall {
             hub: self.hub,
             _request: request,
@@ -2738,7 +2743,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn set_iam_policy(&self, request: Policy, bucket: &str, object: &str) -> ObjectSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: Policy, bucket: &str, object: &str) -> ObjectSetIamPolicyCall<'a, S> {
         ObjectSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2762,7 +2767,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `permissions` - Permissions to test.
-    pub fn test_iam_permissions(&self, bucket: &str, object: &str, permissions: &Vec<String>) -> ObjectTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, bucket: &str, object: &str, permissions: &Vec<String>) -> ObjectTestIamPermissionCall<'a, S> {
         ObjectTestIamPermissionCall {
             hub: self.hub,
             _bucket: bucket.to_string(),
@@ -2786,7 +2791,7 @@ impl<'a> ObjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
-    pub fn update(&self, request: Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a> {
+    pub fn update(&self, request: Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, S> {
         ObjectUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2815,7 +2820,7 @@ impl<'a> ObjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which to look for objects.
-    pub fn watch_all(&self, request: Channel, bucket: &str) -> ObjectWatchAllCall<'a> {
+    pub fn watch_all(&self, request: Channel, bucket: &str) -> ObjectWatchAllCall<'a, S> {
         ObjectWatchAllCall {
             hub: self.hub,
             _request: request,
@@ -2861,22 +2866,22 @@ impl<'a> ObjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `hmac_keys_create(...)`, `hmac_keys_delete(...)`, `hmac_keys_get(...)`, `hmac_keys_list(...)`, `hmac_keys_update(...)` and `service_account_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2886,7 +2891,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Project ID owning the service account.
     /// * `serviceAccountEmail` - Email address of the service account.
-    pub fn hmac_keys_create(&self, project_id: &str, service_account_email: &str) -> ProjectHmacKeyCreateCall<'a> {
+    pub fn hmac_keys_create(&self, project_id: &str, service_account_email: &str) -> ProjectHmacKeyCreateCall<'a, S> {
         ProjectHmacKeyCreateCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -2906,7 +2911,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Project ID owning the requested key
     /// * `accessId` - Name of the HMAC key to be deleted.
-    pub fn hmac_keys_delete(&self, project_id: &str, access_id: &str) -> ProjectHmacKeyDeleteCall<'a> {
+    pub fn hmac_keys_delete(&self, project_id: &str, access_id: &str) -> ProjectHmacKeyDeleteCall<'a, S> {
         ProjectHmacKeyDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -2926,7 +2931,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Project ID owning the service account of the requested key.
     /// * `accessId` - Name of the HMAC key.
-    pub fn hmac_keys_get(&self, project_id: &str, access_id: &str) -> ProjectHmacKeyGetCall<'a> {
+    pub fn hmac_keys_get(&self, project_id: &str, access_id: &str) -> ProjectHmacKeyGetCall<'a, S> {
         ProjectHmacKeyGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -2945,7 +2950,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Name of the project in which to look for HMAC keys.
-    pub fn hmac_keys_list(&self, project_id: &str) -> ProjectHmacKeyListCall<'a> {
+    pub fn hmac_keys_list(&self, project_id: &str) -> ProjectHmacKeyListCall<'a, S> {
         ProjectHmacKeyListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -2969,7 +2974,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Project ID owning the service account of the updated key.
     /// * `accessId` - Name of the HMAC key being updated.
-    pub fn hmac_keys_update(&self, request: HmacKeyMetadata, project_id: &str, access_id: &str) -> ProjectHmacKeyUpdateCall<'a> {
+    pub fn hmac_keys_update(&self, request: HmacKeyMetadata, project_id: &str, access_id: &str) -> ProjectHmacKeyUpdateCall<'a, S> {
         ProjectHmacKeyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2989,7 +2994,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Project ID
-    pub fn service_account_get(&self, project_id: &str) -> ProjectServiceAccountGetCall<'a> {
+    pub fn service_account_get(&self, project_id: &str) -> ProjectServiceAccountGetCall<'a, S> {
         ProjectServiceAccountGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3032,7 +3037,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3042,10 +3047,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketAccessControlDeleteCall<'a>
-    where  {
+pub struct BucketAccessControlDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _entity: String,
     _user_project: Option<String>,
@@ -3055,9 +3060,15 @@ pub struct BucketAccessControlDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketAccessControlDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketAccessControlDeleteCall<'a, S> {}
 
-impl<'a> BucketAccessControlDeleteCall<'a> {
+impl<'a, S> BucketAccessControlDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3196,7 +3207,7 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -3206,21 +3217,21 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -3230,7 +3241,7 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3252,7 +3263,7 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3272,9 +3283,9 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketAccessControlDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketAccessControlDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3306,7 +3317,7 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3316,10 +3327,10 @@ impl<'a> BucketAccessControlDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketAccessControlGetCall<'a>
-    where  {
+pub struct BucketAccessControlGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _entity: String,
     _user_project: Option<String>,
@@ -3329,9 +3340,15 @@ pub struct BucketAccessControlGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketAccessControlGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketAccessControlGetCall<'a, S> {}
 
-impl<'a> BucketAccessControlGetCall<'a> {
+impl<'a, S> BucketAccessControlGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3481,7 +3498,7 @@ impl<'a> BucketAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlGetCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -3491,21 +3508,21 @@ impl<'a> BucketAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlGetCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -3515,7 +3532,7 @@ impl<'a> BucketAccessControlGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3537,7 +3554,7 @@ impl<'a> BucketAccessControlGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3557,9 +3574,9 @@ impl<'a> BucketAccessControlGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketAccessControlGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketAccessControlGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3592,7 +3609,7 @@ impl<'a> BucketAccessControlGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3607,10 +3624,10 @@ impl<'a> BucketAccessControlGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketAccessControlInsertCall<'a>
-    where  {
+pub struct BucketAccessControlInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: BucketAccessControl,
     _bucket: String,
     _user_project: Option<String>,
@@ -3620,9 +3637,15 @@ pub struct BucketAccessControlInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketAccessControlInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketAccessControlInsertCall<'a, S> {}
 
-impl<'a> BucketAccessControlInsertCall<'a> {
+impl<'a, S> BucketAccessControlInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3784,7 +3807,7 @@ impl<'a> BucketAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BucketAccessControl) -> BucketAccessControlInsertCall<'a> {
+    pub fn request(mut self, new_value: BucketAccessControl) -> BucketAccessControlInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3794,21 +3817,21 @@ impl<'a> BucketAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -3818,7 +3841,7 @@ impl<'a> BucketAccessControlInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3840,7 +3863,7 @@ impl<'a> BucketAccessControlInsertCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3860,9 +3883,9 @@ impl<'a> BucketAccessControlInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketAccessControlInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketAccessControlInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3894,7 +3917,7 @@ impl<'a> BucketAccessControlInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3904,10 +3927,10 @@ impl<'a> BucketAccessControlInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketAccessControlListCall<'a>
-    where  {
+pub struct BucketAccessControlListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -3916,9 +3939,15 @@ pub struct BucketAccessControlListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketAccessControlListCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketAccessControlListCall<'a, S> {}
 
-impl<'a> BucketAccessControlListCall<'a> {
+impl<'a, S> BucketAccessControlListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4067,21 +4096,21 @@ impl<'a> BucketAccessControlListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlListCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlListCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -4091,7 +4120,7 @@ impl<'a> BucketAccessControlListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4113,7 +4142,7 @@ impl<'a> BucketAccessControlListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4133,9 +4162,9 @@ impl<'a> BucketAccessControlListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketAccessControlListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketAccessControlListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4168,7 +4197,7 @@ impl<'a> BucketAccessControlListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4183,10 +4212,10 @@ impl<'a> BucketAccessControlListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketAccessControlPatchCall<'a>
-    where  {
+pub struct BucketAccessControlPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: BucketAccessControl,
     _bucket: String,
     _entity: String,
@@ -4197,9 +4226,15 @@ pub struct BucketAccessControlPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketAccessControlPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketAccessControlPatchCall<'a, S> {}
 
-impl<'a> BucketAccessControlPatchCall<'a> {
+impl<'a, S> BucketAccessControlPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4362,7 +4397,7 @@ impl<'a> BucketAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BucketAccessControl) -> BucketAccessControlPatchCall<'a> {
+    pub fn request(mut self, new_value: BucketAccessControl) -> BucketAccessControlPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4372,7 +4407,7 @@ impl<'a> BucketAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -4382,21 +4417,21 @@ impl<'a> BucketAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -4406,7 +4441,7 @@ impl<'a> BucketAccessControlPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4428,7 +4463,7 @@ impl<'a> BucketAccessControlPatchCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4448,9 +4483,9 @@ impl<'a> BucketAccessControlPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketAccessControlPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketAccessControlPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4483,7 +4518,7 @@ impl<'a> BucketAccessControlPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4498,10 +4533,10 @@ impl<'a> BucketAccessControlPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketAccessControlUpdateCall<'a>
-    where  {
+pub struct BucketAccessControlUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: BucketAccessControl,
     _bucket: String,
     _entity: String,
@@ -4512,9 +4547,15 @@ pub struct BucketAccessControlUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketAccessControlUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketAccessControlUpdateCall<'a, S> {}
 
-impl<'a> BucketAccessControlUpdateCall<'a> {
+impl<'a, S> BucketAccessControlUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4677,7 +4718,7 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BucketAccessControl) -> BucketAccessControlUpdateCall<'a> {
+    pub fn request(mut self, new_value: BucketAccessControl) -> BucketAccessControlUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4687,7 +4728,7 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -4697,21 +4738,21 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -4721,7 +4762,7 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketAccessControlUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4743,7 +4784,7 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4763,9 +4804,9 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketAccessControlUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketAccessControlUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4797,7 +4838,7 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4809,10 +4850,10 @@ impl<'a> BucketAccessControlUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketDeleteCall<'a>
-    where  {
+pub struct BucketDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -4823,9 +4864,15 @@ pub struct BucketDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketDeleteCall<'a, S> {}
 
-impl<'a> BucketDeleteCall<'a> {
+impl<'a, S> BucketDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4969,35 +5016,35 @@ impl<'a> BucketDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketDeleteCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketDeleteCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketDeleteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketDeleteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If set, only deletes the bucket if its metageneration does not match this value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketDeleteCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketDeleteCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// If set, only deletes the bucket if its metageneration matches this value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketDeleteCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketDeleteCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -5007,7 +5054,7 @@ impl<'a> BucketDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5029,7 +5076,7 @@ impl<'a> BucketDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5049,9 +5096,9 @@ impl<'a> BucketDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5083,7 +5130,7 @@ impl<'a> BucketDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5096,10 +5143,10 @@ impl<'a> BucketDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketGetCall<'a>
-    where  {
+pub struct BucketGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -5111,9 +5158,15 @@ pub struct BucketGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketGetCall<'a, S> {}
 
-impl<'a> BucketGetCall<'a> {
+impl<'a, S> BucketGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5271,42 +5324,42 @@ impl<'a> BucketGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketGetCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketGetCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketGetCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketGetCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketGetCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketGetCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -5316,7 +5369,7 @@ impl<'a> BucketGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5338,7 +5391,7 @@ impl<'a> BucketGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5358,9 +5411,9 @@ impl<'a> BucketGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5392,7 +5445,7 @@ impl<'a> BucketGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5403,10 +5456,10 @@ impl<'a> BucketGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketGetIamPolicyCall<'a>
-    where  {
+pub struct BucketGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -5416,9 +5469,15 @@ pub struct BucketGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketGetIamPolicyCall<'a, S> {}
 
-impl<'a> BucketGetIamPolicyCall<'a> {
+impl<'a, S> BucketGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5570,28 +5629,28 @@ impl<'a> BucketGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// The IAM policy format version to be returned. If the optionsRequestedPolicyVersion is for an older version that doesn't support part of the requested IAM policy, the request fails.
     ///
     /// Sets the *options requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> BucketGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> BucketGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -5601,7 +5660,7 @@ impl<'a> BucketGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5623,7 +5682,7 @@ impl<'a> BucketGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5643,9 +5702,9 @@ impl<'a> BucketGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5678,7 +5737,7 @@ impl<'a> BucketGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5696,10 +5755,10 @@ impl<'a> BucketGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketInsertCall<'a>
-    where  {
+pub struct BucketInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Bucket,
     _project: String,
     _user_project: Option<String>,
@@ -5712,9 +5771,15 @@ pub struct BucketInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketInsertCall<'a, S> {}
 
-impl<'a> BucketInsertCall<'a> {
+impl<'a, S> BucketInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5864,7 +5929,7 @@ impl<'a> BucketInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Bucket) -> BucketInsertCall<'a> {
+    pub fn request(mut self, new_value: Bucket) -> BucketInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5874,42 +5939,42 @@ impl<'a> BucketInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> BucketInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketInsertCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketInsertCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl, unless the bucket resource specifies acl or defaultObjectAcl properties, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of default object access controls to this bucket.
     ///
     /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a> {
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to this bucket.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a> {
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a, S> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
@@ -5919,7 +5984,7 @@ impl<'a> BucketInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5941,7 +6006,7 @@ impl<'a> BucketInsertCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5961,9 +6026,9 @@ impl<'a> BucketInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5995,7 +6060,7 @@ impl<'a> BucketInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6009,10 +6074,10 @@ impl<'a> BucketInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketListCall<'a>
-    where  {
+pub struct BucketListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _project: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -6025,9 +6090,15 @@ pub struct BucketListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketListCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketListCall<'a, S> {}
 
-impl<'a> BucketListCall<'a> {
+impl<'a, S> BucketListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6167,49 +6238,49 @@ impl<'a> BucketListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> BucketListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> BucketListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketListCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketListCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketListCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> BucketListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Filter results to buckets whose names begin with this prefix.
     ///
     /// Sets the *prefix* query property to the given value.
-    pub fn prefix(mut self, new_value: &str) -> BucketListCall<'a> {
+    pub fn prefix(mut self, new_value: &str) -> BucketListCall<'a, S> {
         self._prefix = Some(new_value.to_string());
         self
     }
     /// A previously-returned page token representing part of the larger set of results to view.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BucketListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BucketListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of buckets to return in a single response. The service will use this parameter or 1,000 items, whichever is smaller.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -6219,7 +6290,7 @@ impl<'a> BucketListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6241,7 +6312,7 @@ impl<'a> BucketListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6261,9 +6332,9 @@ impl<'a> BucketListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6295,7 +6366,7 @@ impl<'a> BucketListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6305,10 +6376,10 @@ impl<'a> BucketListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketLockRetentionPolicyCall<'a>
-    where  {
+pub struct BucketLockRetentionPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _if_metageneration_match: String,
     _user_project: Option<String>,
@@ -6318,9 +6389,15 @@ pub struct BucketLockRetentionPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketLockRetentionPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketLockRetentionPolicyCall<'a, S> {}
 
-impl<'a> BucketLockRetentionPolicyCall<'a> {
+impl<'a, S> BucketLockRetentionPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6470,7 +6547,7 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -6480,21 +6557,21 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a, S> {
         self._if_metageneration_match = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketLockRetentionPolicyCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -6504,7 +6581,7 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketLockRetentionPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketLockRetentionPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6526,7 +6603,7 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketLockRetentionPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketLockRetentionPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6546,9 +6623,9 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketLockRetentionPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketLockRetentionPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6581,7 +6658,7 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6601,10 +6678,10 @@ impl<'a> BucketLockRetentionPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketPatchCall<'a>
-    where  {
+pub struct BucketPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Bucket,
     _bucket: String,
     _user_project: Option<String>,
@@ -6619,9 +6696,15 @@ pub struct BucketPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketPatchCall<'a, S> {}
 
-impl<'a> BucketPatchCall<'a> {
+impl<'a, S> BucketPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6798,7 +6881,7 @@ impl<'a> BucketPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Bucket) -> BucketPatchCall<'a> {
+    pub fn request(mut self, new_value: Bucket) -> BucketPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6808,56 +6891,56 @@ impl<'a> BucketPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of default object access controls to this bucket.
     ///
     /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to this bucket.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -6867,7 +6950,7 @@ impl<'a> BucketPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6889,7 +6972,7 @@ impl<'a> BucketPatchCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6909,9 +6992,9 @@ impl<'a> BucketPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6944,7 +7027,7 @@ impl<'a> BucketPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6959,10 +7042,10 @@ impl<'a> BucketPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketSetIamPolicyCall<'a>
-    where  {
+pub struct BucketSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Policy,
     _bucket: String,
     _user_project: Option<String>,
@@ -6972,9 +7055,15 @@ pub struct BucketSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketSetIamPolicyCall<'a, S> {}
 
-impl<'a> BucketSetIamPolicyCall<'a> {
+impl<'a, S> BucketSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7136,7 +7225,7 @@ impl<'a> BucketSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Policy) -> BucketSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: Policy) -> BucketSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7146,21 +7235,21 @@ impl<'a> BucketSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -7170,7 +7259,7 @@ impl<'a> BucketSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7192,7 +7281,7 @@ impl<'a> BucketSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7212,9 +7301,9 @@ impl<'a> BucketSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7246,7 +7335,7 @@ impl<'a> BucketSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7256,10 +7345,10 @@ impl<'a> BucketSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketTestIamPermissionCall<'a>
-    where  {
+pub struct BucketTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _permissions: Vec<String>,
     _user_project: Option<String>,
@@ -7269,9 +7358,15 @@ pub struct BucketTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketTestIamPermissionCall<'a, S> {}
 
-impl<'a> BucketTestIamPermissionCall<'a> {
+impl<'a, S> BucketTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7425,7 +7520,7 @@ impl<'a> BucketTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -7436,21 +7531,21 @@ impl<'a> BucketTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_permissions(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a> {
+    pub fn add_permissions(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, S> {
         self._permissions.push(new_value.to_string());
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -7460,7 +7555,7 @@ impl<'a> BucketTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7482,7 +7577,7 @@ impl<'a> BucketTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7502,9 +7597,9 @@ impl<'a> BucketTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7537,7 +7632,7 @@ impl<'a> BucketTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7557,10 +7652,10 @@ impl<'a> BucketTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BucketUpdateCall<'a>
-    where  {
+pub struct BucketUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Bucket,
     _bucket: String,
     _user_project: Option<String>,
@@ -7575,9 +7670,15 @@ pub struct BucketUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BucketUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for BucketUpdateCall<'a, S> {}
 
-impl<'a> BucketUpdateCall<'a> {
+impl<'a, S> BucketUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7754,7 +7855,7 @@ impl<'a> BucketUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Bucket) -> BucketUpdateCall<'a> {
+    pub fn request(mut self, new_value: Bucket) -> BucketUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7764,56 +7865,56 @@ impl<'a> BucketUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of default object access controls to this bucket.
     ///
     /// Sets the *predefined default object acl* query property to the given value.
-    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to this bucket.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketUpdateCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> BucketUpdateCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -7823,7 +7924,7 @@ impl<'a> BucketUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7845,7 +7946,7 @@ impl<'a> BucketUpdateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> BucketUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BucketUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7865,9 +7966,9 @@ impl<'a> BucketUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BucketUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BucketUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7900,7 +8001,7 @@ impl<'a> BucketUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7913,19 +8014,25 @@ impl<'a> BucketUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelStopCall<'a>
-    where  {
+pub struct ChannelStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Channel,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelStopCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelStopCall<'a, S> {}
 
-impl<'a> ChannelStopCall<'a> {
+impl<'a, S> ChannelStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8048,7 +8155,7 @@ impl<'a> ChannelStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8058,7 +8165,7 @@ impl<'a> ChannelStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8080,7 +8187,7 @@ impl<'a> ChannelStopCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8100,9 +8207,9 @@ impl<'a> ChannelStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8134,7 +8241,7 @@ impl<'a> ChannelStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8144,10 +8251,10 @@ impl<'a> ChannelStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlDeleteCall<'a>
-    where  {
+pub struct DefaultObjectAccessControlDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _entity: String,
     _user_project: Option<String>,
@@ -8157,9 +8264,15 @@ pub struct DefaultObjectAccessControlDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DefaultObjectAccessControlDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for DefaultObjectAccessControlDeleteCall<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
+impl<'a, S> DefaultObjectAccessControlDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8298,7 +8411,7 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -8308,21 +8421,21 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -8332,7 +8445,7 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8354,7 +8467,7 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8374,9 +8487,9 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DefaultObjectAccessControlDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DefaultObjectAccessControlDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8408,7 +8521,7 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8418,10 +8531,10 @@ impl<'a> DefaultObjectAccessControlDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlGetCall<'a>
-    where  {
+pub struct DefaultObjectAccessControlGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _entity: String,
     _user_project: Option<String>,
@@ -8431,9 +8544,15 @@ pub struct DefaultObjectAccessControlGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DefaultObjectAccessControlGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DefaultObjectAccessControlGetCall<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlGetCall<'a> {
+impl<'a, S> DefaultObjectAccessControlGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8583,7 +8702,7 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -8593,21 +8712,21 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -8617,7 +8736,7 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8639,7 +8758,7 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8659,9 +8778,9 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DefaultObjectAccessControlGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DefaultObjectAccessControlGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8694,7 +8813,7 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8709,10 +8828,10 @@ impl<'a> DefaultObjectAccessControlGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlInsertCall<'a>
-    where  {
+pub struct DefaultObjectAccessControlInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ObjectAccessControl,
     _bucket: String,
     _user_project: Option<String>,
@@ -8722,9 +8841,15 @@ pub struct DefaultObjectAccessControlInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DefaultObjectAccessControlInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for DefaultObjectAccessControlInsertCall<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlInsertCall<'a> {
+impl<'a, S> DefaultObjectAccessControlInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8886,7 +9011,7 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlInsertCall<'a> {
+    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8896,21 +9021,21 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -8920,7 +9045,7 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8942,7 +9067,7 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8962,9 +9087,9 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DefaultObjectAccessControlInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DefaultObjectAccessControlInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8996,7 +9121,7 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9008,10 +9133,10 @@ impl<'a> DefaultObjectAccessControlInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlListCall<'a>
-    where  {
+pub struct DefaultObjectAccessControlListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -9022,9 +9147,15 @@ pub struct DefaultObjectAccessControlListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DefaultObjectAccessControlListCall<'a> {}
+impl<'a, S> client::CallBuilder for DefaultObjectAccessControlListCall<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlListCall<'a> {
+impl<'a, S> DefaultObjectAccessControlListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9179,35 +9310,35 @@ impl<'a> DefaultObjectAccessControlListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, only return default ACL listing if the bucket's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// If present, only return default ACL listing if the bucket's current metageneration matches this value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
@@ -9217,7 +9348,7 @@ impl<'a> DefaultObjectAccessControlListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9239,7 +9370,7 @@ impl<'a> DefaultObjectAccessControlListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9259,9 +9390,9 @@ impl<'a> DefaultObjectAccessControlListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DefaultObjectAccessControlListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DefaultObjectAccessControlListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9294,7 +9425,7 @@ impl<'a> DefaultObjectAccessControlListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9309,10 +9440,10 @@ impl<'a> DefaultObjectAccessControlListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlPatchCall<'a>
-    where  {
+pub struct DefaultObjectAccessControlPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ObjectAccessControl,
     _bucket: String,
     _entity: String,
@@ -9323,9 +9454,15 @@ pub struct DefaultObjectAccessControlPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DefaultObjectAccessControlPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for DefaultObjectAccessControlPatchCall<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlPatchCall<'a> {
+impl<'a, S> DefaultObjectAccessControlPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9488,7 +9625,7 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9498,7 +9635,7 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9508,21 +9645,21 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -9532,7 +9669,7 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9554,7 +9691,7 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9574,9 +9711,9 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DefaultObjectAccessControlPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DefaultObjectAccessControlPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9609,7 +9746,7 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9624,10 +9761,10 @@ impl<'a> DefaultObjectAccessControlPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DefaultObjectAccessControlUpdateCall<'a>
-    where  {
+pub struct DefaultObjectAccessControlUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ObjectAccessControl,
     _bucket: String,
     _entity: String,
@@ -9638,9 +9775,15 @@ pub struct DefaultObjectAccessControlUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DefaultObjectAccessControlUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for DefaultObjectAccessControlUpdateCall<'a, S> {}
 
-impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
+impl<'a, S> DefaultObjectAccessControlUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9803,7 +9946,7 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn request(mut self, new_value: ObjectAccessControl) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9813,7 +9956,7 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -9823,21 +9966,21 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -9847,7 +9990,7 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DefaultObjectAccessControlUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9869,7 +10012,7 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9889,9 +10032,9 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9923,7 +10066,7 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9933,10 +10076,10 @@ impl<'a> DefaultObjectAccessControlUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotificationDeleteCall<'a>
-    where  {
+pub struct NotificationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _notification: String,
     _user_project: Option<String>,
@@ -9946,9 +10089,15 @@ pub struct NotificationDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotificationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for NotificationDeleteCall<'a, S> {}
 
-impl<'a> NotificationDeleteCall<'a> {
+impl<'a, S> NotificationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10087,7 +10236,7 @@ impl<'a> NotificationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> NotificationDeleteCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> NotificationDeleteCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -10097,21 +10246,21 @@ impl<'a> NotificationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn notification(mut self, new_value: &str) -> NotificationDeleteCall<'a> {
+    pub fn notification(mut self, new_value: &str) -> NotificationDeleteCall<'a, S> {
         self._notification = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> NotificationDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> NotificationDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationDeleteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationDeleteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -10121,7 +10270,7 @@ impl<'a> NotificationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10143,7 +10292,7 @@ impl<'a> NotificationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> NotificationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10163,9 +10312,9 @@ impl<'a> NotificationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotificationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10197,7 +10346,7 @@ impl<'a> NotificationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10207,10 +10356,10 @@ impl<'a> NotificationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotificationGetCall<'a>
-    where  {
+pub struct NotificationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _notification: String,
     _user_project: Option<String>,
@@ -10220,9 +10369,15 @@ pub struct NotificationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotificationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NotificationGetCall<'a, S> {}
 
-impl<'a> NotificationGetCall<'a> {
+impl<'a, S> NotificationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10372,7 +10527,7 @@ impl<'a> NotificationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -10382,21 +10537,21 @@ impl<'a> NotificationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn notification(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn notification(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._notification = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -10406,7 +10561,7 @@ impl<'a> NotificationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10428,7 +10583,7 @@ impl<'a> NotificationGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10448,9 +10603,9 @@ impl<'a> NotificationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotificationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10483,7 +10638,7 @@ impl<'a> NotificationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10498,10 +10653,10 @@ impl<'a> NotificationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotificationInsertCall<'a>
-    where  {
+pub struct NotificationInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Notification,
     _bucket: String,
     _user_project: Option<String>,
@@ -10511,9 +10666,15 @@ pub struct NotificationInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotificationInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for NotificationInsertCall<'a, S> {}
 
-impl<'a> NotificationInsertCall<'a> {
+impl<'a, S> NotificationInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10675,7 +10836,7 @@ impl<'a> NotificationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Notification) -> NotificationInsertCall<'a> {
+    pub fn request(mut self, new_value: Notification) -> NotificationInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10685,21 +10846,21 @@ impl<'a> NotificationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> NotificationInsertCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> NotificationInsertCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> NotificationInsertCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> NotificationInsertCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationInsertCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationInsertCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -10709,7 +10870,7 @@ impl<'a> NotificationInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10731,7 +10892,7 @@ impl<'a> NotificationInsertCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> NotificationInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10751,9 +10912,9 @@ impl<'a> NotificationInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotificationInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10785,7 +10946,7 @@ impl<'a> NotificationInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10795,10 +10956,10 @@ impl<'a> NotificationInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotificationListCall<'a>
-    where  {
+pub struct NotificationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -10807,9 +10968,15 @@ pub struct NotificationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotificationListCall<'a> {}
+impl<'a, S> client::CallBuilder for NotificationListCall<'a, S> {}
 
-impl<'a> NotificationListCall<'a> {
+impl<'a, S> NotificationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10958,21 +11125,21 @@ impl<'a> NotificationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> NotificationListCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> NotificationListCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> NotificationListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> NotificationListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationListCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> NotificationListCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -10982,7 +11149,7 @@ impl<'a> NotificationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11004,7 +11171,7 @@ impl<'a> NotificationListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> NotificationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11024,9 +11191,9 @@ impl<'a> NotificationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotificationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11058,7 +11225,7 @@ impl<'a> NotificationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11069,10 +11236,10 @@ impl<'a> NotificationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectAccessControlDeleteCall<'a>
-    where  {
+pub struct ObjectAccessControlDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _entity: String,
@@ -11084,9 +11251,15 @@ pub struct ObjectAccessControlDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectAccessControlDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectAccessControlDeleteCall<'a, S> {}
 
-impl<'a> ObjectAccessControlDeleteCall<'a> {
+impl<'a, S> ObjectAccessControlDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11229,7 +11402,7 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -11239,7 +11412,7 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
@@ -11249,28 +11422,28 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -11280,7 +11453,7 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11302,7 +11475,7 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11322,9 +11495,9 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectAccessControlDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectAccessControlDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11356,7 +11529,7 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11367,10 +11540,10 @@ impl<'a> ObjectAccessControlDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectAccessControlGetCall<'a>
-    where  {
+pub struct ObjectAccessControlGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _entity: String,
@@ -11382,9 +11555,15 @@ pub struct ObjectAccessControlGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectAccessControlGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectAccessControlGetCall<'a, S> {}
 
-impl<'a> ObjectAccessControlGetCall<'a> {
+impl<'a, S> ObjectAccessControlGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11538,7 +11717,7 @@ impl<'a> ObjectAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -11548,7 +11727,7 @@ impl<'a> ObjectAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
@@ -11558,28 +11737,28 @@ impl<'a> ObjectAccessControlGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -11589,7 +11768,7 @@ impl<'a> ObjectAccessControlGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11611,7 +11790,7 @@ impl<'a> ObjectAccessControlGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11631,9 +11810,9 @@ impl<'a> ObjectAccessControlGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectAccessControlGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectAccessControlGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11666,7 +11845,7 @@ impl<'a> ObjectAccessControlGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11682,10 +11861,10 @@ impl<'a> ObjectAccessControlGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectAccessControlInsertCall<'a>
-    where  {
+pub struct ObjectAccessControlInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
@@ -11697,9 +11876,15 @@ pub struct ObjectAccessControlInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectAccessControlInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectAccessControlInsertCall<'a, S> {}
 
-impl<'a> ObjectAccessControlInsertCall<'a> {
+impl<'a, S> ObjectAccessControlInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11865,7 +12050,7 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlInsertCall<'a> {
+    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11875,7 +12060,7 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -11885,28 +12070,28 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -11916,7 +12101,7 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11938,7 +12123,7 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11958,9 +12143,9 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11992,7 +12177,7 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12003,10 +12188,10 @@ impl<'a> ObjectAccessControlInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectAccessControlListCall<'a>
-    where  {
+pub struct ObjectAccessControlListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _user_project: Option<String>,
@@ -12017,9 +12202,15 @@ pub struct ObjectAccessControlListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectAccessControlListCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectAccessControlListCall<'a, S> {}
 
-impl<'a> ObjectAccessControlListCall<'a> {
+impl<'a, S> ObjectAccessControlListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12172,7 +12363,7 @@ impl<'a> ObjectAccessControlListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlListCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -12182,28 +12373,28 @@ impl<'a> ObjectAccessControlListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlListCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlListCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlListCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -12213,7 +12404,7 @@ impl<'a> ObjectAccessControlListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12235,7 +12426,7 @@ impl<'a> ObjectAccessControlListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12255,9 +12446,9 @@ impl<'a> ObjectAccessControlListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectAccessControlListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectAccessControlListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12290,7 +12481,7 @@ impl<'a> ObjectAccessControlListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12306,10 +12497,10 @@ impl<'a> ObjectAccessControlListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectAccessControlPatchCall<'a>
-    where  {
+pub struct ObjectAccessControlPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
@@ -12322,9 +12513,15 @@ pub struct ObjectAccessControlPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectAccessControlPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectAccessControlPatchCall<'a, S> {}
 
-impl<'a> ObjectAccessControlPatchCall<'a> {
+impl<'a, S> ObjectAccessControlPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12491,7 +12688,7 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlPatchCall<'a> {
+    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12501,7 +12698,7 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -12511,7 +12708,7 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
@@ -12521,28 +12718,28 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -12552,7 +12749,7 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12574,7 +12771,7 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12594,9 +12791,9 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectAccessControlPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectAccessControlPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12629,7 +12826,7 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12645,10 +12842,10 @@ impl<'a> ObjectAccessControlPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectAccessControlUpdateCall<'a>
-    where  {
+pub struct ObjectAccessControlUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ObjectAccessControl,
     _bucket: String,
     _object: String,
@@ -12661,9 +12858,15 @@ pub struct ObjectAccessControlUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectAccessControlUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectAccessControlUpdateCall<'a, S> {}
 
-impl<'a> ObjectAccessControlUpdateCall<'a> {
+impl<'a, S> ObjectAccessControlUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12830,7 +13033,7 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn request(mut self, new_value: ObjectAccessControl) -> ObjectAccessControlUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12840,7 +13043,7 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -12850,7 +13053,7 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
@@ -12860,28 +13063,28 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn entity(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         self._entity = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -12891,7 +13094,7 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectAccessControlUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12913,7 +13116,7 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12933,9 +13136,9 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectAccessControlUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectAccessControlUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12968,7 +13171,7 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12987,10 +13190,10 @@ impl<'a> ObjectAccessControlUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectComposeCall<'a>
-    where  {
+pub struct ObjectComposeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: ComposeRequest,
     _destination_bucket: String,
     _destination_object: String,
@@ -13005,9 +13208,15 @@ pub struct ObjectComposeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectComposeCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectComposeCall<'a, S> {}
 
-impl<'a> ObjectComposeCall<'a> {
+impl<'a, S> ObjectComposeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13182,7 +13391,7 @@ impl<'a> ObjectComposeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ComposeRequest) -> ObjectComposeCall<'a> {
+    pub fn request(mut self, new_value: ComposeRequest) -> ObjectComposeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13192,7 +13401,7 @@ impl<'a> ObjectComposeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination_bucket(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn destination_bucket(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._destination_bucket = new_value.to_string();
         self
     }
@@ -13202,49 +13411,49 @@ impl<'a> ObjectComposeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination_object(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn destination_object(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._destination_object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
     ///
     /// Sets the *kms key name* query property to the given value.
-    pub fn kms_key_name(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn kms_key_name(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._kms_key_name = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to the destination object.
     ///
     /// Sets the *destination predefined acl* query property to the given value.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a> {
+    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a, S> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
@@ -13254,7 +13463,7 @@ impl<'a> ObjectComposeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectComposeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectComposeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13276,7 +13485,7 @@ impl<'a> ObjectComposeCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectComposeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectComposeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13296,9 +13505,9 @@ impl<'a> ObjectComposeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectComposeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectComposeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13331,7 +13540,7 @@ impl<'a> ObjectComposeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13358,10 +13567,10 @@ impl<'a> ObjectComposeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectCopyCall<'a>
-    where  {
+pub struct ObjectCopyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Object,
     _source_bucket: String,
     _source_object: String,
@@ -13386,9 +13595,15 @@ pub struct ObjectCopyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectCopyCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectCopyCall<'a, S> {}
 
-impl<'a> ObjectCopyCall<'a> {
+impl<'a, S> ObjectCopyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13589,7 +13804,7 @@ impl<'a> ObjectCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Object) -> ObjectCopyCall<'a> {
+    pub fn request(mut self, new_value: Object) -> ObjectCopyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13599,7 +13814,7 @@ impl<'a> ObjectCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn source_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._source_bucket = new_value.to_string();
         self
     }
@@ -13609,7 +13824,7 @@ impl<'a> ObjectCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_object(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn source_object(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._source_object = new_value.to_string();
         self
     }
@@ -13619,7 +13834,7 @@ impl<'a> ObjectCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn destination_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._destination_bucket = new_value.to_string();
         self
     }
@@ -13629,105 +13844,105 @@ impl<'a> ObjectCopyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination_object(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn destination_object(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._destination_object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
     ///
     /// Sets the *source generation* query property to the given value.
-    pub fn source_generation(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn source_generation(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._source_generation = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.
     ///
     /// Sets the *if source metageneration not match* query property to the given value.
-    pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_source_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current metageneration matches the given value.
     ///
     /// Sets the *if source metageneration match* query property to the given value.
-    pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_source_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current generation does not match the given value.
     ///
     /// Sets the *if source generation not match* query property to the given value.
-    pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_source_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current generation matches the given value.
     ///
     /// Sets the *if source generation match* query property to the given value.
-    pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_source_generation_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the destination object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the destination object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the destination object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to the destination object.
     ///
     /// Sets the *destination predefined acl* query property to the given value.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
     /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
     ///
     /// Sets the *destination kms key name* query property to the given value.
-    pub fn destination_kms_key_name(mut self, new_value: &str) -> ObjectCopyCall<'a> {
+    pub fn destination_kms_key_name(mut self, new_value: &str) -> ObjectCopyCall<'a, S> {
         self._destination_kms_key_name = Some(new_value.to_string());
         self
     }
@@ -13737,7 +13952,7 @@ impl<'a> ObjectCopyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectCopyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectCopyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13759,7 +13974,7 @@ impl<'a> ObjectCopyCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectCopyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectCopyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13779,9 +13994,9 @@ impl<'a> ObjectCopyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectCopyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectCopyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13813,7 +14028,7 @@ impl<'a> ObjectCopyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13828,10 +14043,10 @@ impl<'a> ObjectCopyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectDeleteCall<'a>
-    where  {
+pub struct ObjectDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _user_project: Option<String>,
@@ -13846,9 +14061,15 @@ pub struct ObjectDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectDeleteCall<'a, S> {}
 
-impl<'a> ObjectDeleteCall<'a> {
+impl<'a, S> ObjectDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14002,7 +14223,7 @@ impl<'a> ObjectDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -14012,56 +14233,56 @@ impl<'a> ObjectDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// If present, permanently deletes a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectDeleteCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectDeleteCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -14071,7 +14292,7 @@ impl<'a> ObjectDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14093,7 +14314,7 @@ impl<'a> ObjectDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14113,9 +14334,9 @@ impl<'a> ObjectDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14152,7 +14373,7 @@ impl<'a> ObjectDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14168,10 +14389,10 @@ impl<'a> ObjectDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectGetCall<'a>
-    where  {
+pub struct ObjectGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _user_project: Option<String>,
@@ -14187,9 +14408,15 @@ pub struct ObjectGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectGetCall<'a, S> {}
 
-impl<'a> ObjectGetCall<'a> {
+impl<'a, S> ObjectGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14373,7 +14600,7 @@ impl<'a> ObjectGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -14383,63 +14610,63 @@ impl<'a> ObjectGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectGetCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectGetCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -14449,7 +14676,7 @@ impl<'a> ObjectGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14471,7 +14698,7 @@ impl<'a> ObjectGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14491,9 +14718,9 @@ impl<'a> ObjectGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14525,7 +14752,7 @@ impl<'a> ObjectGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14536,10 +14763,10 @@ impl<'a> ObjectGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectGetIamPolicyCall<'a>
-    where  {
+pub struct ObjectGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _user_project: Option<String>,
@@ -14550,9 +14777,15 @@ pub struct ObjectGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectGetIamPolicyCall<'a, S> {}
 
-impl<'a> ObjectGetIamPolicyCall<'a> {
+impl<'a, S> ObjectGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14705,7 +14938,7 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -14715,28 +14948,28 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -14746,7 +14979,7 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14768,7 +15001,7 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14788,9 +15021,9 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14824,7 +15057,7 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14848,10 +15081,10 @@ impl<'a> ObjectGetIamPolicyCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ObjectInsertCall<'a>
-    where  {
+pub struct ObjectInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Object,
     _bucket: String,
     _user_project: Option<String>,
@@ -14870,9 +15103,15 @@ pub struct ObjectInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectInsertCall<'a, S> {}
 
-impl<'a> ObjectInsertCall<'a> {
+impl<'a, S> ObjectInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15170,7 +15409,7 @@ impl<'a> ObjectInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Object) -> ObjectInsertCall<'a> {
+    pub fn request(mut self, new_value: Object) -> ObjectInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15180,84 +15419,84 @@ impl<'a> ObjectInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to this object.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
     /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
     /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
     ///
     /// Sets the *kms key name* query property to the given value.
-    pub fn kms_key_name(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn kms_key_name(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._kms_key_name = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// If set, sets the contentEncoding property of the final object to this value. Setting this parameter is equivalent to setting the contentEncoding metadata property. This can be useful when uploading an object with uploadType=media to indicate the encoding of the content being uploaded.
     ///
     /// Sets the *content encoding* query property to the given value.
-    pub fn content_encoding(mut self, new_value: &str) -> ObjectInsertCall<'a> {
+    pub fn content_encoding(mut self, new_value: &str) -> ObjectInsertCall<'a, S> {
         self._content_encoding = Some(new_value.to_string());
         self
     }
@@ -15267,7 +15506,7 @@ impl<'a> ObjectInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15289,7 +15528,7 @@ impl<'a> ObjectInsertCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15309,9 +15548,9 @@ impl<'a> ObjectInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15343,7 +15582,7 @@ impl<'a> ObjectInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15362,10 +15601,10 @@ impl<'a> ObjectInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectListCall<'a>
-    where  {
+pub struct ObjectListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _versions: Option<bool>,
     _user_project: Option<String>,
@@ -15383,9 +15622,15 @@ pub struct ObjectListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectListCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectListCall<'a, S> {}
 
-impl<'a> ObjectListCall<'a> {
+impl<'a, S> ObjectListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15561,84 +15806,84 @@ impl<'a> ObjectListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.
     ///
     /// Sets the *versions* query property to the given value.
-    pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a> {
+    pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a, S> {
         self._versions = Some(new_value);
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// Filter results to objects whose names are lexicographically equal to or after startOffset. If endOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
     ///
     /// Sets the *start offset* query property to the given value.
-    pub fn start_offset(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn start_offset(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._start_offset = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Filter results to objects whose names begin with this prefix.
     ///
     /// Sets the *prefix* query property to the given value.
-    pub fn prefix(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn prefix(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._prefix = Some(new_value.to_string());
         self
     }
     /// A previously-returned page token representing part of the larger set of results to view.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items plus prefixes to return in a single page of responses. As duplicate prefixes are omitted, fewer total results may be returned than requested. The service will use this parameter or 1,000 items, whichever is smaller.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// If true, objects that end in exactly one instance of delimiter will have their metadata included in items in addition to prefixes.
     ///
     /// Sets the *include trailing delimiter* query property to the given value.
-    pub fn include_trailing_delimiter(mut self, new_value: bool) -> ObjectListCall<'a> {
+    pub fn include_trailing_delimiter(mut self, new_value: bool) -> ObjectListCall<'a, S> {
         self._include_trailing_delimiter = Some(new_value);
         self
     }
     /// Filter results to objects whose names are lexicographically before endOffset. If startOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
     ///
     /// Sets the *end offset* query property to the given value.
-    pub fn end_offset(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn end_offset(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._end_offset = Some(new_value.to_string());
         self
     }
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
     ///
     /// Sets the *delimiter* query property to the given value.
-    pub fn delimiter(mut self, new_value: &str) -> ObjectListCall<'a> {
+    pub fn delimiter(mut self, new_value: &str) -> ObjectListCall<'a, S> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -15648,7 +15893,7 @@ impl<'a> ObjectListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15670,7 +15915,7 @@ impl<'a> ObjectListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15690,9 +15935,9 @@ impl<'a> ObjectListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15725,7 +15970,7 @@ impl<'a> ObjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15747,10 +15992,10 @@ impl<'a> ObjectListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectPatchCall<'a>
-    where  {
+pub struct ObjectPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Object,
     _bucket: String,
     _object: String,
@@ -15768,9 +16013,15 @@ pub struct ObjectPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectPatchCall<'a, S> {}
 
-impl<'a> ObjectPatchCall<'a> {
+impl<'a, S> ObjectPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15954,7 +16205,7 @@ impl<'a> ObjectPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Object) -> ObjectPatchCall<'a> {
+    pub fn request(mut self, new_value: Object) -> ObjectPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15964,7 +16215,7 @@ impl<'a> ObjectPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -15974,70 +16225,70 @@ impl<'a> ObjectPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request, for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to this object.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectPatchCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectPatchCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -16047,7 +16298,7 @@ impl<'a> ObjectPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16069,7 +16320,7 @@ impl<'a> ObjectPatchCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16089,9 +16340,9 @@ impl<'a> ObjectPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16124,7 +16375,7 @@ impl<'a> ObjectPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16153,10 +16404,10 @@ impl<'a> ObjectPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectRewriteCall<'a>
-    where  {
+pub struct ObjectRewriteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Object,
     _source_bucket: String,
     _source_object: String,
@@ -16183,9 +16434,15 @@ pub struct ObjectRewriteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectRewriteCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectRewriteCall<'a, S> {}
 
-impl<'a> ObjectRewriteCall<'a> {
+impl<'a, S> ObjectRewriteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16392,7 +16649,7 @@ impl<'a> ObjectRewriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Object) -> ObjectRewriteCall<'a> {
+    pub fn request(mut self, new_value: Object) -> ObjectRewriteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16402,7 +16659,7 @@ impl<'a> ObjectRewriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_bucket(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn source_bucket(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._source_bucket = new_value.to_string();
         self
     }
@@ -16412,7 +16669,7 @@ impl<'a> ObjectRewriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_object(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn source_object(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._source_object = new_value.to_string();
         self
     }
@@ -16422,7 +16679,7 @@ impl<'a> ObjectRewriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination_bucket(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn destination_bucket(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._destination_bucket = new_value.to_string();
         self
     }
@@ -16432,119 +16689,119 @@ impl<'a> ObjectRewriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination_object(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn destination_object(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._destination_object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
     ///
     /// Sets the *source generation* query property to the given value.
-    pub fn source_generation(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn source_generation(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._source_generation = Some(new_value.to_string());
         self
     }
     /// Include this field (from the previous rewrite response) on each rewrite request after the first one, until the rewrite response 'done' flag is true. Calls that provide a rewriteToken can omit all other request fields, but if included those fields must match the values provided in the first rewrite request.
     ///
     /// Sets the *rewrite token* query property to the given value.
-    pub fn rewrite_token(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn rewrite_token(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._rewrite_token = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// The maximum number of bytes that will be rewritten per rewrite request. Most callers shouldn't need to specify this parameter - it is primarily in place to support testing. If specified the value must be an integral multiple of 1 MiB (1048576). Also, this only applies to requests where the source and destination span locations and/or storage classes. Finally, this value must not change across rewrite calls else you'll get an error that the rewriteToken is invalid.
     ///
     /// Sets the *max bytes rewritten per call* query property to the given value.
-    pub fn max_bytes_rewritten_per_call(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn max_bytes_rewritten_per_call(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._max_bytes_rewritten_per_call = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.
     ///
     /// Sets the *if source metageneration not match* query property to the given value.
-    pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_source_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current metageneration matches the given value.
     ///
     /// Sets the *if source metageneration match* query property to the given value.
-    pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_source_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current generation does not match the given value.
     ///
     /// Sets the *if source generation not match* query property to the given value.
-    pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_source_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the source object's current generation matches the given value.
     ///
     /// Sets the *if source generation match* query property to the given value.
-    pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_source_generation_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the destination object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to the destination object.
     ///
     /// Sets the *destination predefined acl* query property to the given value.
-    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
     }
     /// Resource name of the Cloud KMS key, of the form projects/my-project/locations/global/keyRings/my-kr/cryptoKeys/my-key, that will be used to encrypt the object. Overrides the object metadata's kms_key_name value, if any.
     ///
     /// Sets the *destination kms key name* query property to the given value.
-    pub fn destination_kms_key_name(mut self, new_value: &str) -> ObjectRewriteCall<'a> {
+    pub fn destination_kms_key_name(mut self, new_value: &str) -> ObjectRewriteCall<'a, S> {
         self._destination_kms_key_name = Some(new_value.to_string());
         self
     }
@@ -16554,7 +16811,7 @@ impl<'a> ObjectRewriteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectRewriteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectRewriteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16576,7 +16833,7 @@ impl<'a> ObjectRewriteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectRewriteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectRewriteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16596,9 +16853,9 @@ impl<'a> ObjectRewriteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectRewriteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectRewriteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16631,7 +16888,7 @@ impl<'a> ObjectRewriteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16647,10 +16904,10 @@ impl<'a> ObjectRewriteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectSetIamPolicyCall<'a>
-    where  {
+pub struct ObjectSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Policy,
     _bucket: String,
     _object: String,
@@ -16662,9 +16919,15 @@ pub struct ObjectSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectSetIamPolicyCall<'a, S> {}
 
-impl<'a> ObjectSetIamPolicyCall<'a> {
+impl<'a, S> ObjectSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16830,7 +17093,7 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Policy) -> ObjectSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: Policy) -> ObjectSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16840,7 +17103,7 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -16850,28 +17113,28 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -16881,7 +17144,7 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16903,7 +17166,7 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16923,9 +17186,9 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16957,7 +17220,7 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16968,10 +17231,10 @@ impl<'a> ObjectSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectTestIamPermissionCall<'a>
-    where  {
+pub struct ObjectTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _bucket: String,
     _object: String,
     _permissions: Vec<String>,
@@ -16983,9 +17246,15 @@ pub struct ObjectTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectTestIamPermissionCall<'a, S> {}
 
-impl<'a> ObjectTestIamPermissionCall<'a> {
+impl<'a, S> ObjectTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17143,7 +17412,7 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -17153,7 +17422,7 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
@@ -17164,28 +17433,28 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_permissions(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a> {
+    pub fn add_permissions(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, S> {
         self._permissions.push(new_value.to_string());
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -17195,7 +17464,7 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17217,7 +17486,7 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17237,9 +17506,9 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17272,7 +17541,7 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17294,10 +17563,10 @@ impl<'a> ObjectTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectUpdateCall<'a>
-    where  {
+pub struct ObjectUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Object,
     _bucket: String,
     _object: String,
@@ -17315,9 +17584,15 @@ pub struct ObjectUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectUpdateCall<'a, S> {}
 
-impl<'a> ObjectUpdateCall<'a> {
+impl<'a, S> ObjectUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17501,7 +17776,7 @@ impl<'a> ObjectUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Object) -> ObjectUpdateCall<'a> {
+    pub fn request(mut self, new_value: Object) -> ObjectUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17511,7 +17786,7 @@ impl<'a> ObjectUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
@@ -17521,70 +17796,70 @@ impl<'a> ObjectUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn object(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn object(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._object = new_value.to_string();
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to full.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Apply a predefined set of access controls to this object.
     ///
     /// Sets the *predefined acl* query property to the given value.
-    pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._predefined_acl = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     ///
     /// Sets the *if metageneration not match* query property to the given value.
-    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     ///
     /// Sets the *if metageneration match* query property to the given value.
-    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.
     ///
     /// Sets the *if generation not match* query property to the given value.
-    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
     }
     /// Makes the operation conditional on whether the object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object.
     ///
     /// Sets the *if generation match* query property to the given value.
-    pub fn if_generation_match(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn if_generation_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._if_generation_match = Some(new_value.to_string());
         self
     }
     /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     ///
     /// Sets the *generation* query property to the given value.
-    pub fn generation(mut self, new_value: &str) -> ObjectUpdateCall<'a> {
+    pub fn generation(mut self, new_value: &str) -> ObjectUpdateCall<'a, S> {
         self._generation = Some(new_value.to_string());
         self
     }
@@ -17594,7 +17869,7 @@ impl<'a> ObjectUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17616,7 +17891,7 @@ impl<'a> ObjectUpdateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17636,9 +17911,9 @@ impl<'a> ObjectUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17671,7 +17946,7 @@ impl<'a> ObjectUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17695,10 +17970,10 @@ impl<'a> ObjectUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ObjectWatchAllCall<'a>
-    where  {
+pub struct ObjectWatchAllCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: Channel,
     _bucket: String,
     _versions: Option<bool>,
@@ -17717,9 +17992,15 @@ pub struct ObjectWatchAllCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ObjectWatchAllCall<'a> {}
+impl<'a, S> client::CallBuilder for ObjectWatchAllCall<'a, S> {}
 
-impl<'a> ObjectWatchAllCall<'a> {
+impl<'a, S> ObjectWatchAllCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17908,7 +18189,7 @@ impl<'a> ObjectWatchAllCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ObjectWatchAllCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ObjectWatchAllCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17918,84 +18199,84 @@ impl<'a> ObjectWatchAllCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._bucket = new_value.to_string();
         self
     }
     /// If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.
     ///
     /// Sets the *versions* query property to the given value.
-    pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a> {
+    pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, S> {
         self._versions = Some(new_value);
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// Filter results to objects whose names are lexicographically equal to or after startOffset. If endOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
     ///
     /// Sets the *start offset* query property to the given value.
-    pub fn start_offset(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn start_offset(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._start_offset = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Filter results to objects whose names begin with this prefix.
     ///
     /// Sets the *prefix* query property to the given value.
-    pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._prefix = Some(new_value.to_string());
         self
     }
     /// A previously-returned page token representing part of the larger set of results to view.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items plus prefixes to return in a single page of responses. As duplicate prefixes are omitted, fewer total results may be returned than requested. The service will use this parameter or 1,000 items, whichever is smaller.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// If true, objects that end in exactly one instance of delimiter will have their metadata included in items in addition to prefixes.
     ///
     /// Sets the *include trailing delimiter* query property to the given value.
-    pub fn include_trailing_delimiter(mut self, new_value: bool) -> ObjectWatchAllCall<'a> {
+    pub fn include_trailing_delimiter(mut self, new_value: bool) -> ObjectWatchAllCall<'a, S> {
         self._include_trailing_delimiter = Some(new_value);
         self
     }
     /// Filter results to objects whose names are lexicographically before endOffset. If startOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
     ///
     /// Sets the *end offset* query property to the given value.
-    pub fn end_offset(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn end_offset(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._end_offset = Some(new_value.to_string());
         self
     }
     /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
     ///
     /// Sets the *delimiter* query property to the given value.
-    pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a> {
+    pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, S> {
         self._delimiter = Some(new_value.to_string());
         self
     }
@@ -18005,7 +18286,7 @@ impl<'a> ObjectWatchAllCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectWatchAllCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ObjectWatchAllCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18027,7 +18308,7 @@ impl<'a> ObjectWatchAllCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18047,9 +18328,9 @@ impl<'a> ObjectWatchAllCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ObjectWatchAllCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ObjectWatchAllCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18081,7 +18362,7 @@ impl<'a> ObjectWatchAllCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18090,10 +18371,10 @@ impl<'a> ObjectWatchAllCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectHmacKeyCreateCall<'a>
-    where  {
+pub struct ProjectHmacKeyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _project_id: String,
     _service_account_email: String,
     _user_project: Option<String>,
@@ -18102,9 +18383,15 @@ pub struct ProjectHmacKeyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectHmacKeyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectHmacKeyCreateCall<'a, S> {}
 
-impl<'a> ProjectHmacKeyCreateCall<'a> {
+impl<'a, S> ProjectHmacKeyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18251,7 +18538,7 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18261,14 +18548,14 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn service_account_email(mut self, new_value: &str) -> ProjectHmacKeyCreateCall<'a> {
+    pub fn service_account_email(mut self, new_value: &str) -> ProjectHmacKeyCreateCall<'a, S> {
         self._service_account_email = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyCreateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyCreateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
@@ -18278,7 +18565,7 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18300,7 +18587,7 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18320,9 +18607,9 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectHmacKeyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectHmacKeyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18354,7 +18641,7 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18363,10 +18650,10 @@ impl<'a> ProjectHmacKeyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectHmacKeyDeleteCall<'a>
-    where  {
+pub struct ProjectHmacKeyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _project_id: String,
     _access_id: String,
     _user_project: Option<String>,
@@ -18375,9 +18662,15 @@ pub struct ProjectHmacKeyDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectHmacKeyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectHmacKeyDeleteCall<'a, S> {}
 
-impl<'a> ProjectHmacKeyDeleteCall<'a> {
+impl<'a, S> ProjectHmacKeyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18513,7 +18806,7 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18523,14 +18816,14 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn access_id(mut self, new_value: &str) -> ProjectHmacKeyDeleteCall<'a> {
+    pub fn access_id(mut self, new_value: &str) -> ProjectHmacKeyDeleteCall<'a, S> {
         self._access_id = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyDeleteCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyDeleteCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
@@ -18540,7 +18833,7 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18562,7 +18855,7 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18582,9 +18875,9 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectHmacKeyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectHmacKeyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18616,7 +18909,7 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18625,10 +18918,10 @@ impl<'a> ProjectHmacKeyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectHmacKeyGetCall<'a>
-    where  {
+pub struct ProjectHmacKeyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _project_id: String,
     _access_id: String,
     _user_project: Option<String>,
@@ -18637,9 +18930,15 @@ pub struct ProjectHmacKeyGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectHmacKeyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectHmacKeyGetCall<'a, S> {}
 
-impl<'a> ProjectHmacKeyGetCall<'a> {
+impl<'a, S> ProjectHmacKeyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18786,7 +19085,7 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18796,14 +19095,14 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn access_id(mut self, new_value: &str) -> ProjectHmacKeyGetCall<'a> {
+    pub fn access_id(mut self, new_value: &str) -> ProjectHmacKeyGetCall<'a, S> {
         self._access_id = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
@@ -18813,7 +19112,7 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18835,7 +19134,7 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18855,9 +19154,9 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectHmacKeyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectHmacKeyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18889,7 +19188,7 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18902,10 +19201,10 @@ impl<'a> ProjectHmacKeyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectHmacKeyListCall<'a>
-    where  {
+pub struct ProjectHmacKeyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _project_id: String,
     _user_project: Option<String>,
     _show_deleted_keys: Option<bool>,
@@ -18917,9 +19216,15 @@ pub struct ProjectHmacKeyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectHmacKeyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectHmacKeyListCall<'a, S> {}
 
-impl<'a> ProjectHmacKeyListCall<'a> {
+impl<'a, S> ProjectHmacKeyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19077,42 +19382,42 @@ impl<'a> ProjectHmacKeyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// Whether or not to show keys in the DELETED state.
     ///
     /// Sets the *show deleted keys* query property to the given value.
-    pub fn show_deleted_keys(mut self, new_value: bool) -> ProjectHmacKeyListCall<'a> {
+    pub fn show_deleted_keys(mut self, new_value: bool) -> ProjectHmacKeyListCall<'a, S> {
         self._show_deleted_keys = Some(new_value);
         self
     }
     /// If present, only keys for the given service account are returned.
     ///
     /// Sets the *service account email* query property to the given value.
-    pub fn service_account_email(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a> {
+    pub fn service_account_email(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a, S> {
         self._service_account_email = Some(new_value.to_string());
         self
     }
     /// A previously-returned page token representing part of the larger set of results to view.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectHmacKeyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return in a single page of responses. The service uses this parameter or 250 items, whichever is smaller. The max number of items per page will also be limited by the number of distinct service accounts in the response. If the number of service accounts in a single response is too high, the page will truncated and a next page token will be returned.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ProjectHmacKeyListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ProjectHmacKeyListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -19122,7 +19427,7 @@ impl<'a> ProjectHmacKeyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19144,7 +19449,7 @@ impl<'a> ProjectHmacKeyListCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19164,9 +19469,9 @@ impl<'a> ProjectHmacKeyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectHmacKeyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectHmacKeyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19199,7 +19504,7 @@ impl<'a> ProjectHmacKeyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19213,10 +19518,10 @@ impl<'a> ProjectHmacKeyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectHmacKeyUpdateCall<'a>
-    where  {
+pub struct ProjectHmacKeyUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _request: HmacKeyMetadata,
     _project_id: String,
     _access_id: String,
@@ -19226,9 +19531,15 @@ pub struct ProjectHmacKeyUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectHmacKeyUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectHmacKeyUpdateCall<'a, S> {}
 
-impl<'a> ProjectHmacKeyUpdateCall<'a> {
+impl<'a, S> ProjectHmacKeyUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19388,7 +19699,7 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HmacKeyMetadata) -> ProjectHmacKeyUpdateCall<'a> {
+    pub fn request(mut self, new_value: HmacKeyMetadata) -> ProjectHmacKeyUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19398,7 +19709,7 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectHmacKeyUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -19408,14 +19719,14 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn access_id(mut self, new_value: &str) -> ProjectHmacKeyUpdateCall<'a> {
+    pub fn access_id(mut self, new_value: &str) -> ProjectHmacKeyUpdateCall<'a, S> {
         self._access_id = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyUpdateCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ProjectHmacKeyUpdateCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
@@ -19425,7 +19736,7 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectHmacKeyUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19447,7 +19758,7 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectHmacKeyUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19467,9 +19778,9 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectHmacKeyUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectHmacKeyUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19501,7 +19812,7 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19511,10 +19822,10 @@ impl<'a> ProjectHmacKeyUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceAccountGetCall<'a>
-    where  {
+pub struct ProjectServiceAccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Storage<>,
+    hub: &'a Storage<S>,
     _project_id: String,
     _user_project: Option<String>,
     _provisional_user_project: Option<String>,
@@ -19523,9 +19834,15 @@ pub struct ProjectServiceAccountGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectServiceAccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectServiceAccountGetCall<'a, S> {}
 
-impl<'a> ProjectServiceAccountGetCall<'a> {
+impl<'a, S> ProjectServiceAccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19674,21 +19991,21 @@ impl<'a> ProjectServiceAccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
-    pub fn user_project(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a> {
+    pub fn user_project(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a, S> {
         self._user_project = Some(new_value.to_string());
         self
     }
     /// The project to be billed for this request if the target bucket is requester-pays bucket.
     ///
     /// Sets the *provisional user project* query property to the given value.
-    pub fn provisional_user_project(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a> {
+    pub fn provisional_user_project(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a, S> {
         self._provisional_user_project = Some(new_value.to_string());
         self
     }
@@ -19698,7 +20015,7 @@ impl<'a> ProjectServiceAccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19720,7 +20037,7 @@ impl<'a> ProjectServiceAccountGetCall<'a> {
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19740,9 +20057,9 @@ impl<'a> ProjectServiceAccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectServiceAccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

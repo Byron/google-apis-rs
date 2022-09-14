@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -98,37 +103,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Texttospeech<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Texttospeech<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Texttospeech<> {}
+impl<'a, S> client::Hub for Texttospeech<S> {}
 
-impl<'a, > Texttospeech<> {
+impl<'a, S> Texttospeech<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Texttospeech<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Texttospeech<S> {
         Texttospeech {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://texttospeech.googleapis.com/".to_string(),
             _root_url: "https://texttospeech.googleapis.com/".to_string(),
         }
     }
 
-    pub fn text(&'a self) -> TextMethods<'a> {
+    pub fn text(&'a self) -> TextMethods<'a, S> {
         TextMethods { hub: &self }
     }
-    pub fn voices(&'a self) -> VoiceMethods<'a> {
+    pub fn voices(&'a self) -> VoiceMethods<'a, S> {
         VoiceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -331,22 +336,22 @@ impl client::Part for VoiceSelectionParams {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `synthesize(...)`
 /// // to build up your call.
 /// let rb = hub.text();
 /// # }
 /// ```
-pub struct TextMethods<'a>
-    where  {
+pub struct TextMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Texttospeech<>,
+    hub: &'a Texttospeech<S>,
 }
 
-impl<'a> client::MethodsBuilder for TextMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TextMethods<'a, S> {}
 
-impl<'a> TextMethods<'a> {
+impl<'a, S> TextMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -355,7 +360,7 @@ impl<'a> TextMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn synthesize(&self, request: SynthesizeSpeechRequest) -> TextSynthesizeCall<'a> {
+    pub fn synthesize(&self, request: SynthesizeSpeechRequest) -> TextSynthesizeCall<'a, S> {
         TextSynthesizeCall {
             hub: self.hub,
             _request: request,
@@ -389,27 +394,27 @@ impl<'a> TextMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.voices();
 /// # }
 /// ```
-pub struct VoiceMethods<'a>
-    where  {
+pub struct VoiceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Texttospeech<>,
+    hub: &'a Texttospeech<S>,
 }
 
-impl<'a> client::MethodsBuilder for VoiceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VoiceMethods<'a, S> {}
 
-impl<'a> VoiceMethods<'a> {
+impl<'a, S> VoiceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of Voice supported for synthesis.
-    pub fn list(&self) -> VoiceListCall<'a> {
+    pub fn list(&self) -> VoiceListCall<'a, S> {
         VoiceListCall {
             hub: self.hub,
             _language_code: Default::default(),
@@ -451,7 +456,7 @@ impl<'a> VoiceMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -464,19 +469,25 @@ impl<'a> VoiceMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TextSynthesizeCall<'a>
-    where  {
+pub struct TextSynthesizeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Texttospeech<>,
+    hub: &'a Texttospeech<S>,
     _request: SynthesizeSpeechRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TextSynthesizeCall<'a> {}
+impl<'a, S> client::CallBuilder for TextSynthesizeCall<'a, S> {}
 
-impl<'a> TextSynthesizeCall<'a> {
+impl<'a, S> TextSynthesizeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -610,7 +621,7 @@ impl<'a> TextSynthesizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SynthesizeSpeechRequest) -> TextSynthesizeCall<'a> {
+    pub fn request(mut self, new_value: SynthesizeSpeechRequest) -> TextSynthesizeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -620,7 +631,7 @@ impl<'a> TextSynthesizeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TextSynthesizeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TextSynthesizeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -645,7 +656,7 @@ impl<'a> TextSynthesizeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TextSynthesizeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TextSynthesizeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -665,9 +676,9 @@ impl<'a> TextSynthesizeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TextSynthesizeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TextSynthesizeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -699,7 +710,7 @@ impl<'a> TextSynthesizeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Texttospeech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -708,19 +719,25 @@ impl<'a> TextSynthesizeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VoiceListCall<'a>
-    where  {
+pub struct VoiceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Texttospeech<>,
+    hub: &'a Texttospeech<S>,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VoiceListCall<'a> {}
+impl<'a, S> client::CallBuilder for VoiceListCall<'a, S> {}
 
-impl<'a> VoiceListCall<'a> {
+impl<'a, S> VoiceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -841,7 +858,7 @@ impl<'a> VoiceListCall<'a> {
     /// Optional. Recommended. [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag. If not specified, the API will return all supported voices. If specified, the ListVoices call will only return voices that can be used to synthesize this language_code. For example, if you specify `"en-NZ"`, all `"en-NZ"` voices will be returned. If you specify `"no"`, both `"no-\*"` (Norwegian) and `"nb-\*"` (Norwegian Bokmal) voices will be returned.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> VoiceListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> VoiceListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -851,7 +868,7 @@ impl<'a> VoiceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VoiceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VoiceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -876,7 +893,7 @@ impl<'a> VoiceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VoiceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VoiceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -896,9 +913,9 @@ impl<'a> VoiceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VoiceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VoiceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

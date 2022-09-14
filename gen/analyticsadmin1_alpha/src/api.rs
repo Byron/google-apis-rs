@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -83,7 +88,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -115,40 +120,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct GoogleAnalyticsAdmin<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct GoogleAnalyticsAdmin<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for GoogleAnalyticsAdmin<> {}
+impl<'a, S> client::Hub for GoogleAnalyticsAdmin<S> {}
 
-impl<'a, > GoogleAnalyticsAdmin<> {
+impl<'a, S> GoogleAnalyticsAdmin<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GoogleAnalyticsAdmin<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> GoogleAnalyticsAdmin<S> {
         GoogleAnalyticsAdmin {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://analyticsadmin.googleapis.com/".to_string(),
             _root_url: "https://analyticsadmin.googleapis.com/".to_string(),
         }
     }
 
-    pub fn account_summaries(&'a self) -> AccountSummaryMethods<'a> {
+    pub fn account_summaries(&'a self) -> AccountSummaryMethods<'a, S> {
         AccountSummaryMethods { hub: &self }
     }
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn properties(&'a self) -> PropertyMethods<'a> {
+    pub fn properties(&'a self) -> PropertyMethods<'a, S> {
         PropertyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1698,27 +1703,27 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.account_summaries();
 /// # }
 /// ```
-pub struct AccountSummaryMethods<'a>
-    where  {
+pub struct AccountSummaryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountSummaryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountSummaryMethods<'a, S> {}
 
-impl<'a> AccountSummaryMethods<'a> {
+impl<'a, S> AccountSummaryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns summaries of all accounts accessible by the caller.
-    pub fn list(&self) -> AccountSummaryListCall<'a> {
+    pub fn list(&self) -> AccountSummaryListCall<'a, S> {
         AccountSummaryListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1753,22 +1758,22 @@ impl<'a> AccountSummaryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_data_sharing_settings(...)`, `list(...)`, `patch(...)`, `provision_account_ticket(...)`, `search_change_history_events(...)`, `user_links_audit(...)`, `user_links_batch_create(...)`, `user_links_batch_delete(...)`, `user_links_batch_get(...)`, `user_links_batch_update(...)`, `user_links_create(...)`, `user_links_delete(...)`, `user_links_get(...)`, `user_links_list(...)` and `user_links_patch(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1778,7 +1783,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> AccountUserLinkAuditCall<'a> {
+    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> AccountUserLinkAuditCall<'a, S> {
         AccountUserLinkAuditCall {
             hub: self.hub,
             _request: request,
@@ -1797,7 +1802,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. This field is required. The parent field in the CreateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> AccountUserLinkBatchCreateCall<'a> {
+    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> AccountUserLinkBatchCreateCall<'a, S> {
         AccountUserLinkBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -1816,7 +1821,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all values for user link names to delete must match this field. Example format: accounts/1234
-    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> AccountUserLinkBatchDeleteCall<'a> {
+    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> AccountUserLinkBatchDeleteCall<'a, S> {
         AccountUserLinkBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -1834,7 +1839,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all provided values for the 'names' field must match this field. Example format: accounts/1234
-    pub fn user_links_batch_get(&self, parent: &str) -> AccountUserLinkBatchGetCall<'a> {
+    pub fn user_links_batch_get(&self, parent: &str) -> AccountUserLinkBatchGetCall<'a, S> {
         AccountUserLinkBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1853,7 +1858,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent field in the UpdateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> AccountUserLinkBatchUpdateCall<'a> {
+    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> AccountUserLinkBatchUpdateCall<'a, S> {
         AccountUserLinkBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1872,7 +1877,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> AccountUserLinkCreateCall<'a> {
+    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> AccountUserLinkCreateCall<'a, S> {
         AccountUserLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -1891,7 +1896,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_delete(&self, name: &str) -> AccountUserLinkDeleteCall<'a> {
+    pub fn user_links_delete(&self, name: &str) -> AccountUserLinkDeleteCall<'a, S> {
         AccountUserLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1908,7 +1913,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_get(&self, name: &str) -> AccountUserLinkGetCall<'a> {
+    pub fn user_links_get(&self, name: &str) -> AccountUserLinkGetCall<'a, S> {
         AccountUserLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1925,7 +1930,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_list(&self, parent: &str) -> AccountUserLinkListCall<'a> {
+    pub fn user_links_list(&self, parent: &str) -> AccountUserLinkListCall<'a, S> {
         AccountUserLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1945,7 +1950,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Example format: properties/1234/userLinks/5678
-    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> AccountUserLinkPatchCall<'a> {
+    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> AccountUserLinkPatchCall<'a, S> {
         AccountUserLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -1963,7 +1968,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Account to soft-delete. Format: accounts/{account} Example: "accounts/100"
-    pub fn delete(&self, name: &str) -> AccountDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> AccountDeleteCall<'a, S> {
         AccountDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1980,7 +1985,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the account to lookup. Format: accounts/{account} Example: "accounts/100"
-    pub fn get(&self, name: &str) -> AccountGetCall<'a> {
+    pub fn get(&self, name: &str) -> AccountGetCall<'a, S> {
         AccountGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1997,7 +2002,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the settings to lookup. Format: accounts/{account}/dataSharingSettings Example: "accounts/1000/dataSharingSettings"
-    pub fn get_data_sharing_settings(&self, name: &str) -> AccountGetDataSharingSettingCall<'a> {
+    pub fn get_data_sharing_settings(&self, name: &str) -> AccountGetDataSharingSettingCall<'a, S> {
         AccountGetDataSharingSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2010,7 +2015,7 @@ impl<'a> AccountMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all accounts accessible by the caller. Note that these accounts might not currently have GA4 properties. Soft-deleted (ie: "trashed") accounts are excluded by default. Returns an empty list if no relevant accounts are found.
-    pub fn list(&self) -> AccountListCall<'a> {
+    pub fn list(&self) -> AccountListCall<'a, S> {
         AccountListCall {
             hub: self.hub,
             _show_deleted: Default::default(),
@@ -2030,7 +2035,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this account. Format: accounts/{account} Example: "accounts/100"
-    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaAccount, name: &str) -> AccountPatchCall<'a> {
+    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaAccount, name: &str) -> AccountPatchCall<'a, S> {
         AccountPatchCall {
             hub: self.hub,
             _request: request,
@@ -2049,7 +2054,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn provision_account_ticket(&self, request: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a> {
+    pub fn provision_account_ticket(&self, request: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a, S> {
         AccountProvisionAccountTicketCall {
             hub: self.hub,
             _request: request,
@@ -2067,7 +2072,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `account` - Required. The account resource for which to return change history resources.
-    pub fn search_change_history_events(&self, request: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest, account: &str) -> AccountSearchChangeHistoryEventCall<'a> {
+    pub fn search_change_history_events(&self, request: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest, account: &str) -> AccountSearchChangeHistoryEventCall<'a, S> {
         AccountSearchChangeHistoryEventCall {
             hub: self.hub,
             _request: request,
@@ -2102,22 +2107,22 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `acknowledge_user_data_collection(...)`, `conversion_events_create(...)`, `conversion_events_delete(...)`, `conversion_events_get(...)`, `conversion_events_list(...)`, `create(...)`, `custom_dimensions_archive(...)`, `custom_dimensions_create(...)`, `custom_dimensions_get(...)`, `custom_dimensions_list(...)`, `custom_dimensions_patch(...)`, `custom_metrics_archive(...)`, `custom_metrics_create(...)`, `custom_metrics_get(...)`, `custom_metrics_list(...)`, `custom_metrics_patch(...)`, `data_streams_create(...)`, `data_streams_delete(...)`, `data_streams_get(...)`, `data_streams_get_global_site_tag(...)`, `data_streams_list(...)`, `data_streams_measurement_protocol_secrets_create(...)`, `data_streams_measurement_protocol_secrets_delete(...)`, `data_streams_measurement_protocol_secrets_get(...)`, `data_streams_measurement_protocol_secrets_list(...)`, `data_streams_measurement_protocol_secrets_patch(...)`, `data_streams_patch(...)`, `delete(...)`, `display_video360_advertiser_link_proposals_approve(...)`, `display_video360_advertiser_link_proposals_cancel(...)`, `display_video360_advertiser_link_proposals_create(...)`, `display_video360_advertiser_link_proposals_delete(...)`, `display_video360_advertiser_link_proposals_get(...)`, `display_video360_advertiser_link_proposals_list(...)`, `display_video360_advertiser_links_create(...)`, `display_video360_advertiser_links_delete(...)`, `display_video360_advertiser_links_get(...)`, `display_video360_advertiser_links_list(...)`, `display_video360_advertiser_links_patch(...)`, `firebase_links_create(...)`, `firebase_links_delete(...)`, `firebase_links_list(...)`, `get(...)`, `get_data_retention_settings(...)`, `get_google_signals_settings(...)`, `google_ads_links_create(...)`, `google_ads_links_delete(...)`, `google_ads_links_list(...)`, `google_ads_links_patch(...)`, `list(...)`, `patch(...)`, `update_data_retention_settings(...)`, `update_google_signals_settings(...)`, `user_links_audit(...)`, `user_links_batch_create(...)`, `user_links_batch_delete(...)`, `user_links_batch_get(...)`, `user_links_batch_update(...)`, `user_links_create(...)`, `user_links_delete(...)`, `user_links_get(...)`, `user_links_list(...)` and `user_links_patch(...)`
 /// // to build up your call.
 /// let rb = hub.properties();
 /// # }
 /// ```
-pub struct PropertyMethods<'a>
-    where  {
+pub struct PropertyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
 }
 
-impl<'a> client::MethodsBuilder for PropertyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PropertyMethods<'a, S> {}
 
-impl<'a> PropertyMethods<'a> {
+impl<'a, S> PropertyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2127,7 +2132,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the parent property where this conversion event will be created. Format: properties/123
-    pub fn conversion_events_create(&self, request: GoogleAnalyticsAdminV1alphaConversionEvent, parent: &str) -> PropertyConversionEventCreateCall<'a> {
+    pub fn conversion_events_create(&self, request: GoogleAnalyticsAdminV1alphaConversionEvent, parent: &str) -> PropertyConversionEventCreateCall<'a, S> {
         PropertyConversionEventCreateCall {
             hub: self.hub,
             _request: request,
@@ -2145,7 +2150,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the conversion event to delete. Format: properties/{property}/conversionEvents/{conversion_event} Example: "properties/123/conversionEvents/456"
-    pub fn conversion_events_delete(&self, name: &str) -> PropertyConversionEventDeleteCall<'a> {
+    pub fn conversion_events_delete(&self, name: &str) -> PropertyConversionEventDeleteCall<'a, S> {
         PropertyConversionEventDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2162,7 +2167,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the conversion event to retrieve. Format: properties/{property}/conversionEvents/{conversion_event} Example: "properties/123/conversionEvents/456"
-    pub fn conversion_events_get(&self, name: &str) -> PropertyConversionEventGetCall<'a> {
+    pub fn conversion_events_get(&self, name: &str) -> PropertyConversionEventGetCall<'a, S> {
         PropertyConversionEventGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2179,7 +2184,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the parent property. Example: 'properties/123'
-    pub fn conversion_events_list(&self, parent: &str) -> PropertyConversionEventListCall<'a> {
+    pub fn conversion_events_list(&self, parent: &str) -> PropertyConversionEventListCall<'a, S> {
         PropertyConversionEventListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2199,7 +2204,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the CustomDimension to archive. Example format: properties/1234/customDimensions/5678
-    pub fn custom_dimensions_archive(&self, request: GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest, name: &str) -> PropertyCustomDimensionArchiveCall<'a> {
+    pub fn custom_dimensions_archive(&self, request: GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest, name: &str) -> PropertyCustomDimensionArchiveCall<'a, S> {
         PropertyCustomDimensionArchiveCall {
             hub: self.hub,
             _request: request,
@@ -2218,7 +2223,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn custom_dimensions_create(&self, request: GoogleAnalyticsAdminV1alphaCustomDimension, parent: &str) -> PropertyCustomDimensionCreateCall<'a> {
+    pub fn custom_dimensions_create(&self, request: GoogleAnalyticsAdminV1alphaCustomDimension, parent: &str) -> PropertyCustomDimensionCreateCall<'a, S> {
         PropertyCustomDimensionCreateCall {
             hub: self.hub,
             _request: request,
@@ -2236,7 +2241,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the CustomDimension to get. Example format: properties/1234/customDimensions/5678
-    pub fn custom_dimensions_get(&self, name: &str) -> PropertyCustomDimensionGetCall<'a> {
+    pub fn custom_dimensions_get(&self, name: &str) -> PropertyCustomDimensionGetCall<'a, S> {
         PropertyCustomDimensionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2253,7 +2258,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn custom_dimensions_list(&self, parent: &str) -> PropertyCustomDimensionListCall<'a> {
+    pub fn custom_dimensions_list(&self, parent: &str) -> PropertyCustomDimensionListCall<'a, S> {
         PropertyCustomDimensionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2273,7 +2278,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name for this CustomDimension resource. Format: properties/{property}/customDimensions/{customDimension}
-    pub fn custom_dimensions_patch(&self, request: GoogleAnalyticsAdminV1alphaCustomDimension, name: &str) -> PropertyCustomDimensionPatchCall<'a> {
+    pub fn custom_dimensions_patch(&self, request: GoogleAnalyticsAdminV1alphaCustomDimension, name: &str) -> PropertyCustomDimensionPatchCall<'a, S> {
         PropertyCustomDimensionPatchCall {
             hub: self.hub,
             _request: request,
@@ -2293,7 +2298,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the CustomMetric to archive. Example format: properties/1234/customMetrics/5678
-    pub fn custom_metrics_archive(&self, request: GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest, name: &str) -> PropertyCustomMetricArchiveCall<'a> {
+    pub fn custom_metrics_archive(&self, request: GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest, name: &str) -> PropertyCustomMetricArchiveCall<'a, S> {
         PropertyCustomMetricArchiveCall {
             hub: self.hub,
             _request: request,
@@ -2312,7 +2317,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn custom_metrics_create(&self, request: GoogleAnalyticsAdminV1alphaCustomMetric, parent: &str) -> PropertyCustomMetricCreateCall<'a> {
+    pub fn custom_metrics_create(&self, request: GoogleAnalyticsAdminV1alphaCustomMetric, parent: &str) -> PropertyCustomMetricCreateCall<'a, S> {
         PropertyCustomMetricCreateCall {
             hub: self.hub,
             _request: request,
@@ -2330,7 +2335,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the CustomMetric to get. Example format: properties/1234/customMetrics/5678
-    pub fn custom_metrics_get(&self, name: &str) -> PropertyCustomMetricGetCall<'a> {
+    pub fn custom_metrics_get(&self, name: &str) -> PropertyCustomMetricGetCall<'a, S> {
         PropertyCustomMetricGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2347,7 +2352,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn custom_metrics_list(&self, parent: &str) -> PropertyCustomMetricListCall<'a> {
+    pub fn custom_metrics_list(&self, parent: &str) -> PropertyCustomMetricListCall<'a, S> {
         PropertyCustomMetricListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2367,7 +2372,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name for this CustomMetric resource. Format: properties/{property}/customMetrics/{customMetric}
-    pub fn custom_metrics_patch(&self, request: GoogleAnalyticsAdminV1alphaCustomMetric, name: &str) -> PropertyCustomMetricPatchCall<'a> {
+    pub fn custom_metrics_patch(&self, request: GoogleAnalyticsAdminV1alphaCustomMetric, name: &str) -> PropertyCustomMetricPatchCall<'a, S> {
         PropertyCustomMetricPatchCall {
             hub: self.hub,
             _request: request,
@@ -2387,7 +2392,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this secret will be created. Format: properties/{property}/dataStreams/{dataStream}
-    pub fn data_streams_measurement_protocol_secrets_create(&self, request: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret, parent: &str) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
+    pub fn data_streams_measurement_protocol_secrets_create(&self, request: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret, parent: &str) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S> {
         PropertyDataStreamMeasurementProtocolSecretCreateCall {
             hub: self.hub,
             _request: request,
@@ -2405,7 +2410,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the MeasurementProtocolSecret to delete. Format: properties/{property}/dataStreams/{dataStream}/measurementProtocolSecrets/{measurementProtocolSecret}
-    pub fn data_streams_measurement_protocol_secrets_delete(&self, name: &str) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
+    pub fn data_streams_measurement_protocol_secrets_delete(&self, name: &str) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S> {
         PropertyDataStreamMeasurementProtocolSecretDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2422,7 +2427,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the measurement protocol secret to lookup. Format: properties/{property}/dataStreams/{dataStream}/measurementProtocolSecrets/{measurementProtocolSecret}
-    pub fn data_streams_measurement_protocol_secrets_get(&self, name: &str) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
+    pub fn data_streams_measurement_protocol_secrets_get(&self, name: &str) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S> {
         PropertyDataStreamMeasurementProtocolSecretGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2439,7 +2444,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the parent stream. Format: properties/{property}/dataStreams/{dataStream}/measurementProtocolSecrets
-    pub fn data_streams_measurement_protocol_secrets_list(&self, parent: &str) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
+    pub fn data_streams_measurement_protocol_secrets_list(&self, parent: &str) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S> {
         PropertyDataStreamMeasurementProtocolSecretListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2459,7 +2464,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this secret. This secret may be a child of any type of stream. Format: properties/{property}/webDataStreams/{webDataStream}/measurementProtocolSecrets/{measurementProtocolSecret}
-    pub fn data_streams_measurement_protocol_secrets_patch(&self, request: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret, name: &str) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
+    pub fn data_streams_measurement_protocol_secrets_patch(&self, request: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret, name: &str) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S> {
         PropertyDataStreamMeasurementProtocolSecretPatchCall {
             hub: self.hub,
             _request: request,
@@ -2479,7 +2484,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaDataStream, parent: &str) -> PropertyDataStreamCreateCall<'a> {
+    pub fn data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaDataStream, parent: &str) -> PropertyDataStreamCreateCall<'a, S> {
         PropertyDataStreamCreateCall {
             hub: self.hub,
             _request: request,
@@ -2497,7 +2502,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the DataStream to delete. Example format: properties/1234/dataStreams/5678
-    pub fn data_streams_delete(&self, name: &str) -> PropertyDataStreamDeleteCall<'a> {
+    pub fn data_streams_delete(&self, name: &str) -> PropertyDataStreamDeleteCall<'a, S> {
         PropertyDataStreamDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2514,7 +2519,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the DataStream to get. Example format: properties/1234/dataStreams/5678
-    pub fn data_streams_get(&self, name: &str) -> PropertyDataStreamGetCall<'a> {
+    pub fn data_streams_get(&self, name: &str) -> PropertyDataStreamGetCall<'a, S> {
         PropertyDataStreamGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2531,7 +2536,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the site tag to lookup. Note that site tags are singletons and do not have unique IDs. Format: properties/{property_id}/dataStreams/{stream_id}/globalSiteTag Example: "properties/123/dataStreams/456/globalSiteTag"
-    pub fn data_streams_get_global_site_tag(&self, name: &str) -> PropertyDataStreamGetGlobalSiteTagCall<'a> {
+    pub fn data_streams_get_global_site_tag(&self, name: &str) -> PropertyDataStreamGetGlobalSiteTagCall<'a, S> {
         PropertyDataStreamGetGlobalSiteTagCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2548,7 +2553,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn data_streams_list(&self, parent: &str) -> PropertyDataStreamListCall<'a> {
+    pub fn data_streams_list(&self, parent: &str) -> PropertyDataStreamListCall<'a, S> {
         PropertyDataStreamListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2568,7 +2573,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this Data Stream. Format: properties/{property_id}/dataStreams/{stream_id} Example: "properties/1000/dataStreams/2000"
-    pub fn data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaDataStream, name: &str) -> PropertyDataStreamPatchCall<'a> {
+    pub fn data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaDataStream, name: &str) -> PropertyDataStreamPatchCall<'a, S> {
         PropertyDataStreamPatchCall {
             hub: self.hub,
             _request: request,
@@ -2588,7 +2593,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the DisplayVideo360AdvertiserLinkProposal to approve. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678
-    pub fn display_video360_advertiser_link_proposals_approve(&self, request: GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
+    pub fn display_video360_advertiser_link_proposals_approve(&self, request: GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkProposalApproveCall {
             hub: self.hub,
             _request: request,
@@ -2607,7 +2612,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the DisplayVideo360AdvertiserLinkProposal to cancel. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678
-    pub fn display_video360_advertiser_link_proposals_cancel(&self, request: GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
+    pub fn display_video360_advertiser_link_proposals_cancel(&self, request: GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkProposalCancelCall {
             hub: self.hub,
             _request: request,
@@ -2626,7 +2631,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn display_video360_advertiser_link_proposals_create(&self, request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
+    pub fn display_video360_advertiser_link_proposals_create(&self, request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkProposalCreateCall {
             hub: self.hub,
             _request: request,
@@ -2644,7 +2649,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the DisplayVideo360AdvertiserLinkProposal to delete. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678
-    pub fn display_video360_advertiser_link_proposals_delete(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
+    pub fn display_video360_advertiser_link_proposals_delete(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2661,7 +2666,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the DisplayVideo360AdvertiserLinkProposal to get. Example format: properties/1234/displayVideo360AdvertiserLinkProposals/5678
-    pub fn display_video360_advertiser_link_proposals_get(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
+    pub fn display_video360_advertiser_link_proposals_get(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkProposalGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2678,7 +2683,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn display_video360_advertiser_link_proposals_list(&self, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
+    pub fn display_video360_advertiser_link_proposals_list(&self, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkProposalListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2698,7 +2703,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn display_video360_advertiser_links_create(&self, request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
+    pub fn display_video360_advertiser_links_create(&self, request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -2716,7 +2721,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the DisplayVideo360AdvertiserLink to delete. Example format: properties/1234/displayVideo360AdvertiserLinks/5678
-    pub fn display_video360_advertiser_links_delete(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
+    pub fn display_video360_advertiser_links_delete(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2733,7 +2738,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the DisplayVideo360AdvertiserLink to get. Example format: properties/1234/displayVideo360AdvertiserLink/5678
-    pub fn display_video360_advertiser_links_get(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
+    pub fn display_video360_advertiser_links_get(&self, name: &str) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2750,7 +2755,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn display_video360_advertiser_links_list(&self, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
+    pub fn display_video360_advertiser_links_list(&self, parent: &str) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2770,7 +2775,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name for this DisplayVideo360AdvertiserLink resource. Format: properties/{propertyId}/displayVideo360AdvertiserLinks/{linkId} Note: linkId is not the Display & Video 360 Advertiser ID
-    pub fn display_video360_advertiser_links_patch(&self, request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink, name: &str) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
+    pub fn display_video360_advertiser_links_patch(&self, request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink, name: &str) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S> {
         PropertyDisplayVideo360AdvertiserLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -2790,7 +2795,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Format: properties/{property_id} Example: properties/1234
-    pub fn firebase_links_create(&self, request: GoogleAnalyticsAdminV1alphaFirebaseLink, parent: &str) -> PropertyFirebaseLinkCreateCall<'a> {
+    pub fn firebase_links_create(&self, request: GoogleAnalyticsAdminV1alphaFirebaseLink, parent: &str) -> PropertyFirebaseLinkCreateCall<'a, S> {
         PropertyFirebaseLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -2808,7 +2813,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: properties/{property_id}/firebaseLinks/{firebase_link_id} Example: properties/1234/firebaseLinks/5678
-    pub fn firebase_links_delete(&self, name: &str) -> PropertyFirebaseLinkDeleteCall<'a> {
+    pub fn firebase_links_delete(&self, name: &str) -> PropertyFirebaseLinkDeleteCall<'a, S> {
         PropertyFirebaseLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2825,7 +2830,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Format: properties/{property_id} Example: properties/1234
-    pub fn firebase_links_list(&self, parent: &str) -> PropertyFirebaseLinkListCall<'a> {
+    pub fn firebase_links_list(&self, parent: &str) -> PropertyFirebaseLinkListCall<'a, S> {
         PropertyFirebaseLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2845,7 +2850,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn google_ads_links_create(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, parent: &str) -> PropertyGoogleAdsLinkCreateCall<'a> {
+    pub fn google_ads_links_create(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, parent: &str) -> PropertyGoogleAdsLinkCreateCall<'a, S> {
         PropertyGoogleAdsLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -2863,7 +2868,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: properties/1234/googleAdsLinks/5678
-    pub fn google_ads_links_delete(&self, name: &str) -> PropertyGoogleAdsLinkDeleteCall<'a> {
+    pub fn google_ads_links_delete(&self, name: &str) -> PropertyGoogleAdsLinkDeleteCall<'a, S> {
         PropertyGoogleAdsLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2880,7 +2885,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn google_ads_links_list(&self, parent: &str) -> PropertyGoogleAdsLinkListCall<'a> {
+    pub fn google_ads_links_list(&self, parent: &str) -> PropertyGoogleAdsLinkListCall<'a, S> {
         PropertyGoogleAdsLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2900,7 +2905,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Format: properties/{propertyId}/googleAdsLinks/{googleAdsLinkId} Note: googleAdsLinkId is not the Google Ads customer ID.
-    pub fn google_ads_links_patch(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, name: &str) -> PropertyGoogleAdsLinkPatchCall<'a> {
+    pub fn google_ads_links_patch(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, name: &str) -> PropertyGoogleAdsLinkPatchCall<'a, S> {
         PropertyGoogleAdsLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -2920,7 +2925,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> PropertyUserLinkAuditCall<'a> {
+    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> PropertyUserLinkAuditCall<'a, S> {
         PropertyUserLinkAuditCall {
             hub: self.hub,
             _request: request,
@@ -2939,7 +2944,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. This field is required. The parent field in the CreateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchCreateCall<'a> {
+    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchCreateCall<'a, S> {
         PropertyUserLinkBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -2958,7 +2963,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all values for user link names to delete must match this field. Example format: accounts/1234
-    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> PropertyUserLinkBatchDeleteCall<'a> {
+    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> PropertyUserLinkBatchDeleteCall<'a, S> {
         PropertyUserLinkBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -2976,7 +2981,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all provided values for the 'names' field must match this field. Example format: accounts/1234
-    pub fn user_links_batch_get(&self, parent: &str) -> PropertyUserLinkBatchGetCall<'a> {
+    pub fn user_links_batch_get(&self, parent: &str) -> PropertyUserLinkBatchGetCall<'a, S> {
         PropertyUserLinkBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2995,7 +3000,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent field in the UpdateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchUpdateCall<'a> {
+    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchUpdateCall<'a, S> {
         PropertyUserLinkBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3014,7 +3019,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> PropertyUserLinkCreateCall<'a> {
+    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> PropertyUserLinkCreateCall<'a, S> {
         PropertyUserLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -3033,7 +3038,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_delete(&self, name: &str) -> PropertyUserLinkDeleteCall<'a> {
+    pub fn user_links_delete(&self, name: &str) -> PropertyUserLinkDeleteCall<'a, S> {
         PropertyUserLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3050,7 +3055,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_get(&self, name: &str) -> PropertyUserLinkGetCall<'a> {
+    pub fn user_links_get(&self, name: &str) -> PropertyUserLinkGetCall<'a, S> {
         PropertyUserLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3067,7 +3072,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_list(&self, parent: &str) -> PropertyUserLinkListCall<'a> {
+    pub fn user_links_list(&self, parent: &str) -> PropertyUserLinkListCall<'a, S> {
         PropertyUserLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3087,7 +3092,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Example format: properties/1234/userLinks/5678
-    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> PropertyUserLinkPatchCall<'a> {
+    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> PropertyUserLinkPatchCall<'a, S> {
         PropertyUserLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -3106,7 +3111,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `property` - Required. The property for which to acknowledge user data collection.
-    pub fn acknowledge_user_data_collection(&self, request: GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest, property: &str) -> PropertyAcknowledgeUserDataCollectionCall<'a> {
+    pub fn acknowledge_user_data_collection(&self, request: GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest, property: &str) -> PropertyAcknowledgeUserDataCollectionCall<'a, S> {
         PropertyAcknowledgeUserDataCollectionCall {
             hub: self.hub,
             _request: request,
@@ -3124,7 +3129,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a> {
+    pub fn create(&self, request: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a, S> {
         PropertyCreateCall {
             hub: self.hub,
             _request: request,
@@ -3141,7 +3146,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Property to soft-delete. Format: properties/{property_id} Example: "properties/1000"
-    pub fn delete(&self, name: &str) -> PropertyDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> PropertyDeleteCall<'a, S> {
         PropertyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3158,7 +3163,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the property to lookup. Format: properties/{property_id} Example: "properties/1000"
-    pub fn get(&self, name: &str) -> PropertyGetCall<'a> {
+    pub fn get(&self, name: &str) -> PropertyGetCall<'a, S> {
         PropertyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3175,7 +3180,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the settings to lookup. Format: properties/{property}/dataRetentionSettings Example: "properties/1000/dataRetentionSettings"
-    pub fn get_data_retention_settings(&self, name: &str) -> PropertyGetDataRetentionSettingCall<'a> {
+    pub fn get_data_retention_settings(&self, name: &str) -> PropertyGetDataRetentionSettingCall<'a, S> {
         PropertyGetDataRetentionSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3192,7 +3197,7 @@ impl<'a> PropertyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the google signals settings to retrieve. Format: properties/{property}/googleSignalsSettings
-    pub fn get_google_signals_settings(&self, name: &str) -> PropertyGetGoogleSignalsSettingCall<'a> {
+    pub fn get_google_signals_settings(&self, name: &str) -> PropertyGetGoogleSignalsSettingCall<'a, S> {
         PropertyGetGoogleSignalsSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3205,7 +3210,7 @@ impl<'a> PropertyMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns child Properties under the specified parent Account. Only "GA4" properties will be returned. Properties will be excluded if the caller does not have access. Soft-deleted (ie: "trashed") properties are excluded by default. Returns an empty list if no relevant properties are found.
-    pub fn list(&self) -> PropertyListCall<'a> {
+    pub fn list(&self) -> PropertyListCall<'a, S> {
         PropertyListCall {
             hub: self.hub,
             _show_deleted: Default::default(),
@@ -3226,7 +3231,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this property. Format: properties/{property_id} Example: "properties/1000"
-    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaProperty, name: &str) -> PropertyPatchCall<'a> {
+    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaProperty, name: &str) -> PropertyPatchCall<'a, S> {
         PropertyPatchCall {
             hub: self.hub,
             _request: request,
@@ -3246,7 +3251,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name for this DataRetentionSetting resource. Format: properties/{property}/dataRetentionSettings
-    pub fn update_data_retention_settings(&self, request: GoogleAnalyticsAdminV1alphaDataRetentionSettings, name: &str) -> PropertyUpdateDataRetentionSettingCall<'a> {
+    pub fn update_data_retention_settings(&self, request: GoogleAnalyticsAdminV1alphaDataRetentionSettings, name: &str) -> PropertyUpdateDataRetentionSettingCall<'a, S> {
         PropertyUpdateDataRetentionSettingCall {
             hub: self.hub,
             _request: request,
@@ -3266,7 +3271,7 @@ impl<'a> PropertyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this setting. Format: properties/{property_id}/googleSignalsSettings Example: "properties/1000/googleSignalsSettings"
-    pub fn update_google_signals_settings(&self, request: GoogleAnalyticsAdminV1alphaGoogleSignalsSettings, name: &str) -> PropertyUpdateGoogleSignalsSettingCall<'a> {
+    pub fn update_google_signals_settings(&self, request: GoogleAnalyticsAdminV1alphaGoogleSignalsSettings, name: &str) -> PropertyUpdateGoogleSignalsSettingCall<'a, S> {
         PropertyUpdateGoogleSignalsSettingCall {
             hub: self.hub,
             _request: request,
@@ -3309,7 +3314,7 @@ impl<'a> PropertyMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3319,10 +3324,10 @@ impl<'a> PropertyMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountSummaryListCall<'a>
-    where  {
+pub struct AccountSummaryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3330,9 +3335,15 @@ pub struct AccountSummaryListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountSummaryListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountSummaryListCall<'a, S> {}
 
-impl<'a> AccountSummaryListCall<'a> {
+impl<'a, S> AccountSummaryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3456,14 +3467,14 @@ impl<'a> AccountSummaryListCall<'a> {
     /// A page token, received from a previous `ListAccountSummaries` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAccountSummaries` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountSummaryListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountSummaryListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of AccountSummary resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountSummaryListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountSummaryListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3473,7 +3484,7 @@ impl<'a> AccountSummaryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSummaryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSummaryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3498,7 +3509,7 @@ impl<'a> AccountSummaryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountSummaryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountSummaryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3518,9 +3529,9 @@ impl<'a> AccountSummaryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountSummaryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountSummaryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3553,7 +3564,7 @@ impl<'a> AccountSummaryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3566,10 +3577,10 @@ impl<'a> AccountSummaryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkAuditCall<'a>
-    where  {
+pub struct AccountUserLinkAuditCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3577,9 +3588,15 @@ pub struct AccountUserLinkAuditCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkAuditCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkAuditCall<'a, S> {}
 
-impl<'a> AccountUserLinkAuditCall<'a> {
+impl<'a, S> AccountUserLinkAuditCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3739,7 +3756,7 @@ impl<'a> AccountUserLinkAuditCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> AccountUserLinkAuditCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> AccountUserLinkAuditCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3749,7 +3766,7 @@ impl<'a> AccountUserLinkAuditCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkAuditCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkAuditCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3759,7 +3776,7 @@ impl<'a> AccountUserLinkAuditCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkAuditCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkAuditCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3784,7 +3801,7 @@ impl<'a> AccountUserLinkAuditCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkAuditCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkAuditCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3804,9 +3821,9 @@ impl<'a> AccountUserLinkAuditCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkAuditCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkAuditCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3839,7 +3856,7 @@ impl<'a> AccountUserLinkAuditCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3852,10 +3869,10 @@ impl<'a> AccountUserLinkAuditCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchCreateCall<'a>
-    where  {
+pub struct AccountUserLinkBatchCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3863,9 +3880,15 @@ pub struct AccountUserLinkBatchCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkBatchCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkBatchCreateCall<'a, S> {}
 
-impl<'a> AccountUserLinkBatchCreateCall<'a> {
+impl<'a, S> AccountUserLinkBatchCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4025,7 +4048,7 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> AccountUserLinkBatchCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> AccountUserLinkBatchCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4035,7 +4058,7 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4045,7 +4068,7 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4070,7 +4093,7 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4090,9 +4113,9 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkBatchCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4125,7 +4148,7 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4138,10 +4161,10 @@ impl<'a> AccountUserLinkBatchCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchDeleteCall<'a>
-    where  {
+pub struct AccountUserLinkBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4149,9 +4172,15 @@ pub struct AccountUserLinkBatchDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkBatchDeleteCall<'a, S> {}
 
-impl<'a> AccountUserLinkBatchDeleteCall<'a> {
+impl<'a, S> AccountUserLinkBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4311,7 +4340,7 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> AccountUserLinkBatchDeleteCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> AccountUserLinkBatchDeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4321,7 +4350,7 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4331,7 +4360,7 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4356,7 +4385,7 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4376,9 +4405,9 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4410,7 +4439,7 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4419,10 +4448,10 @@ impl<'a> AccountUserLinkBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchGetCall<'a>
-    where  {
+pub struct AccountUserLinkBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4430,9 +4459,15 @@ pub struct AccountUserLinkBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkBatchGetCall<'a, S> {}
 
-impl<'a> AccountUserLinkBatchGetCall<'a> {
+impl<'a, S> AccountUserLinkBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4584,7 +4619,7 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4592,7 +4627,7 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -4602,7 +4637,7 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4627,7 +4662,7 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4647,9 +4682,9 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4682,7 +4717,7 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4695,10 +4730,10 @@ impl<'a> AccountUserLinkBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchUpdateCall<'a>
-    where  {
+pub struct AccountUserLinkBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4706,9 +4741,15 @@ pub struct AccountUserLinkBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkBatchUpdateCall<'a, S> {}
 
-impl<'a> AccountUserLinkBatchUpdateCall<'a> {
+impl<'a, S> AccountUserLinkBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4868,7 +4909,7 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> AccountUserLinkBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> AccountUserLinkBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4878,7 +4919,7 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchUpdateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchUpdateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4888,7 +4929,7 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4913,7 +4954,7 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4933,9 +4974,9 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4968,7 +5009,7 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4982,10 +5023,10 @@ impl<'a> AccountUserLinkBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkCreateCall<'a>
-    where  {
+pub struct AccountUserLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _parent: String,
     _notify_new_user: Option<bool>,
@@ -4994,9 +5035,15 @@ pub struct AccountUserLinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkCreateCall<'a, S> {}
 
-impl<'a> AccountUserLinkCreateCall<'a> {
+impl<'a, S> AccountUserLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5159,7 +5206,7 @@ impl<'a> AccountUserLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5169,14 +5216,14 @@ impl<'a> AccountUserLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If set, then email the new user notifying them that they've been granted permissions to the resource.
     ///
     /// Sets the *notify new user* query property to the given value.
-    pub fn notify_new_user(mut self, new_value: bool) -> AccountUserLinkCreateCall<'a> {
+    pub fn notify_new_user(mut self, new_value: bool) -> AccountUserLinkCreateCall<'a, S> {
         self._notify_new_user = Some(new_value);
         self
     }
@@ -5186,7 +5233,7 @@ impl<'a> AccountUserLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5211,7 +5258,7 @@ impl<'a> AccountUserLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5231,9 +5278,9 @@ impl<'a> AccountUserLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5265,7 +5312,7 @@ impl<'a> AccountUserLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5273,19 +5320,25 @@ impl<'a> AccountUserLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkDeleteCall<'a>
-    where  {
+pub struct AccountUserLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkDeleteCall<'a, S> {}
 
-impl<'a> AccountUserLinkDeleteCall<'a> {
+impl<'a, S> AccountUserLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5432,7 +5485,7 @@ impl<'a> AccountUserLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUserLinkDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountUserLinkDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5442,7 +5495,7 @@ impl<'a> AccountUserLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5467,7 +5520,7 @@ impl<'a> AccountUserLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5487,9 +5540,9 @@ impl<'a> AccountUserLinkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5521,7 +5574,7 @@ impl<'a> AccountUserLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5529,19 +5582,25 @@ impl<'a> AccountUserLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkGetCall<'a>
-    where  {
+pub struct AccountUserLinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkGetCall<'a, S> {}
 
-impl<'a> AccountUserLinkGetCall<'a> {
+impl<'a, S> AccountUserLinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5688,7 +5747,7 @@ impl<'a> AccountUserLinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUserLinkGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountUserLinkGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5698,7 +5757,7 @@ impl<'a> AccountUserLinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5723,7 +5782,7 @@ impl<'a> AccountUserLinkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5743,9 +5802,9 @@ impl<'a> AccountUserLinkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5777,7 +5836,7 @@ impl<'a> AccountUserLinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5787,10 +5846,10 @@ impl<'a> AccountUserLinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkListCall<'a>
-    where  {
+pub struct AccountUserLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5799,9 +5858,15 @@ pub struct AccountUserLinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkListCall<'a, S> {}
 
-impl<'a> AccountUserLinkListCall<'a> {
+impl<'a, S> AccountUserLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5954,21 +6019,21 @@ impl<'a> AccountUserLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListUserLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListUserLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountUserLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountUserLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of user links to return. The service may return fewer than this value. If unspecified, at most 200 user links will be returned. The maximum value is 500; values above 500 will be coerced to 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountUserLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountUserLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5978,7 +6043,7 @@ impl<'a> AccountUserLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6003,7 +6068,7 @@ impl<'a> AccountUserLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6023,9 +6088,9 @@ impl<'a> AccountUserLinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6058,7 +6123,7 @@ impl<'a> AccountUserLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6071,10 +6136,10 @@ impl<'a> AccountUserLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkPatchCall<'a>
-    where  {
+pub struct AccountUserLinkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6082,9 +6147,15 @@ pub struct AccountUserLinkPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUserLinkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUserLinkPatchCall<'a, S> {}
 
-impl<'a> AccountUserLinkPatchCall<'a> {
+impl<'a, S> AccountUserLinkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6244,7 +6315,7 @@ impl<'a> AccountUserLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6254,7 +6325,7 @@ impl<'a> AccountUserLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUserLinkPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountUserLinkPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6264,7 +6335,7 @@ impl<'a> AccountUserLinkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6289,7 +6360,7 @@ impl<'a> AccountUserLinkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6309,9 +6380,9 @@ impl<'a> AccountUserLinkPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUserLinkPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6343,7 +6414,7 @@ impl<'a> AccountUserLinkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6351,19 +6422,25 @@ impl<'a> AccountUserLinkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountDeleteCall<'a>
-    where  {
+pub struct AccountDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountDeleteCall<'a, S> {}
 
-impl<'a> AccountDeleteCall<'a> {
+impl<'a, S> AccountDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6510,7 +6587,7 @@ impl<'a> AccountDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6520,7 +6597,7 @@ impl<'a> AccountDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6545,7 +6622,7 @@ impl<'a> AccountDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6565,9 +6642,9 @@ impl<'a> AccountDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6599,7 +6676,7 @@ impl<'a> AccountDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6607,19 +6684,25 @@ impl<'a> AccountDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a>
-    where  {
+pub struct AccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetCall<'a, S> {}
 
-impl<'a> AccountGetCall<'a> {
+impl<'a, S> AccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6766,7 +6849,7 @@ impl<'a> AccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6776,7 +6859,7 @@ impl<'a> AccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6801,7 +6884,7 @@ impl<'a> AccountGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6821,9 +6904,9 @@ impl<'a> AccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6855,7 +6938,7 @@ impl<'a> AccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6863,19 +6946,25 @@ impl<'a> AccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetDataSharingSettingCall<'a>
-    where  {
+pub struct AccountGetDataSharingSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountGetDataSharingSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetDataSharingSettingCall<'a, S> {}
 
-impl<'a> AccountGetDataSharingSettingCall<'a> {
+impl<'a, S> AccountGetDataSharingSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7022,7 +7111,7 @@ impl<'a> AccountGetDataSharingSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetDataSharingSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountGetDataSharingSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7032,7 +7121,7 @@ impl<'a> AccountGetDataSharingSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetDataSharingSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetDataSharingSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7057,7 +7146,7 @@ impl<'a> AccountGetDataSharingSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetDataSharingSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetDataSharingSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7077,9 +7166,9 @@ impl<'a> AccountGetDataSharingSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetDataSharingSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountGetDataSharingSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7111,7 +7200,7 @@ impl<'a> AccountGetDataSharingSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7122,10 +7211,10 @@ impl<'a> AccountGetDataSharingSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a>
-    where  {
+pub struct AccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _show_deleted: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7134,9 +7223,15 @@ pub struct AccountListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListCall<'a, S> {}
 
-impl<'a> AccountListCall<'a> {
+impl<'a, S> AccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7263,21 +7358,21 @@ impl<'a> AccountListCall<'a> {
     /// Whether to include soft-deleted (ie: "trashed") Accounts in the results. Accounts can be inspected to determine whether they are deleted or not.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> AccountListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> AccountListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// A page token, received from a previous `ListAccounts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAccounts` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7287,7 +7382,7 @@ impl<'a> AccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7312,7 +7407,7 @@ impl<'a> AccountListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7332,9 +7427,9 @@ impl<'a> AccountListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7367,7 +7462,7 @@ impl<'a> AccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7381,10 +7476,10 @@ impl<'a> AccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPatchCall<'a>
-    where  {
+pub struct AccountPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaAccount,
     _name: String,
     _update_mask: Option<String>,
@@ -7393,9 +7488,15 @@ pub struct AccountPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountPatchCall<'a, S> {}
 
-impl<'a> AccountPatchCall<'a> {
+impl<'a, S> AccountPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7558,7 +7659,7 @@ impl<'a> AccountPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAccount) -> AccountPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAccount) -> AccountPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7568,14 +7669,14 @@ impl<'a> AccountPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7585,7 +7686,7 @@ impl<'a> AccountPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7610,7 +7711,7 @@ impl<'a> AccountPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7630,9 +7731,9 @@ impl<'a> AccountPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7665,7 +7766,7 @@ impl<'a> AccountPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7678,19 +7779,25 @@ impl<'a> AccountPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProvisionAccountTicketCall<'a>
-    where  {
+pub struct AccountProvisionAccountTicketCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProvisionAccountTicketCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProvisionAccountTicketCall<'a, S> {}
 
-impl<'a> AccountProvisionAccountTicketCall<'a> {
+impl<'a, S> AccountProvisionAccountTicketCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7824,7 +7931,7 @@ impl<'a> AccountProvisionAccountTicketCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7834,7 +7941,7 @@ impl<'a> AccountProvisionAccountTicketCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProvisionAccountTicketCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProvisionAccountTicketCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7859,7 +7966,7 @@ impl<'a> AccountProvisionAccountTicketCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProvisionAccountTicketCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProvisionAccountTicketCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7879,9 +7986,9 @@ impl<'a> AccountProvisionAccountTicketCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProvisionAccountTicketCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProvisionAccountTicketCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7914,7 +8021,7 @@ impl<'a> AccountProvisionAccountTicketCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7927,10 +8034,10 @@ impl<'a> AccountProvisionAccountTicketCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountSearchChangeHistoryEventCall<'a>
-    where  {
+pub struct AccountSearchChangeHistoryEventCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest,
     _account: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7938,9 +8045,15 @@ pub struct AccountSearchChangeHistoryEventCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountSearchChangeHistoryEventCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountSearchChangeHistoryEventCall<'a, S> {}
 
-impl<'a> AccountSearchChangeHistoryEventCall<'a> {
+impl<'a, S> AccountSearchChangeHistoryEventCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8100,7 +8213,7 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest) -> AccountSearchChangeHistoryEventCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest) -> AccountSearchChangeHistoryEventCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8110,7 +8223,7 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountSearchChangeHistoryEventCall<'a> {
+    pub fn account(mut self, new_value: &str) -> AccountSearchChangeHistoryEventCall<'a, S> {
         self._account = new_value.to_string();
         self
     }
@@ -8120,7 +8233,7 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSearchChangeHistoryEventCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSearchChangeHistoryEventCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8145,7 +8258,7 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountSearchChangeHistoryEventCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountSearchChangeHistoryEventCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8165,9 +8278,9 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountSearchChangeHistoryEventCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountSearchChangeHistoryEventCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8200,7 +8313,7 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8213,10 +8326,10 @@ impl<'a> AccountSearchChangeHistoryEventCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyConversionEventCreateCall<'a>
-    where  {
+pub struct PropertyConversionEventCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaConversionEvent,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8224,9 +8337,15 @@ pub struct PropertyConversionEventCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyConversionEventCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyConversionEventCreateCall<'a, S> {}
 
-impl<'a> PropertyConversionEventCreateCall<'a> {
+impl<'a, S> PropertyConversionEventCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8386,7 +8505,7 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaConversionEvent) -> PropertyConversionEventCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaConversionEvent) -> PropertyConversionEventCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8396,7 +8515,7 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyConversionEventCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyConversionEventCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8406,7 +8525,7 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8431,7 +8550,7 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8451,9 +8570,9 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyConversionEventCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyConversionEventCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8485,7 +8604,7 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8493,19 +8612,25 @@ impl<'a> PropertyConversionEventCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyConversionEventDeleteCall<'a>
-    where  {
+pub struct PropertyConversionEventDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyConversionEventDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyConversionEventDeleteCall<'a, S> {}
 
-impl<'a> PropertyConversionEventDeleteCall<'a> {
+impl<'a, S> PropertyConversionEventDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8652,7 +8777,7 @@ impl<'a> PropertyConversionEventDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyConversionEventDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyConversionEventDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8662,7 +8787,7 @@ impl<'a> PropertyConversionEventDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8687,7 +8812,7 @@ impl<'a> PropertyConversionEventDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8707,9 +8832,9 @@ impl<'a> PropertyConversionEventDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyConversionEventDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyConversionEventDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8741,7 +8866,7 @@ impl<'a> PropertyConversionEventDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8749,19 +8874,25 @@ impl<'a> PropertyConversionEventDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyConversionEventGetCall<'a>
-    where  {
+pub struct PropertyConversionEventGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyConversionEventGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyConversionEventGetCall<'a, S> {}
 
-impl<'a> PropertyConversionEventGetCall<'a> {
+impl<'a, S> PropertyConversionEventGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8908,7 +9039,7 @@ impl<'a> PropertyConversionEventGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyConversionEventGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyConversionEventGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8918,7 +9049,7 @@ impl<'a> PropertyConversionEventGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8943,7 +9074,7 @@ impl<'a> PropertyConversionEventGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8963,9 +9094,9 @@ impl<'a> PropertyConversionEventGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyConversionEventGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyConversionEventGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8997,7 +9128,7 @@ impl<'a> PropertyConversionEventGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9007,10 +9138,10 @@ impl<'a> PropertyConversionEventGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyConversionEventListCall<'a>
-    where  {
+pub struct PropertyConversionEventListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9019,9 +9150,15 @@ pub struct PropertyConversionEventListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyConversionEventListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyConversionEventListCall<'a, S> {}
 
-impl<'a> PropertyConversionEventListCall<'a> {
+impl<'a, S> PropertyConversionEventListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9174,21 +9311,21 @@ impl<'a> PropertyConversionEventListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyConversionEventListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyConversionEventListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListConversionEvents` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListConversionEvents` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyConversionEventListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyConversionEventListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyConversionEventListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyConversionEventListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -9198,7 +9335,7 @@ impl<'a> PropertyConversionEventListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyConversionEventListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9223,7 +9360,7 @@ impl<'a> PropertyConversionEventListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyConversionEventListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9243,9 +9380,9 @@ impl<'a> PropertyConversionEventListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyConversionEventListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyConversionEventListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9278,7 +9415,7 @@ impl<'a> PropertyConversionEventListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9291,10 +9428,10 @@ impl<'a> PropertyConversionEventListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomDimensionArchiveCall<'a>
-    where  {
+pub struct PropertyCustomDimensionArchiveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9302,9 +9439,15 @@ pub struct PropertyCustomDimensionArchiveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomDimensionArchiveCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomDimensionArchiveCall<'a, S> {}
 
-impl<'a> PropertyCustomDimensionArchiveCall<'a> {
+impl<'a, S> PropertyCustomDimensionArchiveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9464,7 +9607,7 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest) -> PropertyCustomDimensionArchiveCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaArchiveCustomDimensionRequest) -> PropertyCustomDimensionArchiveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9474,7 +9617,7 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyCustomDimensionArchiveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyCustomDimensionArchiveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9484,7 +9627,7 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionArchiveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionArchiveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9509,7 +9652,7 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionArchiveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionArchiveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9529,9 +9672,9 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomDimensionArchiveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomDimensionArchiveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9564,7 +9707,7 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9577,10 +9720,10 @@ impl<'a> PropertyCustomDimensionArchiveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomDimensionCreateCall<'a>
-    where  {
+pub struct PropertyCustomDimensionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaCustomDimension,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9588,9 +9731,15 @@ pub struct PropertyCustomDimensionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomDimensionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomDimensionCreateCall<'a, S> {}
 
-impl<'a> PropertyCustomDimensionCreateCall<'a> {
+impl<'a, S> PropertyCustomDimensionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9750,7 +9899,7 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomDimension) -> PropertyCustomDimensionCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomDimension) -> PropertyCustomDimensionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9760,7 +9909,7 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyCustomDimensionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyCustomDimensionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -9770,7 +9919,7 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9795,7 +9944,7 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9815,9 +9964,9 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomDimensionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomDimensionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9849,7 +9998,7 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9857,19 +10006,25 @@ impl<'a> PropertyCustomDimensionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomDimensionGetCall<'a>
-    where  {
+pub struct PropertyCustomDimensionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomDimensionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomDimensionGetCall<'a, S> {}
 
-impl<'a> PropertyCustomDimensionGetCall<'a> {
+impl<'a, S> PropertyCustomDimensionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10016,7 +10171,7 @@ impl<'a> PropertyCustomDimensionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyCustomDimensionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyCustomDimensionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10026,7 +10181,7 @@ impl<'a> PropertyCustomDimensionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10051,7 +10206,7 @@ impl<'a> PropertyCustomDimensionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10071,9 +10226,9 @@ impl<'a> PropertyCustomDimensionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomDimensionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomDimensionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10105,7 +10260,7 @@ impl<'a> PropertyCustomDimensionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10115,10 +10270,10 @@ impl<'a> PropertyCustomDimensionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomDimensionListCall<'a>
-    where  {
+pub struct PropertyCustomDimensionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10127,9 +10282,15 @@ pub struct PropertyCustomDimensionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomDimensionListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomDimensionListCall<'a, S> {}
 
-impl<'a> PropertyCustomDimensionListCall<'a> {
+impl<'a, S> PropertyCustomDimensionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10282,21 +10443,21 @@ impl<'a> PropertyCustomDimensionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyCustomDimensionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyCustomDimensionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListCustomDimensions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCustomDimensions` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyCustomDimensionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyCustomDimensionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyCustomDimensionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyCustomDimensionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -10306,7 +10467,7 @@ impl<'a> PropertyCustomDimensionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10331,7 +10492,7 @@ impl<'a> PropertyCustomDimensionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10351,9 +10512,9 @@ impl<'a> PropertyCustomDimensionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomDimensionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomDimensionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10386,7 +10547,7 @@ impl<'a> PropertyCustomDimensionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10400,10 +10561,10 @@ impl<'a> PropertyCustomDimensionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomDimensionPatchCall<'a>
-    where  {
+pub struct PropertyCustomDimensionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaCustomDimension,
     _name: String,
     _update_mask: Option<String>,
@@ -10412,9 +10573,15 @@ pub struct PropertyCustomDimensionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomDimensionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomDimensionPatchCall<'a, S> {}
 
-impl<'a> PropertyCustomDimensionPatchCall<'a> {
+impl<'a, S> PropertyCustomDimensionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10577,7 +10744,7 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomDimension) -> PropertyCustomDimensionPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomDimension) -> PropertyCustomDimensionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10587,14 +10754,14 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyCustomDimensionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyCustomDimensionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyCustomDimensionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyCustomDimensionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10604,7 +10771,7 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomDimensionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10629,7 +10796,7 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomDimensionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10649,9 +10816,9 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomDimensionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomDimensionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10684,7 +10851,7 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10697,10 +10864,10 @@ impl<'a> PropertyCustomDimensionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomMetricArchiveCall<'a>
-    where  {
+pub struct PropertyCustomMetricArchiveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10708,9 +10875,15 @@ pub struct PropertyCustomMetricArchiveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomMetricArchiveCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomMetricArchiveCall<'a, S> {}
 
-impl<'a> PropertyCustomMetricArchiveCall<'a> {
+impl<'a, S> PropertyCustomMetricArchiveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10870,7 +11043,7 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest) -> PropertyCustomMetricArchiveCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaArchiveCustomMetricRequest) -> PropertyCustomMetricArchiveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10880,7 +11053,7 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyCustomMetricArchiveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyCustomMetricArchiveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10890,7 +11063,7 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricArchiveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricArchiveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10915,7 +11088,7 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricArchiveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricArchiveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10935,9 +11108,9 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomMetricArchiveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomMetricArchiveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10970,7 +11143,7 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10983,10 +11156,10 @@ impl<'a> PropertyCustomMetricArchiveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomMetricCreateCall<'a>
-    where  {
+pub struct PropertyCustomMetricCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaCustomMetric,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10994,9 +11167,15 @@ pub struct PropertyCustomMetricCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomMetricCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomMetricCreateCall<'a, S> {}
 
-impl<'a> PropertyCustomMetricCreateCall<'a> {
+impl<'a, S> PropertyCustomMetricCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11156,7 +11335,7 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomMetric) -> PropertyCustomMetricCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomMetric) -> PropertyCustomMetricCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11166,7 +11345,7 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyCustomMetricCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyCustomMetricCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -11176,7 +11355,7 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11201,7 +11380,7 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11221,9 +11400,9 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomMetricCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomMetricCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11255,7 +11434,7 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11263,19 +11442,25 @@ impl<'a> PropertyCustomMetricCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomMetricGetCall<'a>
-    where  {
+pub struct PropertyCustomMetricGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomMetricGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomMetricGetCall<'a, S> {}
 
-impl<'a> PropertyCustomMetricGetCall<'a> {
+impl<'a, S> PropertyCustomMetricGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11422,7 +11607,7 @@ impl<'a> PropertyCustomMetricGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyCustomMetricGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyCustomMetricGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11432,7 +11617,7 @@ impl<'a> PropertyCustomMetricGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11457,7 +11642,7 @@ impl<'a> PropertyCustomMetricGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11477,9 +11662,9 @@ impl<'a> PropertyCustomMetricGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomMetricGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomMetricGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11511,7 +11696,7 @@ impl<'a> PropertyCustomMetricGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11521,10 +11706,10 @@ impl<'a> PropertyCustomMetricGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomMetricListCall<'a>
-    where  {
+pub struct PropertyCustomMetricListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11533,9 +11718,15 @@ pub struct PropertyCustomMetricListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomMetricListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomMetricListCall<'a, S> {}
 
-impl<'a> PropertyCustomMetricListCall<'a> {
+impl<'a, S> PropertyCustomMetricListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11688,21 +11879,21 @@ impl<'a> PropertyCustomMetricListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyCustomMetricListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyCustomMetricListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListCustomMetrics` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCustomMetrics` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyCustomMetricListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyCustomMetricListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyCustomMetricListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyCustomMetricListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -11712,7 +11903,7 @@ impl<'a> PropertyCustomMetricListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11737,7 +11928,7 @@ impl<'a> PropertyCustomMetricListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11757,9 +11948,9 @@ impl<'a> PropertyCustomMetricListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomMetricListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomMetricListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11792,7 +11983,7 @@ impl<'a> PropertyCustomMetricListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11806,10 +11997,10 @@ impl<'a> PropertyCustomMetricListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCustomMetricPatchCall<'a>
-    where  {
+pub struct PropertyCustomMetricPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaCustomMetric,
     _name: String,
     _update_mask: Option<String>,
@@ -11818,9 +12009,15 @@ pub struct PropertyCustomMetricPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCustomMetricPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCustomMetricPatchCall<'a, S> {}
 
-impl<'a> PropertyCustomMetricPatchCall<'a> {
+impl<'a, S> PropertyCustomMetricPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11983,7 +12180,7 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomMetric) -> PropertyCustomMetricPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCustomMetric) -> PropertyCustomMetricPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11993,14 +12190,14 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyCustomMetricPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyCustomMetricPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyCustomMetricPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyCustomMetricPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12010,7 +12207,7 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCustomMetricPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12035,7 +12232,7 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCustomMetricPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12055,9 +12252,9 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCustomMetricPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCustomMetricPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12090,7 +12287,7 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12103,10 +12300,10 @@ impl<'a> PropertyCustomMetricPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamMeasurementProtocolSecretCreateCall<'a>
-    where  {
+pub struct PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12114,9 +12311,15 @@ pub struct PropertyDataStreamMeasurementProtocolSecretCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S> {}
 
-impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
+impl<'a, S> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12276,7 +12479,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12286,7 +12489,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12296,7 +12499,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12321,7 +12524,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12341,9 +12544,9 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12375,7 +12578,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12383,19 +12586,25 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a>
-    where  {
+pub struct PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S> {}
 
-impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
+impl<'a, S> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12542,7 +12751,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12552,7 +12761,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12577,7 +12786,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12597,9 +12806,9 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12631,7 +12840,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12639,19 +12848,25 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamMeasurementProtocolSecretGetCall<'a>
-    where  {
+pub struct PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S> {}
 
-impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
+impl<'a, S> PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12798,7 +13013,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12808,7 +13023,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12833,7 +13048,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12853,9 +13068,9 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12887,7 +13102,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12897,10 +13112,10 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamMeasurementProtocolSecretListCall<'a>
-    where  {
+pub struct PropertyDataStreamMeasurementProtocolSecretListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12909,9 +13124,15 @@ pub struct PropertyDataStreamMeasurementProtocolSecretListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretListCall<'a, S> {}
 
-impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
+impl<'a, S> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13064,21 +13285,21 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListMeasurementProtocolSecrets` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListMeasurementProtocolSecrets` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 10 resources will be returned. The maximum value is 10. Higher values will be coerced to the maximum.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -13088,7 +13309,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13113,7 +13334,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13133,9 +13354,9 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13168,7 +13389,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13182,10 +13403,10 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamMeasurementProtocolSecretPatchCall<'a>
-    where  {
+pub struct PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret,
     _name: String,
     _update_mask: Option<String>,
@@ -13194,9 +13415,15 @@ pub struct PropertyDataStreamMeasurementProtocolSecretPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S> {}
 
-impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
+impl<'a, S> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13359,7 +13586,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13369,14 +13596,14 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The list of fields to be updated. Omitted fields will not be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -13386,7 +13613,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13411,7 +13638,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13431,9 +13658,9 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13466,7 +13693,7 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13479,10 +13706,10 @@ impl<'a> PropertyDataStreamMeasurementProtocolSecretPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamCreateCall<'a>
-    where  {
+pub struct PropertyDataStreamCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaDataStream,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13490,9 +13717,15 @@ pub struct PropertyDataStreamCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamCreateCall<'a, S> {}
 
-impl<'a> PropertyDataStreamCreateCall<'a> {
+impl<'a, S> PropertyDataStreamCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13652,7 +13885,7 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDataStream) -> PropertyDataStreamCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDataStream) -> PropertyDataStreamCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13662,7 +13895,7 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -13672,7 +13905,7 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13697,7 +13930,7 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13717,9 +13950,9 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13751,7 +13984,7 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13759,19 +13992,25 @@ impl<'a> PropertyDataStreamCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamDeleteCall<'a>
-    where  {
+pub struct PropertyDataStreamDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamDeleteCall<'a, S> {}
 
-impl<'a> PropertyDataStreamDeleteCall<'a> {
+impl<'a, S> PropertyDataStreamDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13918,7 +14157,7 @@ impl<'a> PropertyDataStreamDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13928,7 +14167,7 @@ impl<'a> PropertyDataStreamDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13953,7 +14192,7 @@ impl<'a> PropertyDataStreamDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13973,9 +14212,9 @@ impl<'a> PropertyDataStreamDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14007,7 +14246,7 @@ impl<'a> PropertyDataStreamDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14015,19 +14254,25 @@ impl<'a> PropertyDataStreamDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamGetCall<'a>
-    where  {
+pub struct PropertyDataStreamGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamGetCall<'a, S> {}
 
-impl<'a> PropertyDataStreamGetCall<'a> {
+impl<'a, S> PropertyDataStreamGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14174,7 +14419,7 @@ impl<'a> PropertyDataStreamGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14184,7 +14429,7 @@ impl<'a> PropertyDataStreamGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14209,7 +14454,7 @@ impl<'a> PropertyDataStreamGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14229,9 +14474,9 @@ impl<'a> PropertyDataStreamGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14263,7 +14508,7 @@ impl<'a> PropertyDataStreamGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14271,19 +14516,25 @@ impl<'a> PropertyDataStreamGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamGetGlobalSiteTagCall<'a>
-    where  {
+pub struct PropertyDataStreamGetGlobalSiteTagCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamGetGlobalSiteTagCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamGetGlobalSiteTagCall<'a, S> {}
 
-impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
+impl<'a, S> PropertyDataStreamGetGlobalSiteTagCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14430,7 +14681,7 @@ impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamGetGlobalSiteTagCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamGetGlobalSiteTagCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14440,7 +14691,7 @@ impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamGetGlobalSiteTagCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamGetGlobalSiteTagCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14465,7 +14716,7 @@ impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamGetGlobalSiteTagCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamGetGlobalSiteTagCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14485,9 +14736,9 @@ impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamGetGlobalSiteTagCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamGetGlobalSiteTagCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14519,7 +14770,7 @@ impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14529,10 +14780,10 @@ impl<'a> PropertyDataStreamGetGlobalSiteTagCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamListCall<'a>
-    where  {
+pub struct PropertyDataStreamListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14541,9 +14792,15 @@ pub struct PropertyDataStreamListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamListCall<'a, S> {}
 
-impl<'a> PropertyDataStreamListCall<'a> {
+impl<'a, S> PropertyDataStreamListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14696,21 +14953,21 @@ impl<'a> PropertyDataStreamListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDataStreamListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListDataStreams` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDataStreams` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyDataStreamListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyDataStreamListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyDataStreamListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyDataStreamListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14720,7 +14977,7 @@ impl<'a> PropertyDataStreamListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14745,7 +15002,7 @@ impl<'a> PropertyDataStreamListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14765,9 +15022,9 @@ impl<'a> PropertyDataStreamListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14800,7 +15057,7 @@ impl<'a> PropertyDataStreamListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14814,10 +15071,10 @@ impl<'a> PropertyDataStreamListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDataStreamPatchCall<'a>
-    where  {
+pub struct PropertyDataStreamPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaDataStream,
     _name: String,
     _update_mask: Option<String>,
@@ -14826,9 +15083,15 @@ pub struct PropertyDataStreamPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDataStreamPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDataStreamPatchCall<'a, S> {}
 
-impl<'a> PropertyDataStreamPatchCall<'a> {
+impl<'a, S> PropertyDataStreamPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14991,7 +15254,7 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDataStream) -> PropertyDataStreamPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDataStream) -> PropertyDataStreamPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15001,14 +15264,14 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDataStreamPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDataStreamPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyDataStreamPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyDataStreamPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15018,7 +15281,7 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDataStreamPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15043,7 +15306,7 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDataStreamPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15063,9 +15326,9 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDataStreamPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDataStreamPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15098,7 +15361,7 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15111,10 +15374,10 @@ impl<'a> PropertyDataStreamPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15122,9 +15385,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15284,7 +15553,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaApproveDisplayVideo360AdvertiserLinkProposalRequest) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15294,7 +15563,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15304,7 +15573,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15329,7 +15598,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15349,9 +15618,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15384,7 +15653,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15397,10 +15666,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalApproveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15408,9 +15677,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15570,7 +15845,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaCancelDisplayVideo360AdvertiserLinkProposalRequest) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15580,7 +15855,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15590,7 +15865,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15615,7 +15890,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15635,9 +15910,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15670,7 +15945,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15683,10 +15958,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15694,9 +15969,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15856,7 +16137,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15866,7 +16147,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -15876,7 +16157,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15901,7 +16182,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15921,9 +16202,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15955,7 +16236,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15963,19 +16244,25 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16122,7 +16409,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16132,7 +16419,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16157,7 +16444,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16177,9 +16464,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16211,7 +16498,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16219,19 +16506,25 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16378,7 +16671,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16388,7 +16681,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16413,7 +16706,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16433,9 +16726,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16467,7 +16760,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16477,10 +16770,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16489,9 +16782,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16644,21 +16943,21 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListDisplayVideo360AdvertiserLinkProposals` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDisplayVideo360AdvertiserLinkProposals` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16668,7 +16967,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16693,7 +16992,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16713,9 +17012,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16748,7 +17047,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16761,10 +17060,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkProposalListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkCreateCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16772,9 +17071,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16934,7 +17239,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16944,7 +17249,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -16954,7 +17259,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16979,7 +17284,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16999,9 +17304,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17033,7 +17338,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17041,19 +17346,25 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17200,7 +17511,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17210,7 +17521,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17235,7 +17546,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17255,9 +17566,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17289,7 +17600,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17297,19 +17608,25 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkGetCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17456,7 +17773,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17466,7 +17783,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17491,7 +17808,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17511,9 +17828,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17545,7 +17862,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17555,10 +17872,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkListCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -17567,9 +17884,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkListCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17722,21 +18045,21 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListDisplayVideo360AdvertiserLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDisplayVideo360AdvertiserLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -17746,7 +18069,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17771,7 +18094,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17791,9 +18114,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17826,7 +18149,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17840,10 +18163,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDisplayVideo360AdvertiserLinkPatchCall<'a>
-    where  {
+pub struct PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink,
     _name: String,
     _update_mask: Option<String>,
@@ -17852,9 +18175,15 @@ pub struct PropertyDisplayVideo360AdvertiserLinkPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S> {}
 
-impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
+impl<'a, S> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18017,7 +18346,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18027,14 +18356,14 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -18044,7 +18373,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18069,7 +18398,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18089,9 +18418,9 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18124,7 +18453,7 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18137,10 +18466,10 @@ impl<'a> PropertyDisplayVideo360AdvertiserLinkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkCreateCall<'a>
-    where  {
+pub struct PropertyFirebaseLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaFirebaseLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18148,9 +18477,15 @@ pub struct PropertyFirebaseLinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyFirebaseLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyFirebaseLinkCreateCall<'a, S> {}
 
-impl<'a> PropertyFirebaseLinkCreateCall<'a> {
+impl<'a, S> PropertyFirebaseLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18310,7 +18645,7 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaFirebaseLink) -> PropertyFirebaseLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaFirebaseLink) -> PropertyFirebaseLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18320,7 +18655,7 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -18330,7 +18665,7 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18355,7 +18690,7 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18375,9 +18710,9 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyFirebaseLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18409,7 +18744,7 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18417,19 +18752,25 @@ impl<'a> PropertyFirebaseLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkDeleteCall<'a>
-    where  {
+pub struct PropertyFirebaseLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyFirebaseLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyFirebaseLinkDeleteCall<'a, S> {}
 
-impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
+impl<'a, S> PropertyFirebaseLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18576,7 +18917,7 @@ impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyFirebaseLinkDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyFirebaseLinkDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18586,7 +18927,7 @@ impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18611,7 +18952,7 @@ impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18631,9 +18972,9 @@ impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyFirebaseLinkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18665,7 +19006,7 @@ impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18675,10 +19016,10 @@ impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkListCall<'a>
-    where  {
+pub struct PropertyFirebaseLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18687,9 +19028,15 @@ pub struct PropertyFirebaseLinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyFirebaseLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyFirebaseLinkListCall<'a, S> {}
 
-impl<'a> PropertyFirebaseLinkListCall<'a> {
+impl<'a, S> PropertyFirebaseLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18842,21 +19189,21 @@ impl<'a> PropertyFirebaseLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListFirebaseLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProperties` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyFirebaseLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyFirebaseLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -18866,7 +19213,7 @@ impl<'a> PropertyFirebaseLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18891,7 +19238,7 @@ impl<'a> PropertyFirebaseLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18911,9 +19258,9 @@ impl<'a> PropertyFirebaseLinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyFirebaseLinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18946,7 +19293,7 @@ impl<'a> PropertyFirebaseLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18959,10 +19306,10 @@ impl<'a> PropertyFirebaseLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkCreateCall<'a>
-    where  {
+pub struct PropertyGoogleAdsLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaGoogleAdsLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18970,9 +19317,15 @@ pub struct PropertyGoogleAdsLinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGoogleAdsLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGoogleAdsLinkCreateCall<'a, S> {}
 
-impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
+impl<'a, S> PropertyGoogleAdsLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19132,7 +19485,7 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19142,7 +19495,7 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -19152,7 +19505,7 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19177,7 +19530,7 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19197,9 +19550,9 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGoogleAdsLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19231,7 +19584,7 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19239,19 +19592,25 @@ impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkDeleteCall<'a>
-    where  {
+pub struct PropertyGoogleAdsLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGoogleAdsLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGoogleAdsLinkDeleteCall<'a, S> {}
 
-impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
+impl<'a, S> PropertyGoogleAdsLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19398,7 +19757,7 @@ impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19408,7 +19767,7 @@ impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19433,7 +19792,7 @@ impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19453,9 +19812,9 @@ impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGoogleAdsLinkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19487,7 +19846,7 @@ impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19497,10 +19856,10 @@ impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkListCall<'a>
-    where  {
+pub struct PropertyGoogleAdsLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -19509,9 +19868,15 @@ pub struct PropertyGoogleAdsLinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGoogleAdsLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGoogleAdsLinkListCall<'a, S> {}
 
-impl<'a> PropertyGoogleAdsLinkListCall<'a> {
+impl<'a, S> PropertyGoogleAdsLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19664,21 +20029,21 @@ impl<'a> PropertyGoogleAdsLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListGoogleAdsLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListGoogleAdsLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyGoogleAdsLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyGoogleAdsLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -19688,7 +20053,7 @@ impl<'a> PropertyGoogleAdsLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19713,7 +20078,7 @@ impl<'a> PropertyGoogleAdsLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19733,9 +20098,9 @@ impl<'a> PropertyGoogleAdsLinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGoogleAdsLinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19768,7 +20133,7 @@ impl<'a> PropertyGoogleAdsLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19782,10 +20147,10 @@ impl<'a> PropertyGoogleAdsLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkPatchCall<'a>
-    where  {
+pub struct PropertyGoogleAdsLinkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaGoogleAdsLink,
     _name: String,
     _update_mask: Option<String>,
@@ -19794,9 +20159,15 @@ pub struct PropertyGoogleAdsLinkPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGoogleAdsLinkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGoogleAdsLinkPatchCall<'a, S> {}
 
-impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
+impl<'a, S> PropertyGoogleAdsLinkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19959,7 +20330,7 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19969,14 +20340,14 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -19986,7 +20357,7 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20011,7 +20382,7 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20031,9 +20402,9 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGoogleAdsLinkPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20066,7 +20437,7 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20079,10 +20450,10 @@ impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkAuditCall<'a>
-    where  {
+pub struct PropertyUserLinkAuditCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20090,9 +20461,15 @@ pub struct PropertyUserLinkAuditCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkAuditCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkAuditCall<'a, S> {}
 
-impl<'a> PropertyUserLinkAuditCall<'a> {
+impl<'a, S> PropertyUserLinkAuditCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20252,7 +20629,7 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> PropertyUserLinkAuditCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> PropertyUserLinkAuditCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20262,7 +20639,7 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkAuditCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkAuditCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -20272,7 +20649,7 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkAuditCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkAuditCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20297,7 +20674,7 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkAuditCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkAuditCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20317,9 +20694,9 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkAuditCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkAuditCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20352,7 +20729,7 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20365,10 +20742,10 @@ impl<'a> PropertyUserLinkAuditCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchCreateCall<'a>
-    where  {
+pub struct PropertyUserLinkBatchCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20376,9 +20753,15 @@ pub struct PropertyUserLinkBatchCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkBatchCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkBatchCreateCall<'a, S> {}
 
-impl<'a> PropertyUserLinkBatchCreateCall<'a> {
+impl<'a, S> PropertyUserLinkBatchCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20538,7 +20921,7 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> PropertyUserLinkBatchCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> PropertyUserLinkBatchCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20548,7 +20931,7 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -20558,7 +20941,7 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20583,7 +20966,7 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20603,9 +20986,9 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkBatchCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20638,7 +21021,7 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20651,10 +21034,10 @@ impl<'a> PropertyUserLinkBatchCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchDeleteCall<'a>
-    where  {
+pub struct PropertyUserLinkBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20662,9 +21045,15 @@ pub struct PropertyUserLinkBatchDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkBatchDeleteCall<'a, S> {}
 
-impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
+impl<'a, S> PropertyUserLinkBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20824,7 +21213,7 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> PropertyUserLinkBatchDeleteCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> PropertyUserLinkBatchDeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20834,7 +21223,7 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -20844,7 +21233,7 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20869,7 +21258,7 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20889,9 +21278,9 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20923,7 +21312,7 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20932,10 +21321,10 @@ impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchGetCall<'a>
-    where  {
+pub struct PropertyUserLinkBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20943,9 +21332,15 @@ pub struct PropertyUserLinkBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkBatchGetCall<'a, S> {}
 
-impl<'a> PropertyUserLinkBatchGetCall<'a> {
+impl<'a, S> PropertyUserLinkBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21097,7 +21492,7 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21105,7 +21500,7 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -21115,7 +21510,7 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21140,7 +21535,7 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21160,9 +21555,9 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21195,7 +21590,7 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21208,10 +21603,10 @@ impl<'a> PropertyUserLinkBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchUpdateCall<'a>
-    where  {
+pub struct PropertyUserLinkBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21219,9 +21614,15 @@ pub struct PropertyUserLinkBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkBatchUpdateCall<'a, S> {}
 
-impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
+impl<'a, S> PropertyUserLinkBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21381,7 +21782,7 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> PropertyUserLinkBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> PropertyUserLinkBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21391,7 +21792,7 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchUpdateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchUpdateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21401,7 +21802,7 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21426,7 +21827,7 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21446,9 +21847,9 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21481,7 +21882,7 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21495,10 +21896,10 @@ impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkCreateCall<'a>
-    where  {
+pub struct PropertyUserLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _parent: String,
     _notify_new_user: Option<bool>,
@@ -21507,9 +21908,15 @@ pub struct PropertyUserLinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkCreateCall<'a, S> {}
 
-impl<'a> PropertyUserLinkCreateCall<'a> {
+impl<'a, S> PropertyUserLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21672,7 +22079,7 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21682,14 +22089,14 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If set, then email the new user notifying them that they've been granted permissions to the resource.
     ///
     /// Sets the *notify new user* query property to the given value.
-    pub fn notify_new_user(mut self, new_value: bool) -> PropertyUserLinkCreateCall<'a> {
+    pub fn notify_new_user(mut self, new_value: bool) -> PropertyUserLinkCreateCall<'a, S> {
         self._notify_new_user = Some(new_value);
         self
     }
@@ -21699,7 +22106,7 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21724,7 +22131,7 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21744,9 +22151,9 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21778,7 +22185,7 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21786,19 +22193,25 @@ impl<'a> PropertyUserLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkDeleteCall<'a>
-    where  {
+pub struct PropertyUserLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkDeleteCall<'a, S> {}
 
-impl<'a> PropertyUserLinkDeleteCall<'a> {
+impl<'a, S> PropertyUserLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21945,7 +22358,7 @@ impl<'a> PropertyUserLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUserLinkDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyUserLinkDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -21955,7 +22368,7 @@ impl<'a> PropertyUserLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21980,7 +22393,7 @@ impl<'a> PropertyUserLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22000,9 +22413,9 @@ impl<'a> PropertyUserLinkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22034,7 +22447,7 @@ impl<'a> PropertyUserLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22042,19 +22455,25 @@ impl<'a> PropertyUserLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkGetCall<'a>
-    where  {
+pub struct PropertyUserLinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkGetCall<'a, S> {}
 
-impl<'a> PropertyUserLinkGetCall<'a> {
+impl<'a, S> PropertyUserLinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22201,7 +22620,7 @@ impl<'a> PropertyUserLinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUserLinkGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyUserLinkGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22211,7 +22630,7 @@ impl<'a> PropertyUserLinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22236,7 +22655,7 @@ impl<'a> PropertyUserLinkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22256,9 +22675,9 @@ impl<'a> PropertyUserLinkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22290,7 +22709,7 @@ impl<'a> PropertyUserLinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22300,10 +22719,10 @@ impl<'a> PropertyUserLinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkListCall<'a>
-    where  {
+pub struct PropertyUserLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -22312,9 +22731,15 @@ pub struct PropertyUserLinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkListCall<'a, S> {}
 
-impl<'a> PropertyUserLinkListCall<'a> {
+impl<'a, S> PropertyUserLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22467,21 +22892,21 @@ impl<'a> PropertyUserLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListUserLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListUserLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyUserLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyUserLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of user links to return. The service may return fewer than this value. If unspecified, at most 200 user links will be returned. The maximum value is 500; values above 500 will be coerced to 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyUserLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyUserLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -22491,7 +22916,7 @@ impl<'a> PropertyUserLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22516,7 +22941,7 @@ impl<'a> PropertyUserLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22536,9 +22961,9 @@ impl<'a> PropertyUserLinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22571,7 +22996,7 @@ impl<'a> PropertyUserLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22584,10 +23009,10 @@ impl<'a> PropertyUserLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkPatchCall<'a>
-    where  {
+pub struct PropertyUserLinkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22595,9 +23020,15 @@ pub struct PropertyUserLinkPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUserLinkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUserLinkPatchCall<'a, S> {}
 
-impl<'a> PropertyUserLinkPatchCall<'a> {
+impl<'a, S> PropertyUserLinkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22757,7 +23188,7 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22767,7 +23198,7 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUserLinkPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyUserLinkPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22777,7 +23208,7 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22802,7 +23233,7 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22822,9 +23253,9 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUserLinkPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22857,7 +23288,7 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22870,10 +23301,10 @@ impl<'a> PropertyUserLinkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyAcknowledgeUserDataCollectionCall<'a>
-    where  {
+pub struct PropertyAcknowledgeUserDataCollectionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest,
     _property: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22881,9 +23312,15 @@ pub struct PropertyAcknowledgeUserDataCollectionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyAcknowledgeUserDataCollectionCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyAcknowledgeUserDataCollectionCall<'a, S> {}
 
-impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
+impl<'a, S> PropertyAcknowledgeUserDataCollectionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23043,7 +23480,7 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest) -> PropertyAcknowledgeUserDataCollectionCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAcknowledgeUserDataCollectionRequest) -> PropertyAcknowledgeUserDataCollectionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23053,7 +23490,7 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn property(mut self, new_value: &str) -> PropertyAcknowledgeUserDataCollectionCall<'a> {
+    pub fn property(mut self, new_value: &str) -> PropertyAcknowledgeUserDataCollectionCall<'a, S> {
         self._property = new_value.to_string();
         self
     }
@@ -23063,7 +23500,7 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAcknowledgeUserDataCollectionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAcknowledgeUserDataCollectionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23088,7 +23525,7 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyAcknowledgeUserDataCollectionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyAcknowledgeUserDataCollectionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23108,9 +23545,9 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAcknowledgeUserDataCollectionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyAcknowledgeUserDataCollectionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23143,7 +23580,7 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23156,19 +23593,25 @@ impl<'a> PropertyAcknowledgeUserDataCollectionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCreateCall<'a>
-    where  {
+pub struct PropertyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaProperty,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyCreateCall<'a, S> {}
 
-impl<'a> PropertyCreateCall<'a> {
+impl<'a, S> PropertyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23302,7 +23745,7 @@ impl<'a> PropertyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23312,7 +23755,7 @@ impl<'a> PropertyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23337,7 +23780,7 @@ impl<'a> PropertyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23357,9 +23800,9 @@ impl<'a> PropertyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23391,7 +23834,7 @@ impl<'a> PropertyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23399,19 +23842,25 @@ impl<'a> PropertyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDeleteCall<'a>
-    where  {
+pub struct PropertyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyDeleteCall<'a, S> {}
 
-impl<'a> PropertyDeleteCall<'a> {
+impl<'a, S> PropertyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23558,7 +24007,7 @@ impl<'a> PropertyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -23568,7 +24017,7 @@ impl<'a> PropertyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23593,7 +24042,7 @@ impl<'a> PropertyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23613,9 +24062,9 @@ impl<'a> PropertyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23647,7 +24096,7 @@ impl<'a> PropertyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23655,19 +24104,25 @@ impl<'a> PropertyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGetCall<'a>
-    where  {
+pub struct PropertyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGetCall<'a, S> {}
 
-impl<'a> PropertyGetCall<'a> {
+impl<'a, S> PropertyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23814,7 +24269,7 @@ impl<'a> PropertyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -23824,7 +24279,7 @@ impl<'a> PropertyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23849,7 +24304,7 @@ impl<'a> PropertyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23869,9 +24324,9 @@ impl<'a> PropertyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23903,7 +24358,7 @@ impl<'a> PropertyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23911,19 +24366,25 @@ impl<'a> PropertyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGetDataRetentionSettingCall<'a>
-    where  {
+pub struct PropertyGetDataRetentionSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGetDataRetentionSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGetDataRetentionSettingCall<'a, S> {}
 
-impl<'a> PropertyGetDataRetentionSettingCall<'a> {
+impl<'a, S> PropertyGetDataRetentionSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24070,7 +24531,7 @@ impl<'a> PropertyGetDataRetentionSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGetDataRetentionSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyGetDataRetentionSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -24080,7 +24541,7 @@ impl<'a> PropertyGetDataRetentionSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetDataRetentionSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetDataRetentionSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24105,7 +24566,7 @@ impl<'a> PropertyGetDataRetentionSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetDataRetentionSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetDataRetentionSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24125,9 +24586,9 @@ impl<'a> PropertyGetDataRetentionSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetDataRetentionSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGetDataRetentionSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24159,7 +24620,7 @@ impl<'a> PropertyGetDataRetentionSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24167,19 +24628,25 @@ impl<'a> PropertyGetDataRetentionSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGetGoogleSignalsSettingCall<'a>
-    where  {
+pub struct PropertyGetGoogleSignalsSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyGetGoogleSignalsSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyGetGoogleSignalsSettingCall<'a, S> {}
 
-impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
+impl<'a, S> PropertyGetGoogleSignalsSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24326,7 +24793,7 @@ impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGetGoogleSignalsSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyGetGoogleSignalsSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -24336,7 +24803,7 @@ impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetGoogleSignalsSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetGoogleSignalsSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24361,7 +24828,7 @@ impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetGoogleSignalsSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetGoogleSignalsSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24381,9 +24848,9 @@ impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetGoogleSignalsSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyGetGoogleSignalsSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24415,7 +24882,7 @@ impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24427,10 +24894,10 @@ impl<'a> PropertyGetGoogleSignalsSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyListCall<'a>
-    where  {
+pub struct PropertyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _show_deleted: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -24440,9 +24907,15 @@ pub struct PropertyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyListCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyListCall<'a, S> {}
 
-impl<'a> PropertyListCall<'a> {
+impl<'a, S> PropertyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24572,28 +25045,28 @@ impl<'a> PropertyListCall<'a> {
     /// Whether to include soft-deleted (ie: "trashed") Properties in the results. Properties can be inspected to determine whether they are deleted or not.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> PropertyListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> PropertyListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// A page token, received from a previous `ListProperties` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProperties` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Required. An expression for filtering the results of the request. Fields eligible for filtering are: `parent:`(The resource name of the parent account/property) or `ancestor:`(The resource name of the parent account) or `firebase_project:`(The id or number of the linked firebase project). Some examples of filters: ``` | Filter | Description | |-----------------------------|-------------------------------------------| | parent:accounts/123 | The account with account id: 123. | | parent:properties/123 | The property with property id: 123. | | ancestor:accounts/123 | The account with account id: 123. | | firebase_project:project-id | The firebase project with id: project-id. | | firebase_project:123 | The firebase project with number: 123. | ```
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PropertyListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> PropertyListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -24603,7 +25076,7 @@ impl<'a> PropertyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24628,7 +25101,7 @@ impl<'a> PropertyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24648,9 +25121,9 @@ impl<'a> PropertyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24683,7 +25156,7 @@ impl<'a> PropertyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24697,10 +25170,10 @@ impl<'a> PropertyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyPatchCall<'a>
-    where  {
+pub struct PropertyPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaProperty,
     _name: String,
     _update_mask: Option<String>,
@@ -24709,9 +25182,15 @@ pub struct PropertyPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyPatchCall<'a, S> {}
 
-impl<'a> PropertyPatchCall<'a> {
+impl<'a, S> PropertyPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24874,7 +25353,7 @@ impl<'a> PropertyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24884,14 +25363,14 @@ impl<'a> PropertyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -24901,7 +25380,7 @@ impl<'a> PropertyPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24926,7 +25405,7 @@ impl<'a> PropertyPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24946,9 +25425,9 @@ impl<'a> PropertyPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24981,7 +25460,7 @@ impl<'a> PropertyPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24995,10 +25474,10 @@ impl<'a> PropertyPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUpdateDataRetentionSettingCall<'a>
-    where  {
+pub struct PropertyUpdateDataRetentionSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaDataRetentionSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -25007,9 +25486,15 @@ pub struct PropertyUpdateDataRetentionSettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUpdateDataRetentionSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUpdateDataRetentionSettingCall<'a, S> {}
 
-impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
+impl<'a, S> PropertyUpdateDataRetentionSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25172,7 +25657,7 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDataRetentionSettings) -> PropertyUpdateDataRetentionSettingCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaDataRetentionSettings) -> PropertyUpdateDataRetentionSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25182,14 +25667,14 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUpdateDataRetentionSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyUpdateDataRetentionSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyUpdateDataRetentionSettingCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyUpdateDataRetentionSettingCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -25199,7 +25684,7 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUpdateDataRetentionSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUpdateDataRetentionSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25224,7 +25709,7 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUpdateDataRetentionSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUpdateDataRetentionSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25244,9 +25729,9 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUpdateDataRetentionSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUpdateDataRetentionSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25279,7 +25764,7 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GoogleAnalyticsAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25293,10 +25778,10 @@ impl<'a> PropertyUpdateDataRetentionSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUpdateGoogleSignalsSettingCall<'a>
-    where  {
+pub struct PropertyUpdateGoogleSignalsSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GoogleAnalyticsAdmin<>,
+    hub: &'a GoogleAnalyticsAdmin<S>,
     _request: GoogleAnalyticsAdminV1alphaGoogleSignalsSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -25305,9 +25790,15 @@ pub struct PropertyUpdateGoogleSignalsSettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PropertyUpdateGoogleSignalsSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for PropertyUpdateGoogleSignalsSettingCall<'a, S> {}
 
-impl<'a> PropertyUpdateGoogleSignalsSettingCall<'a> {
+impl<'a, S> PropertyUpdateGoogleSignalsSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25470,7 +25961,7 @@ impl<'a> PropertyUpdateGoogleSignalsSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleSignalsSettings) -> PropertyUpdateGoogleSignalsSettingCall<'a> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleSignalsSettings) -> PropertyUpdateGoogleSignalsSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25480,14 +25971,14 @@ impl<'a> PropertyUpdateGoogleSignalsSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUpdateGoogleSignalsSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PropertyUpdateGoogleSignalsSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyUpdateGoogleSignalsSettingCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyUpdateGoogleSignalsSettingCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -25497,7 +25988,7 @@ impl<'a> PropertyUpdateGoogleSignalsSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUpdateGoogleSignalsSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUpdateGoogleSignalsSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25522,7 +26013,7 @@ impl<'a> PropertyUpdateGoogleSignalsSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUpdateGoogleSignalsSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUpdateGoogleSignalsSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25542,9 +26033,9 @@ impl<'a> PropertyUpdateGoogleSignalsSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUpdateGoogleSignalsSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PropertyUpdateGoogleSignalsSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -97,34 +102,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PlayMovies<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PlayMovies<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PlayMovies<> {}
+impl<'a, S> client::Hub for PlayMovies<S> {}
 
-impl<'a, > PlayMovies<> {
+impl<'a, S> PlayMovies<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PlayMovies<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PlayMovies<S> {
         PlayMovies {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://playmoviespartner.googleapis.com/".to_string(),
             _root_url: "https://playmoviespartner.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -668,22 +673,22 @@ impl client::ResponseResult for ListOrdersResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `avails_get(...)`, `avails_list(...)`, `orders_get(...)`, `orders_list(...)`, `store_infos_country_get(...)` and `store_infos_list(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -695,7 +700,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
-    pub fn orders_list(&self, account_id: &str) -> AccountOrderListCall<'a> {
+    pub fn orders_list(&self, account_id: &str) -> AccountOrderListCall<'a, S> {
         AccountOrderListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -724,7 +729,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
     /// * `orderId` - REQUIRED. Order ID.
-    pub fn orders_get(&self, account_id: &str, order_id: &str) -> AccountOrderGetCall<'a> {
+    pub fn orders_get(&self, account_id: &str, order_id: &str) -> AccountOrderGetCall<'a, S> {
         AccountOrderGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -745,7 +750,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
-    pub fn avails_list(&self, account_id: &str) -> AccountAvailListCall<'a> {
+    pub fn avails_list(&self, account_id: &str) -> AccountAvailListCall<'a, S> {
         AccountAvailListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -772,7 +777,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
     /// * `availId` - REQUIRED. Avail ID.
-    pub fn avails_get(&self, account_id: &str, avail_id: &str) -> AccountAvailGetCall<'a> {
+    pub fn avails_get(&self, account_id: &str, avail_id: &str) -> AccountAvailGetCall<'a, S> {
         AccountAvailGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -795,7 +800,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
     /// * `videoId` - REQUIRED. Video ID.
     /// * `country` - REQUIRED. Edit country.
-    pub fn store_infos_country_get(&self, account_id: &str, video_id: &str, country: &str) -> AccountStoreInfoCountryGetCall<'a> {
+    pub fn store_infos_country_get(&self, account_id: &str, video_id: &str, country: &str) -> AccountStoreInfoCountryGetCall<'a, S> {
         AccountStoreInfoCountryGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -817,7 +822,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - REQUIRED. See _General rules_ for more information about this field.
-    pub fn store_infos_list(&self, account_id: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn store_infos_list(&self, account_id: &str) -> AccountStoreInfoListCall<'a, S> {
         AccountStoreInfoListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -871,7 +876,7 @@ impl<'a> AccountMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -887,10 +892,10 @@ impl<'a> AccountMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountOrderListCall<'a>
-    where  {
+pub struct AccountOrderListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
     _account_id: String,
     _video_ids: Vec<String>,
     _studio_names: Vec<String>,
@@ -905,9 +910,15 @@ pub struct AccountOrderListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountOrderListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountOrderListCall<'a, S> {}
 
-impl<'a> AccountOrderListCall<'a> {
+impl<'a, S> AccountOrderListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1082,7 +1093,7 @@ impl<'a> AccountOrderListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -1090,7 +1101,7 @@ impl<'a> AccountOrderListCall<'a> {
     ///
     /// Append the given value to the *video ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_video_ids(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn add_video_ids(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._video_ids.push(new_value.to_string());
         self
     }
@@ -1098,7 +1109,7 @@ impl<'a> AccountOrderListCall<'a> {
     ///
     /// Append the given value to the *studio names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_studio_names(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn add_studio_names(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._studio_names.push(new_value.to_string());
         self
     }
@@ -1106,7 +1117,7 @@ impl<'a> AccountOrderListCall<'a> {
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn add_status(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._status.push(new_value.to_string());
         self
     }
@@ -1114,21 +1125,21 @@ impl<'a> AccountOrderListCall<'a> {
     ///
     /// Append the given value to the *pph names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_pph_names(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn add_pph_names(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._pph_names.push(new_value.to_string());
         self
     }
     /// See _List methods rules_ for info about this field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// See _List methods rules_ for info about this field.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountOrderListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountOrderListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1136,14 +1147,14 @@ impl<'a> AccountOrderListCall<'a> {
     /// that contains the given case-insensitive name.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
     /// Filter Orders that match a case-insensitive, partner-specific custom id.
     ///
     /// Sets the *custom id* query property to the given value.
-    pub fn custom_id(mut self, new_value: &str) -> AccountOrderListCall<'a> {
+    pub fn custom_id(mut self, new_value: &str) -> AccountOrderListCall<'a, S> {
         self._custom_id = Some(new_value.to_string());
         self
     }
@@ -1153,7 +1164,7 @@ impl<'a> AccountOrderListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOrderListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOrderListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1180,7 +1191,7 @@ impl<'a> AccountOrderListCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountOrderListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountOrderListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1200,9 +1211,9 @@ impl<'a> AccountOrderListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountOrderListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountOrderListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1237,7 +1248,7 @@ impl<'a> AccountOrderListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1245,10 +1256,10 @@ impl<'a> AccountOrderListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountOrderGetCall<'a>
-    where  {
+pub struct AccountOrderGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
     _account_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1256,9 +1267,15 @@ pub struct AccountOrderGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountOrderGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountOrderGetCall<'a, S> {}
 
-impl<'a> AccountOrderGetCall<'a> {
+impl<'a, S> AccountOrderGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1402,7 +1419,7 @@ impl<'a> AccountOrderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountOrderGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountOrderGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -1412,7 +1429,7 @@ impl<'a> AccountOrderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> AccountOrderGetCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> AccountOrderGetCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -1422,7 +1439,7 @@ impl<'a> AccountOrderGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOrderGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOrderGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1449,7 +1466,7 @@ impl<'a> AccountOrderGetCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountOrderGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountOrderGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1469,9 +1486,9 @@ impl<'a> AccountOrderGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountOrderGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountOrderGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1506,7 +1523,7 @@ impl<'a> AccountOrderGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1523,10 +1540,10 @@ impl<'a> AccountOrderGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAvailListCall<'a>
-    where  {
+pub struct AccountAvailListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
     _account_id: String,
     _video_ids: Vec<String>,
     _title: Option<String>,
@@ -1542,9 +1559,15 @@ pub struct AccountAvailListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAvailListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAvailListCall<'a, S> {}
 
-impl<'a> AccountAvailListCall<'a> {
+impl<'a, S> AccountAvailListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1724,7 +1747,7 @@ impl<'a> AccountAvailListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -1732,7 +1755,7 @@ impl<'a> AccountAvailListCall<'a> {
     ///
     /// Append the given value to the *video ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_video_ids(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn add_video_ids(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._video_ids.push(new_value.to_string());
         self
     }
@@ -1742,7 +1765,7 @@ impl<'a> AccountAvailListCall<'a> {
     /// case-insensitive title.
     ///
     /// Sets the *title* query property to the given value.
-    pub fn title(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn title(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._title = Some(new_value.to_string());
         self
     }
@@ -1751,7 +1774,7 @@ impl<'a> AccountAvailListCall<'a> {
     ///
     /// Append the given value to the *territories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_territories(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn add_territories(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._territories.push(new_value.to_string());
         self
     }
@@ -1759,7 +1782,7 @@ impl<'a> AccountAvailListCall<'a> {
     ///
     /// Append the given value to the *studio names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_studio_names(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn add_studio_names(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._studio_names.push(new_value.to_string());
         self
     }
@@ -1767,21 +1790,21 @@ impl<'a> AccountAvailListCall<'a> {
     ///
     /// Append the given value to the *pph names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_pph_names(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn add_pph_names(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._pph_names.push(new_value.to_string());
         self
     }
     /// See _List methods rules_ for info about this field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// See _List methods rules_ for info about this field.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountAvailListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountAvailListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1789,7 +1812,7 @@ impl<'a> AccountAvailListCall<'a> {
     ///
     /// Append the given value to the *alt ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_alt_ids(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn add_alt_ids(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._alt_ids.push(new_value.to_string());
         self
     }
@@ -1798,7 +1821,7 @@ impl<'a> AccountAvailListCall<'a> {
     /// should be used instead.
     ///
     /// Sets the *alt id* query property to the given value.
-    pub fn alt_id(mut self, new_value: &str) -> AccountAvailListCall<'a> {
+    pub fn alt_id(mut self, new_value: &str) -> AccountAvailListCall<'a, S> {
         self._alt_id = Some(new_value.to_string());
         self
     }
@@ -1808,7 +1831,7 @@ impl<'a> AccountAvailListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAvailListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAvailListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1835,7 +1858,7 @@ impl<'a> AccountAvailListCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAvailListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAvailListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1855,9 +1878,9 @@ impl<'a> AccountAvailListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAvailListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAvailListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1889,7 +1912,7 @@ impl<'a> AccountAvailListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1897,10 +1920,10 @@ impl<'a> AccountAvailListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAvailGetCall<'a>
-    where  {
+pub struct AccountAvailGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
     _account_id: String,
     _avail_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1908,9 +1931,15 @@ pub struct AccountAvailGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAvailGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAvailGetCall<'a, S> {}
 
-impl<'a> AccountAvailGetCall<'a> {
+impl<'a, S> AccountAvailGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2054,7 +2083,7 @@ impl<'a> AccountAvailGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAvailGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAvailGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2064,7 +2093,7 @@ impl<'a> AccountAvailGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn avail_id(mut self, new_value: &str) -> AccountAvailGetCall<'a> {
+    pub fn avail_id(mut self, new_value: &str) -> AccountAvailGetCall<'a, S> {
         self._avail_id = new_value.to_string();
         self
     }
@@ -2074,7 +2103,7 @@ impl<'a> AccountAvailGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAvailGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAvailGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2101,7 +2130,7 @@ impl<'a> AccountAvailGetCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAvailGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAvailGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2121,9 +2150,9 @@ impl<'a> AccountAvailGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAvailGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAvailGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2158,7 +2187,7 @@ impl<'a> AccountAvailGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2166,10 +2195,10 @@ impl<'a> AccountAvailGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountStoreInfoCountryGetCall<'a>
-    where  {
+pub struct AccountStoreInfoCountryGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
     _account_id: String,
     _video_id: String,
     _country: String,
@@ -2178,9 +2207,15 @@ pub struct AccountStoreInfoCountryGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountStoreInfoCountryGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountStoreInfoCountryGetCall<'a, S> {}
 
-impl<'a> AccountStoreInfoCountryGetCall<'a> {
+impl<'a, S> AccountStoreInfoCountryGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2325,7 +2360,7 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountStoreInfoCountryGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountStoreInfoCountryGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2335,7 +2370,7 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn video_id(mut self, new_value: &str) -> AccountStoreInfoCountryGetCall<'a> {
+    pub fn video_id(mut self, new_value: &str) -> AccountStoreInfoCountryGetCall<'a, S> {
         self._video_id = new_value.to_string();
         self
     }
@@ -2345,7 +2380,7 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn country(mut self, new_value: &str) -> AccountStoreInfoCountryGetCall<'a> {
+    pub fn country(mut self, new_value: &str) -> AccountStoreInfoCountryGetCall<'a, S> {
         self._country = new_value.to_string();
         self
     }
@@ -2355,7 +2390,7 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountStoreInfoCountryGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountStoreInfoCountryGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2382,7 +2417,7 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountStoreInfoCountryGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountStoreInfoCountryGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2402,9 +2437,9 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountStoreInfoCountryGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountStoreInfoCountryGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2439,7 +2474,7 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PlayMovies::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2457,10 +2492,10 @@ impl<'a> AccountStoreInfoCountryGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountStoreInfoListCall<'a>
-    where  {
+pub struct AccountStoreInfoListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PlayMovies<>,
+    hub: &'a PlayMovies<S>,
     _account_id: String,
     _video_ids: Vec<String>,
     _video_id: Option<String>,
@@ -2477,9 +2512,15 @@ pub struct AccountStoreInfoListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountStoreInfoListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountStoreInfoListCall<'a, S> {}
 
-impl<'a> AccountStoreInfoListCall<'a> {
+impl<'a, S> AccountStoreInfoListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2664,7 +2705,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2672,7 +2713,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Append the given value to the *video ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_video_ids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn add_video_ids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._video_ids.push(new_value.to_string());
         self
     }
@@ -2681,7 +2722,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     /// should be used instead.
     ///
     /// Sets the *video id* query property to the given value.
-    pub fn video_id(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn video_id(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._video_id = Some(new_value.to_string());
         self
     }
@@ -2689,7 +2730,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Append the given value to the *studio names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_studio_names(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn add_studio_names(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._studio_names.push(new_value.to_string());
         self
     }
@@ -2697,7 +2738,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Append the given value to the *season ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_season_ids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn add_season_ids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._season_ids.push(new_value.to_string());
         self
     }
@@ -2705,21 +2746,21 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Append the given value to the *pph names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_pph_names(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn add_pph_names(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._pph_names.push(new_value.to_string());
         self
     }
     /// See _List methods rules_ for info about this field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// See _List methods rules_ for info about this field.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountStoreInfoListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountStoreInfoListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2727,7 +2768,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     /// that contains the given case-insensitive name.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -2735,7 +2776,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Append the given value to the *mids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_mids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn add_mids(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._mids.push(new_value.to_string());
         self
     }
@@ -2744,7 +2785,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     ///
     /// Append the given value to the *countries* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_countries(mut self, new_value: &str) -> AccountStoreInfoListCall<'a> {
+    pub fn add_countries(mut self, new_value: &str) -> AccountStoreInfoListCall<'a, S> {
         self._countries.push(new_value.to_string());
         self
     }
@@ -2754,7 +2795,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountStoreInfoListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountStoreInfoListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2781,7 +2822,7 @@ impl<'a> AccountStoreInfoListCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountStoreInfoListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountStoreInfoListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2801,9 +2842,9 @@ impl<'a> AccountStoreInfoListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountStoreInfoListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountStoreInfoListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

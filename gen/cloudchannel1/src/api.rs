@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,40 +108,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Cloudchannel<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Cloudchannel<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Cloudchannel<> {}
+impl<'a, S> client::Hub for Cloudchannel<S> {}
 
-impl<'a, > Cloudchannel<> {
+impl<'a, S> Cloudchannel<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Cloudchannel<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Cloudchannel<S> {
         Cloudchannel {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudchannel.googleapis.com/".to_string(),
             _root_url: "https://cloudchannel.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
-    pub fn products(&'a self) -> ProductMethods<'a> {
+    pub fn products(&'a self) -> ProductMethods<'a, S> {
         ProductMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1846,22 +1851,22 @@ impl client::Part for GoogleTypePostalAddress {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `channel_partner_links_create(...)`, `channel_partner_links_customers_create(...)`, `channel_partner_links_customers_delete(...)`, `channel_partner_links_customers_get(...)`, `channel_partner_links_customers_import(...)`, `channel_partner_links_customers_list(...)`, `channel_partner_links_customers_patch(...)`, `channel_partner_links_get(...)`, `channel_partner_links_list(...)`, `channel_partner_links_patch(...)`, `check_cloud_identity_accounts_exist(...)`, `customers_create(...)`, `customers_delete(...)`, `customers_entitlements_activate(...)`, `customers_entitlements_cancel(...)`, `customers_entitlements_change_offer(...)`, `customers_entitlements_change_parameters(...)`, `customers_entitlements_change_renewal_settings(...)`, `customers_entitlements_create(...)`, `customers_entitlements_get(...)`, `customers_entitlements_list(...)`, `customers_entitlements_lookup_offer(...)`, `customers_entitlements_start_paid_service(...)`, `customers_entitlements_suspend(...)`, `customers_get(...)`, `customers_import(...)`, `customers_list(...)`, `customers_list_purchasable_offers(...)`, `customers_list_purchasable_skus(...)`, `customers_patch(...)`, `customers_provision_cloud_identity(...)`, `customers_transfer_entitlements(...)`, `customers_transfer_entitlements_to_google(...)`, `list_subscribers(...)`, `list_transferable_offers(...)`, `list_transferable_skus(...)`, `offers_list(...)`, `register(...)` and `unregister(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1871,7 +1876,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of reseller account in which to create the customer. Parent uses the format: accounts/{account_id}
-    pub fn channel_partner_links_customers_create(&self, request: GoogleCloudChannelV1Customer, parent: &str) -> AccountChannelPartnerLinkCustomerCreateCall<'a> {
+    pub fn channel_partner_links_customers_create(&self, request: GoogleCloudChannelV1Customer, parent: &str) -> AccountChannelPartnerLinkCustomerCreateCall<'a, S> {
         AccountChannelPartnerLinkCustomerCreateCall {
             hub: self.hub,
             _request: request,
@@ -1889,7 +1894,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the customer to delete.
-    pub fn channel_partner_links_customers_delete(&self, name: &str) -> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
+    pub fn channel_partner_links_customers_delete(&self, name: &str) -> AccountChannelPartnerLinkCustomerDeleteCall<'a, S> {
         AccountChannelPartnerLinkCustomerDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1906,7 +1911,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the customer to retrieve. Name uses the format: accounts/{account_id}/customers/{customer_id}
-    pub fn channel_partner_links_customers_get(&self, name: &str) -> AccountChannelPartnerLinkCustomerGetCall<'a> {
+    pub fn channel_partner_links_customers_get(&self, name: &str) -> AccountChannelPartnerLinkCustomerGetCall<'a, S> {
         AccountChannelPartnerLinkCustomerGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1924,7 +1929,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the reseller's account. Parent takes the format: accounts/{account_id} or accounts/{account_id}/channelPartnerLinks/{channel_partner_id}
-    pub fn channel_partner_links_customers_import(&self, request: GoogleCloudChannelV1ImportCustomerRequest, parent: &str) -> AccountChannelPartnerLinkCustomerImportCall<'a> {
+    pub fn channel_partner_links_customers_import(&self, request: GoogleCloudChannelV1ImportCustomerRequest, parent: &str) -> AccountChannelPartnerLinkCustomerImportCall<'a, S> {
         AccountChannelPartnerLinkCustomerImportCall {
             hub: self.hub,
             _request: request,
@@ -1942,7 +1947,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the reseller account to list customers from. Parent uses the format: accounts/{account_id}.
-    pub fn channel_partner_links_customers_list(&self, parent: &str) -> AccountChannelPartnerLinkCustomerListCall<'a> {
+    pub fn channel_partner_links_customers_list(&self, parent: &str) -> AccountChannelPartnerLinkCustomerListCall<'a, S> {
         AccountChannelPartnerLinkCustomerListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1963,7 +1968,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of the customer. Format: accounts/{account_id}/customers/{customer_id}
-    pub fn channel_partner_links_customers_patch(&self, request: GoogleCloudChannelV1Customer, name: &str) -> AccountChannelPartnerLinkCustomerPatchCall<'a> {
+    pub fn channel_partner_links_customers_patch(&self, request: GoogleCloudChannelV1Customer, name: &str) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S> {
         AccountChannelPartnerLinkCustomerPatchCall {
             hub: self.hub,
             _request: request,
@@ -1983,7 +1988,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Create a channel partner link for the provided reseller account's resource name. Parent uses the format: accounts/{account_id}
-    pub fn channel_partner_links_create(&self, request: GoogleCloudChannelV1ChannelPartnerLink, parent: &str) -> AccountChannelPartnerLinkCreateCall<'a> {
+    pub fn channel_partner_links_create(&self, request: GoogleCloudChannelV1ChannelPartnerLink, parent: &str) -> AccountChannelPartnerLinkCreateCall<'a, S> {
         AccountChannelPartnerLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -2001,7 +2006,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the channel partner link to retrieve. Name uses the format: accounts/{account_id}/channelPartnerLinks/{id} where {id} is the Cloud Identity ID of the partner.
-    pub fn channel_partner_links_get(&self, name: &str) -> AccountChannelPartnerLinkGetCall<'a> {
+    pub fn channel_partner_links_get(&self, name: &str) -> AccountChannelPartnerLinkGetCall<'a, S> {
         AccountChannelPartnerLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2019,7 +2024,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the reseller account for listing channel partner links. Parent uses the format: accounts/{account_id}
-    pub fn channel_partner_links_list(&self, parent: &str) -> AccountChannelPartnerLinkListCall<'a> {
+    pub fn channel_partner_links_list(&self, parent: &str) -> AccountChannelPartnerLinkListCall<'a, S> {
         AccountChannelPartnerLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2040,7 +2045,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the channel partner link to cancel. Name uses the format: accounts/{account_id}/channelPartnerLinks/{id} where {id} is the Cloud Identity ID of the partner.
-    pub fn channel_partner_links_patch(&self, request: GoogleCloudChannelV1UpdateChannelPartnerLinkRequest, name: &str) -> AccountChannelPartnerLinkPatchCall<'a> {
+    pub fn channel_partner_links_patch(&self, request: GoogleCloudChannelV1UpdateChannelPartnerLinkRequest, name: &str) -> AccountChannelPartnerLinkPatchCall<'a, S> {
         AccountChannelPartnerLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -2059,7 +2064,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the entitlement to activate. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_activate(&self, request: GoogleCloudChannelV1ActivateEntitlementRequest, name: &str) -> AccountCustomerEntitlementActivateCall<'a> {
+    pub fn customers_entitlements_activate(&self, request: GoogleCloudChannelV1ActivateEntitlementRequest, name: &str) -> AccountCustomerEntitlementActivateCall<'a, S> {
         AccountCustomerEntitlementActivateCall {
             hub: self.hub,
             _request: request,
@@ -2078,7 +2083,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the entitlement to cancel. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_cancel(&self, request: GoogleCloudChannelV1CancelEntitlementRequest, name: &str) -> AccountCustomerEntitlementCancelCall<'a> {
+    pub fn customers_entitlements_cancel(&self, request: GoogleCloudChannelV1CancelEntitlementRequest, name: &str) -> AccountCustomerEntitlementCancelCall<'a, S> {
         AccountCustomerEntitlementCancelCall {
             hub: self.hub,
             _request: request,
@@ -2097,7 +2102,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the entitlement to update. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_change_offer(&self, request: GoogleCloudChannelV1ChangeOfferRequest, name: &str) -> AccountCustomerEntitlementChangeOfferCall<'a> {
+    pub fn customers_entitlements_change_offer(&self, request: GoogleCloudChannelV1ChangeOfferRequest, name: &str) -> AccountCustomerEntitlementChangeOfferCall<'a, S> {
         AccountCustomerEntitlementChangeOfferCall {
             hub: self.hub,
             _request: request,
@@ -2116,7 +2121,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the entitlement to update. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_change_parameters(&self, request: GoogleCloudChannelV1ChangeParametersRequest, name: &str) -> AccountCustomerEntitlementChangeParameterCall<'a> {
+    pub fn customers_entitlements_change_parameters(&self, request: GoogleCloudChannelV1ChangeParametersRequest, name: &str) -> AccountCustomerEntitlementChangeParameterCall<'a, S> {
         AccountCustomerEntitlementChangeParameterCall {
             hub: self.hub,
             _request: request,
@@ -2135,7 +2140,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the entitlement to update. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_change_renewal_settings(&self, request: GoogleCloudChannelV1ChangeRenewalSettingsRequest, name: &str) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
+    pub fn customers_entitlements_change_renewal_settings(&self, request: GoogleCloudChannelV1ChangeRenewalSettingsRequest, name: &str) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S> {
         AccountCustomerEntitlementChangeRenewalSettingCall {
             hub: self.hub,
             _request: request,
@@ -2154,7 +2159,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the reseller's customer account in which to create the entitlement. Parent uses the format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_entitlements_create(&self, request: GoogleCloudChannelV1CreateEntitlementRequest, parent: &str) -> AccountCustomerEntitlementCreateCall<'a> {
+    pub fn customers_entitlements_create(&self, request: GoogleCloudChannelV1CreateEntitlementRequest, parent: &str) -> AccountCustomerEntitlementCreateCall<'a, S> {
         AccountCustomerEntitlementCreateCall {
             hub: self.hub,
             _request: request,
@@ -2172,7 +2177,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the entitlement to retrieve. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_get(&self, name: &str) -> AccountCustomerEntitlementGetCall<'a> {
+    pub fn customers_entitlements_get(&self, name: &str) -> AccountCustomerEntitlementGetCall<'a, S> {
         AccountCustomerEntitlementGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2189,7 +2194,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the reseller's customer account to list entitlements for. Parent uses the format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_entitlements_list(&self, parent: &str) -> AccountCustomerEntitlementListCall<'a> {
+    pub fn customers_entitlements_list(&self, parent: &str) -> AccountCustomerEntitlementListCall<'a, S> {
         AccountCustomerEntitlementListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2208,7 +2213,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `entitlement` - Required. The resource name of the entitlement to retrieve the Offer. Entitlement uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_lookup_offer(&self, entitlement: &str) -> AccountCustomerEntitlementLookupOfferCall<'a> {
+    pub fn customers_entitlements_lookup_offer(&self, entitlement: &str) -> AccountCustomerEntitlementLookupOfferCall<'a, S> {
         AccountCustomerEntitlementLookupOfferCall {
             hub: self.hub,
             _entitlement: entitlement.to_string(),
@@ -2226,7 +2231,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the entitlement to start a paid service for. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_start_paid_service(&self, request: GoogleCloudChannelV1StartPaidServiceRequest, name: &str) -> AccountCustomerEntitlementStartPaidServiceCall<'a> {
+    pub fn customers_entitlements_start_paid_service(&self, request: GoogleCloudChannelV1StartPaidServiceRequest, name: &str) -> AccountCustomerEntitlementStartPaidServiceCall<'a, S> {
         AccountCustomerEntitlementStartPaidServiceCall {
             hub: self.hub,
             _request: request,
@@ -2245,7 +2250,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the entitlement to suspend. Name uses the format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
-    pub fn customers_entitlements_suspend(&self, request: GoogleCloudChannelV1SuspendEntitlementRequest, name: &str) -> AccountCustomerEntitlementSuspendCall<'a> {
+    pub fn customers_entitlements_suspend(&self, request: GoogleCloudChannelV1SuspendEntitlementRequest, name: &str) -> AccountCustomerEntitlementSuspendCall<'a, S> {
         AccountCustomerEntitlementSuspendCall {
             hub: self.hub,
             _request: request,
@@ -2264,7 +2269,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of reseller account in which to create the customer. Parent uses the format: accounts/{account_id}
-    pub fn customers_create(&self, request: GoogleCloudChannelV1Customer, parent: &str) -> AccountCustomerCreateCall<'a> {
+    pub fn customers_create(&self, request: GoogleCloudChannelV1Customer, parent: &str) -> AccountCustomerCreateCall<'a, S> {
         AccountCustomerCreateCall {
             hub: self.hub,
             _request: request,
@@ -2282,7 +2287,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the customer to delete.
-    pub fn customers_delete(&self, name: &str) -> AccountCustomerDeleteCall<'a> {
+    pub fn customers_delete(&self, name: &str) -> AccountCustomerDeleteCall<'a, S> {
         AccountCustomerDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2299,7 +2304,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the customer to retrieve. Name uses the format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_get(&self, name: &str) -> AccountCustomerGetCall<'a> {
+    pub fn customers_get(&self, name: &str) -> AccountCustomerGetCall<'a, S> {
         AccountCustomerGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2317,7 +2322,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the reseller's account. Parent takes the format: accounts/{account_id} or accounts/{account_id}/channelPartnerLinks/{channel_partner_id}
-    pub fn customers_import(&self, request: GoogleCloudChannelV1ImportCustomerRequest, parent: &str) -> AccountCustomerImportCall<'a> {
+    pub fn customers_import(&self, request: GoogleCloudChannelV1ImportCustomerRequest, parent: &str) -> AccountCustomerImportCall<'a, S> {
         AccountCustomerImportCall {
             hub: self.hub,
             _request: request,
@@ -2335,7 +2340,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the reseller account to list customers from. Parent uses the format: accounts/{account_id}.
-    pub fn customers_list(&self, parent: &str) -> AccountCustomerListCall<'a> {
+    pub fn customers_list(&self, parent: &str) -> AccountCustomerListCall<'a, S> {
         AccountCustomerListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2355,7 +2360,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `customer` - Required. The resource name of the customer to list Offers for. Format: accounts/{account_id}/customers/{customer_id}.
-    pub fn customers_list_purchasable_offers(&self, customer: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn customers_list_purchasable_offers(&self, customer: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         AccountCustomerListPurchasableOfferCall {
             hub: self.hub,
             _customer: customer.to_string(),
@@ -2378,7 +2383,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `customer` - Required. The resource name of the customer to list SKUs for. Format: accounts/{account_id}/customers/{customer_id}.
-    pub fn customers_list_purchasable_skus(&self, customer: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn customers_list_purchasable_skus(&self, customer: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         AccountCustomerListPurchasableSkuCall {
             hub: self.hub,
             _customer: customer.to_string(),
@@ -2402,7 +2407,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of the customer. Format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_patch(&self, request: GoogleCloudChannelV1Customer, name: &str) -> AccountCustomerPatchCall<'a> {
+    pub fn customers_patch(&self, request: GoogleCloudChannelV1Customer, name: &str) -> AccountCustomerPatchCall<'a, S> {
         AccountCustomerPatchCall {
             hub: self.hub,
             _request: request,
@@ -2422,7 +2427,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `customer` - Required. Resource name of the customer. Format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_provision_cloud_identity(&self, request: GoogleCloudChannelV1ProvisionCloudIdentityRequest, customer: &str) -> AccountCustomerProvisionCloudIdentityCall<'a> {
+    pub fn customers_provision_cloud_identity(&self, request: GoogleCloudChannelV1ProvisionCloudIdentityRequest, customer: &str) -> AccountCustomerProvisionCloudIdentityCall<'a, S> {
         AccountCustomerProvisionCloudIdentityCall {
             hub: self.hub,
             _request: request,
@@ -2441,7 +2446,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the reseller's customer account that will receive transferred entitlements. Parent uses the format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_transfer_entitlements(&self, request: GoogleCloudChannelV1TransferEntitlementsRequest, parent: &str) -> AccountCustomerTransferEntitlementCall<'a> {
+    pub fn customers_transfer_entitlements(&self, request: GoogleCloudChannelV1TransferEntitlementsRequest, parent: &str) -> AccountCustomerTransferEntitlementCall<'a, S> {
         AccountCustomerTransferEntitlementCall {
             hub: self.hub,
             _request: request,
@@ -2460,7 +2465,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the reseller's customer account where the entitlements transfer from. Parent uses the format: accounts/{account_id}/customers/{customer_id}
-    pub fn customers_transfer_entitlements_to_google(&self, request: GoogleCloudChannelV1TransferEntitlementsToGoogleRequest, parent: &str) -> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
+    pub fn customers_transfer_entitlements_to_google(&self, request: GoogleCloudChannelV1TransferEntitlementsToGoogleRequest, parent: &str) -> AccountCustomerTransferEntitlementsToGoogleCall<'a, S> {
         AccountCustomerTransferEntitlementsToGoogleCall {
             hub: self.hub,
             _request: request,
@@ -2478,7 +2483,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the reseller account from which to list Offers. Parent uses the format: accounts/{account_id}.
-    pub fn offers_list(&self, parent: &str) -> AccountOfferListCall<'a> {
+    pub fn offers_list(&self, parent: &str) -> AccountOfferListCall<'a, S> {
         AccountOfferListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2500,7 +2505,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The reseller account's resource name. Parent uses the format: accounts/{account_id}
-    pub fn check_cloud_identity_accounts_exist(&self, request: GoogleCloudChannelV1CheckCloudIdentityAccountsExistRequest, parent: &str) -> AccountCheckCloudIdentityAccountsExistCall<'a> {
+    pub fn check_cloud_identity_accounts_exist(&self, request: GoogleCloudChannelV1CheckCloudIdentityAccountsExistRequest, parent: &str) -> AccountCheckCloudIdentityAccountsExistCall<'a, S> {
         AccountCheckCloudIdentityAccountsExistCall {
             hub: self.hub,
             _request: request,
@@ -2518,7 +2523,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `account` - Required. Resource name of the account.
-    pub fn list_subscribers(&self, account: &str) -> AccountListSubscriberCall<'a> {
+    pub fn list_subscribers(&self, account: &str) -> AccountListSubscriberCall<'a, S> {
         AccountListSubscriberCall {
             hub: self.hub,
             _account: account.to_string(),
@@ -2538,7 +2543,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the reseller's account.
-    pub fn list_transferable_offers(&self, request: GoogleCloudChannelV1ListTransferableOffersRequest, parent: &str) -> AccountListTransferableOfferCall<'a> {
+    pub fn list_transferable_offers(&self, request: GoogleCloudChannelV1ListTransferableOffersRequest, parent: &str) -> AccountListTransferableOfferCall<'a, S> {
         AccountListTransferableOfferCall {
             hub: self.hub,
             _request: request,
@@ -2557,7 +2562,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The reseller account's resource name. Parent uses the format: accounts/{account_id}
-    pub fn list_transferable_skus(&self, request: GoogleCloudChannelV1ListTransferableSkusRequest, parent: &str) -> AccountListTransferableSkuCall<'a> {
+    pub fn list_transferable_skus(&self, request: GoogleCloudChannelV1ListTransferableSkusRequest, parent: &str) -> AccountListTransferableSkuCall<'a, S> {
         AccountListTransferableSkuCall {
             hub: self.hub,
             _request: request,
@@ -2576,7 +2581,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `account` - Required. Resource name of the account.
-    pub fn register(&self, request: GoogleCloudChannelV1RegisterSubscriberRequest, account: &str) -> AccountRegisterCall<'a> {
+    pub fn register(&self, request: GoogleCloudChannelV1RegisterSubscriberRequest, account: &str) -> AccountRegisterCall<'a, S> {
         AccountRegisterCall {
             hub: self.hub,
             _request: request,
@@ -2595,7 +2600,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `account` - Required. Resource name of the account.
-    pub fn unregister(&self, request: GoogleCloudChannelV1UnregisterSubscriberRequest, account: &str) -> AccountUnregisterCall<'a> {
+    pub fn unregister(&self, request: GoogleCloudChannelV1UnregisterSubscriberRequest, account: &str) -> AccountUnregisterCall<'a, S> {
         AccountUnregisterCall {
             hub: self.hub,
             _request: request,
@@ -2630,22 +2635,22 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2655,7 +2660,7 @@ impl<'a> OperationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> OperationCancelCall<'a> {
+    pub fn cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> OperationCancelCall<'a, S> {
         OperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -2673,7 +2678,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, S> {
         OperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2690,7 +2695,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2707,7 +2712,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn list(&self, name: &str) -> OperationListCall<'a> {
+    pub fn list(&self, name: &str) -> OperationListCall<'a, S> {
         OperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2744,22 +2749,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `skus_list(...)`
 /// // to build up your call.
 /// let rb = hub.products();
 /// # }
 /// ```
-pub struct ProductMethods<'a>
-    where  {
+pub struct ProductMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProductMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProductMethods<'a, S> {}
 
-impl<'a> ProductMethods<'a> {
+impl<'a, S> ProductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2768,7 +2773,7 @@ impl<'a> ProductMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the Product to list SKUs for. Parent uses the format: products/{product_id}. Supports products/- to retrieve SKUs for all products.
-    pub fn skus_list(&self, parent: &str) -> ProductSkuListCall<'a> {
+    pub fn skus_list(&self, parent: &str) -> ProductSkuListCall<'a, S> {
         ProductSkuListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2785,7 +2790,7 @@ impl<'a> ProductMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the Products the reseller is authorized to sell. Possible error codes: * INVALID_ARGUMENT: Required request parameters are missing or invalid.
-    pub fn list(&self) -> ProductListCall<'a> {
+    pub fn list(&self) -> ProductListCall<'a, S> {
         ProductListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -2830,7 +2835,7 @@ impl<'a> ProductMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2843,10 +2848,10 @@ impl<'a> ProductMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCustomerCreateCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCustomerCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1Customer,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2854,9 +2859,15 @@ pub struct AccountChannelPartnerLinkCustomerCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCustomerCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCustomerCreateCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCustomerCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3016,7 +3027,7 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountChannelPartnerLinkCustomerCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountChannelPartnerLinkCustomerCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3026,7 +3037,7 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3036,7 +3047,7 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3061,7 +3072,7 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3081,9 +3092,9 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3115,7 +3126,7 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3123,19 +3134,25 @@ impl<'a> AccountChannelPartnerLinkCustomerCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCustomerDeleteCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCustomerDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCustomerDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCustomerDeleteCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCustomerDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3282,7 +3299,7 @@ impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3292,7 +3309,7 @@ impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3317,7 +3334,7 @@ impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3337,9 +3354,9 @@ impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3371,7 +3388,7 @@ impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3379,19 +3396,25 @@ impl<'a> AccountChannelPartnerLinkCustomerDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCustomerGetCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCustomerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCustomerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCustomerGetCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCustomerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3538,7 +3561,7 @@ impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3548,7 +3571,7 @@ impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3573,7 +3596,7 @@ impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3593,9 +3616,9 @@ impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3628,7 +3651,7 @@ impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3641,10 +3664,10 @@ impl<'a> AccountChannelPartnerLinkCustomerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCustomerImportCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCustomerImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ImportCustomerRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3652,9 +3675,15 @@ pub struct AccountChannelPartnerLinkCustomerImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCustomerImportCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCustomerImportCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCustomerImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3814,7 +3843,7 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ImportCustomerRequest) -> AccountChannelPartnerLinkCustomerImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ImportCustomerRequest) -> AccountChannelPartnerLinkCustomerImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3824,7 +3853,7 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3834,7 +3863,7 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3859,7 +3888,7 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3879,9 +3908,9 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3913,7 +3942,7 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3924,10 +3953,10 @@ impl<'a> AccountChannelPartnerLinkCustomerImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCustomerListCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCustomerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3937,9 +3966,15 @@ pub struct AccountChannelPartnerLinkCustomerListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCustomerListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCustomerListCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCustomerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4095,28 +4130,28 @@ impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token identifying a page of results other than the first page. Obtained through ListCustomersResponse.next_page_token of the previous CloudChannelService.ListCustomers call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of customers to return. The service may return fewer than this value. If unspecified, returns at most 10 customers. The maximum value is 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountChannelPartnerLinkCustomerListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountChannelPartnerLinkCustomerListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filters applied to the [CloudChannelService.ListCustomers] results. See https://cloud.google.com/channel/docs/concepts/google-cloud/filter-customers for more information.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4126,7 +4161,7 @@ impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4151,7 +4186,7 @@ impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4171,9 +4206,9 @@ impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4206,7 +4241,7 @@ impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4220,10 +4255,10 @@ impl<'a> AccountChannelPartnerLinkCustomerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCustomerPatchCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCustomerPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1Customer,
     _name: String,
     _update_mask: Option<String>,
@@ -4232,9 +4267,15 @@ pub struct AccountChannelPartnerLinkCustomerPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCustomerPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCustomerPatchCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCustomerPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4397,7 +4438,7 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountChannelPartnerLinkCustomerPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4407,14 +4448,14 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask that applies to the resource. Optional.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4424,7 +4465,7 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4449,7 +4490,7 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4469,9 +4510,9 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCustomerPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4504,7 +4545,7 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4517,10 +4558,10 @@ impl<'a> AccountChannelPartnerLinkCustomerPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkCreateCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ChannelPartnerLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4528,9 +4569,15 @@ pub struct AccountChannelPartnerLinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkCreateCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4690,7 +4737,7 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ChannelPartnerLink) -> AccountChannelPartnerLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ChannelPartnerLink) -> AccountChannelPartnerLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4700,7 +4747,7 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4710,7 +4757,7 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4735,7 +4782,7 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4755,9 +4802,9 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4789,7 +4836,7 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4798,10 +4845,10 @@ impl<'a> AccountChannelPartnerLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkGetCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4809,9 +4856,15 @@ pub struct AccountChannelPartnerLinkGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkGetCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkGetCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4961,14 +5014,14 @@ impl<'a> AccountChannelPartnerLinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The level of granularity the ChannelPartnerLink will display.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AccountChannelPartnerLinkGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> AccountChannelPartnerLinkGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -4978,7 +5031,7 @@ impl<'a> AccountChannelPartnerLinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5003,7 +5056,7 @@ impl<'a> AccountChannelPartnerLinkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5023,9 +5076,9 @@ impl<'a> AccountChannelPartnerLinkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5057,7 +5110,7 @@ impl<'a> AccountChannelPartnerLinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5068,10 +5121,10 @@ impl<'a> AccountChannelPartnerLinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkListCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -5081,9 +5134,15 @@ pub struct AccountChannelPartnerLinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkListCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkListCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5239,28 +5298,28 @@ impl<'a> AccountChannelPartnerLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The level of granularity the ChannelPartnerLink will display.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Optional. A token for a page of results other than the first page. Obtained using ListChannelPartnerLinksResponse.next_page_token of the previous CloudChannelService.ListChannelPartnerLinks call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountChannelPartnerLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, server will pick a default size (25). The maximum value is 200; the server will coerce values above 200.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountChannelPartnerLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountChannelPartnerLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5270,7 +5329,7 @@ impl<'a> AccountChannelPartnerLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5295,7 +5354,7 @@ impl<'a> AccountChannelPartnerLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5315,9 +5374,9 @@ impl<'a> AccountChannelPartnerLinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5350,7 +5409,7 @@ impl<'a> AccountChannelPartnerLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5363,10 +5422,10 @@ impl<'a> AccountChannelPartnerLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountChannelPartnerLinkPatchCall<'a>
-    where  {
+pub struct AccountChannelPartnerLinkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1UpdateChannelPartnerLinkRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5374,9 +5433,15 @@ pub struct AccountChannelPartnerLinkPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountChannelPartnerLinkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountChannelPartnerLinkPatchCall<'a, S> {}
 
-impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
+impl<'a, S> AccountChannelPartnerLinkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5536,7 +5601,7 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1UpdateChannelPartnerLinkRequest) -> AccountChannelPartnerLinkPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1UpdateChannelPartnerLinkRequest) -> AccountChannelPartnerLinkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5546,7 +5611,7 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountChannelPartnerLinkPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5556,7 +5621,7 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountChannelPartnerLinkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5581,7 +5646,7 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountChannelPartnerLinkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5601,9 +5666,9 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountChannelPartnerLinkPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountChannelPartnerLinkPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5636,7 +5701,7 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5649,10 +5714,10 @@ impl<'a> AccountChannelPartnerLinkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementActivateCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementActivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ActivateEntitlementRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5660,9 +5725,15 @@ pub struct AccountCustomerEntitlementActivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementActivateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementActivateCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementActivateCall<'a> {
+impl<'a, S> AccountCustomerEntitlementActivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5822,7 +5893,7 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ActivateEntitlementRequest) -> AccountCustomerEntitlementActivateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ActivateEntitlementRequest) -> AccountCustomerEntitlementActivateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5832,7 +5903,7 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementActivateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementActivateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5842,7 +5913,7 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementActivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementActivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5867,7 +5938,7 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementActivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementActivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5887,9 +5958,9 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementActivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementActivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5922,7 +5993,7 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5935,10 +6006,10 @@ impl<'a> AccountCustomerEntitlementActivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementCancelCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1CancelEntitlementRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5946,9 +6017,15 @@ pub struct AccountCustomerEntitlementCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementCancelCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementCancelCall<'a> {
+impl<'a, S> AccountCustomerEntitlementCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6108,7 +6185,7 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1CancelEntitlementRequest) -> AccountCustomerEntitlementCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1CancelEntitlementRequest) -> AccountCustomerEntitlementCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6118,7 +6195,7 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6128,7 +6205,7 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6153,7 +6230,7 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6173,9 +6250,9 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6208,7 +6285,7 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6221,10 +6298,10 @@ impl<'a> AccountCustomerEntitlementCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementChangeOfferCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementChangeOfferCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ChangeOfferRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6232,9 +6309,15 @@ pub struct AccountCustomerEntitlementChangeOfferCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementChangeOfferCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementChangeOfferCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
+impl<'a, S> AccountCustomerEntitlementChangeOfferCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6394,7 +6477,7 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ChangeOfferRequest) -> AccountCustomerEntitlementChangeOfferCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ChangeOfferRequest) -> AccountCustomerEntitlementChangeOfferCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6404,7 +6487,7 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementChangeOfferCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementChangeOfferCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6414,7 +6497,7 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementChangeOfferCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementChangeOfferCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6439,7 +6522,7 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementChangeOfferCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementChangeOfferCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6459,9 +6542,9 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementChangeOfferCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementChangeOfferCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6494,7 +6577,7 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6507,10 +6590,10 @@ impl<'a> AccountCustomerEntitlementChangeOfferCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementChangeParameterCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementChangeParameterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ChangeParametersRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6518,9 +6601,15 @@ pub struct AccountCustomerEntitlementChangeParameterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementChangeParameterCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementChangeParameterCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
+impl<'a, S> AccountCustomerEntitlementChangeParameterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6680,7 +6769,7 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ChangeParametersRequest) -> AccountCustomerEntitlementChangeParameterCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ChangeParametersRequest) -> AccountCustomerEntitlementChangeParameterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6690,7 +6779,7 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementChangeParameterCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementChangeParameterCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6700,7 +6789,7 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementChangeParameterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementChangeParameterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6725,7 +6814,7 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementChangeParameterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementChangeParameterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6745,9 +6834,9 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementChangeParameterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementChangeParameterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6780,7 +6869,7 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6793,10 +6882,10 @@ impl<'a> AccountCustomerEntitlementChangeParameterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementChangeRenewalSettingCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementChangeRenewalSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ChangeRenewalSettingsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6804,9 +6893,15 @@ pub struct AccountCustomerEntitlementChangeRenewalSettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementChangeRenewalSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementChangeRenewalSettingCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
+impl<'a, S> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6966,7 +7061,7 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ChangeRenewalSettingsRequest) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ChangeRenewalSettingsRequest) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6976,7 +7071,7 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6986,7 +7081,7 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7011,7 +7106,7 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7031,9 +7126,9 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementChangeRenewalSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7066,7 +7161,7 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7079,10 +7174,10 @@ impl<'a> AccountCustomerEntitlementChangeRenewalSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementCreateCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1CreateEntitlementRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7090,9 +7185,15 @@ pub struct AccountCustomerEntitlementCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementCreateCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementCreateCall<'a> {
+impl<'a, S> AccountCustomerEntitlementCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7252,7 +7353,7 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1CreateEntitlementRequest) -> AccountCustomerEntitlementCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1CreateEntitlementRequest) -> AccountCustomerEntitlementCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7262,7 +7363,7 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerEntitlementCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerEntitlementCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -7272,7 +7373,7 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7297,7 +7398,7 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7317,9 +7418,9 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7351,7 +7452,7 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7359,19 +7460,25 @@ impl<'a> AccountCustomerEntitlementCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementGetCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementGetCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementGetCall<'a> {
+impl<'a, S> AccountCustomerEntitlementGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7518,7 +7625,7 @@ impl<'a> AccountCustomerEntitlementGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7528,7 +7635,7 @@ impl<'a> AccountCustomerEntitlementGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7553,7 +7660,7 @@ impl<'a> AccountCustomerEntitlementGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7573,9 +7680,9 @@ impl<'a> AccountCustomerEntitlementGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7607,7 +7714,7 @@ impl<'a> AccountCustomerEntitlementGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7617,10 +7724,10 @@ impl<'a> AccountCustomerEntitlementGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementListCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7629,9 +7736,15 @@ pub struct AccountCustomerEntitlementListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementListCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementListCall<'a> {
+impl<'a, S> AccountCustomerEntitlementListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7784,21 +7897,21 @@ impl<'a> AccountCustomerEntitlementListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerEntitlementListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerEntitlementListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token for a page of results other than the first page. Obtained using ListEntitlementsResponse.next_page_token of the previous CloudChannelService.ListEntitlements call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCustomerEntitlementListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCustomerEntitlementListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, return at most 50 entitlements. The maximum value is 100; the server will coerce values above 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCustomerEntitlementListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountCustomerEntitlementListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7808,7 +7921,7 @@ impl<'a> AccountCustomerEntitlementListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7833,7 +7946,7 @@ impl<'a> AccountCustomerEntitlementListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7853,9 +7966,9 @@ impl<'a> AccountCustomerEntitlementListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7887,7 +8000,7 @@ impl<'a> AccountCustomerEntitlementListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7895,19 +8008,25 @@ impl<'a> AccountCustomerEntitlementListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementLookupOfferCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementLookupOfferCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _entitlement: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementLookupOfferCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementLookupOfferCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
+impl<'a, S> AccountCustomerEntitlementLookupOfferCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8054,7 +8173,7 @@ impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entitlement(mut self, new_value: &str) -> AccountCustomerEntitlementLookupOfferCall<'a> {
+    pub fn entitlement(mut self, new_value: &str) -> AccountCustomerEntitlementLookupOfferCall<'a, S> {
         self._entitlement = new_value.to_string();
         self
     }
@@ -8064,7 +8183,7 @@ impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementLookupOfferCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementLookupOfferCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8089,7 +8208,7 @@ impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementLookupOfferCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementLookupOfferCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8109,9 +8228,9 @@ impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementLookupOfferCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementLookupOfferCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8144,7 +8263,7 @@ impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8157,10 +8276,10 @@ impl<'a> AccountCustomerEntitlementLookupOfferCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementStartPaidServiceCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementStartPaidServiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1StartPaidServiceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8168,9 +8287,15 @@ pub struct AccountCustomerEntitlementStartPaidServiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementStartPaidServiceCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementStartPaidServiceCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
+impl<'a, S> AccountCustomerEntitlementStartPaidServiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8330,7 +8455,7 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1StartPaidServiceRequest) -> AccountCustomerEntitlementStartPaidServiceCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1StartPaidServiceRequest) -> AccountCustomerEntitlementStartPaidServiceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8340,7 +8465,7 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementStartPaidServiceCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementStartPaidServiceCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8350,7 +8475,7 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementStartPaidServiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementStartPaidServiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8375,7 +8500,7 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementStartPaidServiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementStartPaidServiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8395,9 +8520,9 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementStartPaidServiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementStartPaidServiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8430,7 +8555,7 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8443,10 +8568,10 @@ impl<'a> AccountCustomerEntitlementStartPaidServiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerEntitlementSuspendCall<'a>
-    where  {
+pub struct AccountCustomerEntitlementSuspendCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1SuspendEntitlementRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8454,9 +8579,15 @@ pub struct AccountCustomerEntitlementSuspendCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerEntitlementSuspendCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerEntitlementSuspendCall<'a, S> {}
 
-impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
+impl<'a, S> AccountCustomerEntitlementSuspendCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8616,7 +8747,7 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1SuspendEntitlementRequest) -> AccountCustomerEntitlementSuspendCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1SuspendEntitlementRequest) -> AccountCustomerEntitlementSuspendCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8626,7 +8757,7 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementSuspendCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerEntitlementSuspendCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8636,7 +8767,7 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementSuspendCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerEntitlementSuspendCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8661,7 +8792,7 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementSuspendCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerEntitlementSuspendCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8681,9 +8812,9 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerEntitlementSuspendCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerEntitlementSuspendCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8716,7 +8847,7 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8729,10 +8860,10 @@ impl<'a> AccountCustomerEntitlementSuspendCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerCreateCall<'a>
-    where  {
+pub struct AccountCustomerCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1Customer,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8740,9 +8871,15 @@ pub struct AccountCustomerCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerCreateCall<'a, S> {}
 
-impl<'a> AccountCustomerCreateCall<'a> {
+impl<'a, S> AccountCustomerCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8902,7 +9039,7 @@ impl<'a> AccountCustomerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountCustomerCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountCustomerCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8912,7 +9049,7 @@ impl<'a> AccountCustomerCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8922,7 +9059,7 @@ impl<'a> AccountCustomerCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8947,7 +9084,7 @@ impl<'a> AccountCustomerCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8967,9 +9104,9 @@ impl<'a> AccountCustomerCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9001,7 +9138,7 @@ impl<'a> AccountCustomerCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9009,19 +9146,25 @@ impl<'a> AccountCustomerCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerDeleteCall<'a>
-    where  {
+pub struct AccountCustomerDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerDeleteCall<'a, S> {}
 
-impl<'a> AccountCustomerDeleteCall<'a> {
+impl<'a, S> AccountCustomerDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9168,7 +9311,7 @@ impl<'a> AccountCustomerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9178,7 +9321,7 @@ impl<'a> AccountCustomerDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9203,7 +9346,7 @@ impl<'a> AccountCustomerDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9223,9 +9366,9 @@ impl<'a> AccountCustomerDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9257,7 +9400,7 @@ impl<'a> AccountCustomerDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9265,19 +9408,25 @@ impl<'a> AccountCustomerDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerGetCall<'a>
-    where  {
+pub struct AccountCustomerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerGetCall<'a, S> {}
 
-impl<'a> AccountCustomerGetCall<'a> {
+impl<'a, S> AccountCustomerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9424,7 +9573,7 @@ impl<'a> AccountCustomerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9434,7 +9583,7 @@ impl<'a> AccountCustomerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9459,7 +9608,7 @@ impl<'a> AccountCustomerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9479,9 +9628,9 @@ impl<'a> AccountCustomerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9514,7 +9663,7 @@ impl<'a> AccountCustomerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9527,10 +9676,10 @@ impl<'a> AccountCustomerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerImportCall<'a>
-    where  {
+pub struct AccountCustomerImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ImportCustomerRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9538,9 +9687,15 @@ pub struct AccountCustomerImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerImportCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerImportCall<'a, S> {}
 
-impl<'a> AccountCustomerImportCall<'a> {
+impl<'a, S> AccountCustomerImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9700,7 +9855,7 @@ impl<'a> AccountCustomerImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ImportCustomerRequest) -> AccountCustomerImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ImportCustomerRequest) -> AccountCustomerImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9710,7 +9865,7 @@ impl<'a> AccountCustomerImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -9720,7 +9875,7 @@ impl<'a> AccountCustomerImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9745,7 +9900,7 @@ impl<'a> AccountCustomerImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9765,9 +9920,9 @@ impl<'a> AccountCustomerImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9799,7 +9954,7 @@ impl<'a> AccountCustomerImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9810,10 +9965,10 @@ impl<'a> AccountCustomerImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerListCall<'a>
-    where  {
+pub struct AccountCustomerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9823,9 +9978,15 @@ pub struct AccountCustomerListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerListCall<'a, S> {}
 
-impl<'a> AccountCustomerListCall<'a> {
+impl<'a, S> AccountCustomerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9981,28 +10142,28 @@ impl<'a> AccountCustomerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token identifying a page of results other than the first page. Obtained through ListCustomersResponse.next_page_token of the previous CloudChannelService.ListCustomers call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCustomerListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCustomerListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of customers to return. The service may return fewer than this value. If unspecified, returns at most 10 customers. The maximum value is 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCustomerListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountCustomerListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filters applied to the [CloudChannelService.ListCustomers] results. See https://cloud.google.com/channel/docs/concepts/google-cloud/filter-customers for more information.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountCustomerListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountCustomerListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10012,7 +10173,7 @@ impl<'a> AccountCustomerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10037,7 +10198,7 @@ impl<'a> AccountCustomerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10057,9 +10218,9 @@ impl<'a> AccountCustomerListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10091,7 +10252,7 @@ impl<'a> AccountCustomerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10105,10 +10266,10 @@ impl<'a> AccountCustomerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerListPurchasableOfferCall<'a>
-    where  {
+pub struct AccountCustomerListPurchasableOfferCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _customer: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10121,9 +10282,15 @@ pub struct AccountCustomerListPurchasableOfferCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerListPurchasableOfferCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerListPurchasableOfferCall<'a, S> {}
 
-impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
+impl<'a, S> AccountCustomerListPurchasableOfferCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10288,49 +10455,49 @@ impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
     /// Optional. A token for a page of results other than the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, returns at most 100 Offers. The maximum value is 1000; the server will coerce values above 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The BCP-47 language code. For example, "en-US". The response will localize in the corresponding language code, if specified. The default value is "en-US".
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Required. SKU that the result should be restricted to. Format: products/{product_id}/skus/{sku_id}.
     ///
     /// Sets the *create entitlement purchase.sku* query property to the given value.
-    pub fn create_entitlement_purchase_sku(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn create_entitlement_purchase_sku(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._create_entitlement_purchase_sku = Some(new_value.to_string());
         self
     }
     /// Optional. Resource name of the new target SKU. Provide this SKU when upgrading or downgrading an entitlement. Format: products/{product_id}/skus/{sku_id}
     ///
     /// Sets the *change offer purchase.new sku* query property to the given value.
-    pub fn change_offer_purchase_new_sku(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn change_offer_purchase_new_sku(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._change_offer_purchase_new_sku = Some(new_value.to_string());
         self
     }
     /// Required. Resource name of the entitlement. Format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
     ///
     /// Sets the *change offer purchase.entitlement* query property to the given value.
-    pub fn change_offer_purchase_entitlement(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn change_offer_purchase_entitlement(mut self, new_value: &str) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._change_offer_purchase_entitlement = Some(new_value.to_string());
         self
     }
@@ -10340,7 +10507,7 @@ impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerListPurchasableOfferCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerListPurchasableOfferCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10365,7 +10532,7 @@ impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerListPurchasableOfferCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerListPurchasableOfferCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10385,9 +10552,9 @@ impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerListPurchasableOfferCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerListPurchasableOfferCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10419,7 +10586,7 @@ impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10433,10 +10600,10 @@ impl<'a> AccountCustomerListPurchasableOfferCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerListPurchasableSkuCall<'a>
-    where  {
+pub struct AccountCustomerListPurchasableSkuCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _customer: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10449,9 +10616,15 @@ pub struct AccountCustomerListPurchasableSkuCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerListPurchasableSkuCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerListPurchasableSkuCall<'a, S> {}
 
-impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
+impl<'a, S> AccountCustomerListPurchasableSkuCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10616,49 +10789,49 @@ impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
     /// Optional. A token for a page of results other than the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, returns at most 100 SKUs. The maximum value is 1000; the server will coerce values above 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The BCP-47 language code. For example, "en-US". The response will localize in the corresponding language code, if specified. The default value is "en-US".
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Required. List SKUs belonging to this Product. Format: products/{product_id}. Supports products/- to retrieve SKUs for all products.
     ///
     /// Sets the *create entitlement purchase.product* query property to the given value.
-    pub fn create_entitlement_purchase_product(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn create_entitlement_purchase_product(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._create_entitlement_purchase_product = Some(new_value.to_string());
         self
     }
     /// Required. Resource name of the entitlement. Format: accounts/{account_id}/customers/{customer_id}/entitlements/{entitlement_id}
     ///
     /// Sets the *change offer purchase.entitlement* query property to the given value.
-    pub fn change_offer_purchase_entitlement(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn change_offer_purchase_entitlement(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._change_offer_purchase_entitlement = Some(new_value.to_string());
         self
     }
     /// Required. Change Type for the entitlement.
     ///
     /// Sets the *change offer purchase.change type* query property to the given value.
-    pub fn change_offer_purchase_change_type(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn change_offer_purchase_change_type(mut self, new_value: &str) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._change_offer_purchase_change_type = Some(new_value.to_string());
         self
     }
@@ -10668,7 +10841,7 @@ impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerListPurchasableSkuCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerListPurchasableSkuCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10693,7 +10866,7 @@ impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerListPurchasableSkuCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerListPurchasableSkuCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10713,9 +10886,9 @@ impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerListPurchasableSkuCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerListPurchasableSkuCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10748,7 +10921,7 @@ impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10762,10 +10935,10 @@ impl<'a> AccountCustomerListPurchasableSkuCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerPatchCall<'a>
-    where  {
+pub struct AccountCustomerPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1Customer,
     _name: String,
     _update_mask: Option<String>,
@@ -10774,9 +10947,15 @@ pub struct AccountCustomerPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerPatchCall<'a, S> {}
 
-impl<'a> AccountCustomerPatchCall<'a> {
+impl<'a, S> AccountCustomerPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10939,7 +11118,7 @@ impl<'a> AccountCustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountCustomerPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1Customer) -> AccountCustomerPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10949,14 +11128,14 @@ impl<'a> AccountCustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountCustomerPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountCustomerPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask that applies to the resource. Optional.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountCustomerPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountCustomerPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10966,7 +11145,7 @@ impl<'a> AccountCustomerPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10991,7 +11170,7 @@ impl<'a> AccountCustomerPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11011,9 +11190,9 @@ impl<'a> AccountCustomerPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11046,7 +11225,7 @@ impl<'a> AccountCustomerPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11059,10 +11238,10 @@ impl<'a> AccountCustomerPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerProvisionCloudIdentityCall<'a>
-    where  {
+pub struct AccountCustomerProvisionCloudIdentityCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ProvisionCloudIdentityRequest,
     _customer: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11070,9 +11249,15 @@ pub struct AccountCustomerProvisionCloudIdentityCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerProvisionCloudIdentityCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerProvisionCloudIdentityCall<'a, S> {}
 
-impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
+impl<'a, S> AccountCustomerProvisionCloudIdentityCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11232,7 +11417,7 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ProvisionCloudIdentityRequest) -> AccountCustomerProvisionCloudIdentityCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ProvisionCloudIdentityRequest) -> AccountCustomerProvisionCloudIdentityCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11242,7 +11427,7 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> AccountCustomerProvisionCloudIdentityCall<'a> {
+    pub fn customer(mut self, new_value: &str) -> AccountCustomerProvisionCloudIdentityCall<'a, S> {
         self._customer = new_value.to_string();
         self
     }
@@ -11252,7 +11437,7 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerProvisionCloudIdentityCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerProvisionCloudIdentityCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11277,7 +11462,7 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerProvisionCloudIdentityCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerProvisionCloudIdentityCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11297,9 +11482,9 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerProvisionCloudIdentityCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerProvisionCloudIdentityCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11332,7 +11517,7 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11345,10 +11530,10 @@ impl<'a> AccountCustomerProvisionCloudIdentityCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerTransferEntitlementCall<'a>
-    where  {
+pub struct AccountCustomerTransferEntitlementCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1TransferEntitlementsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11356,9 +11541,15 @@ pub struct AccountCustomerTransferEntitlementCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerTransferEntitlementCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerTransferEntitlementCall<'a, S> {}
 
-impl<'a> AccountCustomerTransferEntitlementCall<'a> {
+impl<'a, S> AccountCustomerTransferEntitlementCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11518,7 +11709,7 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1TransferEntitlementsRequest) -> AccountCustomerTransferEntitlementCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1TransferEntitlementsRequest) -> AccountCustomerTransferEntitlementCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11528,7 +11719,7 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerTransferEntitlementCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerTransferEntitlementCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -11538,7 +11729,7 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerTransferEntitlementCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerTransferEntitlementCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11563,7 +11754,7 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerTransferEntitlementCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerTransferEntitlementCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11583,9 +11774,9 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerTransferEntitlementCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerTransferEntitlementCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11618,7 +11809,7 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11631,10 +11822,10 @@ impl<'a> AccountCustomerTransferEntitlementCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustomerTransferEntitlementsToGoogleCall<'a>
-    where  {
+pub struct AccountCustomerTransferEntitlementsToGoogleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1TransferEntitlementsToGoogleRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11642,9 +11833,15 @@ pub struct AccountCustomerTransferEntitlementsToGoogleCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustomerTransferEntitlementsToGoogleCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustomerTransferEntitlementsToGoogleCall<'a, S> {}
 
-impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
+impl<'a, S> AccountCustomerTransferEntitlementsToGoogleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11804,7 +12001,7 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1TransferEntitlementsToGoogleRequest) -> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1TransferEntitlementsToGoogleRequest) -> AccountCustomerTransferEntitlementsToGoogleCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11814,7 +12011,7 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCustomerTransferEntitlementsToGoogleCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -11824,7 +12021,7 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomerTransferEntitlementsToGoogleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11849,7 +12046,7 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerTransferEntitlementsToGoogleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomerTransferEntitlementsToGoogleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11869,9 +12066,9 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomerTransferEntitlementsToGoogleCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustomerTransferEntitlementsToGoogleCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11903,7 +12100,7 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11915,10 +12112,10 @@ impl<'a> AccountCustomerTransferEntitlementsToGoogleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountOfferListCall<'a>
-    where  {
+pub struct AccountOfferListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11929,9 +12126,15 @@ pub struct AccountOfferListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountOfferListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountOfferListCall<'a, S> {}
 
-impl<'a> AccountOfferListCall<'a> {
+impl<'a, S> AccountOfferListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12090,35 +12293,35 @@ impl<'a> AccountOfferListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountOfferListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountOfferListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token for a page of results other than the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountOfferListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountOfferListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, returns at most 500 Offers. The maximum value is 1000; the server will coerce values above 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountOfferListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountOfferListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The BCP-47 language code. For example, "en-US". The response will localize in the corresponding language code, if specified. The default value is "en-US".
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> AccountOfferListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> AccountOfferListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Optional. The expression to filter results by name (name of the Offer), sku.name (name of the SKU), or sku.product.name (name of the Product). Example 1: sku.product.name=products/p1 AND sku.name!=products/p1/skus/s1 Example 2: name=accounts/a1/offers/o1
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountOfferListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountOfferListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12128,7 +12331,7 @@ impl<'a> AccountOfferListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOfferListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountOfferListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12153,7 +12356,7 @@ impl<'a> AccountOfferListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountOfferListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountOfferListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12173,9 +12376,9 @@ impl<'a> AccountOfferListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountOfferListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountOfferListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12208,7 +12411,7 @@ impl<'a> AccountOfferListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12221,10 +12424,10 @@ impl<'a> AccountOfferListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCheckCloudIdentityAccountsExistCall<'a>
-    where  {
+pub struct AccountCheckCloudIdentityAccountsExistCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1CheckCloudIdentityAccountsExistRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12232,9 +12435,15 @@ pub struct AccountCheckCloudIdentityAccountsExistCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCheckCloudIdentityAccountsExistCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCheckCloudIdentityAccountsExistCall<'a, S> {}
 
-impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
+impl<'a, S> AccountCheckCloudIdentityAccountsExistCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12394,7 +12603,7 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1CheckCloudIdentityAccountsExistRequest) -> AccountCheckCloudIdentityAccountsExistCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1CheckCloudIdentityAccountsExistRequest) -> AccountCheckCloudIdentityAccountsExistCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12404,7 +12613,7 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountCheckCloudIdentityAccountsExistCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountCheckCloudIdentityAccountsExistCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12414,7 +12623,7 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCheckCloudIdentityAccountsExistCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCheckCloudIdentityAccountsExistCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12439,7 +12648,7 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCheckCloudIdentityAccountsExistCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCheckCloudIdentityAccountsExistCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12459,9 +12668,9 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCheckCloudIdentityAccountsExistCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCheckCloudIdentityAccountsExistCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12493,7 +12702,7 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12503,10 +12712,10 @@ impl<'a> AccountCheckCloudIdentityAccountsExistCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListSubscriberCall<'a>
-    where  {
+pub struct AccountListSubscriberCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _account: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12515,9 +12724,15 @@ pub struct AccountListSubscriberCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListSubscriberCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListSubscriberCall<'a, S> {}
 
-impl<'a> AccountListSubscriberCall<'a> {
+impl<'a, S> AccountListSubscriberCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12670,21 +12885,21 @@ impl<'a> AccountListSubscriberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountListSubscriberCall<'a> {
+    pub fn account(mut self, new_value: &str) -> AccountListSubscriberCall<'a, S> {
         self._account = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListSubscribers` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListSubscribers` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListSubscriberCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListSubscriberCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of service accounts to return. The service may return fewer than this value. If unspecified, returns at most 100 service accounts. The maximum value is 1000; the server will coerce values above 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListSubscriberCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListSubscriberCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -12694,7 +12909,7 @@ impl<'a> AccountListSubscriberCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListSubscriberCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListSubscriberCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12719,7 +12934,7 @@ impl<'a> AccountListSubscriberCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListSubscriberCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListSubscriberCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12739,9 +12954,9 @@ impl<'a> AccountListSubscriberCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListSubscriberCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListSubscriberCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12774,7 +12989,7 @@ impl<'a> AccountListSubscriberCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12787,10 +13002,10 @@ impl<'a> AccountListSubscriberCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListTransferableOfferCall<'a>
-    where  {
+pub struct AccountListTransferableOfferCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ListTransferableOffersRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12798,9 +13013,15 @@ pub struct AccountListTransferableOfferCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListTransferableOfferCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListTransferableOfferCall<'a, S> {}
 
-impl<'a> AccountListTransferableOfferCall<'a> {
+impl<'a, S> AccountListTransferableOfferCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12960,7 +13181,7 @@ impl<'a> AccountListTransferableOfferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ListTransferableOffersRequest) -> AccountListTransferableOfferCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ListTransferableOffersRequest) -> AccountListTransferableOfferCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12970,7 +13191,7 @@ impl<'a> AccountListTransferableOfferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountListTransferableOfferCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountListTransferableOfferCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12980,7 +13201,7 @@ impl<'a> AccountListTransferableOfferCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListTransferableOfferCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListTransferableOfferCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13005,7 +13226,7 @@ impl<'a> AccountListTransferableOfferCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListTransferableOfferCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListTransferableOfferCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13025,9 +13246,9 @@ impl<'a> AccountListTransferableOfferCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListTransferableOfferCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListTransferableOfferCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13060,7 +13281,7 @@ impl<'a> AccountListTransferableOfferCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13073,10 +13294,10 @@ impl<'a> AccountListTransferableOfferCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListTransferableSkuCall<'a>
-    where  {
+pub struct AccountListTransferableSkuCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1ListTransferableSkusRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13084,9 +13305,15 @@ pub struct AccountListTransferableSkuCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListTransferableSkuCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListTransferableSkuCall<'a, S> {}
 
-impl<'a> AccountListTransferableSkuCall<'a> {
+impl<'a, S> AccountListTransferableSkuCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13246,7 +13473,7 @@ impl<'a> AccountListTransferableSkuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1ListTransferableSkusRequest) -> AccountListTransferableSkuCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1ListTransferableSkusRequest) -> AccountListTransferableSkuCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13256,7 +13483,7 @@ impl<'a> AccountListTransferableSkuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountListTransferableSkuCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountListTransferableSkuCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -13266,7 +13493,7 @@ impl<'a> AccountListTransferableSkuCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListTransferableSkuCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListTransferableSkuCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13291,7 +13518,7 @@ impl<'a> AccountListTransferableSkuCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListTransferableSkuCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListTransferableSkuCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13311,9 +13538,9 @@ impl<'a> AccountListTransferableSkuCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListTransferableSkuCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListTransferableSkuCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13346,7 +13573,7 @@ impl<'a> AccountListTransferableSkuCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13359,10 +13586,10 @@ impl<'a> AccountListTransferableSkuCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountRegisterCall<'a>
-    where  {
+pub struct AccountRegisterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1RegisterSubscriberRequest,
     _account: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13370,9 +13597,15 @@ pub struct AccountRegisterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountRegisterCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountRegisterCall<'a, S> {}
 
-impl<'a> AccountRegisterCall<'a> {
+impl<'a, S> AccountRegisterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13532,7 +13765,7 @@ impl<'a> AccountRegisterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1RegisterSubscriberRequest) -> AccountRegisterCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1RegisterSubscriberRequest) -> AccountRegisterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13542,7 +13775,7 @@ impl<'a> AccountRegisterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountRegisterCall<'a> {
+    pub fn account(mut self, new_value: &str) -> AccountRegisterCall<'a, S> {
         self._account = new_value.to_string();
         self
     }
@@ -13552,7 +13785,7 @@ impl<'a> AccountRegisterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountRegisterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountRegisterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13577,7 +13810,7 @@ impl<'a> AccountRegisterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountRegisterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountRegisterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13597,9 +13830,9 @@ impl<'a> AccountRegisterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountRegisterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountRegisterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13632,7 +13865,7 @@ impl<'a> AccountRegisterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13645,10 +13878,10 @@ impl<'a> AccountRegisterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUnregisterCall<'a>
-    where  {
+pub struct AccountUnregisterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleCloudChannelV1UnregisterSubscriberRequest,
     _account: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13656,9 +13889,15 @@ pub struct AccountUnregisterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUnregisterCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUnregisterCall<'a, S> {}
 
-impl<'a> AccountUnregisterCall<'a> {
+impl<'a, S> AccountUnregisterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13818,7 +14057,7 @@ impl<'a> AccountUnregisterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudChannelV1UnregisterSubscriberRequest) -> AccountUnregisterCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudChannelV1UnregisterSubscriberRequest) -> AccountUnregisterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13828,7 +14067,7 @@ impl<'a> AccountUnregisterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountUnregisterCall<'a> {
+    pub fn account(mut self, new_value: &str) -> AccountUnregisterCall<'a, S> {
         self._account = new_value.to_string();
         self
     }
@@ -13838,7 +14077,7 @@ impl<'a> AccountUnregisterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUnregisterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUnregisterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13863,7 +14102,7 @@ impl<'a> AccountUnregisterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUnregisterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUnregisterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13883,9 +14122,9 @@ impl<'a> AccountUnregisterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUnregisterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUnregisterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13918,7 +14157,7 @@ impl<'a> AccountUnregisterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13931,10 +14170,10 @@ impl<'a> AccountUnregisterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationCancelCall<'a>
-    where  {
+pub struct OperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _request: GoogleLongrunningCancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13942,9 +14181,15 @@ pub struct OperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationCancelCall<'a, S> {}
 
-impl<'a> OperationCancelCall<'a> {
+impl<'a, S> OperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14104,7 +14349,7 @@ impl<'a> OperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> OperationCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> OperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14114,7 +14359,7 @@ impl<'a> OperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14124,7 +14369,7 @@ impl<'a> OperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14149,7 +14394,7 @@ impl<'a> OperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14169,9 +14414,9 @@ impl<'a> OperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14203,7 +14448,7 @@ impl<'a> OperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14211,19 +14456,25 @@ impl<'a> OperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationDeleteCall<'a>
-    where  {
+pub struct OperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationDeleteCall<'a, S> {}
 
-impl<'a> OperationDeleteCall<'a> {
+impl<'a, S> OperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14370,7 +14621,7 @@ impl<'a> OperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14380,7 +14631,7 @@ impl<'a> OperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14405,7 +14656,7 @@ impl<'a> OperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14425,9 +14676,9 @@ impl<'a> OperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14459,7 +14710,7 @@ impl<'a> OperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14467,19 +14718,25 @@ impl<'a> OperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14626,7 +14883,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14636,7 +14893,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14661,7 +14918,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14681,9 +14938,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14715,7 +14972,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14726,10 +14983,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a>
-    where  {
+pub struct OperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14739,9 +14996,15 @@ pub struct OperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationListCall<'a, S> {}
 
-impl<'a> OperationListCall<'a> {
+impl<'a, S> OperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14897,28 +15160,28 @@ impl<'a> OperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -14928,7 +15191,7 @@ impl<'a> OperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14953,7 +15216,7 @@ impl<'a> OperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14973,9 +15236,9 @@ impl<'a> OperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15007,7 +15270,7 @@ impl<'a> OperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15019,10 +15282,10 @@ impl<'a> OperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductSkuListCall<'a>
-    where  {
+pub struct ProductSkuListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15033,9 +15296,15 @@ pub struct ProductSkuListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductSkuListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductSkuListCall<'a, S> {}
 
-impl<'a> ProductSkuListCall<'a> {
+impl<'a, S> ProductSkuListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15194,35 +15463,35 @@ impl<'a> ProductSkuListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProductSkuListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProductSkuListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token for a page of results other than the first page. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProductSkuListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProductSkuListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, returns at most 100 SKUs. The maximum value is 1000; the server will coerce values above 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProductSkuListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProductSkuListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The BCP-47 language code. For example, "en-US". The response will localize in the corresponding language code, if specified. The default value is "en-US".
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProductSkuListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProductSkuListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Required. Resource name of the reseller. Format: accounts/{account_id}.
     ///
     /// Sets the *account* query property to the given value.
-    pub fn account(mut self, new_value: &str) -> ProductSkuListCall<'a> {
+    pub fn account(mut self, new_value: &str) -> ProductSkuListCall<'a, S> {
         self._account = Some(new_value.to_string());
         self
     }
@@ -15232,7 +15501,7 @@ impl<'a> ProductSkuListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductSkuListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductSkuListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15257,7 +15526,7 @@ impl<'a> ProductSkuListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductSkuListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductSkuListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15277,9 +15546,9 @@ impl<'a> ProductSkuListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductSkuListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductSkuListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15311,7 +15580,7 @@ impl<'a> ProductSkuListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudchannel::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15323,10 +15592,10 @@ impl<'a> ProductSkuListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductListCall<'a>
-    where  {
+pub struct ProductListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudchannel<>,
+    hub: &'a Cloudchannel<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _language_code: Option<String>,
@@ -15336,9 +15605,15 @@ pub struct ProductListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductListCall<'a, S> {}
 
-impl<'a> ProductListCall<'a> {
+impl<'a, S> ProductListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15468,28 +15743,28 @@ impl<'a> ProductListCall<'a> {
     /// Optional. A token for a page of results other than the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProductListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProductListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Requested page size. Server might return fewer results than requested. If unspecified, returns at most 100 Products. The maximum value is 1000; the server will coerce values above 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProductListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProductListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The BCP-47 language code. For example, "en-US". The response will localize in the corresponding language code, if specified. The default value is "en-US".
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProductListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProductListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Required. The resource name of the reseller account. Format: accounts/{account_id}.
     ///
     /// Sets the *account* query property to the given value.
-    pub fn account(mut self, new_value: &str) -> ProductListCall<'a> {
+    pub fn account(mut self, new_value: &str) -> ProductListCall<'a, S> {
         self._account = Some(new_value.to_string());
         self
     }
@@ -15499,7 +15774,7 @@ impl<'a> ProductListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15524,7 +15799,7 @@ impl<'a> ProductListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15544,9 +15819,9 @@ impl<'a> ProductListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

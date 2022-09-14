@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,34 +109,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct RecaptchaEnterprise<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct RecaptchaEnterprise<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for RecaptchaEnterprise<> {}
+impl<'a, S> client::Hub for RecaptchaEnterprise<S> {}
 
-impl<'a, > RecaptchaEnterprise<> {
+impl<'a, S> RecaptchaEnterprise<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> RecaptchaEnterprise<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> RecaptchaEnterprise<S> {
         RecaptchaEnterprise {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://recaptchaenterprise.googleapis.com/".to_string(),
             _root_url: "https://recaptchaenterprise.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -723,22 +728,22 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `assessments_annotate(...)`, `assessments_create(...)`, `keys_create(...)`, `keys_delete(...)`, `keys_get(...)`, `keys_get_metrics(...)`, `keys_list(...)`, `keys_migrate(...)`, `keys_patch(...)`, `relatedaccountgroupmemberships_search(...)`, `relatedaccountgroups_list(...)` and `relatedaccountgroups_memberships_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -748,7 +753,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the Assessment, in the format "projects/{project}/assessments/{assessment}".
-    pub fn assessments_annotate(&self, request: GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest, name: &str) -> ProjectAssessmentAnnotateCall<'a> {
+    pub fn assessments_annotate(&self, request: GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest, name: &str) -> ProjectAssessmentAnnotateCall<'a, S> {
         ProjectAssessmentAnnotateCall {
             hub: self.hub,
             _request: request,
@@ -767,7 +772,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project in which the assessment will be created, in the format "projects/{project}".
-    pub fn assessments_create(&self, request: GoogleCloudRecaptchaenterpriseV1Assessment, parent: &str) -> ProjectAssessmentCreateCall<'a> {
+    pub fn assessments_create(&self, request: GoogleCloudRecaptchaenterpriseV1Assessment, parent: &str) -> ProjectAssessmentCreateCall<'a, S> {
         ProjectAssessmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -786,7 +791,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project in which the key will be created, in the format "projects/{project}".
-    pub fn keys_create(&self, request: GoogleCloudRecaptchaenterpriseV1Key, parent: &str) -> ProjectKeyCreateCall<'a> {
+    pub fn keys_create(&self, request: GoogleCloudRecaptchaenterpriseV1Key, parent: &str) -> ProjectKeyCreateCall<'a, S> {
         ProjectKeyCreateCall {
             hub: self.hub,
             _request: request,
@@ -804,7 +809,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the key to be deleted, in the format "projects/{project}/keys/{key}".
-    pub fn keys_delete(&self, name: &str) -> ProjectKeyDeleteCall<'a> {
+    pub fn keys_delete(&self, name: &str) -> ProjectKeyDeleteCall<'a, S> {
         ProjectKeyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -821,7 +826,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the requested key, in the format "projects/{project}/keys/{key}".
-    pub fn keys_get(&self, name: &str) -> ProjectKeyGetCall<'a> {
+    pub fn keys_get(&self, name: &str) -> ProjectKeyGetCall<'a, S> {
         ProjectKeyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -838,7 +843,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the requested metrics, in the format "projects/{project}/keys/{key}/metrics".
-    pub fn keys_get_metrics(&self, name: &str) -> ProjectKeyGetMetricCall<'a> {
+    pub fn keys_get_metrics(&self, name: &str) -> ProjectKeyGetMetricCall<'a, S> {
         ProjectKeyGetMetricCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -855,7 +860,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the project that contains the keys that will be listed, in the format "projects/{project}".
-    pub fn keys_list(&self, parent: &str) -> ProjectKeyListCall<'a> {
+    pub fn keys_list(&self, parent: &str) -> ProjectKeyListCall<'a, S> {
         ProjectKeyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -875,7 +880,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the key to be migrated, in the format "projects/{project}/keys/{key}".
-    pub fn keys_migrate(&self, request: GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest, name: &str) -> ProjectKeyMigrateCall<'a> {
+    pub fn keys_migrate(&self, request: GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest, name: &str) -> ProjectKeyMigrateCall<'a, S> {
         ProjectKeyMigrateCall {
             hub: self.hub,
             _request: request,
@@ -894,7 +899,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name for the Key in the format "projects/{project}/keys/{key}".
-    pub fn keys_patch(&self, request: GoogleCloudRecaptchaenterpriseV1Key, name: &str) -> ProjectKeyPatchCall<'a> {
+    pub fn keys_patch(&self, request: GoogleCloudRecaptchaenterpriseV1Key, name: &str) -> ProjectKeyPatchCall<'a, S> {
         ProjectKeyPatchCall {
             hub: self.hub,
             _request: request,
@@ -914,7 +919,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Required. The name of the project to search related account group memberships from, in the format "projects/{project}".
-    pub fn relatedaccountgroupmemberships_search(&self, request: GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsRequest, project: &str) -> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
+    pub fn relatedaccountgroupmemberships_search(&self, request: GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsRequest, project: &str) -> ProjectRelatedaccountgroupmembershipSearchCall<'a, S> {
         ProjectRelatedaccountgroupmembershipSearchCall {
             hub: self.hub,
             _request: request,
@@ -932,7 +937,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name for the related account group in the format `projects/{project}/relatedaccountgroups/{relatedaccountgroup}`.
-    pub fn relatedaccountgroups_memberships_list(&self, parent: &str) -> ProjectRelatedaccountgroupMembershipListCall<'a> {
+    pub fn relatedaccountgroups_memberships_list(&self, parent: &str) -> ProjectRelatedaccountgroupMembershipListCall<'a, S> {
         ProjectRelatedaccountgroupMembershipListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -951,7 +956,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the project to list related account groups from, in the format "projects/{project}".
-    pub fn relatedaccountgroups_list(&self, parent: &str) -> ProjectRelatedaccountgroupListCall<'a> {
+    pub fn relatedaccountgroups_list(&self, parent: &str) -> ProjectRelatedaccountgroupListCall<'a, S> {
         ProjectRelatedaccountgroupListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -995,7 +1000,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1008,10 +1013,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAssessmentAnnotateCall<'a>
-    where  {
+pub struct ProjectAssessmentAnnotateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _request: GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1019,9 +1024,15 @@ pub struct ProjectAssessmentAnnotateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAssessmentAnnotateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAssessmentAnnotateCall<'a, S> {}
 
-impl<'a> ProjectAssessmentAnnotateCall<'a> {
+impl<'a, S> ProjectAssessmentAnnotateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1181,7 +1192,7 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest) -> ProjectAssessmentAnnotateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest) -> ProjectAssessmentAnnotateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1191,7 +1202,7 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAssessmentAnnotateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAssessmentAnnotateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1201,7 +1212,7 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAssessmentAnnotateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAssessmentAnnotateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1226,7 +1237,7 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAssessmentAnnotateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAssessmentAnnotateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1246,9 +1257,9 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAssessmentAnnotateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAssessmentAnnotateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1281,7 +1292,7 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1294,10 +1305,10 @@ impl<'a> ProjectAssessmentAnnotateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAssessmentCreateCall<'a>
-    where  {
+pub struct ProjectAssessmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _request: GoogleCloudRecaptchaenterpriseV1Assessment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1305,9 +1316,15 @@ pub struct ProjectAssessmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAssessmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAssessmentCreateCall<'a, S> {}
 
-impl<'a> ProjectAssessmentCreateCall<'a> {
+impl<'a, S> ProjectAssessmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1467,7 +1484,7 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1Assessment) -> ProjectAssessmentCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1Assessment) -> ProjectAssessmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1477,7 +1494,7 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAssessmentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAssessmentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1487,7 +1504,7 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAssessmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAssessmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1512,7 +1529,7 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAssessmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAssessmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1532,9 +1549,9 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAssessmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAssessmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1567,7 +1584,7 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1580,10 +1597,10 @@ impl<'a> ProjectAssessmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyCreateCall<'a>
-    where  {
+pub struct ProjectKeyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _request: GoogleCloudRecaptchaenterpriseV1Key,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1591,9 +1608,15 @@ pub struct ProjectKeyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyCreateCall<'a, S> {}
 
-impl<'a> ProjectKeyCreateCall<'a> {
+impl<'a, S> ProjectKeyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1753,7 +1776,7 @@ impl<'a> ProjectKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1Key) -> ProjectKeyCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1Key) -> ProjectKeyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1763,7 +1786,7 @@ impl<'a> ProjectKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectKeyCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectKeyCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1773,7 +1796,7 @@ impl<'a> ProjectKeyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1798,7 +1821,7 @@ impl<'a> ProjectKeyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1818,9 +1841,9 @@ impl<'a> ProjectKeyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1852,7 +1875,7 @@ impl<'a> ProjectKeyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1860,19 +1883,25 @@ impl<'a> ProjectKeyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyDeleteCall<'a>
-    where  {
+pub struct ProjectKeyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyDeleteCall<'a, S> {}
 
-impl<'a> ProjectKeyDeleteCall<'a> {
+impl<'a, S> ProjectKeyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2019,7 +2048,7 @@ impl<'a> ProjectKeyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectKeyDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectKeyDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2029,7 +2058,7 @@ impl<'a> ProjectKeyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2054,7 +2083,7 @@ impl<'a> ProjectKeyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2074,9 +2103,9 @@ impl<'a> ProjectKeyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2108,7 +2137,7 @@ impl<'a> ProjectKeyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2116,19 +2145,25 @@ impl<'a> ProjectKeyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyGetCall<'a>
-    where  {
+pub struct ProjectKeyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyGetCall<'a, S> {}
 
-impl<'a> ProjectKeyGetCall<'a> {
+impl<'a, S> ProjectKeyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2275,7 +2310,7 @@ impl<'a> ProjectKeyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectKeyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectKeyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2285,7 +2320,7 @@ impl<'a> ProjectKeyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2310,7 +2345,7 @@ impl<'a> ProjectKeyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2330,9 +2365,9 @@ impl<'a> ProjectKeyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2364,7 +2399,7 @@ impl<'a> ProjectKeyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2372,19 +2407,25 @@ impl<'a> ProjectKeyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyGetMetricCall<'a>
-    where  {
+pub struct ProjectKeyGetMetricCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyGetMetricCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyGetMetricCall<'a, S> {}
 
-impl<'a> ProjectKeyGetMetricCall<'a> {
+impl<'a, S> ProjectKeyGetMetricCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2531,7 +2572,7 @@ impl<'a> ProjectKeyGetMetricCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectKeyGetMetricCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectKeyGetMetricCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2541,7 +2582,7 @@ impl<'a> ProjectKeyGetMetricCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyGetMetricCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyGetMetricCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2566,7 +2607,7 @@ impl<'a> ProjectKeyGetMetricCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyGetMetricCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyGetMetricCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2586,9 +2627,9 @@ impl<'a> ProjectKeyGetMetricCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyGetMetricCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyGetMetricCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2620,7 +2661,7 @@ impl<'a> ProjectKeyGetMetricCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2630,10 +2671,10 @@ impl<'a> ProjectKeyGetMetricCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyListCall<'a>
-    where  {
+pub struct ProjectKeyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2642,9 +2683,15 @@ pub struct ProjectKeyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyListCall<'a, S> {}
 
-impl<'a> ProjectKeyListCall<'a> {
+impl<'a, S> ProjectKeyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2797,21 +2844,21 @@ impl<'a> ProjectKeyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectKeyListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectKeyListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous. ListKeysRequest, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectKeyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectKeyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of keys to return. Default is 10. Max limit is 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectKeyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectKeyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2821,7 +2868,7 @@ impl<'a> ProjectKeyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2846,7 +2893,7 @@ impl<'a> ProjectKeyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2866,9 +2913,9 @@ impl<'a> ProjectKeyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2901,7 +2948,7 @@ impl<'a> ProjectKeyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2914,10 +2961,10 @@ impl<'a> ProjectKeyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyMigrateCall<'a>
-    where  {
+pub struct ProjectKeyMigrateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _request: GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2925,9 +2972,15 @@ pub struct ProjectKeyMigrateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyMigrateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyMigrateCall<'a, S> {}
 
-impl<'a> ProjectKeyMigrateCall<'a> {
+impl<'a, S> ProjectKeyMigrateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3087,7 +3140,7 @@ impl<'a> ProjectKeyMigrateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest) -> ProjectKeyMigrateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest) -> ProjectKeyMigrateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3097,7 +3150,7 @@ impl<'a> ProjectKeyMigrateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectKeyMigrateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectKeyMigrateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3107,7 +3160,7 @@ impl<'a> ProjectKeyMigrateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyMigrateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyMigrateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3132,7 +3185,7 @@ impl<'a> ProjectKeyMigrateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyMigrateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyMigrateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3152,9 +3205,9 @@ impl<'a> ProjectKeyMigrateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyMigrateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyMigrateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3187,7 +3240,7 @@ impl<'a> ProjectKeyMigrateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3201,10 +3254,10 @@ impl<'a> ProjectKeyMigrateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectKeyPatchCall<'a>
-    where  {
+pub struct ProjectKeyPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _request: GoogleCloudRecaptchaenterpriseV1Key,
     _name: String,
     _update_mask: Option<String>,
@@ -3213,9 +3266,15 @@ pub struct ProjectKeyPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectKeyPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectKeyPatchCall<'a, S> {}
 
-impl<'a> ProjectKeyPatchCall<'a> {
+impl<'a, S> ProjectKeyPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3378,7 +3437,7 @@ impl<'a> ProjectKeyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1Key) -> ProjectKeyPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1Key) -> ProjectKeyPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3388,14 +3447,14 @@ impl<'a> ProjectKeyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectKeyPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectKeyPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The mask to control which fields of the key get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectKeyPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectKeyPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3405,7 +3464,7 @@ impl<'a> ProjectKeyPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectKeyPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3430,7 +3489,7 @@ impl<'a> ProjectKeyPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3450,9 +3509,9 @@ impl<'a> ProjectKeyPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectKeyPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectKeyPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3485,7 +3544,7 @@ impl<'a> ProjectKeyPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3498,10 +3557,10 @@ impl<'a> ProjectKeyPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRelatedaccountgroupmembershipSearchCall<'a>
-    where  {
+pub struct ProjectRelatedaccountgroupmembershipSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _request: GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsRequest,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3509,9 +3568,15 @@ pub struct ProjectRelatedaccountgroupmembershipSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRelatedaccountgroupmembershipSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRelatedaccountgroupmembershipSearchCall<'a, S> {}
 
-impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
+impl<'a, S> ProjectRelatedaccountgroupmembershipSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3671,7 +3736,7 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsRequest) -> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsRequest) -> ProjectRelatedaccountgroupmembershipSearchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3681,7 +3746,7 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ProjectRelatedaccountgroupmembershipSearchCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3691,7 +3756,7 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRelatedaccountgroupmembershipSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3716,7 +3781,7 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRelatedaccountgroupmembershipSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRelatedaccountgroupmembershipSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3736,9 +3801,9 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRelatedaccountgroupmembershipSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRelatedaccountgroupmembershipSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3770,7 +3835,7 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3780,10 +3845,10 @@ impl<'a> ProjectRelatedaccountgroupmembershipSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRelatedaccountgroupMembershipListCall<'a>
-    where  {
+pub struct ProjectRelatedaccountgroupMembershipListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3792,9 +3857,15 @@ pub struct ProjectRelatedaccountgroupMembershipListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRelatedaccountgroupMembershipListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRelatedaccountgroupMembershipListCall<'a, S> {}
 
-impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
+impl<'a, S> ProjectRelatedaccountgroupMembershipListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3947,21 +4018,21 @@ impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRelatedaccountgroupMembershipListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRelatedaccountgroupMembershipListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListRelatedAccountGroupMemberships` call. When paginating, all other parameters provided to `ListRelatedAccountGroupMemberships` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRelatedaccountgroupMembershipListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRelatedaccountgroupMembershipListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of accounts to return. The service may return fewer than this value. If unspecified, at most 50 accounts will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRelatedaccountgroupMembershipListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRelatedaccountgroupMembershipListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3971,7 +4042,7 @@ impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRelatedaccountgroupMembershipListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRelatedaccountgroupMembershipListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3996,7 +4067,7 @@ impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRelatedaccountgroupMembershipListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRelatedaccountgroupMembershipListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4016,9 +4087,9 @@ impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRelatedaccountgroupMembershipListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRelatedaccountgroupMembershipListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4050,7 +4121,7 @@ impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4060,10 +4131,10 @@ impl<'a> ProjectRelatedaccountgroupMembershipListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRelatedaccountgroupListCall<'a>
-    where  {
+pub struct ProjectRelatedaccountgroupListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecaptchaEnterprise<>,
+    hub: &'a RecaptchaEnterprise<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4072,9 +4143,15 @@ pub struct ProjectRelatedaccountgroupListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRelatedaccountgroupListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRelatedaccountgroupListCall<'a, S> {}
 
-impl<'a> ProjectRelatedaccountgroupListCall<'a> {
+impl<'a, S> ProjectRelatedaccountgroupListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4227,21 +4304,21 @@ impl<'a> ProjectRelatedaccountgroupListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRelatedaccountgroupListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRelatedaccountgroupListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListRelatedAccountGroups` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListRelatedAccountGroups` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRelatedaccountgroupListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRelatedaccountgroupListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of groups to return. The service may return fewer than this value. If unspecified, at most 50 groups will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRelatedaccountgroupListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRelatedaccountgroupListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4251,7 +4328,7 @@ impl<'a> ProjectRelatedaccountgroupListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRelatedaccountgroupListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRelatedaccountgroupListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4276,7 +4353,7 @@ impl<'a> ProjectRelatedaccountgroupListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRelatedaccountgroupListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRelatedaccountgroupListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4296,9 +4373,9 @@ impl<'a> ProjectRelatedaccountgroupListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRelatedaccountgroupListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRelatedaccountgroupListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

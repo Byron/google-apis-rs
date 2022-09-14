@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -124,7 +129,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -160,34 +165,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Gmail<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Gmail<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Gmail<> {}
+impl<'a, S> client::Hub for Gmail<S> {}
 
-impl<'a, > Gmail<> {
+impl<'a, S> Gmail<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Gmail<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Gmail<S> {
         Gmail {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://gmail.googleapis.com/".to_string(),
             _root_url: "https://gmail.googleapis.com/".to_string(),
         }
     }
 
-    pub fn users(&'a self) -> UserMethods<'a> {
+    pub fn users(&'a self) -> UserMethods<'a, S> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1286,22 +1291,22 @@ impl client::ResponseResult for WatchResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `drafts_create(...)`, `drafts_delete(...)`, `drafts_get(...)`, `drafts_list(...)`, `drafts_send(...)`, `drafts_update(...)`, `get_profile(...)`, `history_list(...)`, `labels_create(...)`, `labels_delete(...)`, `labels_get(...)`, `labels_list(...)`, `labels_patch(...)`, `labels_update(...)`, `messages_attachments_get(...)`, `messages_batch_delete(...)`, `messages_batch_modify(...)`, `messages_delete(...)`, `messages_get(...)`, `messages_import(...)`, `messages_insert(...)`, `messages_list(...)`, `messages_modify(...)`, `messages_send(...)`, `messages_trash(...)`, `messages_untrash(...)`, `settings_delegates_create(...)`, `settings_delegates_delete(...)`, `settings_delegates_get(...)`, `settings_delegates_list(...)`, `settings_filters_create(...)`, `settings_filters_delete(...)`, `settings_filters_get(...)`, `settings_filters_list(...)`, `settings_forwarding_addresses_create(...)`, `settings_forwarding_addresses_delete(...)`, `settings_forwarding_addresses_get(...)`, `settings_forwarding_addresses_list(...)`, `settings_get_auto_forwarding(...)`, `settings_get_imap(...)`, `settings_get_language(...)`, `settings_get_pop(...)`, `settings_get_vacation(...)`, `settings_send_as_create(...)`, `settings_send_as_delete(...)`, `settings_send_as_get(...)`, `settings_send_as_list(...)`, `settings_send_as_patch(...)`, `settings_send_as_smime_info_delete(...)`, `settings_send_as_smime_info_get(...)`, `settings_send_as_smime_info_insert(...)`, `settings_send_as_smime_info_list(...)`, `settings_send_as_smime_info_set_default(...)`, `settings_send_as_update(...)`, `settings_send_as_verify(...)`, `settings_update_auto_forwarding(...)`, `settings_update_imap(...)`, `settings_update_language(...)`, `settings_update_pop(...)`, `settings_update_vacation(...)`, `stop(...)`, `threads_delete(...)`, `threads_get(...)`, `threads_list(...)`, `threads_modify(...)`, `threads_trash(...)`, `threads_untrash(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a>
-    where  {
+pub struct UserMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
 }
 
-impl<'a> client::MethodsBuilder for UserMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UserMethods<'a, S> {}
 
-impl<'a> UserMethods<'a> {
+impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1311,7 +1316,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn drafts_create(&self, request: Draft, user_id: &str) -> UserDraftCreateCall<'a> {
+    pub fn drafts_create(&self, request: Draft, user_id: &str) -> UserDraftCreateCall<'a, S> {
         UserDraftCreateCall {
             hub: self.hub,
             _request: request,
@@ -1330,7 +1335,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the draft to delete.
-    pub fn drafts_delete(&self, user_id: &str, id: &str) -> UserDraftDeleteCall<'a> {
+    pub fn drafts_delete(&self, user_id: &str, id: &str) -> UserDraftDeleteCall<'a, S> {
         UserDraftDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1349,7 +1354,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the draft to retrieve.
-    pub fn drafts_get(&self, user_id: &str, id: &str) -> UserDraftGetCall<'a> {
+    pub fn drafts_get(&self, user_id: &str, id: &str) -> UserDraftGetCall<'a, S> {
         UserDraftGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1368,7 +1373,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn drafts_list(&self, user_id: &str) -> UserDraftListCall<'a> {
+    pub fn drafts_list(&self, user_id: &str) -> UserDraftListCall<'a, S> {
         UserDraftListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1390,7 +1395,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn drafts_send(&self, request: Draft, user_id: &str) -> UserDraftSendCall<'a> {
+    pub fn drafts_send(&self, request: Draft, user_id: &str) -> UserDraftSendCall<'a, S> {
         UserDraftSendCall {
             hub: self.hub,
             _request: request,
@@ -1410,7 +1415,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the draft to update.
-    pub fn drafts_update(&self, request: Draft, user_id: &str, id: &str) -> UserDraftUpdateCall<'a> {
+    pub fn drafts_update(&self, request: Draft, user_id: &str, id: &str) -> UserDraftUpdateCall<'a, S> {
         UserDraftUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1429,7 +1434,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn history_list(&self, user_id: &str) -> UserHistoryListCall<'a> {
+    pub fn history_list(&self, user_id: &str) -> UserHistoryListCall<'a, S> {
         UserHistoryListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1452,7 +1457,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn labels_create(&self, request: Label, user_id: &str) -> UserLabelCreateCall<'a> {
+    pub fn labels_create(&self, request: Label, user_id: &str) -> UserLabelCreateCall<'a, S> {
         UserLabelCreateCall {
             hub: self.hub,
             _request: request,
@@ -1471,7 +1476,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to delete.
-    pub fn labels_delete(&self, user_id: &str, id: &str) -> UserLabelDeleteCall<'a> {
+    pub fn labels_delete(&self, user_id: &str, id: &str) -> UserLabelDeleteCall<'a, S> {
         UserLabelDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1490,7 +1495,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to retrieve.
-    pub fn labels_get(&self, user_id: &str, id: &str) -> UserLabelGetCall<'a> {
+    pub fn labels_get(&self, user_id: &str, id: &str) -> UserLabelGetCall<'a, S> {
         UserLabelGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1508,7 +1513,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a> {
+    pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a, S> {
         UserLabelListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1527,7 +1532,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to update.
-    pub fn labels_patch(&self, request: Label, user_id: &str, id: &str) -> UserLabelPatchCall<'a> {
+    pub fn labels_patch(&self, request: Label, user_id: &str, id: &str) -> UserLabelPatchCall<'a, S> {
         UserLabelPatchCall {
             hub: self.hub,
             _request: request,
@@ -1548,7 +1553,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the label to update.
-    pub fn labels_update(&self, request: Label, user_id: &str, id: &str) -> UserLabelUpdateCall<'a> {
+    pub fn labels_update(&self, request: Label, user_id: &str, id: &str) -> UserLabelUpdateCall<'a, S> {
         UserLabelUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1569,7 +1574,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `messageId` - The ID of the message containing the attachment.
     /// * `id` - The ID of the attachment.
-    pub fn messages_attachments_get(&self, user_id: &str, message_id: &str, id: &str) -> UserMessageAttachmentGetCall<'a> {
+    pub fn messages_attachments_get(&self, user_id: &str, message_id: &str, id: &str) -> UserMessageAttachmentGetCall<'a, S> {
         UserMessageAttachmentGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1589,7 +1594,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn messages_batch_delete(&self, request: BatchDeleteMessagesRequest, user_id: &str) -> UserMessageBatchDeleteCall<'a> {
+    pub fn messages_batch_delete(&self, request: BatchDeleteMessagesRequest, user_id: &str) -> UserMessageBatchDeleteCall<'a, S> {
         UserMessageBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -1608,7 +1613,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn messages_batch_modify(&self, request: BatchModifyMessagesRequest, user_id: &str) -> UserMessageBatchModifyCall<'a> {
+    pub fn messages_batch_modify(&self, request: BatchModifyMessagesRequest, user_id: &str) -> UserMessageBatchModifyCall<'a, S> {
         UserMessageBatchModifyCall {
             hub: self.hub,
             _request: request,
@@ -1627,7 +1632,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to delete.
-    pub fn messages_delete(&self, user_id: &str, id: &str) -> UserMessageDeleteCall<'a> {
+    pub fn messages_delete(&self, user_id: &str, id: &str) -> UserMessageDeleteCall<'a, S> {
         UserMessageDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1646,7 +1651,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
-    pub fn messages_get(&self, user_id: &str, id: &str) -> UserMessageGetCall<'a> {
+    pub fn messages_get(&self, user_id: &str, id: &str) -> UserMessageGetCall<'a, S> {
         UserMessageGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1667,7 +1672,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn messages_import(&self, request: Message, user_id: &str) -> UserMessageImportCall<'a> {
+    pub fn messages_import(&self, request: Message, user_id: &str) -> UserMessageImportCall<'a, S> {
         UserMessageImportCall {
             hub: self.hub,
             _request: request,
@@ -1690,7 +1695,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn messages_insert(&self, request: Message, user_id: &str) -> UserMessageInsertCall<'a> {
+    pub fn messages_insert(&self, request: Message, user_id: &str) -> UserMessageInsertCall<'a, S> {
         UserMessageInsertCall {
             hub: self.hub,
             _request: request,
@@ -1710,7 +1715,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn messages_list(&self, user_id: &str) -> UserMessageListCall<'a> {
+    pub fn messages_list(&self, user_id: &str) -> UserMessageListCall<'a, S> {
         UserMessageListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1734,7 +1739,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to modify.
-    pub fn messages_modify(&self, request: ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a> {
+    pub fn messages_modify(&self, request: ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a, S> {
         UserMessageModifyCall {
             hub: self.hub,
             _request: request,
@@ -1754,7 +1759,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn messages_send(&self, request: Message, user_id: &str) -> UserMessageSendCall<'a> {
+    pub fn messages_send(&self, request: Message, user_id: &str) -> UserMessageSendCall<'a, S> {
         UserMessageSendCall {
             hub: self.hub,
             _request: request,
@@ -1773,7 +1778,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to Trash.
-    pub fn messages_trash(&self, user_id: &str, id: &str) -> UserMessageTrashCall<'a> {
+    pub fn messages_trash(&self, user_id: &str, id: &str) -> UserMessageTrashCall<'a, S> {
         UserMessageTrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1792,7 +1797,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the message to remove from Trash.
-    pub fn messages_untrash(&self, user_id: &str, id: &str) -> UserMessageUntrashCall<'a> {
+    pub fn messages_untrash(&self, user_id: &str, id: &str) -> UserMessageUntrashCall<'a, S> {
         UserMessageUntrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1811,7 +1816,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_delegates_create(&self, request: Delegate, user_id: &str) -> UserSettingDelegateCreateCall<'a> {
+    pub fn settings_delegates_create(&self, request: Delegate, user_id: &str) -> UserSettingDelegateCreateCall<'a, S> {
         UserSettingDelegateCreateCall {
             hub: self.hub,
             _request: request,
@@ -1830,7 +1835,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `delegateEmail` - The email address of the user to be removed as a delegate.
-    pub fn settings_delegates_delete(&self, user_id: &str, delegate_email: &str) -> UserSettingDelegateDeleteCall<'a> {
+    pub fn settings_delegates_delete(&self, user_id: &str, delegate_email: &str) -> UserSettingDelegateDeleteCall<'a, S> {
         UserSettingDelegateDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1849,7 +1854,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `delegateEmail` - The email address of the user whose delegate relationship is to be retrieved.
-    pub fn settings_delegates_get(&self, user_id: &str, delegate_email: &str) -> UserSettingDelegateGetCall<'a> {
+    pub fn settings_delegates_get(&self, user_id: &str, delegate_email: &str) -> UserSettingDelegateGetCall<'a, S> {
         UserSettingDelegateGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1867,7 +1872,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_delegates_list(&self, user_id: &str) -> UserSettingDelegateListCall<'a> {
+    pub fn settings_delegates_list(&self, user_id: &str) -> UserSettingDelegateListCall<'a, S> {
         UserSettingDelegateListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1885,7 +1890,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_filters_create(&self, request: Filter, user_id: &str) -> UserSettingFilterCreateCall<'a> {
+    pub fn settings_filters_create(&self, request: Filter, user_id: &str) -> UserSettingFilterCreateCall<'a, S> {
         UserSettingFilterCreateCall {
             hub: self.hub,
             _request: request,
@@ -1904,7 +1909,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `id` - The ID of the filter to be deleted.
-    pub fn settings_filters_delete(&self, user_id: &str, id: &str) -> UserSettingFilterDeleteCall<'a> {
+    pub fn settings_filters_delete(&self, user_id: &str, id: &str) -> UserSettingFilterDeleteCall<'a, S> {
         UserSettingFilterDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1923,7 +1928,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `id` - The ID of the filter to be fetched.
-    pub fn settings_filters_get(&self, user_id: &str, id: &str) -> UserSettingFilterGetCall<'a> {
+    pub fn settings_filters_get(&self, user_id: &str, id: &str) -> UserSettingFilterGetCall<'a, S> {
         UserSettingFilterGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1941,7 +1946,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_filters_list(&self, user_id: &str) -> UserSettingFilterListCall<'a> {
+    pub fn settings_filters_list(&self, user_id: &str) -> UserSettingFilterListCall<'a, S> {
         UserSettingFilterListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1959,7 +1964,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_forwarding_addresses_create(&self, request: ForwardingAddress, user_id: &str) -> UserSettingForwardingAddresseCreateCall<'a> {
+    pub fn settings_forwarding_addresses_create(&self, request: ForwardingAddress, user_id: &str) -> UserSettingForwardingAddresseCreateCall<'a, S> {
         UserSettingForwardingAddresseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1978,7 +1983,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `forwardingEmail` - The forwarding address to be deleted.
-    pub fn settings_forwarding_addresses_delete(&self, user_id: &str, forwarding_email: &str) -> UserSettingForwardingAddresseDeleteCall<'a> {
+    pub fn settings_forwarding_addresses_delete(&self, user_id: &str, forwarding_email: &str) -> UserSettingForwardingAddresseDeleteCall<'a, S> {
         UserSettingForwardingAddresseDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1997,7 +2002,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `forwardingEmail` - The forwarding address to be retrieved.
-    pub fn settings_forwarding_addresses_get(&self, user_id: &str, forwarding_email: &str) -> UserSettingForwardingAddresseGetCall<'a> {
+    pub fn settings_forwarding_addresses_get(&self, user_id: &str, forwarding_email: &str) -> UserSettingForwardingAddresseGetCall<'a, S> {
         UserSettingForwardingAddresseGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2015,7 +2020,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_forwarding_addresses_list(&self, user_id: &str) -> UserSettingForwardingAddresseListCall<'a> {
+    pub fn settings_forwarding_addresses_list(&self, user_id: &str) -> UserSettingForwardingAddresseListCall<'a, S> {
         UserSettingForwardingAddresseListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2034,7 +2039,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The email address that appears in the "From:" header for mail sent using this alias.
     /// * `id` - The immutable ID for the SmimeInfo.
-    pub fn settings_send_as_smime_info_delete(&self, user_id: &str, send_as_email: &str, id: &str) -> UserSettingSendASmimeInfoDeleteCall<'a> {
+    pub fn settings_send_as_smime_info_delete(&self, user_id: &str, send_as_email: &str, id: &str) -> UserSettingSendASmimeInfoDeleteCall<'a, S> {
         UserSettingSendASmimeInfoDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2055,7 +2060,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The email address that appears in the "From:" header for mail sent using this alias.
     /// * `id` - The immutable ID for the SmimeInfo.
-    pub fn settings_send_as_smime_info_get(&self, user_id: &str, send_as_email: &str, id: &str) -> UserSettingSendASmimeInfoGetCall<'a> {
+    pub fn settings_send_as_smime_info_get(&self, user_id: &str, send_as_email: &str, id: &str) -> UserSettingSendASmimeInfoGetCall<'a, S> {
         UserSettingSendASmimeInfoGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2076,7 +2081,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The email address that appears in the "From:" header for mail sent using this alias.
-    pub fn settings_send_as_smime_info_insert(&self, request: SmimeInfo, user_id: &str, send_as_email: &str) -> UserSettingSendASmimeInfoInsertCall<'a> {
+    pub fn settings_send_as_smime_info_insert(&self, request: SmimeInfo, user_id: &str, send_as_email: &str) -> UserSettingSendASmimeInfoInsertCall<'a, S> {
         UserSettingSendASmimeInfoInsertCall {
             hub: self.hub,
             _request: request,
@@ -2096,7 +2101,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The email address that appears in the "From:" header for mail sent using this alias.
-    pub fn settings_send_as_smime_info_list(&self, user_id: &str, send_as_email: &str) -> UserSettingSendASmimeInfoListCall<'a> {
+    pub fn settings_send_as_smime_info_list(&self, user_id: &str, send_as_email: &str) -> UserSettingSendASmimeInfoListCall<'a, S> {
         UserSettingSendASmimeInfoListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2116,7 +2121,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The email address that appears in the "From:" header for mail sent using this alias.
     /// * `id` - The immutable ID for the SmimeInfo.
-    pub fn settings_send_as_smime_info_set_default(&self, user_id: &str, send_as_email: &str, id: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a> {
+    pub fn settings_send_as_smime_info_set_default(&self, user_id: &str, send_as_email: &str, id: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S> {
         UserSettingSendASmimeInfoSetDefaultCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2136,7 +2141,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_send_as_create(&self, request: SendAs, user_id: &str) -> UserSettingSendACreateCall<'a> {
+    pub fn settings_send_as_create(&self, request: SendAs, user_id: &str) -> UserSettingSendACreateCall<'a, S> {
         UserSettingSendACreateCall {
             hub: self.hub,
             _request: request,
@@ -2155,7 +2160,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The send-as alias to be deleted.
-    pub fn settings_send_as_delete(&self, user_id: &str, send_as_email: &str) -> UserSettingSendADeleteCall<'a> {
+    pub fn settings_send_as_delete(&self, user_id: &str, send_as_email: &str) -> UserSettingSendADeleteCall<'a, S> {
         UserSettingSendADeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2174,7 +2179,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The send-as alias to be retrieved.
-    pub fn settings_send_as_get(&self, user_id: &str, send_as_email: &str) -> UserSettingSendAGetCall<'a> {
+    pub fn settings_send_as_get(&self, user_id: &str, send_as_email: &str) -> UserSettingSendAGetCall<'a, S> {
         UserSettingSendAGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2192,7 +2197,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_send_as_list(&self, user_id: &str) -> UserSettingSendAListCall<'a> {
+    pub fn settings_send_as_list(&self, user_id: &str) -> UserSettingSendAListCall<'a, S> {
         UserSettingSendAListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2211,7 +2216,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The send-as alias to be updated.
-    pub fn settings_send_as_patch(&self, request: SendAs, user_id: &str, send_as_email: &str) -> UserSettingSendAPatchCall<'a> {
+    pub fn settings_send_as_patch(&self, request: SendAs, user_id: &str, send_as_email: &str) -> UserSettingSendAPatchCall<'a, S> {
         UserSettingSendAPatchCall {
             hub: self.hub,
             _request: request,
@@ -2232,7 +2237,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The send-as alias to be updated.
-    pub fn settings_send_as_update(&self, request: SendAs, user_id: &str, send_as_email: &str) -> UserSettingSendAUpdateCall<'a> {
+    pub fn settings_send_as_update(&self, request: SendAs, user_id: &str, send_as_email: &str) -> UserSettingSendAUpdateCall<'a, S> {
         UserSettingSendAUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2252,7 +2257,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
     /// * `sendAsEmail` - The send-as alias to be verified.
-    pub fn settings_send_as_verify(&self, user_id: &str, send_as_email: &str) -> UserSettingSendAVerifyCall<'a> {
+    pub fn settings_send_as_verify(&self, user_id: &str, send_as_email: &str) -> UserSettingSendAVerifyCall<'a, S> {
         UserSettingSendAVerifyCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2270,7 +2275,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_get_auto_forwarding(&self, user_id: &str) -> UserSettingGetAutoForwardingCall<'a> {
+    pub fn settings_get_auto_forwarding(&self, user_id: &str) -> UserSettingGetAutoForwardingCall<'a, S> {
         UserSettingGetAutoForwardingCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2287,7 +2292,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_get_imap(&self, user_id: &str) -> UserSettingGetImapCall<'a> {
+    pub fn settings_get_imap(&self, user_id: &str) -> UserSettingGetImapCall<'a, S> {
         UserSettingGetImapCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2304,7 +2309,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_get_language(&self, user_id: &str) -> UserSettingGetLanguageCall<'a> {
+    pub fn settings_get_language(&self, user_id: &str) -> UserSettingGetLanguageCall<'a, S> {
         UserSettingGetLanguageCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2321,7 +2326,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_get_pop(&self, user_id: &str) -> UserSettingGetPopCall<'a> {
+    pub fn settings_get_pop(&self, user_id: &str) -> UserSettingGetPopCall<'a, S> {
         UserSettingGetPopCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2338,7 +2343,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_get_vacation(&self, user_id: &str) -> UserSettingGetVacationCall<'a> {
+    pub fn settings_get_vacation(&self, user_id: &str) -> UserSettingGetVacationCall<'a, S> {
         UserSettingGetVacationCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2356,7 +2361,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_update_auto_forwarding(&self, request: AutoForwarding, user_id: &str) -> UserSettingUpdateAutoForwardingCall<'a> {
+    pub fn settings_update_auto_forwarding(&self, request: AutoForwarding, user_id: &str) -> UserSettingUpdateAutoForwardingCall<'a, S> {
         UserSettingUpdateAutoForwardingCall {
             hub: self.hub,
             _request: request,
@@ -2375,7 +2380,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_update_imap(&self, request: ImapSettings, user_id: &str) -> UserSettingUpdateImapCall<'a> {
+    pub fn settings_update_imap(&self, request: ImapSettings, user_id: &str) -> UserSettingUpdateImapCall<'a, S> {
         UserSettingUpdateImapCall {
             hub: self.hub,
             _request: request,
@@ -2394,7 +2399,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_update_language(&self, request: LanguageSettings, user_id: &str) -> UserSettingUpdateLanguageCall<'a> {
+    pub fn settings_update_language(&self, request: LanguageSettings, user_id: &str) -> UserSettingUpdateLanguageCall<'a, S> {
         UserSettingUpdateLanguageCall {
             hub: self.hub,
             _request: request,
@@ -2413,7 +2418,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_update_pop(&self, request: PopSettings, user_id: &str) -> UserSettingUpdatePopCall<'a> {
+    pub fn settings_update_pop(&self, request: PopSettings, user_id: &str) -> UserSettingUpdatePopCall<'a, S> {
         UserSettingUpdatePopCall {
             hub: self.hub,
             _request: request,
@@ -2432,7 +2437,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - User's email address. The special value "me" can be used to indicate the authenticated user.
-    pub fn settings_update_vacation(&self, request: VacationSettings, user_id: &str) -> UserSettingUpdateVacationCall<'a> {
+    pub fn settings_update_vacation(&self, request: VacationSettings, user_id: &str) -> UserSettingUpdateVacationCall<'a, S> {
         UserSettingUpdateVacationCall {
             hub: self.hub,
             _request: request,
@@ -2451,7 +2456,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - ID of the Thread to delete.
-    pub fn threads_delete(&self, user_id: &str, id: &str) -> UserThreadDeleteCall<'a> {
+    pub fn threads_delete(&self, user_id: &str, id: &str) -> UserThreadDeleteCall<'a, S> {
         UserThreadDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2470,7 +2475,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to retrieve.
-    pub fn threads_get(&self, user_id: &str, id: &str) -> UserThreadGetCall<'a> {
+    pub fn threads_get(&self, user_id: &str, id: &str) -> UserThreadGetCall<'a, S> {
         UserThreadGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2490,7 +2495,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn threads_list(&self, user_id: &str) -> UserThreadListCall<'a> {
+    pub fn threads_list(&self, user_id: &str) -> UserThreadListCall<'a, S> {
         UserThreadListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2514,7 +2519,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to modify.
-    pub fn threads_modify(&self, request: ModifyThreadRequest, user_id: &str, id: &str) -> UserThreadModifyCall<'a> {
+    pub fn threads_modify(&self, request: ModifyThreadRequest, user_id: &str, id: &str) -> UserThreadModifyCall<'a, S> {
         UserThreadModifyCall {
             hub: self.hub,
             _request: request,
@@ -2534,7 +2539,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to Trash.
-    pub fn threads_trash(&self, user_id: &str, id: &str) -> UserThreadTrashCall<'a> {
+    pub fn threads_trash(&self, user_id: &str, id: &str) -> UserThreadTrashCall<'a, S> {
         UserThreadTrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2553,7 +2558,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
     /// * `id` - The ID of the thread to remove from Trash.
-    pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a> {
+    pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a, S> {
         UserThreadUntrashCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2571,7 +2576,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn get_profile(&self, user_id: &str) -> UserGetProfileCall<'a> {
+    pub fn get_profile(&self, user_id: &str) -> UserGetProfileCall<'a, S> {
         UserGetProfileCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2588,7 +2593,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn stop(&self, user_id: &str) -> UserStopCall<'a> {
+    pub fn stop(&self, user_id: &str) -> UserStopCall<'a, S> {
         UserStopCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2606,7 +2611,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - The user's email address. The special value `me` can be used to indicate the authenticated user.
-    pub fn watch(&self, request: WatchRequest, user_id: &str) -> UserWatchCall<'a> {
+    pub fn watch(&self, request: WatchRequest, user_id: &str) -> UserWatchCall<'a, S> {
         UserWatchCall {
             hub: self.hub,
             _request: request,
@@ -2650,7 +2655,7 @@ impl<'a> UserMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2663,10 +2668,10 @@ impl<'a> UserMethods<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct UserDraftCreateCall<'a>
-    where  {
+pub struct UserDraftCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Draft,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2674,9 +2679,15 @@ pub struct UserDraftCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDraftCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDraftCreateCall<'a, S> {}
 
-impl<'a> UserDraftCreateCall<'a> {
+impl<'a, S> UserDraftCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2945,7 +2956,7 @@ impl<'a> UserDraftCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Draft) -> UserDraftCreateCall<'a> {
+    pub fn request(mut self, new_value: Draft) -> UserDraftCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2955,7 +2966,7 @@ impl<'a> UserDraftCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftCreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftCreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2965,7 +2976,7 @@ impl<'a> UserDraftCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2990,7 +3001,7 @@ impl<'a> UserDraftCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3010,9 +3021,9 @@ impl<'a> UserDraftCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDraftCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDraftCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3044,7 +3055,7 @@ impl<'a> UserDraftCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3052,10 +3063,10 @@ impl<'a> UserDraftCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDraftDeleteCall<'a>
-    where  {
+pub struct UserDraftDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3063,9 +3074,15 @@ pub struct UserDraftDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDraftDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDraftDeleteCall<'a, S> {}
 
-impl<'a> UserDraftDeleteCall<'a> {
+impl<'a, S> UserDraftDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3198,7 +3215,7 @@ impl<'a> UserDraftDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3208,7 +3225,7 @@ impl<'a> UserDraftDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserDraftDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -3218,7 +3235,7 @@ impl<'a> UserDraftDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3243,7 +3260,7 @@ impl<'a> UserDraftDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3263,9 +3280,9 @@ impl<'a> UserDraftDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDraftDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDraftDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3297,7 +3314,7 @@ impl<'a> UserDraftDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3306,10 +3323,10 @@ impl<'a> UserDraftDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDraftGetCall<'a>
-    where  {
+pub struct UserDraftGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _format: Option<String>,
@@ -3318,9 +3335,15 @@ pub struct UserDraftGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDraftGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDraftGetCall<'a, S> {}
 
-impl<'a> UserDraftGetCall<'a> {
+impl<'a, S> UserDraftGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3467,7 +3490,7 @@ impl<'a> UserDraftGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3477,14 +3500,14 @@ impl<'a> UserDraftGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserDraftGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserDraftGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// The format to return the draft in.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a> {
+    pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a, S> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -3494,7 +3517,7 @@ impl<'a> UserDraftGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3519,7 +3542,7 @@ impl<'a> UserDraftGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3539,9 +3562,9 @@ impl<'a> UserDraftGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDraftGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDraftGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3573,7 +3596,7 @@ impl<'a> UserDraftGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3585,10 +3608,10 @@ impl<'a> UserDraftGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDraftListCall<'a>
-    where  {
+pub struct UserDraftListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -3599,9 +3622,15 @@ pub struct UserDraftListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDraftListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDraftListCall<'a, S> {}
 
-impl<'a> UserDraftListCall<'a> {
+impl<'a, S> UserDraftListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3756,35 +3785,35 @@ impl<'a> UserDraftListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// Only return draft messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> UserDraftListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> UserDraftListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token to retrieve a specific page of results in the list.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserDraftListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserDraftListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of drafts to return. This field defaults to 100. The maximum allowed value for this field is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Include drafts from `SPAM` and `TRASH` in the results.
     ///
     /// Sets the *include spam trash* query property to the given value.
-    pub fn include_spam_trash(mut self, new_value: bool) -> UserDraftListCall<'a> {
+    pub fn include_spam_trash(mut self, new_value: bool) -> UserDraftListCall<'a, S> {
         self._include_spam_trash = Some(new_value);
         self
     }
@@ -3794,7 +3823,7 @@ impl<'a> UserDraftListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3819,7 +3848,7 @@ impl<'a> UserDraftListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3839,9 +3868,9 @@ impl<'a> UserDraftListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDraftListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDraftListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3875,7 +3904,7 @@ impl<'a> UserDraftListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3888,10 +3917,10 @@ impl<'a> UserDraftListCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct UserDraftSendCall<'a>
-    where  {
+pub struct UserDraftSendCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Draft,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3899,9 +3928,15 @@ pub struct UserDraftSendCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDraftSendCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDraftSendCall<'a, S> {}
 
-impl<'a> UserDraftSendCall<'a> {
+impl<'a, S> UserDraftSendCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4170,7 +4205,7 @@ impl<'a> UserDraftSendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Draft) -> UserDraftSendCall<'a> {
+    pub fn request(mut self, new_value: Draft) -> UserDraftSendCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4180,7 +4215,7 @@ impl<'a> UserDraftSendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftSendCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftSendCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4190,7 +4225,7 @@ impl<'a> UserDraftSendCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftSendCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftSendCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4215,7 +4250,7 @@ impl<'a> UserDraftSendCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftSendCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftSendCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4235,9 +4270,9 @@ impl<'a> UserDraftSendCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDraftSendCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDraftSendCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4271,7 +4306,7 @@ impl<'a> UserDraftSendCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4284,10 +4319,10 @@ impl<'a> UserDraftSendCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct UserDraftUpdateCall<'a>
-    where  {
+pub struct UserDraftUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Draft,
     _user_id: String,
     _id: String,
@@ -4296,9 +4331,15 @@ pub struct UserDraftUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDraftUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDraftUpdateCall<'a, S> {}
 
-impl<'a> UserDraftUpdateCall<'a> {
+impl<'a, S> UserDraftUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4568,7 +4609,7 @@ impl<'a> UserDraftUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Draft) -> UserDraftUpdateCall<'a> {
+    pub fn request(mut self, new_value: Draft) -> UserDraftUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4578,7 +4619,7 @@ impl<'a> UserDraftUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDraftUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4588,7 +4629,7 @@ impl<'a> UserDraftUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserDraftUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -4598,7 +4639,7 @@ impl<'a> UserDraftUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDraftUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4623,7 +4664,7 @@ impl<'a> UserDraftUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDraftUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDraftUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4643,9 +4684,9 @@ impl<'a> UserDraftUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDraftUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDraftUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4677,7 +4718,7 @@ impl<'a> UserDraftUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4690,10 +4731,10 @@ impl<'a> UserDraftUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserHistoryListCall<'a>
-    where  {
+pub struct UserHistoryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _start_history_id: Option<String>,
     _page_token: Option<String>,
@@ -4705,9 +4746,15 @@ pub struct UserHistoryListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserHistoryListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserHistoryListCall<'a, S> {}
 
-impl<'a> UserHistoryListCall<'a> {
+impl<'a, S> UserHistoryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4867,35 +4914,35 @@ impl<'a> UserHistoryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserHistoryListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserHistoryListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// Required. Returns history records after the specified `startHistoryId`. The supplied `startHistoryId` should be obtained from the `historyId` of a message, thread, or previous `list` response. History IDs increase chronologically but are not contiguous with random gaps in between valid IDs. Supplying an invalid or out of date `startHistoryId` typically returns an `HTTP 404` error code. A `historyId` is typically valid for at least a week, but in some rare circumstances may be valid for only a few hours. If you receive an `HTTP 404` error response, your application should perform a full sync. If you receive no `nextPageToken` in the response, there are no updates to retrieve and you can store the returned `historyId` for a future request.
     ///
     /// Sets the *start history id* query property to the given value.
-    pub fn start_history_id(mut self, new_value: &str) -> UserHistoryListCall<'a> {
+    pub fn start_history_id(mut self, new_value: &str) -> UserHistoryListCall<'a, S> {
         self._start_history_id = Some(new_value.to_string());
         self
     }
     /// Page token to retrieve a specific page of results in the list.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserHistoryListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserHistoryListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of history records to return. This field defaults to 100. The maximum allowed value for this field is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> UserHistoryListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> UserHistoryListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Only return messages with a label matching the ID.
     ///
     /// Sets the *label id* query property to the given value.
-    pub fn label_id(mut self, new_value: &str) -> UserHistoryListCall<'a> {
+    pub fn label_id(mut self, new_value: &str) -> UserHistoryListCall<'a, S> {
         self._label_id = Some(new_value.to_string());
         self
     }
@@ -4903,7 +4950,7 @@ impl<'a> UserHistoryListCall<'a> {
     ///
     /// Append the given value to the *history types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_history_types(mut self, new_value: &str) -> UserHistoryListCall<'a> {
+    pub fn add_history_types(mut self, new_value: &str) -> UserHistoryListCall<'a, S> {
         self._history_types.push(new_value.to_string());
         self
     }
@@ -4913,7 +4960,7 @@ impl<'a> UserHistoryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserHistoryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserHistoryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4938,7 +4985,7 @@ impl<'a> UserHistoryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserHistoryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserHistoryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4958,9 +5005,9 @@ impl<'a> UserHistoryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserHistoryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserHistoryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4993,7 +5040,7 @@ impl<'a> UserHistoryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5006,10 +5053,10 @@ impl<'a> UserHistoryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserLabelCreateCall<'a>
-    where  {
+pub struct UserLabelCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Label,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5017,9 +5064,15 @@ pub struct UserLabelCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserLabelCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserLabelCreateCall<'a, S> {}
 
-impl<'a> UserLabelCreateCall<'a> {
+impl<'a, S> UserLabelCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5175,7 +5228,7 @@ impl<'a> UserLabelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Label) -> UserLabelCreateCall<'a> {
+    pub fn request(mut self, new_value: Label) -> UserLabelCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5185,7 +5238,7 @@ impl<'a> UserLabelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelCreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelCreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5195,7 +5248,7 @@ impl<'a> UserLabelCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5220,7 +5273,7 @@ impl<'a> UserLabelCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5240,9 +5293,9 @@ impl<'a> UserLabelCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserLabelCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserLabelCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5274,7 +5327,7 @@ impl<'a> UserLabelCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5282,10 +5335,10 @@ impl<'a> UserLabelCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserLabelDeleteCall<'a>
-    where  {
+pub struct UserLabelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5293,9 +5346,15 @@ pub struct UserLabelDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserLabelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserLabelDeleteCall<'a, S> {}
 
-impl<'a> UserLabelDeleteCall<'a> {
+impl<'a, S> UserLabelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5428,7 +5487,7 @@ impl<'a> UserLabelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5438,7 +5497,7 @@ impl<'a> UserLabelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserLabelDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -5448,7 +5507,7 @@ impl<'a> UserLabelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5473,7 +5532,7 @@ impl<'a> UserLabelDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5493,9 +5552,9 @@ impl<'a> UserLabelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserLabelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserLabelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5527,7 +5586,7 @@ impl<'a> UserLabelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5535,10 +5594,10 @@ impl<'a> UserLabelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserLabelGetCall<'a>
-    where  {
+pub struct UserLabelGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5546,9 +5605,15 @@ pub struct UserLabelGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserLabelGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserLabelGetCall<'a, S> {}
 
-impl<'a> UserLabelGetCall<'a> {
+impl<'a, S> UserLabelGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5692,7 +5757,7 @@ impl<'a> UserLabelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5702,7 +5767,7 @@ impl<'a> UserLabelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserLabelGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserLabelGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -5712,7 +5777,7 @@ impl<'a> UserLabelGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5737,7 +5802,7 @@ impl<'a> UserLabelGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5757,9 +5822,9 @@ impl<'a> UserLabelGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserLabelGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserLabelGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5791,7 +5856,7 @@ impl<'a> UserLabelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5799,19 +5864,25 @@ impl<'a> UserLabelGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserLabelListCall<'a>
-    where  {
+pub struct UserLabelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserLabelListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserLabelListCall<'a, S> {}
 
-impl<'a> UserLabelListCall<'a> {
+impl<'a, S> UserLabelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5954,7 +6025,7 @@ impl<'a> UserLabelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -5964,7 +6035,7 @@ impl<'a> UserLabelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5989,7 +6060,7 @@ impl<'a> UserLabelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6009,9 +6080,9 @@ impl<'a> UserLabelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserLabelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserLabelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6044,7 +6115,7 @@ impl<'a> UserLabelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6057,10 +6128,10 @@ impl<'a> UserLabelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserLabelPatchCall<'a>
-    where  {
+pub struct UserLabelPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Label,
     _user_id: String,
     _id: String,
@@ -6069,9 +6140,15 @@ pub struct UserLabelPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserLabelPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for UserLabelPatchCall<'a, S> {}
 
-impl<'a> UserLabelPatchCall<'a> {
+impl<'a, S> UserLabelPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6228,7 +6305,7 @@ impl<'a> UserLabelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Label) -> UserLabelPatchCall<'a> {
+    pub fn request(mut self, new_value: Label) -> UserLabelPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6238,7 +6315,7 @@ impl<'a> UserLabelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelPatchCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelPatchCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6248,7 +6325,7 @@ impl<'a> UserLabelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserLabelPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserLabelPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -6258,7 +6335,7 @@ impl<'a> UserLabelPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6283,7 +6360,7 @@ impl<'a> UserLabelPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6303,9 +6380,9 @@ impl<'a> UserLabelPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserLabelPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserLabelPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6338,7 +6415,7 @@ impl<'a> UserLabelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6351,10 +6428,10 @@ impl<'a> UserLabelPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserLabelUpdateCall<'a>
-    where  {
+pub struct UserLabelUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Label,
     _user_id: String,
     _id: String,
@@ -6363,9 +6440,15 @@ pub struct UserLabelUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserLabelUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserLabelUpdateCall<'a, S> {}
 
-impl<'a> UserLabelUpdateCall<'a> {
+impl<'a, S> UserLabelUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6522,7 +6605,7 @@ impl<'a> UserLabelUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Label) -> UserLabelUpdateCall<'a> {
+    pub fn request(mut self, new_value: Label) -> UserLabelUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6532,7 +6615,7 @@ impl<'a> UserLabelUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserLabelUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6542,7 +6625,7 @@ impl<'a> UserLabelUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserLabelUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -6552,7 +6635,7 @@ impl<'a> UserLabelUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserLabelUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6577,7 +6660,7 @@ impl<'a> UserLabelUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserLabelUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserLabelUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6597,9 +6680,9 @@ impl<'a> UserLabelUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserLabelUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserLabelUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6631,7 +6714,7 @@ impl<'a> UserLabelUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6639,10 +6722,10 @@ impl<'a> UserLabelUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageAttachmentGetCall<'a>
-    where  {
+pub struct UserMessageAttachmentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _message_id: String,
     _id: String,
@@ -6651,9 +6734,15 @@ pub struct UserMessageAttachmentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageAttachmentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageAttachmentGetCall<'a, S> {}
 
-impl<'a> UserMessageAttachmentGetCall<'a> {
+impl<'a, S> UserMessageAttachmentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6798,7 +6887,7 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -6808,7 +6897,7 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn message_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a> {
+    pub fn message_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, S> {
         self._message_id = new_value.to_string();
         self
     }
@@ -6818,7 +6907,7 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -6828,7 +6917,7 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageAttachmentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageAttachmentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6853,7 +6942,7 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageAttachmentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageAttachmentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6873,9 +6962,9 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageAttachmentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageAttachmentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6908,7 +6997,7 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6921,10 +7010,10 @@ impl<'a> UserMessageAttachmentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageBatchDeleteCall<'a>
-    where  {
+pub struct UserMessageBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: BatchDeleteMessagesRequest,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6932,9 +7021,15 @@ pub struct UserMessageBatchDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageBatchDeleteCall<'a, S> {}
 
-impl<'a> UserMessageBatchDeleteCall<'a> {
+impl<'a, S> UserMessageBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7079,7 +7174,7 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteMessagesRequest) -> UserMessageBatchDeleteCall<'a> {
+    pub fn request(mut self, new_value: BatchDeleteMessagesRequest) -> UserMessageBatchDeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7089,7 +7184,7 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageBatchDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageBatchDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7099,7 +7194,7 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7124,7 +7219,7 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7144,9 +7239,9 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7179,7 +7274,7 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7192,10 +7287,10 @@ impl<'a> UserMessageBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageBatchModifyCall<'a>
-    where  {
+pub struct UserMessageBatchModifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: BatchModifyMessagesRequest,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7203,9 +7298,15 @@ pub struct UserMessageBatchModifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageBatchModifyCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageBatchModifyCall<'a, S> {}
 
-impl<'a> UserMessageBatchModifyCall<'a> {
+impl<'a, S> UserMessageBatchModifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7350,7 +7451,7 @@ impl<'a> UserMessageBatchModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchModifyMessagesRequest) -> UserMessageBatchModifyCall<'a> {
+    pub fn request(mut self, new_value: BatchModifyMessagesRequest) -> UserMessageBatchModifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7360,7 +7461,7 @@ impl<'a> UserMessageBatchModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageBatchModifyCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageBatchModifyCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7370,7 +7471,7 @@ impl<'a> UserMessageBatchModifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageBatchModifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageBatchModifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7395,7 +7496,7 @@ impl<'a> UserMessageBatchModifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageBatchModifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageBatchModifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7415,9 +7516,9 @@ impl<'a> UserMessageBatchModifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageBatchModifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageBatchModifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7449,7 +7550,7 @@ impl<'a> UserMessageBatchModifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7457,10 +7558,10 @@ impl<'a> UserMessageBatchModifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageDeleteCall<'a>
-    where  {
+pub struct UserMessageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7468,9 +7569,15 @@ pub struct UserMessageDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageDeleteCall<'a, S> {}
 
-impl<'a> UserMessageDeleteCall<'a> {
+impl<'a, S> UserMessageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7603,7 +7710,7 @@ impl<'a> UserMessageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7613,7 +7720,7 @@ impl<'a> UserMessageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7623,7 +7730,7 @@ impl<'a> UserMessageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7648,7 +7755,7 @@ impl<'a> UserMessageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7668,9 +7775,9 @@ impl<'a> UserMessageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7702,7 +7809,7 @@ impl<'a> UserMessageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7712,10 +7819,10 @@ impl<'a> UserMessageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageGetCall<'a>
-    where  {
+pub struct UserMessageGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _metadata_headers: Vec<String>,
@@ -7725,9 +7832,15 @@ pub struct UserMessageGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageGetCall<'a, S> {}
 
-impl<'a> UserMessageGetCall<'a> {
+impl<'a, S> UserMessageGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7879,7 +7992,7 @@ impl<'a> UserMessageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7889,7 +8002,7 @@ impl<'a> UserMessageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserMessageGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7897,14 +8010,14 @@ impl<'a> UserMessageGetCall<'a> {
     ///
     /// Append the given value to the *metadata headers* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_metadata_headers(mut self, new_value: &str) -> UserMessageGetCall<'a> {
+    pub fn add_metadata_headers(mut self, new_value: &str) -> UserMessageGetCall<'a, S> {
         self._metadata_headers.push(new_value.to_string());
         self
     }
     /// The format to return the message in.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a> {
+    pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a, S> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -7914,7 +8027,7 @@ impl<'a> UserMessageGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7939,7 +8052,7 @@ impl<'a> UserMessageGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7959,9 +8072,9 @@ impl<'a> UserMessageGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7995,7 +8108,7 @@ impl<'a> UserMessageGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8012,10 +8125,10 @@ impl<'a> UserMessageGetCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct UserMessageImportCall<'a>
-    where  {
+pub struct UserMessageImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Message,
     _user_id: String,
     _process_for_calendar: Option<bool>,
@@ -8027,9 +8140,15 @@ pub struct UserMessageImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageImportCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageImportCall<'a, S> {}
 
-impl<'a> UserMessageImportCall<'a> {
+impl<'a, S> UserMessageImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8310,7 +8429,7 @@ impl<'a> UserMessageImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> UserMessageImportCall<'a> {
+    pub fn request(mut self, new_value: Message) -> UserMessageImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8320,35 +8439,35 @@ impl<'a> UserMessageImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageImportCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageImportCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// Process calendar invites in the email and add any extracted meetings to the Google Calendar for this user.
     ///
     /// Sets the *process for calendar* query property to the given value.
-    pub fn process_for_calendar(mut self, new_value: bool) -> UserMessageImportCall<'a> {
+    pub fn process_for_calendar(mut self, new_value: bool) -> UserMessageImportCall<'a, S> {
         self._process_for_calendar = Some(new_value);
         self
     }
     /// Ignore the Gmail spam classifier decision and never mark this email as SPAM in the mailbox.
     ///
     /// Sets the *never mark spam* query property to the given value.
-    pub fn never_mark_spam(mut self, new_value: bool) -> UserMessageImportCall<'a> {
+    pub fn never_mark_spam(mut self, new_value: bool) -> UserMessageImportCall<'a, S> {
         self._never_mark_spam = Some(new_value);
         self
     }
     /// Source for Gmail's internal date of the message.
     ///
     /// Sets the *internal date source* query property to the given value.
-    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a> {
+    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a, S> {
         self._internal_date_source = Some(new_value.to_string());
         self
     }
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.
     ///
     /// Sets the *deleted* query property to the given value.
-    pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a> {
+    pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a, S> {
         self._deleted = Some(new_value);
         self
     }
@@ -8358,7 +8477,7 @@ impl<'a> UserMessageImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8383,7 +8502,7 @@ impl<'a> UserMessageImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8403,9 +8522,9 @@ impl<'a> UserMessageImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8439,7 +8558,7 @@ impl<'a> UserMessageImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8454,10 +8573,10 @@ impl<'a> UserMessageImportCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct UserMessageInsertCall<'a>
-    where  {
+pub struct UserMessageInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Message,
     _user_id: String,
     _internal_date_source: Option<String>,
@@ -8467,9 +8586,15 @@ pub struct UserMessageInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageInsertCall<'a, S> {}
 
-impl<'a> UserMessageInsertCall<'a> {
+impl<'a, S> UserMessageInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8744,7 +8869,7 @@ impl<'a> UserMessageInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> UserMessageInsertCall<'a> {
+    pub fn request(mut self, new_value: Message) -> UserMessageInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8754,21 +8879,21 @@ impl<'a> UserMessageInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageInsertCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageInsertCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// Source for Gmail's internal date of the message.
     ///
     /// Sets the *internal date source* query property to the given value.
-    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a> {
+    pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a, S> {
         self._internal_date_source = Some(new_value.to_string());
         self
     }
     /// Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.
     ///
     /// Sets the *deleted* query property to the given value.
-    pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a> {
+    pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a, S> {
         self._deleted = Some(new_value);
         self
     }
@@ -8778,7 +8903,7 @@ impl<'a> UserMessageInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8803,7 +8928,7 @@ impl<'a> UserMessageInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8823,9 +8948,9 @@ impl<'a> UserMessageInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8857,7 +8982,7 @@ impl<'a> UserMessageInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8870,10 +8995,10 @@ impl<'a> UserMessageInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageListCall<'a>
-    where  {
+pub struct UserMessageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -8885,9 +9010,15 @@ pub struct UserMessageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageListCall<'a, S> {}
 
-impl<'a> UserMessageListCall<'a> {
+impl<'a, S> UserMessageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9047,28 +9178,28 @@ impl<'a> UserMessageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> UserMessageListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> UserMessageListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token to retrieve a specific page of results in the list.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserMessageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserMessageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of messages to return. This field defaults to 100. The maximum allowed value for this field is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> UserMessageListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> UserMessageListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -9076,14 +9207,14 @@ impl<'a> UserMessageListCall<'a> {
     ///
     /// Append the given value to the *label ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_label_ids(mut self, new_value: &str) -> UserMessageListCall<'a> {
+    pub fn add_label_ids(mut self, new_value: &str) -> UserMessageListCall<'a, S> {
         self._label_ids.push(new_value.to_string());
         self
     }
     /// Include messages from `SPAM` and `TRASH` in the results.
     ///
     /// Sets the *include spam trash* query property to the given value.
-    pub fn include_spam_trash(mut self, new_value: bool) -> UserMessageListCall<'a> {
+    pub fn include_spam_trash(mut self, new_value: bool) -> UserMessageListCall<'a, S> {
         self._include_spam_trash = Some(new_value);
         self
     }
@@ -9093,7 +9224,7 @@ impl<'a> UserMessageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9118,7 +9249,7 @@ impl<'a> UserMessageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9138,9 +9269,9 @@ impl<'a> UserMessageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9173,7 +9304,7 @@ impl<'a> UserMessageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9186,10 +9317,10 @@ impl<'a> UserMessageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageModifyCall<'a>
-    where  {
+pub struct UserMessageModifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: ModifyMessageRequest,
     _user_id: String,
     _id: String,
@@ -9198,9 +9329,15 @@ pub struct UserMessageModifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageModifyCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageModifyCall<'a, S> {}
 
-impl<'a> UserMessageModifyCall<'a> {
+impl<'a, S> UserMessageModifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9357,7 +9494,7 @@ impl<'a> UserMessageModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyMessageRequest) -> UserMessageModifyCall<'a> {
+    pub fn request(mut self, new_value: ModifyMessageRequest) -> UserMessageModifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9367,7 +9504,7 @@ impl<'a> UserMessageModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -9377,7 +9514,7 @@ impl<'a> UserMessageModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -9387,7 +9524,7 @@ impl<'a> UserMessageModifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageModifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageModifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9412,7 +9549,7 @@ impl<'a> UserMessageModifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageModifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageModifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9432,9 +9569,9 @@ impl<'a> UserMessageModifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageModifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageModifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9468,7 +9605,7 @@ impl<'a> UserMessageModifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9481,10 +9618,10 @@ impl<'a> UserMessageModifyCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct UserMessageSendCall<'a>
-    where  {
+pub struct UserMessageSendCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Message,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9492,9 +9629,15 @@ pub struct UserMessageSendCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageSendCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageSendCall<'a, S> {}
 
-impl<'a> UserMessageSendCall<'a> {
+impl<'a, S> UserMessageSendCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9763,7 +9906,7 @@ impl<'a> UserMessageSendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> UserMessageSendCall<'a> {
+    pub fn request(mut self, new_value: Message) -> UserMessageSendCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9773,7 +9916,7 @@ impl<'a> UserMessageSendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageSendCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageSendCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -9783,7 +9926,7 @@ impl<'a> UserMessageSendCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageSendCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageSendCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9808,7 +9951,7 @@ impl<'a> UserMessageSendCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageSendCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageSendCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9828,9 +9971,9 @@ impl<'a> UserMessageSendCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageSendCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageSendCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9862,7 +10005,7 @@ impl<'a> UserMessageSendCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9870,10 +10013,10 @@ impl<'a> UserMessageSendCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageTrashCall<'a>
-    where  {
+pub struct UserMessageTrashCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9881,9 +10024,15 @@ pub struct UserMessageTrashCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageTrashCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageTrashCall<'a, S> {}
 
-impl<'a> UserMessageTrashCall<'a> {
+impl<'a, S> UserMessageTrashCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10027,7 +10176,7 @@ impl<'a> UserMessageTrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageTrashCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageTrashCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -10037,7 +10186,7 @@ impl<'a> UserMessageTrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageTrashCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserMessageTrashCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -10047,7 +10196,7 @@ impl<'a> UserMessageTrashCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageTrashCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageTrashCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10072,7 +10221,7 @@ impl<'a> UserMessageTrashCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageTrashCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageTrashCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10092,9 +10241,9 @@ impl<'a> UserMessageTrashCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageTrashCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageTrashCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10126,7 +10275,7 @@ impl<'a> UserMessageTrashCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10134,10 +10283,10 @@ impl<'a> UserMessageTrashCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserMessageUntrashCall<'a>
-    where  {
+pub struct UserMessageUntrashCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10145,9 +10294,15 @@ pub struct UserMessageUntrashCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserMessageUntrashCall<'a> {}
+impl<'a, S> client::CallBuilder for UserMessageUntrashCall<'a, S> {}
 
-impl<'a> UserMessageUntrashCall<'a> {
+impl<'a, S> UserMessageUntrashCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10291,7 +10446,7 @@ impl<'a> UserMessageUntrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserMessageUntrashCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -10301,7 +10456,7 @@ impl<'a> UserMessageUntrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserMessageUntrashCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -10311,7 +10466,7 @@ impl<'a> UserMessageUntrashCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageUntrashCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserMessageUntrashCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10336,7 +10491,7 @@ impl<'a> UserMessageUntrashCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserMessageUntrashCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserMessageUntrashCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10356,9 +10511,9 @@ impl<'a> UserMessageUntrashCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserMessageUntrashCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserMessageUntrashCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10391,7 +10546,7 @@ impl<'a> UserMessageUntrashCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10404,10 +10559,10 @@ impl<'a> UserMessageUntrashCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingDelegateCreateCall<'a>
-    where  {
+pub struct UserSettingDelegateCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Delegate,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10415,9 +10570,15 @@ pub struct UserSettingDelegateCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingDelegateCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingDelegateCreateCall<'a, S> {}
 
-impl<'a> UserSettingDelegateCreateCall<'a> {
+impl<'a, S> UserSettingDelegateCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10573,7 +10734,7 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Delegate) -> UserSettingDelegateCreateCall<'a> {
+    pub fn request(mut self, new_value: Delegate) -> UserSettingDelegateCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10583,7 +10744,7 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateCreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateCreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -10593,7 +10754,7 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10618,7 +10779,7 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10638,9 +10799,9 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingDelegateCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingDelegateCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10672,7 +10833,7 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10680,10 +10841,10 @@ impl<'a> UserSettingDelegateCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingDelegateDeleteCall<'a>
-    where  {
+pub struct UserSettingDelegateDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10691,9 +10852,15 @@ pub struct UserSettingDelegateDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingDelegateDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingDelegateDeleteCall<'a, S> {}
 
-impl<'a> UserSettingDelegateDeleteCall<'a> {
+impl<'a, S> UserSettingDelegateDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10826,7 +10993,7 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -10836,7 +11003,7 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn delegate_email(mut self, new_value: &str) -> UserSettingDelegateDeleteCall<'a> {
+    pub fn delegate_email(mut self, new_value: &str) -> UserSettingDelegateDeleteCall<'a, S> {
         self._delegate_email = new_value.to_string();
         self
     }
@@ -10846,7 +11013,7 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10871,7 +11038,7 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10891,9 +11058,9 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingDelegateDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingDelegateDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10925,7 +11092,7 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10933,10 +11100,10 @@ impl<'a> UserSettingDelegateDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingDelegateGetCall<'a>
-    where  {
+pub struct UserSettingDelegateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10944,9 +11111,15 @@ pub struct UserSettingDelegateGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingDelegateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingDelegateGetCall<'a, S> {}
 
-impl<'a> UserSettingDelegateGetCall<'a> {
+impl<'a, S> UserSettingDelegateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11090,7 +11263,7 @@ impl<'a> UserSettingDelegateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11100,7 +11273,7 @@ impl<'a> UserSettingDelegateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn delegate_email(mut self, new_value: &str) -> UserSettingDelegateGetCall<'a> {
+    pub fn delegate_email(mut self, new_value: &str) -> UserSettingDelegateGetCall<'a, S> {
         self._delegate_email = new_value.to_string();
         self
     }
@@ -11110,7 +11283,7 @@ impl<'a> UserSettingDelegateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11135,7 +11308,7 @@ impl<'a> UserSettingDelegateGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11155,9 +11328,9 @@ impl<'a> UserSettingDelegateGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingDelegateGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingDelegateGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11189,7 +11362,7 @@ impl<'a> UserSettingDelegateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11197,19 +11370,25 @@ impl<'a> UserSettingDelegateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingDelegateListCall<'a>
-    where  {
+pub struct UserSettingDelegateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingDelegateListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingDelegateListCall<'a, S> {}
 
-impl<'a> UserSettingDelegateListCall<'a> {
+impl<'a, S> UserSettingDelegateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11352,7 +11531,7 @@ impl<'a> UserSettingDelegateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingDelegateListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11362,7 +11541,7 @@ impl<'a> UserSettingDelegateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingDelegateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11387,7 +11566,7 @@ impl<'a> UserSettingDelegateListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingDelegateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11407,9 +11586,9 @@ impl<'a> UserSettingDelegateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingDelegateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingDelegateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11442,7 +11621,7 @@ impl<'a> UserSettingDelegateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11455,10 +11634,10 @@ impl<'a> UserSettingDelegateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingFilterCreateCall<'a>
-    where  {
+pub struct UserSettingFilterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: Filter,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11466,9 +11645,15 @@ pub struct UserSettingFilterCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingFilterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingFilterCreateCall<'a, S> {}
 
-impl<'a> UserSettingFilterCreateCall<'a> {
+impl<'a, S> UserSettingFilterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11624,7 +11809,7 @@ impl<'a> UserSettingFilterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Filter) -> UserSettingFilterCreateCall<'a> {
+    pub fn request(mut self, new_value: Filter) -> UserSettingFilterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11634,7 +11819,7 @@ impl<'a> UserSettingFilterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterCreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterCreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11644,7 +11829,7 @@ impl<'a> UserSettingFilterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11669,7 +11854,7 @@ impl<'a> UserSettingFilterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11689,9 +11874,9 @@ impl<'a> UserSettingFilterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingFilterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingFilterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11723,7 +11908,7 @@ impl<'a> UserSettingFilterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11731,10 +11916,10 @@ impl<'a> UserSettingFilterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingFilterDeleteCall<'a>
-    where  {
+pub struct UserSettingFilterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11742,9 +11927,15 @@ pub struct UserSettingFilterDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingFilterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingFilterDeleteCall<'a, S> {}
 
-impl<'a> UserSettingFilterDeleteCall<'a> {
+impl<'a, S> UserSettingFilterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11877,7 +12068,7 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11887,7 +12078,7 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserSettingFilterDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserSettingFilterDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -11897,7 +12088,7 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11922,7 +12113,7 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11942,9 +12133,9 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingFilterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingFilterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11976,7 +12167,7 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11984,10 +12175,10 @@ impl<'a> UserSettingFilterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingFilterGetCall<'a>
-    where  {
+pub struct UserSettingFilterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11995,9 +12186,15 @@ pub struct UserSettingFilterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingFilterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingFilterGetCall<'a, S> {}
 
-impl<'a> UserSettingFilterGetCall<'a> {
+impl<'a, S> UserSettingFilterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12141,7 +12338,7 @@ impl<'a> UserSettingFilterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -12151,7 +12348,7 @@ impl<'a> UserSettingFilterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserSettingFilterGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserSettingFilterGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -12161,7 +12358,7 @@ impl<'a> UserSettingFilterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12186,7 +12383,7 @@ impl<'a> UserSettingFilterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12206,9 +12403,9 @@ impl<'a> UserSettingFilterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingFilterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingFilterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12240,7 +12437,7 @@ impl<'a> UserSettingFilterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12248,19 +12445,25 @@ impl<'a> UserSettingFilterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingFilterListCall<'a>
-    where  {
+pub struct UserSettingFilterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingFilterListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingFilterListCall<'a, S> {}
 
-impl<'a> UserSettingFilterListCall<'a> {
+impl<'a, S> UserSettingFilterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12403,7 +12606,7 @@ impl<'a> UserSettingFilterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingFilterListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -12413,7 +12616,7 @@ impl<'a> UserSettingFilterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingFilterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12438,7 +12641,7 @@ impl<'a> UserSettingFilterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingFilterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12458,9 +12661,9 @@ impl<'a> UserSettingFilterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingFilterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingFilterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12493,7 +12696,7 @@ impl<'a> UserSettingFilterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12506,10 +12709,10 @@ impl<'a> UserSettingFilterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingForwardingAddresseCreateCall<'a>
-    where  {
+pub struct UserSettingForwardingAddresseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: ForwardingAddress,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12517,9 +12720,15 @@ pub struct UserSettingForwardingAddresseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingForwardingAddresseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingForwardingAddresseCreateCall<'a, S> {}
 
-impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
+impl<'a, S> UserSettingForwardingAddresseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12675,7 +12884,7 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ForwardingAddress) -> UserSettingForwardingAddresseCreateCall<'a> {
+    pub fn request(mut self, new_value: ForwardingAddress) -> UserSettingForwardingAddresseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12685,7 +12894,7 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseCreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseCreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -12695,7 +12904,7 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12720,7 +12929,7 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12740,9 +12949,9 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingForwardingAddresseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingForwardingAddresseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12774,7 +12983,7 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12782,10 +12991,10 @@ impl<'a> UserSettingForwardingAddresseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingForwardingAddresseDeleteCall<'a>
-    where  {
+pub struct UserSettingForwardingAddresseDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _forwarding_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12793,9 +13002,15 @@ pub struct UserSettingForwardingAddresseDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingForwardingAddresseDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingForwardingAddresseDeleteCall<'a, S> {}
 
-impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
+impl<'a, S> UserSettingForwardingAddresseDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12928,7 +13143,7 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -12938,7 +13153,7 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn forwarding_email(mut self, new_value: &str) -> UserSettingForwardingAddresseDeleteCall<'a> {
+    pub fn forwarding_email(mut self, new_value: &str) -> UserSettingForwardingAddresseDeleteCall<'a, S> {
         self._forwarding_email = new_value.to_string();
         self
     }
@@ -12948,7 +13163,7 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12973,7 +13188,7 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12993,9 +13208,9 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingForwardingAddresseDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingForwardingAddresseDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13027,7 +13242,7 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13035,10 +13250,10 @@ impl<'a> UserSettingForwardingAddresseDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingForwardingAddresseGetCall<'a>
-    where  {
+pub struct UserSettingForwardingAddresseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _forwarding_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13046,9 +13261,15 @@ pub struct UserSettingForwardingAddresseGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingForwardingAddresseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingForwardingAddresseGetCall<'a, S> {}
 
-impl<'a> UserSettingForwardingAddresseGetCall<'a> {
+impl<'a, S> UserSettingForwardingAddresseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13192,7 +13413,7 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -13202,7 +13423,7 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn forwarding_email(mut self, new_value: &str) -> UserSettingForwardingAddresseGetCall<'a> {
+    pub fn forwarding_email(mut self, new_value: &str) -> UserSettingForwardingAddresseGetCall<'a, S> {
         self._forwarding_email = new_value.to_string();
         self
     }
@@ -13212,7 +13433,7 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13237,7 +13458,7 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13257,9 +13478,9 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingForwardingAddresseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingForwardingAddresseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13291,7 +13512,7 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13299,19 +13520,25 @@ impl<'a> UserSettingForwardingAddresseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingForwardingAddresseListCall<'a>
-    where  {
+pub struct UserSettingForwardingAddresseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingForwardingAddresseListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingForwardingAddresseListCall<'a, S> {}
 
-impl<'a> UserSettingForwardingAddresseListCall<'a> {
+impl<'a, S> UserSettingForwardingAddresseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13454,7 +13681,7 @@ impl<'a> UserSettingForwardingAddresseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingForwardingAddresseListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -13464,7 +13691,7 @@ impl<'a> UserSettingForwardingAddresseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingForwardingAddresseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13489,7 +13716,7 @@ impl<'a> UserSettingForwardingAddresseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingForwardingAddresseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13509,9 +13736,9 @@ impl<'a> UserSettingForwardingAddresseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingForwardingAddresseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingForwardingAddresseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13543,7 +13770,7 @@ impl<'a> UserSettingForwardingAddresseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13551,10 +13778,10 @@ impl<'a> UserSettingForwardingAddresseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendASmimeInfoDeleteCall<'a>
-    where  {
+pub struct UserSettingSendASmimeInfoDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _id: String,
@@ -13563,9 +13790,15 @@ pub struct UserSettingSendASmimeInfoDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendASmimeInfoDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendASmimeInfoDeleteCall<'a, S> {}
 
-impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
+impl<'a, S> UserSettingSendASmimeInfoDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13699,7 +13932,7 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -13709,7 +13942,7 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoDeleteCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoDeleteCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -13719,7 +13952,7 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserSettingSendASmimeInfoDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserSettingSendASmimeInfoDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -13729,7 +13962,7 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13754,7 +13987,7 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13774,9 +14007,9 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendASmimeInfoDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendASmimeInfoDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13808,7 +14041,7 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13816,10 +14049,10 @@ impl<'a> UserSettingSendASmimeInfoDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendASmimeInfoGetCall<'a>
-    where  {
+pub struct UserSettingSendASmimeInfoGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _id: String,
@@ -13828,9 +14061,15 @@ pub struct UserSettingSendASmimeInfoGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendASmimeInfoGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendASmimeInfoGetCall<'a, S> {}
 
-impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
+impl<'a, S> UserSettingSendASmimeInfoGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13975,7 +14214,7 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -13985,7 +14224,7 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoGetCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoGetCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -13995,7 +14234,7 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserSettingSendASmimeInfoGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserSettingSendASmimeInfoGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -14005,7 +14244,7 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14030,7 +14269,7 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14050,9 +14289,9 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendASmimeInfoGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendASmimeInfoGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14085,7 +14324,7 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14098,10 +14337,10 @@ impl<'a> UserSettingSendASmimeInfoGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendASmimeInfoInsertCall<'a>
-    where  {
+pub struct UserSettingSendASmimeInfoInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: SmimeInfo,
     _user_id: String,
     _send_as_email: String,
@@ -14110,9 +14349,15 @@ pub struct UserSettingSendASmimeInfoInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendASmimeInfoInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendASmimeInfoInsertCall<'a, S> {}
 
-impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
+impl<'a, S> UserSettingSendASmimeInfoInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14269,7 +14514,7 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SmimeInfo) -> UserSettingSendASmimeInfoInsertCall<'a> {
+    pub fn request(mut self, new_value: SmimeInfo) -> UserSettingSendASmimeInfoInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14279,7 +14524,7 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoInsertCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoInsertCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -14289,7 +14534,7 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoInsertCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoInsertCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -14299,7 +14544,7 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14324,7 +14569,7 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14344,9 +14589,9 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendASmimeInfoInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendASmimeInfoInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14378,7 +14623,7 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14386,10 +14631,10 @@ impl<'a> UserSettingSendASmimeInfoInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendASmimeInfoListCall<'a>
-    where  {
+pub struct UserSettingSendASmimeInfoListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14397,9 +14642,15 @@ pub struct UserSettingSendASmimeInfoListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendASmimeInfoListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendASmimeInfoListCall<'a, S> {}
 
-impl<'a> UserSettingSendASmimeInfoListCall<'a> {
+impl<'a, S> UserSettingSendASmimeInfoListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14543,7 +14794,7 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -14553,7 +14804,7 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoListCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoListCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -14563,7 +14814,7 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14588,7 +14839,7 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14608,9 +14859,9 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendASmimeInfoListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendASmimeInfoListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14642,7 +14893,7 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14650,10 +14901,10 @@ impl<'a> UserSettingSendASmimeInfoListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendASmimeInfoSetDefaultCall<'a>
-    where  {
+pub struct UserSettingSendASmimeInfoSetDefaultCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _id: String,
@@ -14662,9 +14913,15 @@ pub struct UserSettingSendASmimeInfoSetDefaultCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendASmimeInfoSetDefaultCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendASmimeInfoSetDefaultCall<'a, S> {}
 
-impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
+impl<'a, S> UserSettingSendASmimeInfoSetDefaultCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14798,7 +15055,7 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -14808,7 +15065,7 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -14818,7 +15075,7 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -14828,7 +15085,7 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoSetDefaultCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14853,7 +15110,7 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoSetDefaultCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14873,9 +15130,9 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendASmimeInfoSetDefaultCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendASmimeInfoSetDefaultCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14908,7 +15165,7 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14921,10 +15178,10 @@ impl<'a> UserSettingSendASmimeInfoSetDefaultCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendACreateCall<'a>
-    where  {
+pub struct UserSettingSendACreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: SendAs,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14932,9 +15189,15 @@ pub struct UserSettingSendACreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendACreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendACreateCall<'a, S> {}
 
-impl<'a> UserSettingSendACreateCall<'a> {
+impl<'a, S> UserSettingSendACreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15090,7 +15353,7 @@ impl<'a> UserSettingSendACreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SendAs) -> UserSettingSendACreateCall<'a> {
+    pub fn request(mut self, new_value: SendAs) -> UserSettingSendACreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15100,7 +15363,7 @@ impl<'a> UserSettingSendACreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendACreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendACreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -15110,7 +15373,7 @@ impl<'a> UserSettingSendACreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendACreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendACreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15135,7 +15398,7 @@ impl<'a> UserSettingSendACreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendACreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendACreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15155,9 +15418,9 @@ impl<'a> UserSettingSendACreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendACreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendACreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15189,7 +15452,7 @@ impl<'a> UserSettingSendACreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15197,10 +15460,10 @@ impl<'a> UserSettingSendACreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendADeleteCall<'a>
-    where  {
+pub struct UserSettingSendADeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15208,9 +15471,15 @@ pub struct UserSettingSendADeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendADeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendADeleteCall<'a, S> {}
 
-impl<'a> UserSettingSendADeleteCall<'a> {
+impl<'a, S> UserSettingSendADeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15343,7 +15612,7 @@ impl<'a> UserSettingSendADeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendADeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendADeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -15353,7 +15622,7 @@ impl<'a> UserSettingSendADeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendADeleteCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendADeleteCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -15363,7 +15632,7 @@ impl<'a> UserSettingSendADeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendADeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendADeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15388,7 +15657,7 @@ impl<'a> UserSettingSendADeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendADeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendADeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15408,9 +15677,9 @@ impl<'a> UserSettingSendADeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendADeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendADeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15442,7 +15711,7 @@ impl<'a> UserSettingSendADeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15450,10 +15719,10 @@ impl<'a> UserSettingSendADeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendAGetCall<'a>
-    where  {
+pub struct UserSettingSendAGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15461,9 +15730,15 @@ pub struct UserSettingSendAGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendAGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendAGetCall<'a, S> {}
 
-impl<'a> UserSettingSendAGetCall<'a> {
+impl<'a, S> UserSettingSendAGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15607,7 +15882,7 @@ impl<'a> UserSettingSendAGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -15617,7 +15892,7 @@ impl<'a> UserSettingSendAGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAGetCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAGetCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -15627,7 +15902,7 @@ impl<'a> UserSettingSendAGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15652,7 +15927,7 @@ impl<'a> UserSettingSendAGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15672,9 +15947,9 @@ impl<'a> UserSettingSendAGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendAGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendAGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15706,7 +15981,7 @@ impl<'a> UserSettingSendAGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15714,19 +15989,25 @@ impl<'a> UserSettingSendAGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendAListCall<'a>
-    where  {
+pub struct UserSettingSendAListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendAListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendAListCall<'a, S> {}
 
-impl<'a> UserSettingSendAListCall<'a> {
+impl<'a, S> UserSettingSendAListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15869,7 +16150,7 @@ impl<'a> UserSettingSendAListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -15879,7 +16160,7 @@ impl<'a> UserSettingSendAListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15904,7 +16185,7 @@ impl<'a> UserSettingSendAListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15924,9 +16205,9 @@ impl<'a> UserSettingSendAListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendAListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendAListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15959,7 +16240,7 @@ impl<'a> UserSettingSendAListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15972,10 +16253,10 @@ impl<'a> UserSettingSendAListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendAPatchCall<'a>
-    where  {
+pub struct UserSettingSendAPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: SendAs,
     _user_id: String,
     _send_as_email: String,
@@ -15984,9 +16265,15 @@ pub struct UserSettingSendAPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendAPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendAPatchCall<'a, S> {}
 
-impl<'a> UserSettingSendAPatchCall<'a> {
+impl<'a, S> UserSettingSendAPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16143,7 +16430,7 @@ impl<'a> UserSettingSendAPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SendAs) -> UserSettingSendAPatchCall<'a> {
+    pub fn request(mut self, new_value: SendAs) -> UserSettingSendAPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16153,7 +16440,7 @@ impl<'a> UserSettingSendAPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAPatchCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAPatchCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -16163,7 +16450,7 @@ impl<'a> UserSettingSendAPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAPatchCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAPatchCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -16173,7 +16460,7 @@ impl<'a> UserSettingSendAPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16198,7 +16485,7 @@ impl<'a> UserSettingSendAPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16218,9 +16505,9 @@ impl<'a> UserSettingSendAPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendAPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendAPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16253,7 +16540,7 @@ impl<'a> UserSettingSendAPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16266,10 +16553,10 @@ impl<'a> UserSettingSendAPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendAUpdateCall<'a>
-    where  {
+pub struct UserSettingSendAUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: SendAs,
     _user_id: String,
     _send_as_email: String,
@@ -16278,9 +16565,15 @@ pub struct UserSettingSendAUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendAUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendAUpdateCall<'a, S> {}
 
-impl<'a> UserSettingSendAUpdateCall<'a> {
+impl<'a, S> UserSettingSendAUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16437,7 +16730,7 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SendAs) -> UserSettingSendAUpdateCall<'a> {
+    pub fn request(mut self, new_value: SendAs) -> UserSettingSendAUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16447,7 +16740,7 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -16457,7 +16750,7 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAUpdateCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAUpdateCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -16467,7 +16760,7 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16492,7 +16785,7 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16512,9 +16805,9 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendAUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendAUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16546,7 +16839,7 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16554,10 +16847,10 @@ impl<'a> UserSettingSendAUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingSendAVerifyCall<'a>
-    where  {
+pub struct UserSettingSendAVerifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _send_as_email: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16565,9 +16858,15 @@ pub struct UserSettingSendAVerifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingSendAVerifyCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingSendAVerifyCall<'a, S> {}
 
-impl<'a> UserSettingSendAVerifyCall<'a> {
+impl<'a, S> UserSettingSendAVerifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16700,7 +16999,7 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAVerifyCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingSendAVerifyCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -16710,7 +17009,7 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAVerifyCall<'a> {
+    pub fn send_as_email(mut self, new_value: &str) -> UserSettingSendAVerifyCall<'a, S> {
         self._send_as_email = new_value.to_string();
         self
     }
@@ -16720,7 +17019,7 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAVerifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingSendAVerifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16745,7 +17044,7 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAVerifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingSendAVerifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16765,9 +17064,9 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingSendAVerifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingSendAVerifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16799,7 +17098,7 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16807,19 +17106,25 @@ impl<'a> UserSettingSendAVerifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingGetAutoForwardingCall<'a>
-    where  {
+pub struct UserSettingGetAutoForwardingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingGetAutoForwardingCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingGetAutoForwardingCall<'a, S> {}
 
-impl<'a> UserSettingGetAutoForwardingCall<'a> {
+impl<'a, S> UserSettingGetAutoForwardingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16962,7 +17267,7 @@ impl<'a> UserSettingGetAutoForwardingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingGetAutoForwardingCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingGetAutoForwardingCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -16972,7 +17277,7 @@ impl<'a> UserSettingGetAutoForwardingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetAutoForwardingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetAutoForwardingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16997,7 +17302,7 @@ impl<'a> UserSettingGetAutoForwardingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetAutoForwardingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetAutoForwardingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17017,9 +17322,9 @@ impl<'a> UserSettingGetAutoForwardingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingGetAutoForwardingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingGetAutoForwardingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17051,7 +17356,7 @@ impl<'a> UserSettingGetAutoForwardingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17059,19 +17364,25 @@ impl<'a> UserSettingGetAutoForwardingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingGetImapCall<'a>
-    where  {
+pub struct UserSettingGetImapCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingGetImapCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingGetImapCall<'a, S> {}
 
-impl<'a> UserSettingGetImapCall<'a> {
+impl<'a, S> UserSettingGetImapCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17214,7 +17525,7 @@ impl<'a> UserSettingGetImapCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingGetImapCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingGetImapCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -17224,7 +17535,7 @@ impl<'a> UserSettingGetImapCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetImapCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetImapCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17249,7 +17560,7 @@ impl<'a> UserSettingGetImapCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetImapCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetImapCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17269,9 +17580,9 @@ impl<'a> UserSettingGetImapCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingGetImapCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingGetImapCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17303,7 +17614,7 @@ impl<'a> UserSettingGetImapCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17311,19 +17622,25 @@ impl<'a> UserSettingGetImapCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingGetLanguageCall<'a>
-    where  {
+pub struct UserSettingGetLanguageCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingGetLanguageCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingGetLanguageCall<'a, S> {}
 
-impl<'a> UserSettingGetLanguageCall<'a> {
+impl<'a, S> UserSettingGetLanguageCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17466,7 +17783,7 @@ impl<'a> UserSettingGetLanguageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingGetLanguageCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingGetLanguageCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -17476,7 +17793,7 @@ impl<'a> UserSettingGetLanguageCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetLanguageCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetLanguageCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17501,7 +17818,7 @@ impl<'a> UserSettingGetLanguageCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetLanguageCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetLanguageCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17521,9 +17838,9 @@ impl<'a> UserSettingGetLanguageCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingGetLanguageCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingGetLanguageCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17555,7 +17872,7 @@ impl<'a> UserSettingGetLanguageCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17563,19 +17880,25 @@ impl<'a> UserSettingGetLanguageCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingGetPopCall<'a>
-    where  {
+pub struct UserSettingGetPopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingGetPopCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingGetPopCall<'a, S> {}
 
-impl<'a> UserSettingGetPopCall<'a> {
+impl<'a, S> UserSettingGetPopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17718,7 +18041,7 @@ impl<'a> UserSettingGetPopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingGetPopCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingGetPopCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -17728,7 +18051,7 @@ impl<'a> UserSettingGetPopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetPopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetPopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17753,7 +18076,7 @@ impl<'a> UserSettingGetPopCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetPopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetPopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17773,9 +18096,9 @@ impl<'a> UserSettingGetPopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingGetPopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingGetPopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17807,7 +18130,7 @@ impl<'a> UserSettingGetPopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17815,19 +18138,25 @@ impl<'a> UserSettingGetPopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingGetVacationCall<'a>
-    where  {
+pub struct UserSettingGetVacationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingGetVacationCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingGetVacationCall<'a, S> {}
 
-impl<'a> UserSettingGetVacationCall<'a> {
+impl<'a, S> UserSettingGetVacationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17970,7 +18299,7 @@ impl<'a> UserSettingGetVacationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingGetVacationCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingGetVacationCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -17980,7 +18309,7 @@ impl<'a> UserSettingGetVacationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetVacationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingGetVacationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18005,7 +18334,7 @@ impl<'a> UserSettingGetVacationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetVacationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingGetVacationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18025,9 +18354,9 @@ impl<'a> UserSettingGetVacationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingGetVacationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingGetVacationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18060,7 +18389,7 @@ impl<'a> UserSettingGetVacationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18073,10 +18402,10 @@ impl<'a> UserSettingGetVacationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingUpdateAutoForwardingCall<'a>
-    where  {
+pub struct UserSettingUpdateAutoForwardingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: AutoForwarding,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18084,9 +18413,15 @@ pub struct UserSettingUpdateAutoForwardingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingUpdateAutoForwardingCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingUpdateAutoForwardingCall<'a, S> {}
 
-impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
+impl<'a, S> UserSettingUpdateAutoForwardingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18242,7 +18577,7 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AutoForwarding) -> UserSettingUpdateAutoForwardingCall<'a> {
+    pub fn request(mut self, new_value: AutoForwarding) -> UserSettingUpdateAutoForwardingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18252,7 +18587,7 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateAutoForwardingCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateAutoForwardingCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -18262,7 +18597,7 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateAutoForwardingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateAutoForwardingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18287,7 +18622,7 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateAutoForwardingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateAutoForwardingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18307,9 +18642,9 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingUpdateAutoForwardingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingUpdateAutoForwardingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18342,7 +18677,7 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18355,10 +18690,10 @@ impl<'a> UserSettingUpdateAutoForwardingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingUpdateImapCall<'a>
-    where  {
+pub struct UserSettingUpdateImapCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: ImapSettings,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18366,9 +18701,15 @@ pub struct UserSettingUpdateImapCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingUpdateImapCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingUpdateImapCall<'a, S> {}
 
-impl<'a> UserSettingUpdateImapCall<'a> {
+impl<'a, S> UserSettingUpdateImapCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18524,7 +18865,7 @@ impl<'a> UserSettingUpdateImapCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImapSettings) -> UserSettingUpdateImapCall<'a> {
+    pub fn request(mut self, new_value: ImapSettings) -> UserSettingUpdateImapCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18534,7 +18875,7 @@ impl<'a> UserSettingUpdateImapCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateImapCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateImapCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -18544,7 +18885,7 @@ impl<'a> UserSettingUpdateImapCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateImapCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateImapCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18569,7 +18910,7 @@ impl<'a> UserSettingUpdateImapCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateImapCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateImapCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18589,9 +18930,9 @@ impl<'a> UserSettingUpdateImapCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingUpdateImapCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingUpdateImapCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18624,7 +18965,7 @@ impl<'a> UserSettingUpdateImapCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18637,10 +18978,10 @@ impl<'a> UserSettingUpdateImapCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingUpdateLanguageCall<'a>
-    where  {
+pub struct UserSettingUpdateLanguageCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: LanguageSettings,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18648,9 +18989,15 @@ pub struct UserSettingUpdateLanguageCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingUpdateLanguageCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingUpdateLanguageCall<'a, S> {}
 
-impl<'a> UserSettingUpdateLanguageCall<'a> {
+impl<'a, S> UserSettingUpdateLanguageCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18806,7 +19153,7 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LanguageSettings) -> UserSettingUpdateLanguageCall<'a> {
+    pub fn request(mut self, new_value: LanguageSettings) -> UserSettingUpdateLanguageCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18816,7 +19163,7 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateLanguageCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateLanguageCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -18826,7 +19173,7 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateLanguageCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateLanguageCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18851,7 +19198,7 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateLanguageCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateLanguageCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18871,9 +19218,9 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingUpdateLanguageCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingUpdateLanguageCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18906,7 +19253,7 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18919,10 +19266,10 @@ impl<'a> UserSettingUpdateLanguageCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingUpdatePopCall<'a>
-    where  {
+pub struct UserSettingUpdatePopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: PopSettings,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18930,9 +19277,15 @@ pub struct UserSettingUpdatePopCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingUpdatePopCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingUpdatePopCall<'a, S> {}
 
-impl<'a> UserSettingUpdatePopCall<'a> {
+impl<'a, S> UserSettingUpdatePopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19088,7 +19441,7 @@ impl<'a> UserSettingUpdatePopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PopSettings) -> UserSettingUpdatePopCall<'a> {
+    pub fn request(mut self, new_value: PopSettings) -> UserSettingUpdatePopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19098,7 +19451,7 @@ impl<'a> UserSettingUpdatePopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdatePopCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdatePopCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -19108,7 +19461,7 @@ impl<'a> UserSettingUpdatePopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdatePopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdatePopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19133,7 +19486,7 @@ impl<'a> UserSettingUpdatePopCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdatePopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdatePopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19153,9 +19506,9 @@ impl<'a> UserSettingUpdatePopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingUpdatePopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingUpdatePopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19188,7 +19541,7 @@ impl<'a> UserSettingUpdatePopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19201,10 +19554,10 @@ impl<'a> UserSettingUpdatePopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSettingUpdateVacationCall<'a>
-    where  {
+pub struct UserSettingUpdateVacationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: VacationSettings,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19212,9 +19565,15 @@ pub struct UserSettingUpdateVacationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSettingUpdateVacationCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSettingUpdateVacationCall<'a, S> {}
 
-impl<'a> UserSettingUpdateVacationCall<'a> {
+impl<'a, S> UserSettingUpdateVacationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19370,7 +19729,7 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: VacationSettings) -> UserSettingUpdateVacationCall<'a> {
+    pub fn request(mut self, new_value: VacationSettings) -> UserSettingUpdateVacationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19380,7 +19739,7 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateVacationCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSettingUpdateVacationCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -19390,7 +19749,7 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateVacationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSettingUpdateVacationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19415,7 +19774,7 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateVacationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSettingUpdateVacationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19435,9 +19794,9 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSettingUpdateVacationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSettingUpdateVacationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19469,7 +19828,7 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19477,10 +19836,10 @@ impl<'a> UserSettingUpdateVacationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserThreadDeleteCall<'a>
-    where  {
+pub struct UserThreadDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19488,9 +19847,15 @@ pub struct UserThreadDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserThreadDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserThreadDeleteCall<'a, S> {}
 
-impl<'a> UserThreadDeleteCall<'a> {
+impl<'a, S> UserThreadDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19623,7 +19988,7 @@ impl<'a> UserThreadDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -19633,7 +19998,7 @@ impl<'a> UserThreadDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserThreadDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -19643,7 +20008,7 @@ impl<'a> UserThreadDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19668,7 +20033,7 @@ impl<'a> UserThreadDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19688,9 +20053,9 @@ impl<'a> UserThreadDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserThreadDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserThreadDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19722,7 +20087,7 @@ impl<'a> UserThreadDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19732,10 +20097,10 @@ impl<'a> UserThreadDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserThreadGetCall<'a>
-    where  {
+pub struct UserThreadGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _metadata_headers: Vec<String>,
@@ -19745,9 +20110,15 @@ pub struct UserThreadGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserThreadGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserThreadGetCall<'a, S> {}
 
-impl<'a> UserThreadGetCall<'a> {
+impl<'a, S> UserThreadGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19899,7 +20270,7 @@ impl<'a> UserThreadGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -19909,7 +20280,7 @@ impl<'a> UserThreadGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserThreadGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserThreadGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -19917,14 +20288,14 @@ impl<'a> UserThreadGetCall<'a> {
     ///
     /// Append the given value to the *metadata headers* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_metadata_headers(mut self, new_value: &str) -> UserThreadGetCall<'a> {
+    pub fn add_metadata_headers(mut self, new_value: &str) -> UserThreadGetCall<'a, S> {
         self._metadata_headers.push(new_value.to_string());
         self
     }
     /// The format to return the messages in.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a> {
+    pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a, S> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -19934,7 +20305,7 @@ impl<'a> UserThreadGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19959,7 +20330,7 @@ impl<'a> UserThreadGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19979,9 +20350,9 @@ impl<'a> UserThreadGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserThreadGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserThreadGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20013,7 +20384,7 @@ impl<'a> UserThreadGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20026,10 +20397,10 @@ impl<'a> UserThreadGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserThreadListCall<'a>
-    where  {
+pub struct UserThreadListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -20041,9 +20412,15 @@ pub struct UserThreadListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserThreadListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserThreadListCall<'a, S> {}
 
-impl<'a> UserThreadListCall<'a> {
+impl<'a, S> UserThreadListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20203,28 +20580,28 @@ impl<'a> UserThreadListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// Only return threads matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> UserThreadListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> UserThreadListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token to retrieve a specific page of results in the list.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserThreadListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserThreadListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of threads to return. This field defaults to 100. The maximum allowed value for this field is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> UserThreadListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> UserThreadListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -20232,14 +20609,14 @@ impl<'a> UserThreadListCall<'a> {
     ///
     /// Append the given value to the *label ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_label_ids(mut self, new_value: &str) -> UserThreadListCall<'a> {
+    pub fn add_label_ids(mut self, new_value: &str) -> UserThreadListCall<'a, S> {
         self._label_ids.push(new_value.to_string());
         self
     }
     /// Include threads from `SPAM` and `TRASH` in the results.
     ///
     /// Sets the *include spam trash* query property to the given value.
-    pub fn include_spam_trash(mut self, new_value: bool) -> UserThreadListCall<'a> {
+    pub fn include_spam_trash(mut self, new_value: bool) -> UserThreadListCall<'a, S> {
         self._include_spam_trash = Some(new_value);
         self
     }
@@ -20249,7 +20626,7 @@ impl<'a> UserThreadListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20274,7 +20651,7 @@ impl<'a> UserThreadListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20294,9 +20671,9 @@ impl<'a> UserThreadListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserThreadListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserThreadListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20329,7 +20706,7 @@ impl<'a> UserThreadListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20342,10 +20719,10 @@ impl<'a> UserThreadListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserThreadModifyCall<'a>
-    where  {
+pub struct UserThreadModifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: ModifyThreadRequest,
     _user_id: String,
     _id: String,
@@ -20354,9 +20731,15 @@ pub struct UserThreadModifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserThreadModifyCall<'a> {}
+impl<'a, S> client::CallBuilder for UserThreadModifyCall<'a, S> {}
 
-impl<'a> UserThreadModifyCall<'a> {
+impl<'a, S> UserThreadModifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20513,7 +20896,7 @@ impl<'a> UserThreadModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyThreadRequest) -> UserThreadModifyCall<'a> {
+    pub fn request(mut self, new_value: ModifyThreadRequest) -> UserThreadModifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20523,7 +20906,7 @@ impl<'a> UserThreadModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadModifyCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadModifyCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -20533,7 +20916,7 @@ impl<'a> UserThreadModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserThreadModifyCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserThreadModifyCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -20543,7 +20926,7 @@ impl<'a> UserThreadModifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadModifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadModifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20568,7 +20951,7 @@ impl<'a> UserThreadModifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadModifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadModifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20588,9 +20971,9 @@ impl<'a> UserThreadModifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserThreadModifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserThreadModifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20622,7 +21005,7 @@ impl<'a> UserThreadModifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20630,10 +21013,10 @@ impl<'a> UserThreadModifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserThreadTrashCall<'a>
-    where  {
+pub struct UserThreadTrashCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20641,9 +21024,15 @@ pub struct UserThreadTrashCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserThreadTrashCall<'a> {}
+impl<'a, S> client::CallBuilder for UserThreadTrashCall<'a, S> {}
 
-impl<'a> UserThreadTrashCall<'a> {
+impl<'a, S> UserThreadTrashCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20787,7 +21176,7 @@ impl<'a> UserThreadTrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadTrashCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadTrashCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -20797,7 +21186,7 @@ impl<'a> UserThreadTrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserThreadTrashCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserThreadTrashCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -20807,7 +21196,7 @@ impl<'a> UserThreadTrashCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadTrashCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadTrashCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20832,7 +21221,7 @@ impl<'a> UserThreadTrashCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadTrashCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadTrashCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20852,9 +21241,9 @@ impl<'a> UserThreadTrashCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserThreadTrashCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserThreadTrashCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20886,7 +21275,7 @@ impl<'a> UserThreadTrashCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20894,10 +21283,10 @@ impl<'a> UserThreadTrashCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserThreadUntrashCall<'a>
-    where  {
+pub struct UserThreadUntrashCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20905,9 +21294,15 @@ pub struct UserThreadUntrashCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserThreadUntrashCall<'a> {}
+impl<'a, S> client::CallBuilder for UserThreadUntrashCall<'a, S> {}
 
-impl<'a> UserThreadUntrashCall<'a> {
+impl<'a, S> UserThreadUntrashCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21051,7 +21446,7 @@ impl<'a> UserThreadUntrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -21061,7 +21456,7 @@ impl<'a> UserThreadUntrashCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a> {
+    pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -21071,7 +21466,7 @@ impl<'a> UserThreadUntrashCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadUntrashCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserThreadUntrashCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21096,7 +21491,7 @@ impl<'a> UserThreadUntrashCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserThreadUntrashCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserThreadUntrashCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21116,9 +21511,9 @@ impl<'a> UserThreadUntrashCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserThreadUntrashCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserThreadUntrashCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21150,7 +21545,7 @@ impl<'a> UserThreadUntrashCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21158,19 +21553,25 @@ impl<'a> UserThreadUntrashCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserGetProfileCall<'a>
-    where  {
+pub struct UserGetProfileCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserGetProfileCall<'a> {}
+impl<'a, S> client::CallBuilder for UserGetProfileCall<'a, S> {}
 
-impl<'a> UserGetProfileCall<'a> {
+impl<'a, S> UserGetProfileCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21313,7 +21714,7 @@ impl<'a> UserGetProfileCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserGetProfileCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserGetProfileCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -21323,7 +21724,7 @@ impl<'a> UserGetProfileCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetProfileCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetProfileCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21348,7 +21749,7 @@ impl<'a> UserGetProfileCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetProfileCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetProfileCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21368,9 +21769,9 @@ impl<'a> UserGetProfileCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetProfileCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserGetProfileCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21402,7 +21803,7 @@ impl<'a> UserGetProfileCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21410,19 +21811,25 @@ impl<'a> UserGetProfileCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserStopCall<'a>
-    where  {
+pub struct UserStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserStopCall<'a> {}
+impl<'a, S> client::CallBuilder for UserStopCall<'a, S> {}
 
-impl<'a> UserStopCall<'a> {
+impl<'a, S> UserStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21554,7 +21961,7 @@ impl<'a> UserStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserStopCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserStopCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -21564,7 +21971,7 @@ impl<'a> UserStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21589,7 +21996,7 @@ impl<'a> UserStopCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21609,9 +22016,9 @@ impl<'a> UserStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21644,7 +22051,7 @@ impl<'a> UserStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Gmail::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21657,10 +22064,10 @@ impl<'a> UserStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserWatchCall<'a>
-    where  {
+pub struct UserWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Gmail<>,
+    hub: &'a Gmail<S>,
     _request: WatchRequest,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21668,9 +22075,15 @@ pub struct UserWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for UserWatchCall<'a, S> {}
 
-impl<'a> UserWatchCall<'a> {
+impl<'a, S> UserWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21826,7 +22239,7 @@ impl<'a> UserWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WatchRequest) -> UserWatchCall<'a> {
+    pub fn request(mut self, new_value: WatchRequest) -> UserWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21836,7 +22249,7 @@ impl<'a> UserWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserWatchCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserWatchCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -21846,7 +22259,7 @@ impl<'a> UserWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21871,7 +22284,7 @@ impl<'a> UserWatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21891,9 +22304,9 @@ impl<'a> UserWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

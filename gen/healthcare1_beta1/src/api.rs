@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudHealthcare<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudHealthcare<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudHealthcare<> {}
+impl<'a, S> client::Hub for CloudHealthcare<S> {}
 
-impl<'a, > CloudHealthcare<> {
+impl<'a, S> CloudHealthcare<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudHealthcare<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudHealthcare<S> {
         CloudHealthcare {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://healthcare.googleapis.com/".to_string(),
             _root_url: "https://healthcare.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3240,22 +3245,22 @@ impl client::Part for Vertex {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_datasets_annotation_stores_annotations_create(...)`, `locations_datasets_annotation_stores_annotations_delete(...)`, `locations_datasets_annotation_stores_annotations_get(...)`, `locations_datasets_annotation_stores_annotations_list(...)`, `locations_datasets_annotation_stores_annotations_patch(...)`, `locations_datasets_annotation_stores_create(...)`, `locations_datasets_annotation_stores_delete(...)`, `locations_datasets_annotation_stores_evaluate(...)`, `locations_datasets_annotation_stores_export(...)`, `locations_datasets_annotation_stores_get(...)`, `locations_datasets_annotation_stores_get_iam_policy(...)`, `locations_datasets_annotation_stores_import(...)`, `locations_datasets_annotation_stores_list(...)`, `locations_datasets_annotation_stores_patch(...)`, `locations_datasets_annotation_stores_set_iam_policy(...)`, `locations_datasets_annotation_stores_test_iam_permissions(...)`, `locations_datasets_consent_stores_attribute_definitions_create(...)`, `locations_datasets_consent_stores_attribute_definitions_delete(...)`, `locations_datasets_consent_stores_attribute_definitions_get(...)`, `locations_datasets_consent_stores_attribute_definitions_list(...)`, `locations_datasets_consent_stores_attribute_definitions_patch(...)`, `locations_datasets_consent_stores_check_data_access(...)`, `locations_datasets_consent_stores_consent_artifacts_create(...)`, `locations_datasets_consent_stores_consent_artifacts_delete(...)`, `locations_datasets_consent_stores_consent_artifacts_get(...)`, `locations_datasets_consent_stores_consent_artifacts_list(...)`, `locations_datasets_consent_stores_consents_activate(...)`, `locations_datasets_consent_stores_consents_create(...)`, `locations_datasets_consent_stores_consents_delete(...)`, `locations_datasets_consent_stores_consents_delete_revision(...)`, `locations_datasets_consent_stores_consents_get(...)`, `locations_datasets_consent_stores_consents_list(...)`, `locations_datasets_consent_stores_consents_list_revisions(...)`, `locations_datasets_consent_stores_consents_patch(...)`, `locations_datasets_consent_stores_consents_reject(...)`, `locations_datasets_consent_stores_consents_revoke(...)`, `locations_datasets_consent_stores_create(...)`, `locations_datasets_consent_stores_delete(...)`, `locations_datasets_consent_stores_evaluate_user_consents(...)`, `locations_datasets_consent_stores_get(...)`, `locations_datasets_consent_stores_get_iam_policy(...)`, `locations_datasets_consent_stores_list(...)`, `locations_datasets_consent_stores_patch(...)`, `locations_datasets_consent_stores_query_accessible_data(...)`, `locations_datasets_consent_stores_set_iam_policy(...)`, `locations_datasets_consent_stores_test_iam_permissions(...)`, `locations_datasets_consent_stores_user_data_mappings_archive(...)`, `locations_datasets_consent_stores_user_data_mappings_create(...)`, `locations_datasets_consent_stores_user_data_mappings_delete(...)`, `locations_datasets_consent_stores_user_data_mappings_get(...)`, `locations_datasets_consent_stores_user_data_mappings_list(...)`, `locations_datasets_consent_stores_user_data_mappings_patch(...)`, `locations_datasets_create(...)`, `locations_datasets_deidentify(...)`, `locations_datasets_delete(...)`, `locations_datasets_dicom_stores_create(...)`, `locations_datasets_dicom_stores_deidentify(...)`, `locations_datasets_dicom_stores_delete(...)`, `locations_datasets_dicom_stores_export(...)`, `locations_datasets_dicom_stores_get(...)`, `locations_datasets_dicom_stores_get_iam_policy(...)`, `locations_datasets_dicom_stores_import(...)`, `locations_datasets_dicom_stores_list(...)`, `locations_datasets_dicom_stores_patch(...)`, `locations_datasets_dicom_stores_search_for_instances(...)`, `locations_datasets_dicom_stores_search_for_series(...)`, `locations_datasets_dicom_stores_search_for_studies(...)`, `locations_datasets_dicom_stores_set_iam_policy(...)`, `locations_datasets_dicom_stores_store_instances(...)`, `locations_datasets_dicom_stores_studies_delete(...)`, `locations_datasets_dicom_stores_studies_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_retrieve_study(...)`, `locations_datasets_dicom_stores_studies_search_for_instances(...)`, `locations_datasets_dicom_stores_studies_search_for_series(...)`, `locations_datasets_dicom_stores_studies_series_delete(...)`, `locations_datasets_dicom_stores_studies_series_instances_delete(...)`, `locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(...)`, `locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(...)`, `locations_datasets_dicom_stores_studies_series_retrieve_metadata(...)`, `locations_datasets_dicom_stores_studies_series_retrieve_series(...)`, `locations_datasets_dicom_stores_studies_series_search_for_instances(...)`, `locations_datasets_dicom_stores_studies_store_instances(...)`, `locations_datasets_dicom_stores_test_iam_permissions(...)`, `locations_datasets_fhir_stores_configure_search(...)`, `locations_datasets_fhir_stores_create(...)`, `locations_datasets_fhir_stores_deidentify(...)`, `locations_datasets_fhir_stores_delete(...)`, `locations_datasets_fhir_stores_export(...)`, `locations_datasets_fhir_stores_fhir__concept_map_search_translate(...)`, `locations_datasets_fhir_stores_fhir__concept_map_translate(...)`, `locations_datasets_fhir_stores_fhir__observation_lastn(...)`, `locations_datasets_fhir_stores_fhir__patient_everything(...)`, `locations_datasets_fhir_stores_fhir__resource_purge(...)`, `locations_datasets_fhir_stores_fhir__resource_validate(...)`, `locations_datasets_fhir_stores_fhir_capabilities(...)`, `locations_datasets_fhir_stores_fhir_conditional_delete(...)`, `locations_datasets_fhir_stores_fhir_conditional_patch(...)`, `locations_datasets_fhir_stores_fhir_conditional_update(...)`, `locations_datasets_fhir_stores_fhir_create(...)`, `locations_datasets_fhir_stores_fhir_delete(...)`, `locations_datasets_fhir_stores_fhir_execute_bundle(...)`, `locations_datasets_fhir_stores_fhir_history(...)`, `locations_datasets_fhir_stores_fhir_patch(...)`, `locations_datasets_fhir_stores_fhir_read(...)`, `locations_datasets_fhir_stores_fhir_search(...)`, `locations_datasets_fhir_stores_fhir_search_type(...)`, `locations_datasets_fhir_stores_fhir_update(...)`, `locations_datasets_fhir_stores_fhir_vread(...)`, `locations_datasets_fhir_stores_get(...)`, `locations_datasets_fhir_stores_get_iam_policy(...)`, `locations_datasets_fhir_stores_import(...)`, `locations_datasets_fhir_stores_list(...)`, `locations_datasets_fhir_stores_patch(...)`, `locations_datasets_fhir_stores_set_iam_policy(...)`, `locations_datasets_fhir_stores_test_iam_permissions(...)`, `locations_datasets_get(...)`, `locations_datasets_get_iam_policy(...)`, `locations_datasets_hl7_v2_stores_create(...)`, `locations_datasets_hl7_v2_stores_delete(...)`, `locations_datasets_hl7_v2_stores_export(...)`, `locations_datasets_hl7_v2_stores_get(...)`, `locations_datasets_hl7_v2_stores_get_iam_policy(...)`, `locations_datasets_hl7_v2_stores_import(...)`, `locations_datasets_hl7_v2_stores_list(...)`, `locations_datasets_hl7_v2_stores_messages_batch_get(...)`, `locations_datasets_hl7_v2_stores_messages_create(...)`, `locations_datasets_hl7_v2_stores_messages_delete(...)`, `locations_datasets_hl7_v2_stores_messages_get(...)`, `locations_datasets_hl7_v2_stores_messages_ingest(...)`, `locations_datasets_hl7_v2_stores_messages_list(...)`, `locations_datasets_hl7_v2_stores_messages_patch(...)`, `locations_datasets_hl7_v2_stores_patch(...)`, `locations_datasets_hl7_v2_stores_set_iam_policy(...)`, `locations_datasets_hl7_v2_stores_test_iam_permissions(...)`, `locations_datasets_list(...)`, `locations_datasets_operations_cancel(...)`, `locations_datasets_operations_get(...)`, `locations_datasets_operations_list(...)`, `locations_datasets_patch(...)`, `locations_datasets_set_iam_policy(...)`, `locations_datasets_test_iam_permissions(...)`, `locations_get(...)`, `locations_list(...)` and `locations_services_nlp_analyze_entities(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3265,7 +3270,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the Annotation store this annotation belongs to. For example, `projects/my-project/locations/us-central1/datasets/mydataset/annotationStores/myannotationstore`.
-    pub fn locations_datasets_annotation_stores_annotations_create(&self, request: Annotation, parent: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
+    pub fn locations_datasets_annotation_stores_annotations_create(&self, request: Annotation, parent: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreAnnotationCreateCall {
             hub: self.hub,
             _request: request,
@@ -3283,7 +3288,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the Annotation to delete.
-    pub fn locations_datasets_annotation_stores_annotations_delete(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
+    pub fn locations_datasets_annotation_stores_annotations_delete(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3300,7 +3305,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the Annotation to retrieve.
-    pub fn locations_datasets_annotation_stores_annotations_get(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
+    pub fn locations_datasets_annotation_stores_annotations_get(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreAnnotationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3317,7 +3322,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the Annotation store to retrieve Annotations from.
-    pub fn locations_datasets_annotation_stores_annotations_list(&self, parent: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn locations_datasets_annotation_stores_annotations_list(&self, parent: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreAnnotationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3339,7 +3344,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the Annotation, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}/annotations/{annotation_id}`.
-    pub fn locations_datasets_annotation_stores_annotations_patch(&self, request: Annotation, name: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
+    pub fn locations_datasets_annotation_stores_annotations_patch(&self, request: Annotation, name: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreAnnotationPatchCall {
             hub: self.hub,
             _request: request,
@@ -3359,7 +3364,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the dataset this Annotation store belongs to.
-    pub fn locations_datasets_annotation_stores_create(&self, request: AnnotationStore, parent: &str) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
+    pub fn locations_datasets_annotation_stores_create(&self, request: AnnotationStore, parent: &str) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreCreateCall {
             hub: self.hub,
             _request: request,
@@ -3378,7 +3383,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the Annotation store to delete.
-    pub fn locations_datasets_annotation_stores_delete(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
+    pub fn locations_datasets_annotation_stores_delete(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3396,7 +3401,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The Annotation store to compare against `golden_store`, in the format of `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`.
-    pub fn locations_datasets_annotation_stores_evaluate(&self, request: EvaluateAnnotationStoreRequest, name: &str) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
+    pub fn locations_datasets_annotation_stores_evaluate(&self, request: EvaluateAnnotationStoreRequest, name: &str) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreEvaluateCall {
             hub: self.hub,
             _request: request,
@@ -3415,7 +3420,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the Annotation store to export annotations to, in the format of `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`.
-    pub fn locations_datasets_annotation_stores_export(&self, request: ExportAnnotationsRequest, name: &str) -> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
+    pub fn locations_datasets_annotation_stores_export(&self, request: ExportAnnotationsRequest, name: &str) -> ProjectLocationDatasetAnnotationStoreExportCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreExportCall {
             hub: self.hub,
             _request: request,
@@ -3433,7 +3438,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the Annotation store to get.
-    pub fn locations_datasets_annotation_stores_get(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
+    pub fn locations_datasets_annotation_stores_get(&self, name: &str) -> ProjectLocationDatasetAnnotationStoreGetCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3450,7 +3455,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_annotation_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
+    pub fn locations_datasets_annotation_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -3469,7 +3474,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the Annotation store to which the server imports annotations, in the format `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`.
-    pub fn locations_datasets_annotation_stores_import(&self, request: ImportAnnotationsRequest, name: &str) -> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
+    pub fn locations_datasets_annotation_stores_import(&self, request: ImportAnnotationsRequest, name: &str) -> ProjectLocationDatasetAnnotationStoreImportCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreImportCall {
             hub: self.hub,
             _request: request,
@@ -3487,7 +3492,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the dataset.
-    pub fn locations_datasets_annotation_stores_list(&self, parent: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+    pub fn locations_datasets_annotation_stores_list(&self, parent: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3508,7 +3513,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the Annotation store, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/annotationStores/{annotation_store_id}`.
-    pub fn locations_datasets_annotation_stores_patch(&self, request: AnnotationStore, name: &str) -> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
+    pub fn locations_datasets_annotation_stores_patch(&self, request: AnnotationStore, name: &str) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S> {
         ProjectLocationDatasetAnnotationStorePatchCall {
             hub: self.hub,
             _request: request,
@@ -3528,7 +3533,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_annotation_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
+    pub fn locations_datasets_annotation_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3547,7 +3552,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_annotation_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
+    pub fn locations_datasets_annotation_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S> {
         ProjectLocationDatasetAnnotationStoreTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -3566,7 +3571,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the consent store that this Attribute definition belongs to.
-    pub fn locations_datasets_consent_stores_attribute_definitions_create(&self, request: AttributeDefinition, parent: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
+    pub fn locations_datasets_consent_stores_attribute_definitions_create(&self, request: AttributeDefinition, parent: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S> {
         ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall {
             hub: self.hub,
             _request: request,
@@ -3585,7 +3590,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Attribute definition to delete. To preserve referential integrity, Attribute definitions referenced by a User data mapping or the latest revision of a Consent cannot be deleted.
-    pub fn locations_datasets_consent_stores_attribute_definitions_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
+    pub fn locations_datasets_consent_stores_attribute_definitions_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S> {
         ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3602,7 +3607,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Attribute definition to get.
-    pub fn locations_datasets_consent_stores_attribute_definitions_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
+    pub fn locations_datasets_consent_stores_attribute_definitions_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S> {
         ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3619,7 +3624,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the consent store to retrieve Attribute definitions from.
-    pub fn locations_datasets_consent_stores_attribute_definitions_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+    pub fn locations_datasets_consent_stores_attribute_definitions_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {
         ProjectLocationDatasetConsentStoreAttributeDefinitionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3640,7 +3645,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the Attribute definition, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/attributeDefinitions/{attribute_definition_id}`. Cannot be changed after creation.
-    pub fn locations_datasets_consent_stores_attribute_definitions_patch(&self, request: AttributeDefinition, name: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
+    pub fn locations_datasets_consent_stores_attribute_definitions_patch(&self, request: AttributeDefinition, name: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S> {
         ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall {
             hub: self.hub,
             _request: request,
@@ -3660,7 +3665,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the consent store this Consent artifact belongs to.
-    pub fn locations_datasets_consent_stores_consent_artifacts_create(&self, request: ConsentArtifact, parent: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
+    pub fn locations_datasets_consent_stores_consent_artifacts_create(&self, request: ConsentArtifact, parent: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentArtifactCreateCall {
             hub: self.hub,
             _request: request,
@@ -3678,7 +3683,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Consent artifact to delete. To preserve referential integrity, Consent artifacts referenced by the latest revision of a Consent cannot be deleted.
-    pub fn locations_datasets_consent_stores_consent_artifacts_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
+    pub fn locations_datasets_consent_stores_consent_artifacts_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3695,7 +3700,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Consent artifact to retrieve.
-    pub fn locations_datasets_consent_stores_consent_artifacts_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
+    pub fn locations_datasets_consent_stores_consent_artifacts_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentArtifactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3712,7 +3717,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the consent store to retrieve consent artifacts from.
-    pub fn locations_datasets_consent_stores_consent_artifacts_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+    pub fn locations_datasets_consent_stores_consent_artifacts_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentArtifactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3733,7 +3738,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the Consent to activate, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}`. An INVALID_ARGUMENT error occurs if `revision_id` is specified in the name.
-    pub fn locations_datasets_consent_stores_consents_activate(&self, request: ActivateConsentRequest, name: &str) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_activate(&self, request: ActivateConsentRequest, name: &str) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentActivateCall {
             hub: self.hub,
             _request: request,
@@ -3752,7 +3757,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Name of the consent store.
-    pub fn locations_datasets_consent_stores_consents_create(&self, request: Consent, parent: &str) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_create(&self, request: Consent, parent: &str) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentCreateCall {
             hub: self.hub,
             _request: request,
@@ -3770,7 +3775,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Consent to delete, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}`. An INVALID_ARGUMENT error occurs if `revision_id` is specified in the name.
-    pub fn locations_datasets_consent_stores_consents_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3787,7 +3792,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Consent revision to delete, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}@{revision_id}`. An INVALID_ARGUMENT error occurs if `revision_id` is not specified in the name.
-    pub fn locations_datasets_consent_stores_consents_delete_revision(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_delete_revision(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3804,7 +3809,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Consent to retrieve, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}`. In order to retrieve a previous revision of the Consent, also provide the revision ID: `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}@{revision_id}`
-    pub fn locations_datasets_consent_stores_consents_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3821,7 +3826,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the consent store to retrieve Consents from.
-    pub fn locations_datasets_consent_stores_consents_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3841,7 +3846,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Consent to retrieve revisions for.
-    pub fn locations_datasets_consent_stores_consents_list_revisions(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_list_revisions(&self, name: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentListRevisionCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3862,7 +3867,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the Consent, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}`. Cannot be changed after creation.
-    pub fn locations_datasets_consent_stores_consents_patch(&self, request: Consent, name: &str) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_patch(&self, request: Consent, name: &str) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentPatchCall {
             hub: self.hub,
             _request: request,
@@ -3882,7 +3887,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the Consent to reject, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}`. An INVALID_ARGUMENT error occurs if `revision_id` is specified in the name.
-    pub fn locations_datasets_consent_stores_consents_reject(&self, request: RejectConsentRequest, name: &str) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_reject(&self, request: RejectConsentRequest, name: &str) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentRejectCall {
             hub: self.hub,
             _request: request,
@@ -3901,7 +3906,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the Consent to revoke, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/consents/{consent_id}`. An INVALID_ARGUMENT error occurs if `revision_id` is specified in the name.
-    pub fn locations_datasets_consent_stores_consents_revoke(&self, request: RevokeConsentRequest, name: &str) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
+    pub fn locations_datasets_consent_stores_consents_revoke(&self, request: RevokeConsentRequest, name: &str) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S> {
         ProjectLocationDatasetConsentStoreConsentRevokeCall {
             hub: self.hub,
             _request: request,
@@ -3920,7 +3925,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the User data mapping to archive.
-    pub fn locations_datasets_consent_stores_user_data_mappings_archive(&self, request: ArchiveUserDataMappingRequest, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
+    pub fn locations_datasets_consent_stores_user_data_mappings_archive(&self, request: ArchiveUserDataMappingRequest, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S> {
         ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall {
             hub: self.hub,
             _request: request,
@@ -3939,7 +3944,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Name of the consent store.
-    pub fn locations_datasets_consent_stores_user_data_mappings_create(&self, request: UserDataMapping, parent: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
+    pub fn locations_datasets_consent_stores_user_data_mappings_create(&self, request: UserDataMapping, parent: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S> {
         ProjectLocationDatasetConsentStoreUserDataMappingCreateCall {
             hub: self.hub,
             _request: request,
@@ -3957,7 +3962,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the User data mapping to delete.
-    pub fn locations_datasets_consent_stores_user_data_mappings_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
+    pub fn locations_datasets_consent_stores_user_data_mappings_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S> {
         ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3974,7 +3979,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the User data mapping to retrieve.
-    pub fn locations_datasets_consent_stores_user_data_mappings_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
+    pub fn locations_datasets_consent_stores_user_data_mappings_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S> {
         ProjectLocationDatasetConsentStoreUserDataMappingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3991,7 +3996,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the consent store to retrieve User data mappings from.
-    pub fn locations_datasets_consent_stores_user_data_mappings_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+    pub fn locations_datasets_consent_stores_user_data_mappings_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {
         ProjectLocationDatasetConsentStoreUserDataMappingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4012,7 +4017,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the User data mapping, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}/userDataMappings/{user_data_mapping_id}`.
-    pub fn locations_datasets_consent_stores_user_data_mappings_patch(&self, request: UserDataMapping, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
+    pub fn locations_datasets_consent_stores_user_data_mappings_patch(&self, request: UserDataMapping, name: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S> {
         ProjectLocationDatasetConsentStoreUserDataMappingPatchCall {
             hub: self.hub,
             _request: request,
@@ -4032,7 +4037,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `consentStore` - Required. Name of the consent store where the requested data_id is stored, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}`.
-    pub fn locations_datasets_consent_stores_check_data_access(&self, request: CheckDataAccessRequest, consent_store: &str) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
+    pub fn locations_datasets_consent_stores_check_data_access(&self, request: CheckDataAccessRequest, consent_store: &str) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S> {
         ProjectLocationDatasetConsentStoreCheckDataAccesCall {
             hub: self.hub,
             _request: request,
@@ -4051,7 +4056,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the dataset this consent store belongs to.
-    pub fn locations_datasets_consent_stores_create(&self, request: ConsentStore, parent: &str) -> ProjectLocationDatasetConsentStoreCreateCall<'a> {
+    pub fn locations_datasets_consent_stores_create(&self, request: ConsentStore, parent: &str) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S> {
         ProjectLocationDatasetConsentStoreCreateCall {
             hub: self.hub,
             _request: request,
@@ -4070,7 +4075,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the consent store to delete.
-    pub fn locations_datasets_consent_stores_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
+    pub fn locations_datasets_consent_stores_delete(&self, name: &str) -> ProjectLocationDatasetConsentStoreDeleteCall<'a, S> {
         ProjectLocationDatasetConsentStoreDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4088,7 +4093,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `consentStore` - Required. Name of the consent store to retrieve User data mappings from.
-    pub fn locations_datasets_consent_stores_evaluate_user_consents(&self, request: EvaluateUserConsentsRequest, consent_store: &str) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
+    pub fn locations_datasets_consent_stores_evaluate_user_consents(&self, request: EvaluateUserConsentsRequest, consent_store: &str) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S> {
         ProjectLocationDatasetConsentStoreEvaluateUserConsentCall {
             hub: self.hub,
             _request: request,
@@ -4106,7 +4111,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the consent store to get.
-    pub fn locations_datasets_consent_stores_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreGetCall<'a> {
+    pub fn locations_datasets_consent_stores_get(&self, name: &str) -> ProjectLocationDatasetConsentStoreGetCall<'a, S> {
         ProjectLocationDatasetConsentStoreGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4123,7 +4128,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_consent_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
+    pub fn locations_datasets_consent_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S> {
         ProjectLocationDatasetConsentStoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -4141,7 +4146,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the dataset.
-    pub fn locations_datasets_consent_stores_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreListCall<'a> {
+    pub fn locations_datasets_consent_stores_list(&self, parent: &str) -> ProjectLocationDatasetConsentStoreListCall<'a, S> {
         ProjectLocationDatasetConsentStoreListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4162,7 +4167,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the consent store, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/consentStores/{consent_store_id}`. Cannot be changed after creation.
-    pub fn locations_datasets_consent_stores_patch(&self, request: ConsentStore, name: &str) -> ProjectLocationDatasetConsentStorePatchCall<'a> {
+    pub fn locations_datasets_consent_stores_patch(&self, request: ConsentStore, name: &str) -> ProjectLocationDatasetConsentStorePatchCall<'a, S> {
         ProjectLocationDatasetConsentStorePatchCall {
             hub: self.hub,
             _request: request,
@@ -4182,7 +4187,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `consentStore` - Required. Name of the consent store to retrieve User data mappings from.
-    pub fn locations_datasets_consent_stores_query_accessible_data(&self, request: QueryAccessibleDataRequest, consent_store: &str) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
+    pub fn locations_datasets_consent_stores_query_accessible_data(&self, request: QueryAccessibleDataRequest, consent_store: &str) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S> {
         ProjectLocationDatasetConsentStoreQueryAccessibleDataCall {
             hub: self.hub,
             _request: request,
@@ -4201,7 +4206,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_consent_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
+    pub fn locations_datasets_consent_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S> {
         ProjectLocationDatasetConsentStoreSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -4220,7 +4225,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_consent_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
+    pub fn locations_datasets_consent_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S> {
         ProjectLocationDatasetConsentStoreTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -4239,7 +4244,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveFrames DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}/instances/{instance_uid}/frames/{frame_list}`.
-    pub fn locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_frames(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4258,7 +4263,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveRenderedFrames DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}/instances/{instance_uid}/frames/{frame_list}/rendered`.
-    pub fn locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_instances_frames_retrieve_rendered(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4277,7 +4282,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the DeleteInstance request. For example, `studies/{study_uid}/series/{series_uid}/instances/{instance_uid}`.
-    pub fn locations_datasets_dicom_stores_studies_series_instances_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_instances_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4296,7 +4301,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveInstance DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}/instances/{instance_uid}`.
-    pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_instance(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4315,7 +4320,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveInstanceMetadata DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}/instances/{instance_uid}/metadata`.
-    pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4334,7 +4339,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveRenderedInstance DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}/instances/{instance_uid}/rendered`.
-    pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_instances_retrieve_rendered(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4353,7 +4358,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the DeleteSeries request. For example, `studies/{study_uid}/series/{series_uid}`.
-    pub fn locations_datasets_dicom_stores_studies_series_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4372,7 +4377,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveSeriesMetadata DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}/metadata`.
-    pub fn locations_datasets_dicom_stores_studies_series_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4391,7 +4396,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveSeries DICOMweb request. For example, `studies/{study_uid}/series/{series_uid}`.
-    pub fn locations_datasets_dicom_stores_studies_series_retrieve_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_retrieve_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4410,7 +4415,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the SearchForInstancesRequest DICOMweb request. For example, `instances`, `series/{series_uid}/instances`, or `studies/{study_uid}/instances`.
-    pub fn locations_datasets_dicom_stores_studies_series_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_series_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4429,7 +4434,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - No description provided.
     /// * `dicomWebPath` - The path of the DeleteStudy request. For example, `studies/{study_uid}`.
-    pub fn locations_datasets_dicom_stores_studies_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_delete(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudyDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4448,7 +4453,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveStudyMetadata DICOMweb request. For example, `studies/{study_uid}/metadata`.
-    pub fn locations_datasets_dicom_stores_studies_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_retrieve_metadata(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4467,7 +4472,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the RetrieveStudy DICOMweb request. For example, `studies/{study_uid}`.
-    pub fn locations_datasets_dicom_stores_studies_retrieve_study(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_retrieve_study(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4486,7 +4491,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the SearchForInstancesRequest DICOMweb request. For example, `instances`, `series/{series_uid}/instances`, or `studies/{study_uid}/instances`.
-    pub fn locations_datasets_dicom_stores_studies_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySearchForInstanceCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4505,7 +4510,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the SearchForSeries DICOMweb request. For example, `series` or `studies/{study_uid}/series`.
-    pub fn locations_datasets_dicom_stores_studies_search_for_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_search_for_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudySearchForSeryCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4525,7 +4530,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the StoreInstances DICOMweb request. For example, `studies/[{study_uid}]`. Note that the `study_uid` is optional.
-    pub fn locations_datasets_dicom_stores_studies_store_instances(&self, request: HttpBody, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
+    pub fn locations_datasets_dicom_stores_studies_store_instances(&self, request: HttpBody, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S> {
         ProjectLocationDatasetDicomStoreStudyStoreInstanceCall {
             hub: self.hub,
             _request: request,
@@ -4545,7 +4550,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the dataset this DICOM store belongs to.
-    pub fn locations_datasets_dicom_stores_create(&self, request: DicomStore, parent: &str) -> ProjectLocationDatasetDicomStoreCreateCall<'a> {
+    pub fn locations_datasets_dicom_stores_create(&self, request: DicomStore, parent: &str) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S> {
         ProjectLocationDatasetDicomStoreCreateCall {
             hub: self.hub,
             _request: request,
@@ -4565,7 +4570,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `sourceStore` - Source DICOM store resource name. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
-    pub fn locations_datasets_dicom_stores_deidentify(&self, request: DeidentifyDicomStoreRequest, source_store: &str) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
+    pub fn locations_datasets_dicom_stores_deidentify(&self, request: DeidentifyDicomStoreRequest, source_store: &str) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S> {
         ProjectLocationDatasetDicomStoreDeidentifyCall {
             hub: self.hub,
             _request: request,
@@ -4583,7 +4588,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the DICOM store to delete.
-    pub fn locations_datasets_dicom_stores_delete(&self, name: &str) -> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
+    pub fn locations_datasets_dicom_stores_delete(&self, name: &str) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, S> {
         ProjectLocationDatasetDicomStoreDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4601,7 +4606,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The DICOM store resource name from which to export the data. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
-    pub fn locations_datasets_dicom_stores_export(&self, request: ExportDicomDataRequest, name: &str) -> ProjectLocationDatasetDicomStoreExportCall<'a> {
+    pub fn locations_datasets_dicom_stores_export(&self, request: ExportDicomDataRequest, name: &str) -> ProjectLocationDatasetDicomStoreExportCall<'a, S> {
         ProjectLocationDatasetDicomStoreExportCall {
             hub: self.hub,
             _request: request,
@@ -4619,7 +4624,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the DICOM store to get.
-    pub fn locations_datasets_dicom_stores_get(&self, name: &str) -> ProjectLocationDatasetDicomStoreGetCall<'a> {
+    pub fn locations_datasets_dicom_stores_get(&self, name: &str) -> ProjectLocationDatasetDicomStoreGetCall<'a, S> {
         ProjectLocationDatasetDicomStoreGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4636,7 +4641,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_dicom_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
+    pub fn locations_datasets_dicom_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S> {
         ProjectLocationDatasetDicomStoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -4655,7 +4660,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the DICOM store resource into which the data is imported. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
-    pub fn locations_datasets_dicom_stores_import(&self, request: ImportDicomDataRequest, name: &str) -> ProjectLocationDatasetDicomStoreImportCall<'a> {
+    pub fn locations_datasets_dicom_stores_import(&self, request: ImportDicomDataRequest, name: &str) -> ProjectLocationDatasetDicomStoreImportCall<'a, S> {
         ProjectLocationDatasetDicomStoreImportCall {
             hub: self.hub,
             _request: request,
@@ -4673,7 +4678,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the dataset.
-    pub fn locations_datasets_dicom_stores_list(&self, parent: &str) -> ProjectLocationDatasetDicomStoreListCall<'a> {
+    pub fn locations_datasets_dicom_stores_list(&self, parent: &str) -> ProjectLocationDatasetDicomStoreListCall<'a, S> {
         ProjectLocationDatasetDicomStoreListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4694,7 +4699,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the DICOM store, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
-    pub fn locations_datasets_dicom_stores_patch(&self, request: DicomStore, name: &str) -> ProjectLocationDatasetDicomStorePatchCall<'a> {
+    pub fn locations_datasets_dicom_stores_patch(&self, request: DicomStore, name: &str) -> ProjectLocationDatasetDicomStorePatchCall<'a, S> {
         ProjectLocationDatasetDicomStorePatchCall {
             hub: self.hub,
             _request: request,
@@ -4714,7 +4719,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the SearchForInstancesRequest DICOMweb request. For example, `instances`, `series/{series_uid}/instances`, or `studies/{study_uid}/instances`.
-    pub fn locations_datasets_dicom_stores_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
+    pub fn locations_datasets_dicom_stores_search_for_instances(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S> {
         ProjectLocationDatasetDicomStoreSearchForInstanceCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4733,7 +4738,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the SearchForSeries DICOMweb request. For example, `series` or `studies/{study_uid}/series`.
-    pub fn locations_datasets_dicom_stores_search_for_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
+    pub fn locations_datasets_dicom_stores_search_for_series(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S> {
         ProjectLocationDatasetDicomStoreSearchForSeryCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4752,7 +4757,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the SearchForStudies DICOMweb request. For example, `studies`.
-    pub fn locations_datasets_dicom_stores_search_for_studies(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
+    pub fn locations_datasets_dicom_stores_search_for_studies(&self, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S> {
         ProjectLocationDatasetDicomStoreSearchForStudyCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4771,7 +4776,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_dicom_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
+    pub fn locations_datasets_dicom_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S> {
         ProjectLocationDatasetDicomStoreSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -4791,7 +4796,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the DICOM store that is being accessed. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`.
     /// * `dicomWebPath` - The path of the StoreInstances DICOMweb request. For example, `studies/[{study_uid}]`. Note that the `study_uid` is optional.
-    pub fn locations_datasets_dicom_stores_store_instances(&self, request: HttpBody, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
+    pub fn locations_datasets_dicom_stores_store_instances(&self, request: HttpBody, parent: &str, dicom_web_path: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S> {
         ProjectLocationDatasetDicomStoreStoreInstanceCall {
             hub: self.hub,
             _request: request,
@@ -4811,7 +4816,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_dicom_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
+    pub fn locations_datasets_dicom_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S> {
         ProjectLocationDatasetDicomStoreTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -4829,7 +4834,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name for the FHIR store containing the concept map(s) to use for the translation.
-    pub fn locations_datasets_fhir_stores_fhir__concept_map_search_translate(&self, parent: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir__concept_map_search_translate(&self, parent: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4852,7 +4857,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The URL for the concept map to use for the translation.
-    pub fn locations_datasets_fhir_stores_fhir__concept_map_translate(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir__concept_map_translate(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4872,7 +4877,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the FHIR store to retrieve resources from.
-    pub fn locations_datasets_fhir_stores_fhir__observation_lastn(&self, parent: &str) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir__observation_lastn(&self, parent: &str) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirObservationLastnCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4889,7 +4894,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Name of the `Patient` resource for which the information is required.
-    pub fn locations_datasets_fhir_stores_fhir__patient_everything(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir__patient_everything(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirPatientEverythingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4912,7 +4917,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource to purge.
-    pub fn locations_datasets_fhir_stores_fhir__resource_purge(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir__resource_purge(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirResourcePurgeCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4931,7 +4936,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the FHIR store that holds the profiles being used for validation.
     /// * `type` - The FHIR resource type of the resource being validated. For a complete list, see the FHIR Resource Index ([DSTU2](http://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html), [STU3](http://hl7.org/implement/standards/fhir/STU3/resourcelist.html), or [R4](http://hl7.org/implement/standards/fhir/R4/resourcelist.html)). Must match the resource type in the provided content.
-    pub fn locations_datasets_fhir_stores_fhir__resource_validate(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir__resource_validate(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirResourceValidateCall {
             hub: self.hub,
             _request: request,
@@ -4951,7 +4956,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Name of the FHIR store to retrieve the capabilities for.
-    pub fn locations_datasets_fhir_stores_fhir_capabilities(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_capabilities(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirCapabilityCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4969,7 +4974,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `parent` - The name of the FHIR store this resource belongs to.
     /// * `type` - The FHIR resource type to delete, such as Patient or Observation. For a complete list, see the FHIR Resource Index ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html), [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html), [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
-    pub fn locations_datasets_fhir_stores_fhir_conditional_delete(&self, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_conditional_delete(&self, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4989,7 +4994,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the FHIR store this resource belongs to.
     /// * `type` - The FHIR resource type to update, such as Patient or Observation. For a complete list, see the FHIR Resource Index ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html), [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html), [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
-    pub fn locations_datasets_fhir_stores_fhir_conditional_patch(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_conditional_patch(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirConditionalPatchCall {
             hub: self.hub,
             _request: request,
@@ -5010,7 +5015,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the FHIR store this resource belongs to.
     /// * `type` - The FHIR resource type to update, such as Patient or Observation. For a complete list, see the FHIR Resource Index ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html), [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html), [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)). Must match the resource type in the provided content.
-    pub fn locations_datasets_fhir_stores_fhir_conditional_update(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_conditional_update(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5031,7 +5036,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the FHIR store this resource belongs to.
     /// * `type` - The FHIR resource type to create, such as Patient or Observation. For a complete list, see the FHIR Resource Index ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html), [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html), [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)). Must match the resource type in the provided content.
-    pub fn locations_datasets_fhir_stores_fhir_create(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_create(&self, request: HttpBody, parent: &str, type_: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirCreateCall {
             hub: self.hub,
             _request: request,
@@ -5050,7 +5055,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource to delete.
-    pub fn locations_datasets_fhir_stores_fhir_delete(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_delete(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5068,7 +5073,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Name of the FHIR store in which this bundle will be executed.
-    pub fn locations_datasets_fhir_stores_fhir_execute_bundle(&self, request: HttpBody, parent: &str) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_execute_bundle(&self, request: HttpBody, parent: &str) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirExecuteBundleCall {
             hub: self.hub,
             _request: request,
@@ -5086,7 +5091,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource to retrieve.
-    pub fn locations_datasets_fhir_stores_fhir_history(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_history(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirHistoryCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5108,7 +5113,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the resource to update.
-    pub fn locations_datasets_fhir_stores_fhir_patch(&self, request: HttpBody, name: &str) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_patch(&self, request: HttpBody, name: &str) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirPatchCall {
             hub: self.hub,
             _request: request,
@@ -5126,7 +5131,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource to retrieve.
-    pub fn locations_datasets_fhir_stores_fhir_read(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_read(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirReadCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5144,7 +5149,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Name of the FHIR store to retrieve resources from.
-    pub fn locations_datasets_fhir_stores_fhir_search(&self, request: SearchResourcesRequest, parent: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_search(&self, request: SearchResourcesRequest, parent: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirSearchCall {
             hub: self.hub,
             _request: request,
@@ -5164,7 +5169,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - Name of the FHIR store to retrieve resources from.
     /// * `resourceType` - The FHIR resource type to search, such as Patient or Observation. For a complete list, see the FHIR Resource Index ([DSTU2](https://hl7.org/implement/standards/fhir/DSTU2/resourcelist.html), [STU3](https://hl7.org/implement/standards/fhir/STU3/resourcelist.html), [R4](https://hl7.org/implement/standards/fhir/R4/resourcelist.html)).
-    pub fn locations_datasets_fhir_stores_fhir_search_type(&self, request: SearchResourcesRequest, parent: &str, resource_type: &str) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_search_type(&self, request: SearchResourcesRequest, parent: &str, resource_type: &str) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirSearchTypeCall {
             hub: self.hub,
             _request: request,
@@ -5184,7 +5189,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the resource to update.
-    pub fn locations_datasets_fhir_stores_fhir_update(&self, request: HttpBody, name: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_update(&self, request: HttpBody, name: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5202,7 +5207,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource version to retrieve.
-    pub fn locations_datasets_fhir_stores_fhir_vread(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
+    pub fn locations_datasets_fhir_stores_fhir_vread(&self, name: &str) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S> {
         ProjectLocationDatasetFhirStoreFhirVreadCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5220,7 +5225,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the FHIR store to configure, in the format `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_configure_search(&self, request: ConfigureSearchRequest, name: &str) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
+    pub fn locations_datasets_fhir_stores_configure_search(&self, request: ConfigureSearchRequest, name: &str) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S> {
         ProjectLocationDatasetFhirStoreConfigureSearchCall {
             hub: self.hub,
             _request: request,
@@ -5239,7 +5244,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the dataset this FHIR store belongs to.
-    pub fn locations_datasets_fhir_stores_create(&self, request: FhirStore, parent: &str) -> ProjectLocationDatasetFhirStoreCreateCall<'a> {
+    pub fn locations_datasets_fhir_stores_create(&self, request: FhirStore, parent: &str) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S> {
         ProjectLocationDatasetFhirStoreCreateCall {
             hub: self.hub,
             _request: request,
@@ -5259,7 +5264,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `sourceStore` - Source FHIR store resource name. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_deidentify(&self, request: DeidentifyFhirStoreRequest, source_store: &str) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
+    pub fn locations_datasets_fhir_stores_deidentify(&self, request: DeidentifyFhirStoreRequest, source_store: &str) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S> {
         ProjectLocationDatasetFhirStoreDeidentifyCall {
             hub: self.hub,
             _request: request,
@@ -5277,7 +5282,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the FHIR store to delete.
-    pub fn locations_datasets_fhir_stores_delete(&self, name: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
+    pub fn locations_datasets_fhir_stores_delete(&self, name: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, S> {
         ProjectLocationDatasetFhirStoreDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5295,7 +5300,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the FHIR store to export resource from, in the format of `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_export(&self, request: ExportResourcesRequest, name: &str) -> ProjectLocationDatasetFhirStoreExportCall<'a> {
+    pub fn locations_datasets_fhir_stores_export(&self, request: ExportResourcesRequest, name: &str) -> ProjectLocationDatasetFhirStoreExportCall<'a, S> {
         ProjectLocationDatasetFhirStoreExportCall {
             hub: self.hub,
             _request: request,
@@ -5313,7 +5318,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the FHIR store to get.
-    pub fn locations_datasets_fhir_stores_get(&self, name: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a> {
+    pub fn locations_datasets_fhir_stores_get(&self, name: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a, S> {
         ProjectLocationDatasetFhirStoreGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5330,7 +5335,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_fhir_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
+    pub fn locations_datasets_fhir_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S> {
         ProjectLocationDatasetFhirStoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -5349,7 +5354,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the FHIR store to import FHIR resources to, in the format of `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_import(&self, request: ImportResourcesRequest, name: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a> {
+    pub fn locations_datasets_fhir_stores_import(&self, request: ImportResourcesRequest, name: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a, S> {
         ProjectLocationDatasetFhirStoreImportCall {
             hub: self.hub,
             _request: request,
@@ -5367,7 +5372,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the dataset.
-    pub fn locations_datasets_fhir_stores_list(&self, parent: &str) -> ProjectLocationDatasetFhirStoreListCall<'a> {
+    pub fn locations_datasets_fhir_stores_list(&self, parent: &str) -> ProjectLocationDatasetFhirStoreListCall<'a, S> {
         ProjectLocationDatasetFhirStoreListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5388,7 +5393,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of the FHIR store, of the form `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`.
-    pub fn locations_datasets_fhir_stores_patch(&self, request: FhirStore, name: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a> {
+    pub fn locations_datasets_fhir_stores_patch(&self, request: FhirStore, name: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, S> {
         ProjectLocationDatasetFhirStorePatchCall {
             hub: self.hub,
             _request: request,
@@ -5408,7 +5413,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_fhir_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
+    pub fn locations_datasets_fhir_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S> {
         ProjectLocationDatasetFhirStoreSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -5427,7 +5432,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_fhir_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
+    pub fn locations_datasets_fhir_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S> {
         ProjectLocationDatasetFhirStoreTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -5445,7 +5450,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the HL7v2 store to retrieve messages from, in the format: `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/hl7v2Stores/{hl7v2_store_id}`.
-    pub fn locations_datasets_hl7_v2_stores_messages_batch_get(&self, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_batch_get(&self, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessageBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5465,7 +5470,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the dataset this message belongs to.
-    pub fn locations_datasets_hl7_v2_stores_messages_create(&self, request: CreateMessageRequest, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_create(&self, request: CreateMessageRequest, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessageCreateCall {
             hub: self.hub,
             _request: request,
@@ -5483,7 +5488,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the HL7v2 message to delete.
-    pub fn locations_datasets_hl7_v2_stores_messages_delete(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_delete(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessageDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5500,7 +5505,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the HL7v2 message to retrieve.
-    pub fn locations_datasets_hl7_v2_stores_messages_get(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_get(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessageGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5519,7 +5524,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the HL7v2 store this message belongs to.
-    pub fn locations_datasets_hl7_v2_stores_messages_ingest(&self, request: IngestMessageRequest, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_ingest(&self, request: IngestMessageRequest, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessageIngestCall {
             hub: self.hub,
             _request: request,
@@ -5537,7 +5542,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the HL7v2 store to retrieve messages from.
-    pub fn locations_datasets_hl7_v2_stores_messages_list(&self, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_list(&self, parent: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessageListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5560,7 +5565,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the Message, of the form `projects/{project_id}/datasets/{dataset_id}/hl7V2Stores/{hl7_v2_store_id}/messages/{message_id}`. Assigned by the server.
-    pub fn locations_datasets_hl7_v2_stores_messages_patch(&self, request: Message, name: &str) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_messages_patch(&self, request: Message, name: &str) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreMessagePatchCall {
             hub: self.hub,
             _request: request,
@@ -5580,7 +5585,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the dataset this HL7v2 store belongs to.
-    pub fn locations_datasets_hl7_v2_stores_create(&self, request: Hl7V2Store, parent: &str) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_create(&self, request: Hl7V2Store, parent: &str) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreCreateCall {
             hub: self.hub,
             _request: request,
@@ -5599,7 +5604,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the HL7v2 store to delete.
-    pub fn locations_datasets_hl7_v2_stores_delete(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_delete(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5617,7 +5622,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the source HL7v2 store, in the format `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/hl7v2Stores/{hl7v2_store_id}`
-    pub fn locations_datasets_hl7_v2_stores_export(&self, request: ExportMessagesRequest, name: &str) -> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_export(&self, request: ExportMessagesRequest, name: &str) -> ProjectLocationDatasetHl7V2StoreExportCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreExportCall {
             hub: self.hub,
             _request: request,
@@ -5635,7 +5640,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the HL7v2 store to get.
-    pub fn locations_datasets_hl7_v2_stores_get(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_get(&self, name: &str) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5652,7 +5657,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_hl7_v2_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -5671,7 +5676,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the target HL7v2 store, in the format `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/hl7v2Stores/{hl7v2_store_id}`
-    pub fn locations_datasets_hl7_v2_stores_import(&self, request: ImportMessagesRequest, name: &str) -> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_import(&self, request: ImportMessagesRequest, name: &str) -> ProjectLocationDatasetHl7V2StoreImportCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreImportCall {
             hub: self.hub,
             _request: request,
@@ -5689,7 +5694,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Name of the dataset.
-    pub fn locations_datasets_hl7_v2_stores_list(&self, parent: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_list(&self, parent: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5710,7 +5715,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the HL7v2 store, of the form `projects/{project_id}/datasets/{dataset_id}/hl7V2Stores/{hl7v2_store_id}`.
-    pub fn locations_datasets_hl7_v2_stores_patch(&self, request: Hl7V2Store, name: &str) -> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_patch(&self, request: Hl7V2Store, name: &str) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S> {
         ProjectLocationDatasetHl7V2StorePatchCall {
             hub: self.hub,
             _request: request,
@@ -5730,7 +5735,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_hl7_v2_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -5749,7 +5754,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_hl7_v2_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
+    pub fn locations_datasets_hl7_v2_stores_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S> {
         ProjectLocationDatasetHl7V2StoreTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -5768,7 +5773,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn locations_datasets_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationDatasetOperationCancelCall<'a> {
+    pub fn locations_datasets_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationDatasetOperationCancelCall<'a, S> {
         ProjectLocationDatasetOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -5786,7 +5791,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_datasets_operations_get(&self, name: &str) -> ProjectLocationDatasetOperationGetCall<'a> {
+    pub fn locations_datasets_operations_get(&self, name: &str) -> ProjectLocationDatasetOperationGetCall<'a, S> {
         ProjectLocationDatasetOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5803,7 +5808,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_datasets_operations_list(&self, name: &str) -> ProjectLocationDatasetOperationListCall<'a> {
+    pub fn locations_datasets_operations_list(&self, name: &str) -> ProjectLocationDatasetOperationListCall<'a, S> {
         ProjectLocationDatasetOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5824,7 +5829,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the project where the server creates the dataset. For example, `projects/{project_id}/locations/{location_id}`.
-    pub fn locations_datasets_create(&self, request: Dataset, parent: &str) -> ProjectLocationDatasetCreateCall<'a> {
+    pub fn locations_datasets_create(&self, request: Dataset, parent: &str) -> ProjectLocationDatasetCreateCall<'a, S> {
         ProjectLocationDatasetCreateCall {
             hub: self.hub,
             _request: request,
@@ -5844,7 +5849,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `sourceDataset` - Source dataset resource name. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`.
-    pub fn locations_datasets_deidentify(&self, request: DeidentifyDatasetRequest, source_dataset: &str) -> ProjectLocationDatasetDeidentifyCall<'a> {
+    pub fn locations_datasets_deidentify(&self, request: DeidentifyDatasetRequest, source_dataset: &str) -> ProjectLocationDatasetDeidentifyCall<'a, S> {
         ProjectLocationDatasetDeidentifyCall {
             hub: self.hub,
             _request: request,
@@ -5862,7 +5867,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the dataset to delete. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`.
-    pub fn locations_datasets_delete(&self, name: &str) -> ProjectLocationDatasetDeleteCall<'a> {
+    pub fn locations_datasets_delete(&self, name: &str) -> ProjectLocationDatasetDeleteCall<'a, S> {
         ProjectLocationDatasetDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5879,7 +5884,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the dataset to read. For example, `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`.
-    pub fn locations_datasets_get(&self, name: &str) -> ProjectLocationDatasetGetCall<'a> {
+    pub fn locations_datasets_get(&self, name: &str) -> ProjectLocationDatasetGetCall<'a, S> {
         ProjectLocationDatasetGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5896,7 +5901,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetGetIamPolicyCall<'a> {
+    pub fn locations_datasets_get_iam_policy(&self, resource: &str) -> ProjectLocationDatasetGetIamPolicyCall<'a, S> {
         ProjectLocationDatasetGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -5914,7 +5919,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the project whose datasets should be listed. For example, `projects/{project_id}/locations/{location_id}`.
-    pub fn locations_datasets_list(&self, parent: &str) -> ProjectLocationDatasetListCall<'a> {
+    pub fn locations_datasets_list(&self, parent: &str) -> ProjectLocationDatasetListCall<'a, S> {
         ProjectLocationDatasetListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5934,7 +5939,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the dataset, of the form `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}`.
-    pub fn locations_datasets_patch(&self, request: Dataset, name: &str) -> ProjectLocationDatasetPatchCall<'a> {
+    pub fn locations_datasets_patch(&self, request: Dataset, name: &str) -> ProjectLocationDatasetPatchCall<'a, S> {
         ProjectLocationDatasetPatchCall {
             hub: self.hub,
             _request: request,
@@ -5954,7 +5959,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetSetIamPolicyCall<'a> {
+    pub fn locations_datasets_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationDatasetSetIamPolicyCall<'a, S> {
         ProjectLocationDatasetSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -5973,7 +5978,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_datasets_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a> {
+    pub fn locations_datasets_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a, S> {
         ProjectLocationDatasetTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -5992,7 +5997,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `nlpService` - The resource name of the service of the form: "projects/{project_id}/locations/{location_id}/services/nlp".
-    pub fn locations_services_nlp_analyze_entities(&self, request: AnalyzeEntitiesRequest, nlp_service: &str) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
+    pub fn locations_services_nlp_analyze_entities(&self, request: AnalyzeEntitiesRequest, nlp_service: &str) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S> {
         ProjectLocationServiceNlpAnalyzeEntityCall {
             hub: self.hub,
             _request: request,
@@ -6010,7 +6015,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, S> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -6027,7 +6032,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, S> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -6072,7 +6077,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6085,10 +6090,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Annotation,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6096,9 +6101,15 @@ pub struct ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6258,7 +6269,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Annotation) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
+    pub fn request(mut self, new_value: Annotation) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6268,7 +6279,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6278,7 +6289,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6303,7 +6314,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6323,9 +6334,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6357,7 +6368,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6365,19 +6376,25 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6524,7 +6541,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6534,7 +6551,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6559,7 +6576,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6579,9 +6596,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6613,7 +6630,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6621,19 +6638,25 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6780,7 +6803,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6790,7 +6813,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6815,7 +6838,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6835,9 +6858,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6869,7 +6892,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6881,10 +6904,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -6895,9 +6918,15 @@ pub struct ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7056,35 +7085,35 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Controls which fields are populated in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Limit on the number of Annotations to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Restricts Annotations returned to those matching a filter. Functions available for filtering are: - `matches("annotation_source.cloud_healthcare_source.name", substring)`. Filter on `cloud_healthcare_source.name`. For example: `matches("annotation_source.cloud_healthcare_source.name", "some source")`. - `matches("annotation", substring)`. Filter on all fields of annotation. For example: `matches("annotation", "some-content")`. - `type("text")`, `type("image")`, `type("resource")`. Filter on the type of annotation `data`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7094,7 +7123,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7119,7 +7148,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7139,9 +7168,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7174,7 +7203,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7188,10 +7217,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Annotation,
     _name: String,
     _update_mask: Option<String>,
@@ -7200,9 +7229,15 @@ pub struct ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7365,7 +7400,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Annotation) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
+    pub fn request(mut self, new_value: Annotation) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7375,14 +7410,14 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7392,7 +7427,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7417,7 +7452,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7437,9 +7472,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7472,7 +7507,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7486,10 +7521,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreAnnotationPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: AnnotationStore,
     _parent: String,
     _annotation_store_id: Option<String>,
@@ -7498,9 +7533,15 @@ pub struct ProjectLocationDatasetAnnotationStoreCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7663,7 +7704,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnnotationStore) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
+    pub fn request(mut self, new_value: AnnotationStore) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7673,14 +7714,14 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The ID of the Annotation store that is being created. The string must match the following regex: `[\p{L}\p{N}_\-\.]{1,256}`.
     ///
     /// Sets the *annotation store id* query property to the given value.
-    pub fn annotation_store_id(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
+    pub fn annotation_store_id(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S> {
         self._annotation_store_id = Some(new_value.to_string());
         self
     }
@@ -7690,7 +7731,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7715,7 +7756,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7735,9 +7776,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7769,7 +7810,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7777,19 +7818,25 @@ impl<'a> ProjectLocationDatasetAnnotationStoreCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7936,7 +7983,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7946,7 +7993,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7971,7 +8018,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7991,9 +8038,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8026,7 +8073,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8039,10 +8086,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreEvaluateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: EvaluateAnnotationStoreRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8050,9 +8097,15 @@ pub struct ProjectLocationDatasetAnnotationStoreEvaluateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8212,7 +8265,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EvaluateAnnotationStoreRequest) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
+    pub fn request(mut self, new_value: EvaluateAnnotationStoreRequest) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8222,7 +8275,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8232,7 +8285,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8257,7 +8310,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8277,9 +8330,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8312,7 +8365,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8325,10 +8378,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreEvaluateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreExportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ExportAnnotationsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8336,9 +8389,15 @@ pub struct ProjectLocationDatasetAnnotationStoreExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreExportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8498,7 +8557,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportAnnotationsRequest) -> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
+    pub fn request(mut self, new_value: ExportAnnotationsRequest) -> ProjectLocationDatasetAnnotationStoreExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8508,7 +8567,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreExportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8518,7 +8577,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8543,7 +8602,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8563,9 +8622,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8597,7 +8656,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8605,19 +8664,25 @@ impl<'a> ProjectLocationDatasetAnnotationStoreExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8764,7 +8829,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8774,7 +8839,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8799,7 +8864,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8819,9 +8884,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8853,7 +8918,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8862,10 +8927,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8873,9 +8938,15 @@ pub struct ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9025,14 +9096,14 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -9042,7 +9113,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9067,7 +9138,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9087,9 +9158,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9122,7 +9193,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9135,10 +9206,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreImportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ImportAnnotationsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9146,9 +9217,15 @@ pub struct ProjectLocationDatasetAnnotationStoreImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreImportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9308,7 +9385,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportAnnotationsRequest) -> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
+    pub fn request(mut self, new_value: ImportAnnotationsRequest) -> ProjectLocationDatasetAnnotationStoreImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9318,7 +9395,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreImportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9328,7 +9405,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9353,7 +9430,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9373,9 +9450,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9407,7 +9484,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9418,10 +9495,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9431,9 +9508,15 @@ pub struct ProjectLocationDatasetAnnotationStoreListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9589,28 +9672,28 @@ impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Limit on the number of Annotation stores to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Restricts stores returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Only filtering on labels is supported, for example `labels.key=value`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9620,7 +9703,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9645,7 +9728,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9665,9 +9748,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9700,7 +9783,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9714,10 +9797,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStorePatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStorePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: AnnotationStore,
     _name: String,
     _update_mask: Option<String>,
@@ -9726,9 +9809,15 @@ pub struct ProjectLocationDatasetAnnotationStorePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStorePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStorePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStorePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9891,7 +9980,7 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnnotationStore) -> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
+    pub fn request(mut self, new_value: AnnotationStore) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9901,14 +9990,14 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9918,7 +10007,7 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9943,7 +10032,7 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStorePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9963,9 +10052,9 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStorePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStorePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9998,7 +10087,7 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10011,10 +10100,10 @@ impl<'a> ProjectLocationDatasetAnnotationStorePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10022,9 +10111,15 @@ pub struct ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10184,7 +10279,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10194,7 +10289,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -10204,7 +10299,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10229,7 +10324,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10249,9 +10344,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10284,7 +10379,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10297,10 +10392,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10308,9 +10403,15 @@ pub struct ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10470,7 +10571,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10480,7 +10581,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -10490,7 +10591,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10515,7 +10616,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10535,9 +10636,9 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10570,7 +10671,7 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10584,10 +10685,10 @@ impl<'a> ProjectLocationDatasetAnnotationStoreTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: AttributeDefinition,
     _parent: String,
     _attribute_definition_id: Option<String>,
@@ -10596,9 +10697,15 @@ pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10761,7 +10868,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AttributeDefinition) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
+    pub fn request(mut self, new_value: AttributeDefinition) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10771,14 +10878,14 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the Attribute definition to create. The string must match the following regex: `_a-zA-Z{0,255}` and must not be a reserved keyword within the Common Expression Language as listed on https://github.com/google/cel-spec/blob/master/doc/langdef.md.
     ///
     /// Sets the *attribute definition id* query property to the given value.
-    pub fn attribute_definition_id(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
+    pub fn attribute_definition_id(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S> {
         self._attribute_definition_id = Some(new_value.to_string());
         self
     }
@@ -10788,7 +10895,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10813,7 +10920,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10833,9 +10940,9 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10867,7 +10974,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10875,19 +10982,25 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11034,7 +11147,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11044,7 +11157,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11069,7 +11182,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11089,9 +11202,9 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11123,7 +11236,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11131,19 +11244,25 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11290,7 +11409,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11300,7 +11419,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11325,7 +11444,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11345,9 +11464,9 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11379,7 +11498,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11390,10 +11509,10 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11403,9 +11522,15 @@ pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11561,28 +11686,28 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Token to retrieve the next page of results or empty to get the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Limit on the number of Attribute definitions to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Restricts the attributes returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. The only field available for filtering is `category`. For example, `filter=category=\"REQUEST\"`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11592,7 +11717,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11617,7 +11742,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11637,9 +11762,9 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11672,7 +11797,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11686,10 +11811,10 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: AttributeDefinition,
     _name: String,
     _update_mask: Option<String>,
@@ -11698,9 +11823,15 @@ pub struct ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11863,7 +11994,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AttributeDefinition) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
+    pub fn request(mut self, new_value: AttributeDefinition) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11873,14 +12004,14 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask that applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask. Only the `description`, `allowed_values`, `consent_default_values` and `data_mapping_default_value` fields can be updated. The updated `allowed_values` must contain all values from the previous `allowed_values`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11890,7 +12021,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11915,7 +12046,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11935,9 +12066,9 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11970,7 +12101,7 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11983,10 +12114,10 @@ impl<'a> ProjectLocationDatasetConsentStoreAttributeDefinitionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ConsentArtifact,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11994,9 +12125,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12156,7 +12293,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ConsentArtifact) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
+    pub fn request(mut self, new_value: ConsentArtifact) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12166,7 +12303,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12176,7 +12313,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12201,7 +12338,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12221,9 +12358,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12255,7 +12392,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12263,19 +12400,25 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12422,7 +12565,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12432,7 +12575,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12457,7 +12600,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12477,9 +12620,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12511,7 +12654,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12519,19 +12662,25 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12678,7 +12827,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12688,7 +12837,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12713,7 +12862,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12733,9 +12882,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12767,7 +12916,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12778,10 +12927,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12791,9 +12940,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12949,28 +13104,28 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Limit on the number of consent artifacts to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Restricts the artifacts returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. The fields available for filtering are: - user_id. For example, `filter=user_id=\"user123\"`. - consent_content_version - metadata. For example, `filter=Metadata(\"testkey\")=\"value\"` or `filter=HasMetadata(\"testkey\")`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12980,7 +13135,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13005,7 +13160,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13025,9 +13180,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13060,7 +13215,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13073,10 +13228,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentArtifactListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentActivateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ActivateConsentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13084,9 +13239,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentActivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13246,7 +13407,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ActivateConsentRequest) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
+    pub fn request(mut self, new_value: ActivateConsentRequest) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13256,7 +13417,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13266,7 +13427,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13291,7 +13452,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13311,9 +13472,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentActivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13346,7 +13507,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13359,10 +13520,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentActivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Consent,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13370,9 +13531,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13532,7 +13699,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Consent) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
+    pub fn request(mut self, new_value: Consent) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13542,7 +13709,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -13552,7 +13719,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13577,7 +13744,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13597,9 +13764,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13631,7 +13798,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13639,19 +13806,25 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13798,7 +13971,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13808,7 +13981,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13833,7 +14006,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13853,9 +14026,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13887,7 +14060,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13895,19 +14068,25 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14054,7 +14233,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14064,7 +14243,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14089,7 +14268,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14109,9 +14288,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14143,7 +14322,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14151,19 +14330,25 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentDeleteRevisionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14310,7 +14495,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14320,7 +14505,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14345,7 +14530,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14365,9 +14550,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14399,7 +14584,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14410,10 +14595,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14423,9 +14608,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14581,28 +14772,28 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Limit on the number of Consents to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Restricts the consents returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. The fields available for filtering are: - user_id. For example, `filter='user_id="user123"'`. - consent_artifact - state - revision_create_time - metadata. For example, `filter=Metadata(\"testkey\")=\"value\"` or `filter=HasMetadata(\"testkey\")`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -14612,7 +14803,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14637,7 +14828,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14657,9 +14848,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14691,7 +14882,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14702,10 +14893,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14715,9 +14906,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14873,28 +15070,28 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Token to retrieve the next page of results or empty if there are no more results in the list.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Limit on the number of revisions to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Restricts the revisions returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Fields/functions available for filtering are: - user_id. For example, `filter='user_id="user123"'`. - consent_artifact - state - revision_create_time - metadata. For example, `filter=Metadata(\"testkey\")=\"value\"` or `filter=HasMetadata(\"testkey\")`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -14904,7 +15101,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14929,7 +15126,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14949,9 +15146,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14984,7 +15181,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14998,10 +15195,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentListRevisionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Consent,
     _name: String,
     _update_mask: Option<String>,
@@ -15010,9 +15207,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15175,7 +15378,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Consent) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
+    pub fn request(mut self, new_value: Consent) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15185,14 +15388,14 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask to apply to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask. Only the `user_id`, `policies`, `consent_artifact`, and `metadata` fields can be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15202,7 +15405,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15227,7 +15430,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15247,9 +15450,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15282,7 +15485,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15295,10 +15498,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentRejectCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: RejectConsentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15306,9 +15509,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentRejectCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15468,7 +15677,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RejectConsentRequest) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
+    pub fn request(mut self, new_value: RejectConsentRequest) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15478,7 +15687,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15488,7 +15697,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15513,7 +15722,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15533,9 +15742,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentRejectCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15568,7 +15777,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15581,10 +15790,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRejectCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreConsentRevokeCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: RevokeConsentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15592,9 +15801,15 @@ pub struct ProjectLocationDatasetConsentStoreConsentRevokeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15754,7 +15969,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RevokeConsentRequest) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
+    pub fn request(mut self, new_value: RevokeConsentRequest) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15764,7 +15979,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15774,7 +15989,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15799,7 +16014,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15819,9 +16034,9 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15854,7 +16069,7 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15867,10 +16082,10 @@ impl<'a> ProjectLocationDatasetConsentStoreConsentRevokeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ArchiveUserDataMappingRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15878,9 +16093,15 @@ pub struct ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16040,7 +16261,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ArchiveUserDataMappingRequest) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
+    pub fn request(mut self, new_value: ArchiveUserDataMappingRequest) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16050,7 +16271,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16060,7 +16281,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16085,7 +16306,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16105,9 +16326,9 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16140,7 +16361,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16153,10 +16374,10 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingArchiveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: UserDataMapping,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16164,9 +16385,15 @@ pub struct ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16326,7 +16553,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserDataMapping) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
+    pub fn request(mut self, new_value: UserDataMapping) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16336,7 +16563,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -16346,7 +16573,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16371,7 +16598,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16391,9 +16618,9 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16425,7 +16652,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16433,19 +16660,25 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16592,7 +16825,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16602,7 +16835,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16627,7 +16860,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16647,9 +16880,9 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16681,7 +16914,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16689,19 +16922,25 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16848,7 +17087,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16858,7 +17097,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16883,7 +17122,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16903,9 +17142,9 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16937,7 +17176,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16948,10 +17187,10 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16961,9 +17200,15 @@ pub struct ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17119,28 +17364,28 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Token to retrieve the next page of results, or empty to get the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Limit on the number of User data mappings to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Restricts the user data mappings returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. The fields available for filtering are: - data_id - user_id. For example, `filter=user_id=\"user123\"`. - archived - archive_time
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -17150,7 +17395,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17175,7 +17420,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17195,9 +17440,9 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17230,7 +17475,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17244,10 +17489,10 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: UserDataMapping,
     _name: String,
     _update_mask: Option<String>,
@@ -17256,9 +17501,15 @@ pub struct ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17421,7 +17672,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserDataMapping) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
+    pub fn request(mut self, new_value: UserDataMapping) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17431,14 +17682,14 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask that applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask. Only the `data_id`, `user_id` and `resource_attributes` fields can be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -17448,7 +17699,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17473,7 +17724,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17493,9 +17744,9 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17528,7 +17779,7 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17541,10 +17792,10 @@ impl<'a> ProjectLocationDatasetConsentStoreUserDataMappingPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: CheckDataAccessRequest,
     _consent_store: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17552,9 +17803,15 @@ pub struct ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17714,7 +17971,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CheckDataAccessRequest) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
+    pub fn request(mut self, new_value: CheckDataAccessRequest) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17724,7 +17981,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn consent_store(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
+    pub fn consent_store(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S> {
         self._consent_store = new_value.to_string();
         self
     }
@@ -17734,7 +17991,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17759,7 +18016,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17779,9 +18036,9 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17814,7 +18071,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17828,10 +18085,10 @@ impl<'a> ProjectLocationDatasetConsentStoreCheckDataAccesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ConsentStore,
     _parent: String,
     _consent_store_id: Option<String>,
@@ -17840,9 +18097,15 @@ pub struct ProjectLocationDatasetConsentStoreCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18005,7 +18268,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ConsentStore) -> ProjectLocationDatasetConsentStoreCreateCall<'a> {
+    pub fn request(mut self, new_value: ConsentStore) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18015,14 +18278,14 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the consent store to create. The string must match the following regex: `[\p{L}\p{N}_\-\.]{1,256}`. Cannot be changed after creation.
     ///
     /// Sets the *consent store id* query property to the given value.
-    pub fn consent_store_id(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreCreateCall<'a> {
+    pub fn consent_store_id(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S> {
         self._consent_store_id = Some(new_value.to_string());
         self
     }
@@ -18032,7 +18295,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18057,7 +18320,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18077,9 +18340,9 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18111,7 +18374,7 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18119,19 +18382,25 @@ impl<'a> ProjectLocationDatasetConsentStoreCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18278,7 +18547,7 @@ impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18288,7 +18557,7 @@ impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18313,7 +18582,7 @@ impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18333,9 +18602,9 @@ impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18368,7 +18637,7 @@ impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18381,10 +18650,10 @@ impl<'a> ProjectLocationDatasetConsentStoreDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: EvaluateUserConsentsRequest,
     _consent_store: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18392,9 +18661,15 @@ pub struct ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18554,7 +18829,7 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EvaluateUserConsentsRequest) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
+    pub fn request(mut self, new_value: EvaluateUserConsentsRequest) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18564,7 +18839,7 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn consent_store(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
+    pub fn consent_store(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S> {
         self._consent_store = new_value.to_string();
         self
     }
@@ -18574,7 +18849,7 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18599,7 +18874,7 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18619,9 +18894,9 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18653,7 +18928,7 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18661,19 +18936,25 @@ impl<'a> ProjectLocationDatasetConsentStoreEvaluateUserConsentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18820,7 +19101,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18830,7 +19111,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18855,7 +19136,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18875,9 +19156,9 @@ impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18909,7 +19190,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18918,10 +19199,10 @@ impl<'a> ProjectLocationDatasetConsentStoreGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18929,9 +19210,15 @@ pub struct ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19081,14 +19368,14 @@ impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -19098,7 +19385,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19123,7 +19410,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19143,9 +19430,9 @@ impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19177,7 +19464,7 @@ impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19188,10 +19475,10 @@ impl<'a> ProjectLocationDatasetConsentStoreGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -19201,9 +19488,15 @@ pub struct ProjectLocationDatasetConsentStoreListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19359,28 +19652,28 @@ impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Token to retrieve the next page of results, or empty to get the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Limit on the number of consent stores to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetConsentStoreListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Restricts the stores returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Only filtering on labels is supported. For example, `filter=labels.key=value`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -19390,7 +19683,7 @@ impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19415,7 +19708,7 @@ impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19435,9 +19728,9 @@ impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19470,7 +19763,7 @@ impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19484,10 +19777,10 @@ impl<'a> ProjectLocationDatasetConsentStoreListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStorePatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStorePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ConsentStore,
     _name: String,
     _update_mask: Option<String>,
@@ -19496,9 +19789,15 @@ pub struct ProjectLocationDatasetConsentStorePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStorePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStorePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStorePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19661,7 +19960,7 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ConsentStore) -> ProjectLocationDatasetConsentStorePatchCall<'a> {
+    pub fn request(mut self, new_value: ConsentStore) -> ProjectLocationDatasetConsentStorePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19671,14 +19970,14 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStorePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetConsentStorePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask that applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask. Only the `labels`, `default_consent_ttl`, and `enable_consent_create_on_update` fields are allowed to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStorePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetConsentStorePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -19688,7 +19987,7 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStorePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStorePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19713,7 +20012,7 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStorePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStorePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19733,9 +20032,9 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStorePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStorePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19768,7 +20067,7 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19781,10 +20080,10 @@ impl<'a> ProjectLocationDatasetConsentStorePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: QueryAccessibleDataRequest,
     _consent_store: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19792,9 +20091,15 @@ pub struct ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19954,7 +20259,7 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: QueryAccessibleDataRequest) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
+    pub fn request(mut self, new_value: QueryAccessibleDataRequest) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19964,7 +20269,7 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn consent_store(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
+    pub fn consent_store(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S> {
         self._consent_store = new_value.to_string();
         self
     }
@@ -19974,7 +20279,7 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19999,7 +20304,7 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20019,9 +20324,9 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20054,7 +20359,7 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20067,10 +20372,10 @@ impl<'a> ProjectLocationDatasetConsentStoreQueryAccessibleDataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20078,9 +20383,15 @@ pub struct ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20240,7 +20551,7 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20250,7 +20561,7 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -20260,7 +20571,7 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20285,7 +20596,7 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20305,9 +20616,9 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20340,7 +20651,7 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20353,10 +20664,10 @@ impl<'a> ProjectLocationDatasetConsentStoreSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20364,9 +20675,15 @@ pub struct ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20526,7 +20843,7 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20536,7 +20853,7 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -20546,7 +20863,7 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20571,7 +20888,7 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20591,9 +20908,9 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20625,7 +20942,7 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20633,10 +20950,10 @@ impl<'a> ProjectLocationDatasetConsentStoreTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20644,9 +20961,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCa
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20794,7 +21117,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -20804,7 +21127,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -20814,7 +21137,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20839,7 +21162,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20859,9 +21182,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20893,7 +21216,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20901,10 +21224,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveFrameCall
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20912,9 +21235,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRendere
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21062,7 +21391,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21072,7 +21401,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -21082,7 +21411,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21107,7 +21436,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21127,9 +21456,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21161,7 +21490,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21169,10 +21498,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceFrameRetrieveRenderedC
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21180,9 +21509,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21330,7 +21665,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21340,7 +21675,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -21350,7 +21685,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21375,7 +21710,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21395,9 +21730,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21429,7 +21764,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21437,10 +21772,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21448,9 +21783,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21598,7 +21939,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21608,7 +21949,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -21618,7 +21959,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21643,7 +21984,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21663,9 +22004,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21697,7 +22038,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21705,10 +22046,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveInstanceCall<'
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21716,9 +22057,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21866,7 +22213,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21876,7 +22223,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -21886,7 +22233,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21911,7 +22258,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21931,9 +22278,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21965,7 +22312,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21973,10 +22320,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveMetadataCall<'
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21984,9 +22331,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22134,7 +22487,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -22144,7 +22497,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -22154,7 +22507,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22179,7 +22532,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22199,9 +22552,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22233,7 +22586,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22241,10 +22594,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryInstanceRetrieveRenderedCall<'
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22252,9 +22605,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22402,7 +22761,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -22412,7 +22771,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -22422,7 +22781,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22447,7 +22806,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22467,9 +22826,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22501,7 +22860,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22509,10 +22868,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22520,9 +22879,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22670,7 +23035,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -22680,7 +23045,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -22690,7 +23055,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22715,7 +23080,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22735,9 +23100,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22769,7 +23134,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22777,10 +23142,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveMetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22788,9 +23153,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22938,7 +23309,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -22948,7 +23319,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -22958,7 +23329,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22983,7 +23354,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23003,9 +23374,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23037,7 +23408,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23045,10 +23416,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySeryRetrieveSeryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23056,9 +23427,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23206,7 +23583,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -23216,7 +23593,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -23226,7 +23603,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23251,7 +23628,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23271,9 +23648,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23305,7 +23682,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23313,10 +23690,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySerySearchForInstanceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudyDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23324,9 +23701,15 @@ pub struct ProjectLocationDatasetDicomStoreStudyDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23473,7 +23856,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -23483,7 +23866,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -23493,7 +23876,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23518,7 +23901,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23538,9 +23921,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23572,7 +23955,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23580,10 +23963,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23591,9 +23974,15 @@ pub struct ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23741,7 +24130,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -23751,7 +24140,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -23761,7 +24150,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23786,7 +24175,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23806,9 +24195,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23840,7 +24229,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23848,10 +24237,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveMetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23859,9 +24248,15 @@ pub struct ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24009,7 +24404,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -24019,7 +24414,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -24029,7 +24424,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24054,7 +24449,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24074,9 +24469,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24108,7 +24503,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24116,10 +24511,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyRetrieveStudyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -24127,9 +24522,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24277,7 +24678,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -24287,7 +24688,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -24297,7 +24698,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24322,7 +24723,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24342,9 +24743,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24376,7 +24777,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24384,10 +24785,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForInstanceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -24395,9 +24796,15 @@ pub struct ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24545,7 +24952,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -24555,7 +24962,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -24565,7 +24972,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24590,7 +24997,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24610,9 +25017,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24645,7 +25052,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24658,10 +25065,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudySearchForSeryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _dicom_web_path: String,
@@ -24670,9 +25077,15 @@ pub struct ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24833,7 +25246,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24843,7 +25256,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -24853,7 +25266,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -24863,7 +25276,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24888,7 +25301,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24908,9 +25321,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24943,7 +25356,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24957,10 +25370,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStudyStoreInstanceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: DicomStore,
     _parent: String,
     _dicom_store_id: Option<String>,
@@ -24969,9 +25382,15 @@ pub struct ProjectLocationDatasetDicomStoreCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25134,7 +25553,7 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DicomStore) -> ProjectLocationDatasetDicomStoreCreateCall<'a> {
+    pub fn request(mut self, new_value: DicomStore) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25144,14 +25563,14 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The ID of the DICOM store that is being created. Any string value up to 256 characters in length.
     ///
     /// Sets the *dicom store id* query property to the given value.
-    pub fn dicom_store_id(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreCreateCall<'a> {
+    pub fn dicom_store_id(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S> {
         self._dicom_store_id = Some(new_value.to_string());
         self
     }
@@ -25161,7 +25580,7 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25186,7 +25605,7 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25206,9 +25625,9 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25241,7 +25660,7 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25254,10 +25673,10 @@ impl<'a> ProjectLocationDatasetDicomStoreCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreDeidentifyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: DeidentifyDicomStoreRequest,
     _source_store: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25265,9 +25684,15 @@ pub struct ProjectLocationDatasetDicomStoreDeidentifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25427,7 +25852,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeidentifyDicomStoreRequest) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
+    pub fn request(mut self, new_value: DeidentifyDicomStoreRequest) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25437,7 +25862,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_store(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
+    pub fn source_store(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S> {
         self._source_store = new_value.to_string();
         self
     }
@@ -25447,7 +25872,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25472,7 +25897,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25492,9 +25917,9 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreDeidentifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25526,7 +25951,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25534,19 +25959,25 @@ impl<'a> ProjectLocationDatasetDicomStoreDeidentifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25693,7 +26124,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -25703,7 +26134,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25728,7 +26159,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25748,9 +26179,9 @@ impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25783,7 +26214,7 @@ impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25796,10 +26227,10 @@ impl<'a> ProjectLocationDatasetDicomStoreDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreExportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ExportDicomDataRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25807,9 +26238,15 @@ pub struct ProjectLocationDatasetDicomStoreExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreExportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25969,7 +26406,7 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportDicomDataRequest) -> ProjectLocationDatasetDicomStoreExportCall<'a> {
+    pub fn request(mut self, new_value: ExportDicomDataRequest) -> ProjectLocationDatasetDicomStoreExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25979,7 +26416,7 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreExportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreExportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -25989,7 +26426,7 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26014,7 +26451,7 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26034,9 +26471,9 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26068,7 +26505,7 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26076,19 +26513,25 @@ impl<'a> ProjectLocationDatasetDicomStoreExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26235,7 +26678,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -26245,7 +26688,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26270,7 +26713,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26290,9 +26733,9 @@ impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26324,7 +26767,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26333,10 +26776,10 @@ impl<'a> ProjectLocationDatasetDicomStoreGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -26344,9 +26787,15 @@ pub struct ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26496,14 +26945,14 @@ impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -26513,7 +26962,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26538,7 +26987,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26558,9 +27007,9 @@ impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26593,7 +27042,7 @@ impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26606,10 +27055,10 @@ impl<'a> ProjectLocationDatasetDicomStoreGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreImportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ImportDicomDataRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -26617,9 +27066,15 @@ pub struct ProjectLocationDatasetDicomStoreImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreImportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26779,7 +27234,7 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportDicomDataRequest) -> ProjectLocationDatasetDicomStoreImportCall<'a> {
+    pub fn request(mut self, new_value: ImportDicomDataRequest) -> ProjectLocationDatasetDicomStoreImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26789,7 +27244,7 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreImportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreImportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -26799,7 +27254,7 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26824,7 +27279,7 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26844,9 +27299,9 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26878,7 +27333,7 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26889,10 +27344,10 @@ impl<'a> ProjectLocationDatasetDicomStoreImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -26902,9 +27357,15 @@ pub struct ProjectLocationDatasetDicomStoreListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27060,28 +27521,28 @@ impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Limit on the number of DICOM stores to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetDicomStoreListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetDicomStoreListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Restricts stores returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Only filtering on labels is supported. For example, `labels.key=value`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -27091,7 +27552,7 @@ impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27116,7 +27577,7 @@ impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27136,9 +27597,9 @@ impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27171,7 +27632,7 @@ impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27185,10 +27646,10 @@ impl<'a> ProjectLocationDatasetDicomStoreListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStorePatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStorePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: DicomStore,
     _name: String,
     _update_mask: Option<String>,
@@ -27197,9 +27658,15 @@ pub struct ProjectLocationDatasetDicomStorePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStorePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStorePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStorePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27362,7 +27829,7 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DicomStore) -> ProjectLocationDatasetDicomStorePatchCall<'a> {
+    pub fn request(mut self, new_value: DicomStore) -> ProjectLocationDatasetDicomStorePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27372,14 +27839,14 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStorePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDicomStorePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetDicomStorePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetDicomStorePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -27389,7 +27856,7 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStorePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStorePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27414,7 +27881,7 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStorePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStorePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27434,9 +27901,9 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStorePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStorePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27468,7 +27935,7 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27476,10 +27943,10 @@ impl<'a> ProjectLocationDatasetDicomStorePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27487,9 +27954,15 @@ pub struct ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27637,7 +28110,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -27647,7 +28120,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -27657,7 +28130,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27682,7 +28155,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27702,9 +28175,9 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27736,7 +28209,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27744,10 +28217,10 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForInstanceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreSearchForSeryCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27755,9 +28228,15 @@ pub struct ProjectLocationDatasetDicomStoreSearchForSeryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27905,7 +28384,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -27915,7 +28394,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -27925,7 +28404,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27950,7 +28429,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27970,9 +28449,9 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28004,7 +28483,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28012,10 +28491,10 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForSeryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreSearchForStudyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _dicom_web_path: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28023,9 +28502,15 @@ pub struct ProjectLocationDatasetDicomStoreSearchForStudyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28173,7 +28658,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -28183,7 +28668,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -28193,7 +28678,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28218,7 +28703,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28238,9 +28723,9 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28273,7 +28758,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28286,10 +28771,10 @@ impl<'a> ProjectLocationDatasetDicomStoreSearchForStudyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28297,9 +28782,15 @@ pub struct ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28459,7 +28950,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -28469,7 +28960,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -28479,7 +28970,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28504,7 +28995,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28524,9 +29015,9 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28559,7 +29050,7 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28572,10 +29063,10 @@ impl<'a> ProjectLocationDatasetDicomStoreSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreStoreInstanceCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _dicom_web_path: String,
@@ -28584,9 +29075,15 @@ pub struct ProjectLocationDatasetDicomStoreStoreInstanceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28747,7 +29244,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -28757,7 +29254,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -28767,7 +29264,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
+    pub fn dicom_web_path(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S> {
         self._dicom_web_path = new_value.to_string();
         self
     }
@@ -28777,7 +29274,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28802,7 +29299,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28822,9 +29319,9 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28857,7 +29354,7 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28870,10 +29367,10 @@ impl<'a> ProjectLocationDatasetDicomStoreStoreInstanceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28881,9 +29378,15 @@ pub struct ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29043,7 +29546,7 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29053,7 +29556,7 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -29063,7 +29566,7 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29088,7 +29591,7 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29108,9 +29611,9 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29142,7 +29645,7 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29156,10 +29659,10 @@ impl<'a> ProjectLocationDatasetDicomStoreTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _url: Option<String>,
     _target: Option<String>,
@@ -29172,9 +29675,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29339,49 +29848,49 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The canonical url of the concept map to use. If unset, the source and target is used to search for concept maps.
     ///
     /// Sets the *url* query property to the given value.
-    pub fn url(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn url(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._url = Some(new_value.to_string());
         self
     }
     /// The target value set of the concept map to be used. If unset, source is used to search for concept maps.
     ///
     /// Sets the *target* query property to the given value.
-    pub fn target(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn target(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._target = Some(new_value.to_string());
         self
     }
     /// The system for the code to be translated.
     ///
     /// Sets the *system* query property to the given value.
-    pub fn system(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn system(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._system = Some(new_value.to_string());
         self
     }
     /// The source value set of the concept map to be used. If unset, target is used to search for concept maps.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn source(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The version of the concept map to use. If unset, the most current version is used.
     ///
     /// Sets the *concept map version* query property to the given value.
-    pub fn concept_map_version(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn concept_map_version(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._concept_map_version = Some(new_value.to_string());
         self
     }
     /// The code to translate.
     ///
     /// Sets the *code* query property to the given value.
-    pub fn code(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn code(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._code = Some(new_value.to_string());
         self
     }
@@ -29391,7 +29900,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29416,7 +29925,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29436,9 +29945,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29470,7 +29979,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29481,10 +29990,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapSearchTranslateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _system: Option<String>,
     _concept_map_version: Option<String>,
@@ -29494,9 +30003,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29652,28 +30167,28 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The system for the code to be translated.
     ///
     /// Sets the *system* query property to the given value.
-    pub fn system(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+    pub fn system(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {
         self._system = Some(new_value.to_string());
         self
     }
     /// The version of the concept map to use. If unset, the most current version is used.
     ///
     /// Sets the *concept map version* query property to the given value.
-    pub fn concept_map_version(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+    pub fn concept_map_version(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {
         self._concept_map_version = Some(new_value.to_string());
         self
     }
     /// The code to translate.
     ///
     /// Sets the *code* query property to the given value.
-    pub fn code(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+    pub fn code(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {
         self._code = Some(new_value.to_string());
         self
     }
@@ -29683,7 +30198,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29708,7 +30223,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29728,9 +30243,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29762,7 +30277,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29770,19 +30285,25 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConceptMapTranslateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29929,7 +30450,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -29939,7 +30460,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29964,7 +30485,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29984,9 +30505,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30018,7 +30539,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30032,10 +30553,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirObservationLastnCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _start: Option<String>,
     _end: Option<String>,
@@ -30048,9 +30569,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30215,49 +30742,49 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The response includes records subsequent to the start date. If no start date is provided, all records prior to the end date are in scope.
     ///
     /// Sets the *start* query property to the given value.
-    pub fn start(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn start(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self._start = Some(new_value.to_string());
         self
     }
     /// The response includes records prior to the end date. If no end date is provided, all records subsequent to the start date are in scope.
     ///
     /// Sets the *end* query property to the given value.
-    pub fn end(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn end(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self._end = Some(new_value.to_string());
         self
     }
     /// String of comma-delimited FHIR resource types. If provided, only resources of the specified resource type(s) are returned.
     ///
     /// Sets the *_type* query property to the given value.
-    pub fn _type(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn _type(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self.__type = Some(new_value.to_string());
         self
     }
     /// If provided, only resources updated after this time are returned. The time uses the format YYYY-MM-DDThh:mm:ss.sss+zz:zz. For example, `2015-02-07T13:28:17.239+02:00` or `2017-01-01T00:00:00Z`. The time must be specified to the second and include a time zone.
     ///
     /// Sets the *_since* query property to the given value.
-    pub fn _since(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn _since(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self.__since = Some(new_value.to_string());
         self
     }
     /// Used to retrieve the next or previous page of results when using pagination. Set `_page_token` to the value of _page_token set in next or previous page links' url. Next and previous page are returned in the response bundle's links field, where `link.relation` is "previous" or "next". Omit `_page_token` if no previous request has been made.
     ///
     /// Sets the *_page_token* query property to the given value.
-    pub fn _page_token(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn _page_token(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self.__page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of resources in a page. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *_count* query property to the given value.
-    pub fn _count(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn _count(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self.__count = Some(new_value);
         self
     }
@@ -30267,7 +30794,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30292,7 +30819,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30312,9 +30839,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30346,7 +30873,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30354,19 +30881,25 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatientEverythingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30513,7 +31046,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -30523,7 +31056,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30548,7 +31081,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30568,9 +31101,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30603,7 +31136,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30617,10 +31150,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourcePurgeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _type_: String,
@@ -30630,9 +31163,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30796,7 +31335,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -30806,7 +31345,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -30816,14 +31355,14 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {
         self._type_ = new_value.to_string();
         self
     }
     /// A profile that this resource should be validated against.
     ///
     /// Sets the *profile* query property to the given value.
-    pub fn profile(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+    pub fn profile(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {
         self._profile = Some(new_value.to_string());
         self
     }
@@ -30833,7 +31372,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30858,7 +31397,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30878,9 +31417,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30912,7 +31451,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30920,19 +31459,25 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirResourceValidateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31079,7 +31624,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -31089,7 +31634,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31114,7 +31659,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31134,9 +31679,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31168,7 +31713,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31176,10 +31721,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCapabilityCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _type_: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -31187,9 +31732,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31337,7 +31888,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -31347,7 +31898,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S> {
         self._type_ = new_value.to_string();
         self
     }
@@ -31357,7 +31908,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31382,7 +31933,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31402,9 +31953,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31437,7 +31988,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -31450,10 +32001,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _type_: String,
@@ -31462,9 +32013,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31625,7 +32182,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -31635,7 +32192,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -31645,7 +32202,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S> {
         self._type_ = new_value.to_string();
         self
     }
@@ -31655,7 +32212,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31680,7 +32237,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31700,9 +32257,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31735,7 +32292,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -31748,10 +32305,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _type_: String,
@@ -31760,9 +32317,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31923,7 +32486,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -31933,7 +32496,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -31943,7 +32506,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S> {
         self._type_ = new_value.to_string();
         self
     }
@@ -31953,7 +32516,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31978,7 +32541,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31998,9 +32561,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32033,7 +32596,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -32046,10 +32609,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirConditionalUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _type_: String,
@@ -32058,9 +32621,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32221,7 +32790,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -32231,7 +32800,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -32241,7 +32810,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S> {
         self._type_ = new_value.to_string();
         self
     }
@@ -32251,7 +32820,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32276,7 +32845,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32296,9 +32865,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32330,7 +32899,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32338,19 +32907,25 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32497,7 +33072,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -32507,7 +33082,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32532,7 +33107,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32552,9 +33127,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32587,7 +33162,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -32600,10 +33175,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -32611,9 +33186,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32773,7 +33354,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -32783,7 +33364,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -32793,7 +33374,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32818,7 +33399,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32838,9 +33419,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32872,7 +33453,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32884,10 +33465,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirExecuteBundleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirHistoryCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     __since: Option<String>,
     __page_token: Option<String>,
@@ -32898,9 +33479,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirHistoryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33059,35 +33646,35 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Only include resource versions that were created at or after the given instant in time. The instant in time uses the format YYYY-MM-DDThh:mm:ss.sss+zz:zz (for example 2015-02-07T13:28:17.239+02:00 or 2017-01-01T00:00:00Z). The time must be specified to the second and include a time zone.
     ///
     /// Sets the *_since* query property to the given value.
-    pub fn _since(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn _since(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         self.__since = Some(new_value.to_string());
         self
     }
     /// Used to retrieve the first, previous, next, or last page of resource versions when using pagination. Value should be set to the value of `_page_token` set in next or previous page links' URLs. Next and previous page are returned in the response bundle's links field, where `link.relation` is "previous" or "next". Omit `_page_token` if no previous request has been made.
     ///
     /// Sets the *_page_token* query property to the given value.
-    pub fn _page_token(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn _page_token(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         self.__page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of search results on a page. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *_count* query property to the given value.
-    pub fn _count(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn _count(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         self.__count = Some(new_value);
         self
     }
     /// Only include resource versions that were current at some point during the time period specified in the date time value. The date parameter format is yyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm] Clients may specify any of the following: * An entire year: `_at=2019` * An entire month: `_at=2019-01` * A specific day: `_at=2019-01-20` * A specific second: `_at=2018-12-31T23:59:58Z`
     ///
     /// Sets the *_at* query property to the given value.
-    pub fn _at(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn _at(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         self.__at = Some(new_value.to_string());
         self
     }
@@ -33097,7 +33684,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33122,7 +33709,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33142,9 +33729,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33177,7 +33764,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -33190,10 +33777,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirHistoryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -33201,9 +33788,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33363,7 +33956,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -33373,7 +33966,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -33383,7 +33976,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33408,7 +34001,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33428,9 +34021,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33462,7 +34055,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33470,19 +34063,25 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirReadCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirReadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirReadCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirReadCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirReadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33629,7 +34228,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -33639,7 +34238,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33664,7 +34263,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33684,9 +34283,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirReadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33719,7 +34318,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -33732,10 +34331,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirReadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirSearchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SearchResourcesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -33743,9 +34342,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33905,7 +34510,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchResourcesRequest) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
+    pub fn request(mut self, new_value: SearchResourcesRequest) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -33915,7 +34520,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -33925,7 +34530,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33950,7 +34555,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33970,9 +34575,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34005,7 +34610,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34018,10 +34623,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SearchResourcesRequest,
     _parent: String,
     _resource_type: String,
@@ -34030,9 +34635,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34193,7 +34804,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchResourcesRequest) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
+    pub fn request(mut self, new_value: SearchResourcesRequest) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -34203,7 +34814,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -34213,7 +34824,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_type(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
+    pub fn resource_type(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S> {
         self._resource_type = new_value.to_string();
         self
     }
@@ -34223,7 +34834,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34248,7 +34859,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34268,9 +34879,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34303,7 +34914,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34316,10 +34927,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirSearchTypeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirUpdateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: HttpBody,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -34327,9 +34938,15 @@ pub struct ProjectLocationDatasetFhirStoreFhirUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34489,7 +35106,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
+    pub fn request(mut self, new_value: HttpBody) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -34499,7 +35116,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -34509,7 +35126,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34534,7 +35151,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34554,9 +35171,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34588,7 +35205,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -34596,19 +35213,25 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreFhirVreadCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34755,7 +35378,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -34765,7 +35388,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34790,7 +35413,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34810,9 +35433,9 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreFhirVreadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34845,7 +35468,7 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34858,10 +35481,10 @@ impl<'a> ProjectLocationDatasetFhirStoreFhirVreadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreConfigureSearchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ConfigureSearchRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -34869,9 +35492,15 @@ pub struct ProjectLocationDatasetFhirStoreConfigureSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35031,7 +35660,7 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ConfigureSearchRequest) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
+    pub fn request(mut self, new_value: ConfigureSearchRequest) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -35041,7 +35670,7 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -35051,7 +35680,7 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35076,7 +35705,7 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35096,9 +35725,9 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35131,7 +35760,7 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -35145,10 +35774,10 @@ impl<'a> ProjectLocationDatasetFhirStoreConfigureSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: FhirStore,
     _parent: String,
     _fhir_store_id: Option<String>,
@@ -35157,9 +35786,15 @@ pub struct ProjectLocationDatasetFhirStoreCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35322,7 +35957,7 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FhirStore) -> ProjectLocationDatasetFhirStoreCreateCall<'a> {
+    pub fn request(mut self, new_value: FhirStore) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -35332,14 +35967,14 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The ID of the FHIR store that is being created. The string must match the following regex: `[\p{L}\p{N}_\-\.]{1,256}`.
     ///
     /// Sets the *fhir store id* query property to the given value.
-    pub fn fhir_store_id(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreCreateCall<'a> {
+    pub fn fhir_store_id(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S> {
         self._fhir_store_id = Some(new_value.to_string());
         self
     }
@@ -35349,7 +35984,7 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35374,7 +36009,7 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35394,9 +36029,9 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35429,7 +36064,7 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -35442,10 +36077,10 @@ impl<'a> ProjectLocationDatasetFhirStoreCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreDeidentifyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: DeidentifyFhirStoreRequest,
     _source_store: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -35453,9 +36088,15 @@ pub struct ProjectLocationDatasetFhirStoreDeidentifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35615,7 +36256,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeidentifyFhirStoreRequest) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
+    pub fn request(mut self, new_value: DeidentifyFhirStoreRequest) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -35625,7 +36266,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_store(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
+    pub fn source_store(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S> {
         self._source_store = new_value.to_string();
         self
     }
@@ -35635,7 +36276,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35660,7 +36301,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35680,9 +36321,9 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreDeidentifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35714,7 +36355,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -35722,19 +36363,25 @@ impl<'a> ProjectLocationDatasetFhirStoreDeidentifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35881,7 +36528,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -35891,7 +36538,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35916,7 +36563,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35936,9 +36583,9 @@ impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35971,7 +36618,7 @@ impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -35984,10 +36631,10 @@ impl<'a> ProjectLocationDatasetFhirStoreDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreExportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ExportResourcesRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -35995,9 +36642,15 @@ pub struct ProjectLocationDatasetFhirStoreExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreExportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36157,7 +36810,7 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportResourcesRequest) -> ProjectLocationDatasetFhirStoreExportCall<'a> {
+    pub fn request(mut self, new_value: ExportResourcesRequest) -> ProjectLocationDatasetFhirStoreExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -36167,7 +36820,7 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreExportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreExportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -36177,7 +36830,7 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36202,7 +36855,7 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36222,9 +36875,9 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -36256,7 +36909,7 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -36264,19 +36917,25 @@ impl<'a> ProjectLocationDatasetFhirStoreExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36423,7 +37082,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -36433,7 +37092,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36458,7 +37117,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36478,9 +37137,9 @@ impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -36512,7 +37171,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -36521,10 +37180,10 @@ impl<'a> ProjectLocationDatasetFhirStoreGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -36532,9 +37191,15 @@ pub struct ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36684,14 +37349,14 @@ impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -36701,7 +37366,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36726,7 +37391,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36746,9 +37411,9 @@ impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -36781,7 +37446,7 @@ impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -36794,10 +37459,10 @@ impl<'a> ProjectLocationDatasetFhirStoreGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreImportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ImportResourcesRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -36805,9 +37470,15 @@ pub struct ProjectLocationDatasetFhirStoreImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreImportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36967,7 +37638,7 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportResourcesRequest) -> ProjectLocationDatasetFhirStoreImportCall<'a> {
+    pub fn request(mut self, new_value: ImportResourcesRequest) -> ProjectLocationDatasetFhirStoreImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -36977,7 +37648,7 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreImportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -36987,7 +37658,7 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -37012,7 +37683,7 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37032,9 +37703,9 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -37066,7 +37737,7 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -37077,10 +37748,10 @@ impl<'a> ProjectLocationDatasetFhirStoreImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -37090,9 +37761,15 @@ pub struct ProjectLocationDatasetFhirStoreListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -37248,28 +37925,28 @@ impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Limit on the number of FHIR stores to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetFhirStoreListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Restricts stores returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Only filtering on labels is supported, for example `labels.key=value`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -37279,7 +37956,7 @@ impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -37304,7 +37981,7 @@ impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37324,9 +38001,9 @@ impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -37359,7 +38036,7 @@ impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -37373,10 +38050,10 @@ impl<'a> ProjectLocationDatasetFhirStoreListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStorePatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStorePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: FhirStore,
     _name: String,
     _update_mask: Option<String>,
@@ -37385,9 +38062,15 @@ pub struct ProjectLocationDatasetFhirStorePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStorePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStorePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStorePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -37550,7 +38233,7 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FhirStore) -> ProjectLocationDatasetFhirStorePatchCall<'a> {
+    pub fn request(mut self, new_value: FhirStore) -> ProjectLocationDatasetFhirStorePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -37560,14 +38243,14 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetFhirStorePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -37577,7 +38260,7 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStorePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStorePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -37602,7 +38285,7 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStorePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStorePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37622,9 +38305,9 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStorePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStorePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -37657,7 +38340,7 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -37670,10 +38353,10 @@ impl<'a> ProjectLocationDatasetFhirStorePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -37681,9 +38364,15 @@ pub struct ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -37843,7 +38532,7 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -37853,7 +38542,7 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -37863,7 +38552,7 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -37888,7 +38577,7 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37908,9 +38597,9 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -37943,7 +38632,7 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -37956,10 +38645,10 @@ impl<'a> ProjectLocationDatasetFhirStoreSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -37967,9 +38656,15 @@ pub struct ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -38129,7 +38824,7 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -38139,7 +38834,7 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -38149,7 +38844,7 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -38174,7 +38869,7 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38194,9 +38889,9 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -38228,7 +38923,7 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -38238,10 +38933,10 @@ impl<'a> ProjectLocationDatasetFhirStoreTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _view: Option<String>,
     _ids: Vec<String>,
@@ -38250,9 +38945,15 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -38407,14 +39108,14 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Specifies the parts of the Messages resource to return in the response. When unspecified, equivalent to BASIC.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -38422,7 +39123,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
     ///
     /// Append the given value to the *ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_ids(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
+    pub fn add_ids(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
         self._ids.push(new_value.to_string());
         self
     }
@@ -38432,7 +39133,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -38457,7 +39158,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38477,9 +39178,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -38512,7 +39213,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -38525,10 +39226,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: CreateMessageRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -38536,9 +39237,15 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -38698,7 +39405,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateMessageRequest) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateMessageRequest) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -38708,7 +39415,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -38718,7 +39425,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -38743,7 +39450,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38763,9 +39470,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -38797,7 +39504,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -38805,19 +39512,25 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -38964,7 +39677,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -38974,7 +39687,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -38999,7 +39712,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39019,9 +39732,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -39053,7 +39766,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -39062,10 +39775,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessageGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -39073,9 +39786,15 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -39225,14 +39944,14 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies which parts of the Message resource to return in the response. When unspecified, equivalent to FULL.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -39242,7 +39961,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -39267,7 +39986,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39287,9 +40006,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -39322,7 +40041,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -39335,10 +40054,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: IngestMessageRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -39346,9 +40065,15 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -39508,7 +40233,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IngestMessageRequest) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
+    pub fn request(mut self, new_value: IngestMessageRequest) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -39518,7 +40243,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -39528,7 +40253,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -39553,7 +40278,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39573,9 +40298,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -39607,7 +40332,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -39620,10 +40345,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageIngestCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessageListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -39635,9 +40360,15 @@ pub struct ProjectLocationDatasetHl7V2StoreMessageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -39799,42 +40530,42 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Specifies the parts of the Message to return in the response. When unspecified, equivalent to BASIC. Setting this to anything other than BASIC with a `page_size` larger than the default can generate a large response, which impacts the performance of this method.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Limit on the number of messages to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Orders messages returned by the specified order_by clause. Syntax: https://cloud.google.com/apis/design/design_patterns#sorting_order Fields available for ordering are: * `send_time`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Restricts messages returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Fields/functions available for filtering are: * `message_type`, from the MSH-9.1 field. For example, `NOT message_type = "ADT"`. * `send_date` or `sendDate`, the YYYY-MM-DD date the message was sent in the dataset's time_zone, from the MSH-7 segment. For example, `send_date < "2017-01-02"`. * `send_time`, the timestamp when the message was sent, using the RFC3339 time format for comparisons, from the MSH-7 segment. For example, `send_time < "2017-01-02T00:00:00-05:00"`. * `create_time`, the timestamp when the message was created in the HL7v2 store. Use the RFC3339 time format for comparisons. For example, `create_time < "2017-01-02T00:00:00-05:00"`. * `send_facility`, the care center that the message came from, from the MSH-4 segment. For example, `send_facility = "ABC"`. * `PatientId(value, type)`, which matches if the message lists a patient having an ID of the given value and type in the PID-2, PID-3, or PID-4 segments. For example, `PatientId("123456", "MRN")`. * `labels.x`, a string value of the label with key `x` as set using the Message.labels map. For example, `labels."priority"="high"`. The operator `:*` can be used to assert the existence of a label. For example, `labels."priority":*`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -39844,7 +40575,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -39869,7 +40600,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39889,9 +40620,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -39924,7 +40655,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -39938,10 +40669,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Message,
     _name: String,
     _update_mask: Option<String>,
@@ -39950,9 +40681,15 @@ pub struct ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -40115,7 +40852,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
+    pub fn request(mut self, new_value: Message) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -40125,14 +40862,14 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -40142,7 +40879,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -40167,7 +40904,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -40187,9 +40924,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -40222,7 +40959,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -40236,10 +40973,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreMessagePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Hl7V2Store,
     _parent: String,
     _hl7_v2_store_id: Option<String>,
@@ -40248,9 +40985,15 @@ pub struct ProjectLocationDatasetHl7V2StoreCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -40413,7 +41156,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Hl7V2Store) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
+    pub fn request(mut self, new_value: Hl7V2Store) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -40423,14 +41166,14 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The ID of the HL7v2 store that is being created. The string must match the following regex: `[\p{L}\p{N}_\-\.]{1,256}`.
     ///
     /// Sets the *hl7 v2 store id* query property to the given value.
-    pub fn hl7_v2_store_id(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
+    pub fn hl7_v2_store_id(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S> {
         self._hl7_v2_store_id = Some(new_value.to_string());
         self
     }
@@ -40440,7 +41183,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -40465,7 +41208,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -40485,9 +41228,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -40519,7 +41262,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -40527,19 +41270,25 @@ impl<'a> ProjectLocationDatasetHl7V2StoreCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -40686,7 +41435,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -40696,7 +41445,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -40721,7 +41470,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -40741,9 +41490,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -40776,7 +41525,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -40789,10 +41538,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreExportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ExportMessagesRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -40800,9 +41549,15 @@ pub struct ProjectLocationDatasetHl7V2StoreExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreExportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -40962,7 +41717,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportMessagesRequest) -> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
+    pub fn request(mut self, new_value: ExportMessagesRequest) -> ProjectLocationDatasetHl7V2StoreExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -40972,7 +41727,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreExportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -40982,7 +41737,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -41007,7 +41762,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41027,9 +41782,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -41061,7 +41816,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -41069,19 +41824,25 @@ impl<'a> ProjectLocationDatasetHl7V2StoreExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -41228,7 +41989,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -41238,7 +41999,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -41263,7 +42024,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41283,9 +42044,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -41317,7 +42078,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -41326,10 +42087,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -41337,9 +42098,15 @@ pub struct ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -41489,14 +42256,14 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -41506,7 +42273,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -41531,7 +42298,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41551,9 +42318,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -41586,7 +42353,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -41599,10 +42366,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreImportCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: ImportMessagesRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -41610,9 +42377,15 @@ pub struct ProjectLocationDatasetHl7V2StoreImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreImportCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -41772,7 +42545,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ImportMessagesRequest) -> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
+    pub fn request(mut self, new_value: ImportMessagesRequest) -> ProjectLocationDatasetHl7V2StoreImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -41782,7 +42555,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreImportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -41792,7 +42565,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -41817,7 +42590,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41837,9 +42610,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -41871,7 +42644,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -41882,10 +42655,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -41895,9 +42668,15 @@ pub struct ProjectLocationDatasetHl7V2StoreListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -42053,28 +42832,28 @@ impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from the previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Limit on the number of HL7v2 stores to return in a single response. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Restricts stores returned to those matching a filter. The following syntax is available: * A string field value can be written as text inside quotation marks, for example `"query text"`. The only valid relational operation for text fields is equality (`=`), where text is searched within the field, rather than having the field be equal to the text. For example, `"Comment = great"` returns messages with `great` in the comment field. * A number field value can be written as an integer, a decimal, or an exponential. The valid relational operators for number fields are the equality operator (`=`), along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * A date field value must be written in `yyyy-mm-dd` form. Fields with date and time use the RFC3339 time format. Leading zeros are required for one-digit months and days. The valid relational operators for date fields are the equality operator (`=`) , along with the less than/greater than operators (`<`, `<=`, `>`, `>=`). Note that there is no inequality (`!=`) operator. You can prepend the `NOT` operator to an expression to negate it. * Multiple field query expressions can be combined in one query by adding `AND` or `OR` operators between the expressions. If a boolean operator appears within a quoted string, it is not treated as special, it's just another part of the character string to be matched. You can prepend the `NOT` operator to an expression to negate it. Only filtering on labels is supported. For example, `labels.key=value`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -42084,7 +42863,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -42109,7 +42888,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42129,9 +42908,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -42164,7 +42943,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -42178,10 +42957,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StorePatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StorePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Hl7V2Store,
     _name: String,
     _update_mask: Option<String>,
@@ -42190,9 +42969,15 @@ pub struct ProjectLocationDatasetHl7V2StorePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StorePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StorePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StorePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -42355,7 +43140,7 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Hl7V2Store) -> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
+    pub fn request(mut self, new_value: Hl7V2Store) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -42365,14 +43150,14 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -42382,7 +43167,7 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -42407,7 +43192,7 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StorePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42427,9 +43212,9 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StorePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StorePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -42462,7 +43247,7 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -42475,10 +43260,10 @@ impl<'a> ProjectLocationDatasetHl7V2StorePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -42486,9 +43271,15 @@ pub struct ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -42648,7 +43439,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -42658,7 +43449,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -42668,7 +43459,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -42693,7 +43484,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42713,9 +43504,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -42748,7 +43539,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -42761,10 +43552,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -42772,9 +43563,15 @@ pub struct ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -42934,7 +43731,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -42944,7 +43741,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -42954,7 +43751,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -42979,7 +43776,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42999,9 +43796,9 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -43034,7 +43831,7 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -43047,10 +43844,10 @@ impl<'a> ProjectLocationDatasetHl7V2StoreTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetOperationCancelCall<'a>
-    where  {
+pub struct ProjectLocationDatasetOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -43058,9 +43855,15 @@ pub struct ProjectLocationDatasetOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
+impl<'a, S> ProjectLocationDatasetOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -43220,7 +44023,7 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationDatasetOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationDatasetOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -43230,7 +44033,7 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -43240,7 +44043,7 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -43265,7 +44068,7 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43285,9 +44088,9 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -43319,7 +44122,7 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -43327,19 +44130,25 @@ impl<'a> ProjectLocationDatasetOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -43486,7 +44295,7 @@ impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -43496,7 +44305,7 @@ impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -43521,7 +44330,7 @@ impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43541,9 +44350,9 @@ impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -43575,7 +44384,7 @@ impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -43586,10 +44395,10 @@ impl<'a> ProjectLocationDatasetOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetOperationListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -43599,9 +44408,15 @@ pub struct ProjectLocationDatasetOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetOperationListCall<'a> {
+impl<'a, S> ProjectLocationDatasetOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -43757,28 +44572,28 @@ impl<'a> ProjectLocationDatasetOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationDatasetOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -43788,7 +44603,7 @@ impl<'a> ProjectLocationDatasetOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -43813,7 +44628,7 @@ impl<'a> ProjectLocationDatasetOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43833,9 +44648,9 @@ impl<'a> ProjectLocationDatasetOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -43868,7 +44683,7 @@ impl<'a> ProjectLocationDatasetOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -43882,10 +44697,10 @@ impl<'a> ProjectLocationDatasetOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetCreateCall<'a>
-    where  {
+pub struct ProjectLocationDatasetCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Dataset,
     _parent: String,
     _dataset_id: Option<String>,
@@ -43894,9 +44709,15 @@ pub struct ProjectLocationDatasetCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetCreateCall<'a> {
+impl<'a, S> ProjectLocationDatasetCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -44059,7 +44880,7 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> ProjectLocationDatasetCreateCall<'a> {
+    pub fn request(mut self, new_value: Dataset) -> ProjectLocationDatasetCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -44069,14 +44890,14 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The ID of the dataset that is being created. The string must match the following regex: `[\p{L}\p{N}_\-\.]{1,256}`.
     ///
     /// Sets the *dataset id* query property to the given value.
-    pub fn dataset_id(mut self, new_value: &str) -> ProjectLocationDatasetCreateCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> ProjectLocationDatasetCreateCall<'a, S> {
         self._dataset_id = Some(new_value.to_string());
         self
     }
@@ -44086,7 +44907,7 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -44111,7 +44932,7 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44131,9 +44952,9 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -44166,7 +44987,7 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -44179,10 +45000,10 @@ impl<'a> ProjectLocationDatasetCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDeidentifyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDeidentifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: DeidentifyDatasetRequest,
     _source_dataset: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -44190,9 +45011,15 @@ pub struct ProjectLocationDatasetDeidentifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDeidentifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDeidentifyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
+impl<'a, S> ProjectLocationDatasetDeidentifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -44352,7 +45179,7 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeidentifyDatasetRequest) -> ProjectLocationDatasetDeidentifyCall<'a> {
+    pub fn request(mut self, new_value: DeidentifyDatasetRequest) -> ProjectLocationDatasetDeidentifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -44362,7 +45189,7 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source_dataset(mut self, new_value: &str) -> ProjectLocationDatasetDeidentifyCall<'a> {
+    pub fn source_dataset(mut self, new_value: &str) -> ProjectLocationDatasetDeidentifyCall<'a, S> {
         self._source_dataset = new_value.to_string();
         self
     }
@@ -44372,7 +45199,7 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDeidentifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDeidentifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -44397,7 +45224,7 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDeidentifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDeidentifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44417,9 +45244,9 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDeidentifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDeidentifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -44451,7 +45278,7 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -44459,19 +45286,25 @@ impl<'a> ProjectLocationDatasetDeidentifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetDeleteCall<'a>
-    where  {
+pub struct ProjectLocationDatasetDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetDeleteCall<'a> {
+impl<'a, S> ProjectLocationDatasetDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -44618,7 +45451,7 @@ impl<'a> ProjectLocationDatasetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -44628,7 +45461,7 @@ impl<'a> ProjectLocationDatasetDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -44653,7 +45486,7 @@ impl<'a> ProjectLocationDatasetDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44673,9 +45506,9 @@ impl<'a> ProjectLocationDatasetDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -44707,7 +45540,7 @@ impl<'a> ProjectLocationDatasetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -44715,19 +45548,25 @@ impl<'a> ProjectLocationDatasetDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetGetCall<'a>
-    where  {
+pub struct ProjectLocationDatasetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetGetCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetGetCall<'a> {
+impl<'a, S> ProjectLocationDatasetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -44874,7 +45713,7 @@ impl<'a> ProjectLocationDatasetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -44884,7 +45723,7 @@ impl<'a> ProjectLocationDatasetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -44909,7 +45748,7 @@ impl<'a> ProjectLocationDatasetGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44929,9 +45768,9 @@ impl<'a> ProjectLocationDatasetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -44963,7 +45802,7 @@ impl<'a> ProjectLocationDatasetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -44972,10 +45811,10 @@ impl<'a> ProjectLocationDatasetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -44983,9 +45822,15 @@ pub struct ProjectLocationDatasetGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -45135,14 +45980,14 @@ impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationDatasetGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -45152,7 +45997,7 @@ impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -45177,7 +46022,7 @@ impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45197,9 +46042,9 @@ impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -45231,7 +46076,7 @@ impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -45241,10 +46086,10 @@ impl<'a> ProjectLocationDatasetGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetListCall<'a>
-    where  {
+pub struct ProjectLocationDatasetListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -45253,9 +46098,15 @@ pub struct ProjectLocationDatasetListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetListCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetListCall<'a> {
+impl<'a, S> ProjectLocationDatasetListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -45408,21 +46259,21 @@ impl<'a> ProjectLocationDatasetListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDatasetListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationDatasetListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return. If not specified, 100 is used. May not be larger than 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationDatasetListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -45432,7 +46283,7 @@ impl<'a> ProjectLocationDatasetListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -45457,7 +46308,7 @@ impl<'a> ProjectLocationDatasetListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45477,9 +46328,9 @@ impl<'a> ProjectLocationDatasetListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -45512,7 +46363,7 @@ impl<'a> ProjectLocationDatasetListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45526,10 +46377,10 @@ impl<'a> ProjectLocationDatasetListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetPatchCall<'a>
-    where  {
+pub struct ProjectLocationDatasetPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: Dataset,
     _name: String,
     _update_mask: Option<String>,
@@ -45538,9 +46389,15 @@ pub struct ProjectLocationDatasetPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetPatchCall<'a> {
+impl<'a, S> ProjectLocationDatasetPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -45703,7 +46560,7 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> ProjectLocationDatasetPatchCall<'a> {
+    pub fn request(mut self, new_value: Dataset) -> ProjectLocationDatasetPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -45713,14 +46570,14 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDatasetPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationDatasetPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -45730,7 +46587,7 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -45755,7 +46612,7 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45775,9 +46632,9 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -45810,7 +46667,7 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45823,10 +46680,10 @@ impl<'a> ProjectLocationDatasetPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationDatasetSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -45834,9 +46691,15 @@ pub struct ProjectLocationDatasetSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationDatasetSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -45996,7 +46859,7 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationDatasetSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -46006,7 +46869,7 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -46016,7 +46879,7 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -46041,7 +46904,7 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46061,9 +46924,9 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -46096,7 +46959,7 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -46109,10 +46972,10 @@ impl<'a> ProjectLocationDatasetSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDatasetTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationDatasetTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -46120,9 +46983,15 @@ pub struct ProjectLocationDatasetTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationDatasetTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationDatasetTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationDatasetTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -46282,7 +47151,7 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationDatasetTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -46292,7 +47161,7 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationDatasetTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -46302,7 +47171,7 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDatasetTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -46327,7 +47196,7 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDatasetTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46347,9 +47216,9 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDatasetTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationDatasetTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -46382,7 +47251,7 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -46395,10 +47264,10 @@ impl<'a> ProjectLocationDatasetTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceNlpAnalyzeEntityCall<'a>
-    where  {
+pub struct ProjectLocationServiceNlpAnalyzeEntityCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _request: AnalyzeEntitiesRequest,
     _nlp_service: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -46406,9 +47275,15 @@ pub struct ProjectLocationServiceNlpAnalyzeEntityCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationServiceNlpAnalyzeEntityCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationServiceNlpAnalyzeEntityCall<'a, S> {}
 
-impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
+impl<'a, S> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -46568,7 +47443,7 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
+    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -46578,7 +47453,7 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn nlp_service(mut self, new_value: &str) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
+    pub fn nlp_service(mut self, new_value: &str) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S> {
         self._nlp_service = new_value.to_string();
         self
     }
@@ -46588,7 +47463,7 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -46613,7 +47488,7 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46633,9 +47508,9 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationServiceNlpAnalyzeEntityCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -46667,7 +47542,7 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -46675,19 +47550,25 @@ impl<'a> ProjectLocationServiceNlpAnalyzeEntityCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a>
-    where  {
+pub struct ProjectLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGetCall<'a> {
+impl<'a, S> ProjectLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -46834,7 +47715,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -46844,7 +47725,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -46869,7 +47750,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46889,9 +47770,9 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -46923,7 +47804,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudHealthcare::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -46934,10 +47815,10 @@ impl<'a> ProjectLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a>
-    where  {
+pub struct ProjectLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudHealthcare<>,
+    hub: &'a CloudHealthcare<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -46947,9 +47828,15 @@ pub struct ProjectLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationListCall<'a, S> {}
 
-impl<'a> ProjectLocationListCall<'a> {
+impl<'a, S> ProjectLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -47105,28 +47992,28 @@ impl<'a> ProjectLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service selects a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -47136,7 +48023,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -47161,7 +48048,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -47181,9 +48068,9 @@ impl<'a> ProjectLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

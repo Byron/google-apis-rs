@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,37 +109,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct DoubleClickBidManager<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct DoubleClickBidManager<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for DoubleClickBidManager<> {}
+impl<'a, S> client::Hub for DoubleClickBidManager<S> {}
 
-impl<'a, > DoubleClickBidManager<> {
+impl<'a, S> DoubleClickBidManager<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DoubleClickBidManager<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DoubleClickBidManager<S> {
         DoubleClickBidManager {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://doubleclickbidmanager.googleapis.com/doubleclickbidmanager/v1.1/".to_string(),
             _root_url: "https://doubleclickbidmanager.googleapis.com/".to_string(),
         }
     }
 
-    pub fn queries(&'a self) -> QueryMethods<'a> {
+    pub fn queries(&'a self) -> QueryMethods<'a, S> {
         QueryMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a> {
+    pub fn reports(&'a self) -> ReportMethods<'a, S> {
         ReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -633,22 +638,22 @@ impl client::RequestValue for RunQueryRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `createquery(...)`, `deletequery(...)`, `getquery(...)`, `listqueries(...)` and `runquery(...)`
 /// // to build up your call.
 /// let rb = hub.queries();
 /// # }
 /// ```
-pub struct QueryMethods<'a>
-    where  {
+pub struct QueryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for QueryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for QueryMethods<'a, S> {}
 
-impl<'a> QueryMethods<'a> {
+impl<'a, S> QueryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -657,7 +662,7 @@ impl<'a> QueryMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn createquery(&self, request: Query) -> QueryCreatequeryCall<'a> {
+    pub fn createquery(&self, request: Query) -> QueryCreatequeryCall<'a, S> {
         QueryCreatequeryCall {
             hub: self.hub,
             _request: request,
@@ -675,7 +680,7 @@ impl<'a> QueryMethods<'a> {
     /// # Arguments
     ///
     /// * `queryId` - Query ID to delete.
-    pub fn deletequery(&self, query_id: &str) -> QueryDeletequeryCall<'a> {
+    pub fn deletequery(&self, query_id: &str) -> QueryDeletequeryCall<'a, S> {
         QueryDeletequeryCall {
             hub: self.hub,
             _query_id: query_id.to_string(),
@@ -692,7 +697,7 @@ impl<'a> QueryMethods<'a> {
     /// # Arguments
     ///
     /// * `queryId` - Query ID to retrieve.
-    pub fn getquery(&self, query_id: &str) -> QueryGetqueryCall<'a> {
+    pub fn getquery(&self, query_id: &str) -> QueryGetqueryCall<'a, S> {
         QueryGetqueryCall {
             hub: self.hub,
             _query_id: query_id.to_string(),
@@ -705,7 +710,7 @@ impl<'a> QueryMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves stored queries.
-    pub fn listqueries(&self) -> QueryListqueryCall<'a> {
+    pub fn listqueries(&self) -> QueryListqueryCall<'a, S> {
         QueryListqueryCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -724,7 +729,7 @@ impl<'a> QueryMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `queryId` - Query ID to run.
-    pub fn runquery(&self, request: RunQueryRequest, query_id: &str) -> QueryRunqueryCall<'a> {
+    pub fn runquery(&self, request: RunQueryRequest, query_id: &str) -> QueryRunqueryCall<'a, S> {
         QueryRunqueryCall {
             hub: self.hub,
             _request: request,
@@ -760,22 +765,22 @@ impl<'a> QueryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `listreports(...)`
 /// // to build up your call.
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a>
-    where  {
+pub struct ReportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for ReportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ReportMethods<'a, S> {}
 
-impl<'a> ReportMethods<'a> {
+impl<'a, S> ReportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -784,7 +789,7 @@ impl<'a> ReportMethods<'a> {
     /// # Arguments
     ///
     /// * `queryId` - Query ID with which the reports are associated.
-    pub fn listreports(&self, query_id: &str) -> ReportListreportCall<'a> {
+    pub fn listreports(&self, query_id: &str) -> ReportListreportCall<'a, S> {
         ReportListreportCall {
             hub: self.hub,
             _query_id: query_id.to_string(),
@@ -828,7 +833,7 @@ impl<'a> ReportMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -842,10 +847,10 @@ impl<'a> ReportMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QueryCreatequeryCall<'a>
-    where  {
+pub struct QueryCreatequeryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
     _request: Query,
     _asynchronous: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -853,9 +858,15 @@ pub struct QueryCreatequeryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QueryCreatequeryCall<'a> {}
+impl<'a, S> client::CallBuilder for QueryCreatequeryCall<'a, S> {}
 
-impl<'a> QueryCreatequeryCall<'a> {
+impl<'a, S> QueryCreatequeryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -992,14 +1003,14 @@ impl<'a> QueryCreatequeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Query) -> QueryCreatequeryCall<'a> {
+    pub fn request(mut self, new_value: Query) -> QueryCreatequeryCall<'a, S> {
         self._request = new_value;
         self
     }
     /// If true, tries to run the query asynchronously. Only applicable when the frequency is ONE_TIME.
     ///
     /// Sets the *asynchronous* query property to the given value.
-    pub fn asynchronous(mut self, new_value: bool) -> QueryCreatequeryCall<'a> {
+    pub fn asynchronous(mut self, new_value: bool) -> QueryCreatequeryCall<'a, S> {
         self._asynchronous = Some(new_value);
         self
     }
@@ -1009,7 +1020,7 @@ impl<'a> QueryCreatequeryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryCreatequeryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryCreatequeryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1034,7 +1045,7 @@ impl<'a> QueryCreatequeryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> QueryCreatequeryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryCreatequeryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1054,9 +1065,9 @@ impl<'a> QueryCreatequeryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QueryCreatequeryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QueryCreatequeryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1088,7 +1099,7 @@ impl<'a> QueryCreatequeryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1096,19 +1107,25 @@ impl<'a> QueryCreatequeryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QueryDeletequeryCall<'a>
-    where  {
+pub struct QueryDeletequeryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
     _query_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QueryDeletequeryCall<'a> {}
+impl<'a, S> client::CallBuilder for QueryDeletequeryCall<'a, S> {}
 
-impl<'a> QueryDeletequeryCall<'a> {
+impl<'a, S> QueryDeletequeryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1240,7 +1257,7 @@ impl<'a> QueryDeletequeryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn query_id(mut self, new_value: &str) -> QueryDeletequeryCall<'a> {
+    pub fn query_id(mut self, new_value: &str) -> QueryDeletequeryCall<'a, S> {
         self._query_id = new_value.to_string();
         self
     }
@@ -1250,7 +1267,7 @@ impl<'a> QueryDeletequeryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryDeletequeryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryDeletequeryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1275,7 +1292,7 @@ impl<'a> QueryDeletequeryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> QueryDeletequeryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryDeletequeryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1295,9 +1312,9 @@ impl<'a> QueryDeletequeryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QueryDeletequeryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QueryDeletequeryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1329,7 +1346,7 @@ impl<'a> QueryDeletequeryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1337,19 +1354,25 @@ impl<'a> QueryDeletequeryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QueryGetqueryCall<'a>
-    where  {
+pub struct QueryGetqueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
     _query_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QueryGetqueryCall<'a> {}
+impl<'a, S> client::CallBuilder for QueryGetqueryCall<'a, S> {}
 
-impl<'a> QueryGetqueryCall<'a> {
+impl<'a, S> QueryGetqueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1492,7 +1515,7 @@ impl<'a> QueryGetqueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn query_id(mut self, new_value: &str) -> QueryGetqueryCall<'a> {
+    pub fn query_id(mut self, new_value: &str) -> QueryGetqueryCall<'a, S> {
         self._query_id = new_value.to_string();
         self
     }
@@ -1502,7 +1525,7 @@ impl<'a> QueryGetqueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryGetqueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryGetqueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1527,7 +1550,7 @@ impl<'a> QueryGetqueryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> QueryGetqueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryGetqueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1547,9 +1570,9 @@ impl<'a> QueryGetqueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QueryGetqueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QueryGetqueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1581,7 +1604,7 @@ impl<'a> QueryGetqueryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1591,10 +1614,10 @@ impl<'a> QueryGetqueryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QueryListqueryCall<'a>
-    where  {
+pub struct QueryListqueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1602,9 +1625,15 @@ pub struct QueryListqueryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QueryListqueryCall<'a> {}
+impl<'a, S> client::CallBuilder for QueryListqueryCall<'a, S> {}
 
-impl<'a> QueryListqueryCall<'a> {
+impl<'a, S> QueryListqueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1728,14 +1757,14 @@ impl<'a> QueryListqueryCall<'a> {
     /// Optional pagination token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> QueryListqueryCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> QueryListqueryCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results per page. Must be between 1 and 100. Defaults to 100 if unspecified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> QueryListqueryCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> QueryListqueryCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1745,7 +1774,7 @@ impl<'a> QueryListqueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryListqueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryListqueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1770,7 +1799,7 @@ impl<'a> QueryListqueryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> QueryListqueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryListqueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1790,9 +1819,9 @@ impl<'a> QueryListqueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QueryListqueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QueryListqueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1825,7 +1854,7 @@ impl<'a> QueryListqueryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1839,10 +1868,10 @@ impl<'a> QueryListqueryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct QueryRunqueryCall<'a>
-    where  {
+pub struct QueryRunqueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
     _request: RunQueryRequest,
     _query_id: String,
     _asynchronous: Option<bool>,
@@ -1851,9 +1880,15 @@ pub struct QueryRunqueryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for QueryRunqueryCall<'a> {}
+impl<'a, S> client::CallBuilder for QueryRunqueryCall<'a, S> {}
 
-impl<'a> QueryRunqueryCall<'a> {
+impl<'a, S> QueryRunqueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2001,7 +2036,7 @@ impl<'a> QueryRunqueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunQueryRequest) -> QueryRunqueryCall<'a> {
+    pub fn request(mut self, new_value: RunQueryRequest) -> QueryRunqueryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2011,14 +2046,14 @@ impl<'a> QueryRunqueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn query_id(mut self, new_value: &str) -> QueryRunqueryCall<'a> {
+    pub fn query_id(mut self, new_value: &str) -> QueryRunqueryCall<'a, S> {
         self._query_id = new_value.to_string();
         self
     }
     /// If true, tries to run the query asynchronously.
     ///
     /// Sets the *asynchronous* query property to the given value.
-    pub fn asynchronous(mut self, new_value: bool) -> QueryRunqueryCall<'a> {
+    pub fn asynchronous(mut self, new_value: bool) -> QueryRunqueryCall<'a, S> {
         self._asynchronous = Some(new_value);
         self
     }
@@ -2028,7 +2063,7 @@ impl<'a> QueryRunqueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryRunqueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> QueryRunqueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2053,7 +2088,7 @@ impl<'a> QueryRunqueryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> QueryRunqueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> QueryRunqueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2073,9 +2108,9 @@ impl<'a> QueryRunqueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> QueryRunqueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> QueryRunqueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2107,7 +2142,7 @@ impl<'a> QueryRunqueryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DoubleClickBidManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2117,10 +2152,10 @@ impl<'a> QueryRunqueryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReportListreportCall<'a>
-    where  {
+pub struct ReportListreportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DoubleClickBidManager<>,
+    hub: &'a DoubleClickBidManager<S>,
     _query_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2129,9 +2164,15 @@ pub struct ReportListreportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReportListreportCall<'a> {}
+impl<'a, S> client::CallBuilder for ReportListreportCall<'a, S> {}
 
-impl<'a> ReportListreportCall<'a> {
+impl<'a, S> ReportListreportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2280,21 +2321,21 @@ impl<'a> ReportListreportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn query_id(mut self, new_value: &str) -> ReportListreportCall<'a> {
+    pub fn query_id(mut self, new_value: &str) -> ReportListreportCall<'a, S> {
         self._query_id = new_value.to_string();
         self
     }
     /// Optional pagination token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ReportListreportCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ReportListreportCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results per page. Must be between 1 and 100. Defaults to 100 if unspecified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ReportListreportCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ReportListreportCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2304,7 +2345,7 @@ impl<'a> ReportListreportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportListreportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportListreportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2329,7 +2370,7 @@ impl<'a> ReportListreportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ReportListreportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportListreportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2349,9 +2390,9 @@ impl<'a> ReportListreportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReportListreportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReportListreportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

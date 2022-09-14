@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,46 +109,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct SASPortalTesting<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct SASPortalTesting<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for SASPortalTesting<> {}
+impl<'a, S> client::Hub for SASPortalTesting<S> {}
 
-impl<'a, > SASPortalTesting<> {
+impl<'a, S> SASPortalTesting<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SASPortalTesting<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> SASPortalTesting<S> {
         SASPortalTesting {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://prod-tt-sasportal.googleapis.com/".to_string(),
             _root_url: "https://prod-tt-sasportal.googleapis.com/".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a> {
+    pub fn customers(&'a self) -> CustomerMethods<'a, S> {
         CustomerMethods { hub: &self }
     }
-    pub fn deployments(&'a self) -> DeploymentMethods<'a> {
+    pub fn deployments(&'a self) -> DeploymentMethods<'a, S> {
         DeploymentMethods { hub: &self }
     }
-    pub fn installer(&'a self) -> InstallerMethods<'a> {
+    pub fn installer(&'a self) -> InstallerMethods<'a, S> {
         InstallerMethods { hub: &self }
     }
-    pub fn nodes(&'a self) -> NodeMethods<'a> {
+    pub fn nodes(&'a self) -> NodeMethods<'a, S> {
         NodeMethods { hub: &self }
     }
-    pub fn policies(&'a self) -> PolicyMethods<'a> {
+    pub fn policies(&'a self) -> PolicyMethods<'a, S> {
         PolicyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1101,22 +1106,22 @@ impl client::ResponseResult for SasPortalValidateInstallerResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `deployments_create(...)`, `deployments_delete(...)`, `deployments_devices_create(...)`, `deployments_devices_create_signed(...)`, `deployments_devices_list(...)`, `deployments_get(...)`, `deployments_list(...)`, `deployments_move(...)`, `deployments_patch(...)`, `devices_create(...)`, `devices_create_signed(...)`, `devices_delete(...)`, `devices_get(...)`, `devices_list(...)`, `devices_move(...)`, `devices_patch(...)`, `devices_sign_device(...)`, `devices_update_signed(...)`, `get(...)`, `list(...)`, `nodes_create(...)`, `nodes_delete(...)`, `nodes_deployments_create(...)`, `nodes_deployments_list(...)`, `nodes_devices_create(...)`, `nodes_devices_create_signed(...)`, `nodes_devices_list(...)`, `nodes_get(...)`, `nodes_list(...)`, `nodes_move(...)`, `nodes_nodes_create(...)`, `nodes_nodes_list(...)`, `nodes_patch(...)` and `patch(...)`
 /// // to build up your call.
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a>
-    where  {
+pub struct CustomerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
 }
 
-impl<'a> client::MethodsBuilder for CustomerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CustomerMethods<'a, S> {}
 
-impl<'a> CustomerMethods<'a> {
+impl<'a, S> CustomerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1126,7 +1131,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeploymentDeviceCreateCall<'a> {
+    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeploymentDeviceCreateCall<'a, S> {
         CustomerDeploymentDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1145,7 +1150,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
+    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a, S> {
         CustomerDeploymentDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1163,7 +1168,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_list(&self, parent: &str) -> CustomerDeploymentDeviceListCall<'a> {
+    pub fn deployments_devices_list(&self, parent: &str) -> CustomerDeploymentDeviceListCall<'a, S> {
         CustomerDeploymentDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1184,7 +1189,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the deployment is to be created.
-    pub fn deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerDeploymentCreateCall<'a> {
+    pub fn deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerDeploymentCreateCall<'a, S> {
         CustomerDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1202,7 +1207,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_delete(&self, name: &str) -> CustomerDeploymentDeleteCall<'a> {
+    pub fn deployments_delete(&self, name: &str) -> CustomerDeploymentDeleteCall<'a, S> {
         CustomerDeploymentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1219,7 +1224,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_get(&self, name: &str) -> CustomerDeploymentGetCall<'a> {
+    pub fn deployments_get(&self, name: &str) -> CustomerDeploymentGetCall<'a, S> {
         CustomerDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1236,7 +1241,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn deployments_list(&self, parent: &str) -> CustomerDeploymentListCall<'a> {
+    pub fn deployments_list(&self, parent: &str) -> CustomerDeploymentListCall<'a, S> {
         CustomerDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1257,7 +1262,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the deployment to move.
-    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> CustomerDeploymentMoveCall<'a> {
+    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> CustomerDeploymentMoveCall<'a, S> {
         CustomerDeploymentMoveCall {
             hub: self.hub,
             _request: request,
@@ -1276,7 +1281,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> CustomerDeploymentPatchCall<'a> {
+    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> CustomerDeploymentPatchCall<'a, S> {
         CustomerDeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -1296,7 +1301,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeviceCreateCall<'a> {
+    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeviceCreateCall<'a, S> {
         CustomerDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1315,7 +1320,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeviceCreateSignedCall<'a> {
+    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeviceCreateSignedCall<'a, S> {
         CustomerDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1333,7 +1338,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_delete(&self, name: &str) -> CustomerDeviceDeleteCall<'a> {
+    pub fn devices_delete(&self, name: &str) -> CustomerDeviceDeleteCall<'a, S> {
         CustomerDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1350,7 +1355,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_get(&self, name: &str) -> CustomerDeviceGetCall<'a> {
+    pub fn devices_get(&self, name: &str) -> CustomerDeviceGetCall<'a, S> {
         CustomerDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1367,7 +1372,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_list(&self, parent: &str) -> CustomerDeviceListCall<'a> {
+    pub fn devices_list(&self, parent: &str) -> CustomerDeviceListCall<'a, S> {
         CustomerDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1388,7 +1393,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to move.
-    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> CustomerDeviceMoveCall<'a> {
+    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> CustomerDeviceMoveCall<'a, S> {
         CustomerDeviceMoveCall {
             hub: self.hub,
             _request: request,
@@ -1407,7 +1412,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> CustomerDevicePatchCall<'a> {
+    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> CustomerDevicePatchCall<'a, S> {
         CustomerDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -1427,7 +1432,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> CustomerDeviceSignDeviceCall<'a> {
+    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> CustomerDeviceSignDeviceCall<'a, S> {
         CustomerDeviceSignDeviceCall {
             hub: self.hub,
             _request: request,
@@ -1446,7 +1451,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to update.
-    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> CustomerDeviceUpdateSignedCall<'a> {
+    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> CustomerDeviceUpdateSignedCall<'a, S> {
         CustomerDeviceUpdateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1465,7 +1470,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the deployment is to be created.
-    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerNodeDeploymentCreateCall<'a> {
+    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerNodeDeploymentCreateCall<'a, S> {
         CustomerNodeDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1483,7 +1488,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn nodes_deployments_list(&self, parent: &str) -> CustomerNodeDeploymentListCall<'a> {
+    pub fn nodes_deployments_list(&self, parent: &str) -> CustomerNodeDeploymentListCall<'a, S> {
         CustomerNodeDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1504,7 +1509,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerNodeDeviceCreateCall<'a> {
+    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerNodeDeviceCreateCall<'a, S> {
         CustomerNodeDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1523,7 +1528,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerNodeDeviceCreateSignedCall<'a> {
+    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerNodeDeviceCreateSignedCall<'a, S> {
         CustomerNodeDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1541,7 +1546,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_list(&self, parent: &str) -> CustomerNodeDeviceListCall<'a> {
+    pub fn nodes_devices_list(&self, parent: &str) -> CustomerNodeDeviceListCall<'a, S> {
         CustomerNodeDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1562,7 +1567,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeNodeCreateCall<'a> {
+    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeNodeCreateCall<'a, S> {
         CustomerNodeNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -1580,7 +1585,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_nodes_list(&self, parent: &str) -> CustomerNodeNodeListCall<'a> {
+    pub fn nodes_nodes_list(&self, parent: &str) -> CustomerNodeNodeListCall<'a, S> {
         CustomerNodeNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1601,7 +1606,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeCreateCall<'a> {
+    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeCreateCall<'a, S> {
         CustomerNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -1619,7 +1624,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_delete(&self, name: &str) -> CustomerNodeDeleteCall<'a> {
+    pub fn nodes_delete(&self, name: &str) -> CustomerNodeDeleteCall<'a, S> {
         CustomerNodeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1636,7 +1641,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_get(&self, name: &str) -> CustomerNodeGetCall<'a> {
+    pub fn nodes_get(&self, name: &str) -> CustomerNodeGetCall<'a, S> {
         CustomerNodeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1653,7 +1658,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_list(&self, parent: &str) -> CustomerNodeListCall<'a> {
+    pub fn nodes_list(&self, parent: &str) -> CustomerNodeListCall<'a, S> {
         CustomerNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1674,7 +1679,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the node to move.
-    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> CustomerNodeMoveCall<'a> {
+    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> CustomerNodeMoveCall<'a, S> {
         CustomerNodeMoveCall {
             hub: self.hub,
             _request: request,
@@ -1693,7 +1698,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> CustomerNodePatchCall<'a> {
+    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> CustomerNodePatchCall<'a, S> {
         CustomerNodePatchCall {
             hub: self.hub,
             _request: request,
@@ -1712,7 +1717,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the customer.
-    pub fn get(&self, name: &str) -> CustomerGetCall<'a> {
+    pub fn get(&self, name: &str) -> CustomerGetCall<'a, S> {
         CustomerGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1725,7 +1730,7 @@ impl<'a> CustomerMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of requested customers.
-    pub fn list(&self) -> CustomerListCall<'a> {
+    pub fn list(&self) -> CustomerListCall<'a, S> {
         CustomerListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1744,7 +1749,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of the customer.
-    pub fn patch(&self, request: SasPortalCustomer, name: &str) -> CustomerPatchCall<'a> {
+    pub fn patch(&self, request: SasPortalCustomer, name: &str) -> CustomerPatchCall<'a, S> {
         CustomerPatchCall {
             hub: self.hub,
             _request: request,
@@ -1780,22 +1785,22 @@ impl<'a> CustomerMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `devices_delete(...)`, `devices_get(...)`, `devices_move(...)`, `devices_patch(...)`, `devices_sign_device(...)`, `devices_update_signed(...)` and `get(...)`
 /// // to build up your call.
 /// let rb = hub.deployments();
 /// # }
 /// ```
-pub struct DeploymentMethods<'a>
-    where  {
+pub struct DeploymentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
 }
 
-impl<'a> client::MethodsBuilder for DeploymentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DeploymentMethods<'a, S> {}
 
-impl<'a> DeploymentMethods<'a> {
+impl<'a, S> DeploymentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1804,7 +1809,7 @@ impl<'a> DeploymentMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_delete(&self, name: &str) -> DeploymentDeviceDeleteCall<'a> {
+    pub fn devices_delete(&self, name: &str) -> DeploymentDeviceDeleteCall<'a, S> {
         DeploymentDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1821,7 +1826,7 @@ impl<'a> DeploymentMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_get(&self, name: &str) -> DeploymentDeviceGetCall<'a> {
+    pub fn devices_get(&self, name: &str) -> DeploymentDeviceGetCall<'a, S> {
         DeploymentDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1839,7 +1844,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to move.
-    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> DeploymentDeviceMoveCall<'a> {
+    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> DeploymentDeviceMoveCall<'a, S> {
         DeploymentDeviceMoveCall {
             hub: self.hub,
             _request: request,
@@ -1858,7 +1863,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> DeploymentDevicePatchCall<'a> {
+    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> DeploymentDevicePatchCall<'a, S> {
         DeploymentDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -1878,7 +1883,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> DeploymentDeviceSignDeviceCall<'a> {
+    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> DeploymentDeviceSignDeviceCall<'a, S> {
         DeploymentDeviceSignDeviceCall {
             hub: self.hub,
             _request: request,
@@ -1897,7 +1902,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to update.
-    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> DeploymentDeviceUpdateSignedCall<'a> {
+    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> DeploymentDeviceUpdateSignedCall<'a, S> {
         DeploymentDeviceUpdateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1915,7 +1920,7 @@ impl<'a> DeploymentMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn get(&self, name: &str) -> DeploymentGetCall<'a> {
+    pub fn get(&self, name: &str) -> DeploymentGetCall<'a, S> {
         DeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1949,22 +1954,22 @@ impl<'a> DeploymentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `generate_secret(...)` and `validate(...)`
 /// // to build up your call.
 /// let rb = hub.installer();
 /// # }
 /// ```
-pub struct InstallerMethods<'a>
-    where  {
+pub struct InstallerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
 }
 
-impl<'a> client::MethodsBuilder for InstallerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for InstallerMethods<'a, S> {}
 
-impl<'a> InstallerMethods<'a> {
+impl<'a, S> InstallerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1973,7 +1978,7 @@ impl<'a> InstallerMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn generate_secret(&self, request: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a> {
+    pub fn generate_secret(&self, request: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a, S> {
         InstallerGenerateSecretCall {
             hub: self.hub,
             _request: request,
@@ -1990,7 +1995,7 @@ impl<'a> InstallerMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn validate(&self, request: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a> {
+    pub fn validate(&self, request: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a, S> {
         InstallerValidateCall {
             hub: self.hub,
             _request: request,
@@ -2024,22 +2029,22 @@ impl<'a> InstallerMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `deployments_delete(...)`, `deployments_devices_create(...)`, `deployments_devices_create_signed(...)`, `deployments_devices_list(...)`, `deployments_get(...)`, `deployments_list(...)`, `deployments_move(...)`, `deployments_patch(...)`, `devices_create(...)`, `devices_create_signed(...)`, `devices_delete(...)`, `devices_get(...)`, `devices_list(...)`, `devices_move(...)`, `devices_patch(...)`, `devices_sign_device(...)`, `devices_update_signed(...)`, `get(...)`, `nodes_create(...)`, `nodes_delete(...)`, `nodes_deployments_create(...)`, `nodes_deployments_list(...)`, `nodes_devices_create(...)`, `nodes_devices_create_signed(...)`, `nodes_devices_list(...)`, `nodes_get(...)`, `nodes_list(...)`, `nodes_move(...)`, `nodes_nodes_create(...)`, `nodes_nodes_list(...)` and `nodes_patch(...)`
 /// // to build up your call.
 /// let rb = hub.nodes();
 /// # }
 /// ```
-pub struct NodeMethods<'a>
-    where  {
+pub struct NodeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
 }
 
-impl<'a> client::MethodsBuilder for NodeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for NodeMethods<'a, S> {}
 
-impl<'a> NodeMethods<'a> {
+impl<'a, S> NodeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2049,7 +2054,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeploymentDeviceCreateCall<'a> {
+    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeploymentDeviceCreateCall<'a, S> {
         NodeDeploymentDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2068,7 +2073,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeploymentDeviceCreateSignedCall<'a> {
+    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeploymentDeviceCreateSignedCall<'a, S> {
         NodeDeploymentDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2086,7 +2091,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_list(&self, parent: &str) -> NodeDeploymentDeviceListCall<'a> {
+    pub fn deployments_devices_list(&self, parent: &str) -> NodeDeploymentDeviceListCall<'a, S> {
         NodeDeploymentDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2106,7 +2111,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_delete(&self, name: &str) -> NodeDeploymentDeleteCall<'a> {
+    pub fn deployments_delete(&self, name: &str) -> NodeDeploymentDeleteCall<'a, S> {
         NodeDeploymentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2123,7 +2128,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_get(&self, name: &str) -> NodeDeploymentGetCall<'a> {
+    pub fn deployments_get(&self, name: &str) -> NodeDeploymentGetCall<'a, S> {
         NodeDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2140,7 +2145,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn deployments_list(&self, parent: &str) -> NodeDeploymentListCall<'a> {
+    pub fn deployments_list(&self, parent: &str) -> NodeDeploymentListCall<'a, S> {
         NodeDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2161,7 +2166,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the deployment to move.
-    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> NodeDeploymentMoveCall<'a> {
+    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> NodeDeploymentMoveCall<'a, S> {
         NodeDeploymentMoveCall {
             hub: self.hub,
             _request: request,
@@ -2180,7 +2185,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> NodeDeploymentPatchCall<'a> {
+    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> NodeDeploymentPatchCall<'a, S> {
         NodeDeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -2200,7 +2205,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeviceCreateCall<'a> {
+    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeviceCreateCall<'a, S> {
         NodeDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2219,7 +2224,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeviceCreateSignedCall<'a> {
+    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeviceCreateSignedCall<'a, S> {
         NodeDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2237,7 +2242,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_delete(&self, name: &str) -> NodeDeviceDeleteCall<'a> {
+    pub fn devices_delete(&self, name: &str) -> NodeDeviceDeleteCall<'a, S> {
         NodeDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2254,7 +2259,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_get(&self, name: &str) -> NodeDeviceGetCall<'a> {
+    pub fn devices_get(&self, name: &str) -> NodeDeviceGetCall<'a, S> {
         NodeDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2271,7 +2276,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_list(&self, parent: &str) -> NodeDeviceListCall<'a> {
+    pub fn devices_list(&self, parent: &str) -> NodeDeviceListCall<'a, S> {
         NodeDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2292,7 +2297,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to move.
-    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> NodeDeviceMoveCall<'a> {
+    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> NodeDeviceMoveCall<'a, S> {
         NodeDeviceMoveCall {
             hub: self.hub,
             _request: request,
@@ -2311,7 +2316,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> NodeDevicePatchCall<'a> {
+    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> NodeDevicePatchCall<'a, S> {
         NodeDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -2331,7 +2336,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> NodeDeviceSignDeviceCall<'a> {
+    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> NodeDeviceSignDeviceCall<'a, S> {
         NodeDeviceSignDeviceCall {
             hub: self.hub,
             _request: request,
@@ -2350,7 +2355,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to update.
-    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> NodeDeviceUpdateSignedCall<'a> {
+    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> NodeDeviceUpdateSignedCall<'a, S> {
         NodeDeviceUpdateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2369,7 +2374,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the deployment is to be created.
-    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> NodeNodeDeploymentCreateCall<'a> {
+    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> NodeNodeDeploymentCreateCall<'a, S> {
         NodeNodeDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -2387,7 +2392,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn nodes_deployments_list(&self, parent: &str) -> NodeNodeDeploymentListCall<'a> {
+    pub fn nodes_deployments_list(&self, parent: &str) -> NodeNodeDeploymentListCall<'a, S> {
         NodeNodeDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2408,7 +2413,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeNodeDeviceCreateCall<'a> {
+    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeNodeDeviceCreateCall<'a, S> {
         NodeNodeDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2427,7 +2432,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeNodeDeviceCreateSignedCall<'a> {
+    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeNodeDeviceCreateSignedCall<'a, S> {
         NodeNodeDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2445,7 +2450,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_list(&self, parent: &str) -> NodeNodeDeviceListCall<'a> {
+    pub fn nodes_devices_list(&self, parent: &str) -> NodeNodeDeviceListCall<'a, S> {
         NodeNodeDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2466,7 +2471,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeNodeCreateCall<'a> {
+    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeNodeCreateCall<'a, S> {
         NodeNodeNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -2484,7 +2489,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_nodes_list(&self, parent: &str) -> NodeNodeNodeListCall<'a> {
+    pub fn nodes_nodes_list(&self, parent: &str) -> NodeNodeNodeListCall<'a, S> {
         NodeNodeNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2505,7 +2510,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeCreateCall<'a> {
+    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeCreateCall<'a, S> {
         NodeNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -2523,7 +2528,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_delete(&self, name: &str) -> NodeNodeDeleteCall<'a> {
+    pub fn nodes_delete(&self, name: &str) -> NodeNodeDeleteCall<'a, S> {
         NodeNodeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2540,7 +2545,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_get(&self, name: &str) -> NodeNodeGetCall<'a> {
+    pub fn nodes_get(&self, name: &str) -> NodeNodeGetCall<'a, S> {
         NodeNodeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2557,7 +2562,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_list(&self, parent: &str) -> NodeNodeListCall<'a> {
+    pub fn nodes_list(&self, parent: &str) -> NodeNodeListCall<'a, S> {
         NodeNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2578,7 +2583,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the node to move.
-    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> NodeNodeMoveCall<'a> {
+    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> NodeNodeMoveCall<'a, S> {
         NodeNodeMoveCall {
             hub: self.hub,
             _request: request,
@@ -2597,7 +2602,7 @@ impl<'a> NodeMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> NodeNodePatchCall<'a> {
+    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> NodeNodePatchCall<'a, S> {
         NodeNodePatchCall {
             hub: self.hub,
             _request: request,
@@ -2616,7 +2621,7 @@ impl<'a> NodeMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn get(&self, name: &str) -> NodeGetCall<'a> {
+    pub fn get(&self, name: &str) -> NodeGetCall<'a, S> {
         NodeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2650,22 +2655,22 @@ impl<'a> NodeMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `set(...)` and `test(...)`
 /// // to build up your call.
 /// let rb = hub.policies();
 /// # }
 /// ```
-pub struct PolicyMethods<'a>
-    where  {
+pub struct PolicyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
 }
 
-impl<'a> client::MethodsBuilder for PolicyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PolicyMethods<'a, S> {}
 
-impl<'a> PolicyMethods<'a> {
+impl<'a, S> PolicyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2674,7 +2679,7 @@ impl<'a> PolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get(&self, request: SasPortalGetPolicyRequest) -> PolicyGetCall<'a> {
+    pub fn get(&self, request: SasPortalGetPolicyRequest) -> PolicyGetCall<'a, S> {
         PolicyGetCall {
             hub: self.hub,
             _request: request,
@@ -2691,7 +2696,7 @@ impl<'a> PolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn set(&self, request: SasPortalSetPolicyRequest) -> PolicySetCall<'a> {
+    pub fn set(&self, request: SasPortalSetPolicyRequest) -> PolicySetCall<'a, S> {
         PolicySetCall {
             hub: self.hub,
             _request: request,
@@ -2708,7 +2713,7 @@ impl<'a> PolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn test(&self, request: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a> {
+    pub fn test(&self, request: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a, S> {
         PolicyTestCall {
             hub: self.hub,
             _request: request,
@@ -2750,7 +2755,7 @@ impl<'a> PolicyMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2763,10 +2768,10 @@ impl<'a> PolicyMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeviceCreateCall<'a>
-    where  {
+pub struct CustomerDeploymentDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2774,9 +2779,15 @@ pub struct CustomerDeploymentDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentDeviceCreateCall<'a, S> {}
 
-impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
+impl<'a, S> CustomerDeploymentDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2936,7 +2947,7 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeploymentDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeploymentDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2946,7 +2957,7 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2956,7 +2967,7 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2981,7 +2992,7 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3001,9 +3012,9 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3036,7 +3047,7 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3049,10 +3060,10 @@ impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeviceCreateSignedCall<'a>
-    where  {
+pub struct CustomerDeploymentDeviceCreateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3060,9 +3071,15 @@ pub struct CustomerDeploymentDeviceCreateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentDeviceCreateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentDeviceCreateSignedCall<'a, S> {}
 
-impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
+impl<'a, S> CustomerDeploymentDeviceCreateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3222,7 +3239,7 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeploymentDeviceCreateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3232,7 +3249,7 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3242,7 +3259,7 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3267,7 +3284,7 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3287,9 +3304,9 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceCreateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentDeviceCreateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3321,7 +3338,7 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3332,10 +3349,10 @@ impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeviceListCall<'a>
-    where  {
+pub struct CustomerDeploymentDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3345,9 +3362,15 @@ pub struct CustomerDeploymentDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentDeviceListCall<'a, S> {}
 
-impl<'a> CustomerDeploymentDeviceListCall<'a> {
+impl<'a, S> CustomerDeploymentDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3503,28 +3526,28 @@ impl<'a> CustomerDeploymentDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3534,7 +3557,7 @@ impl<'a> CustomerDeploymentDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3559,7 +3582,7 @@ impl<'a> CustomerDeploymentDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3579,9 +3602,9 @@ impl<'a> CustomerDeploymentDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3614,7 +3637,7 @@ impl<'a> CustomerDeploymentDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3627,10 +3650,10 @@ impl<'a> CustomerDeploymentDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentCreateCall<'a>
-    where  {
+pub struct CustomerDeploymentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDeployment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3638,9 +3661,15 @@ pub struct CustomerDeploymentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentCreateCall<'a, S> {}
 
-impl<'a> CustomerDeploymentCreateCall<'a> {
+impl<'a, S> CustomerDeploymentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3800,7 +3829,7 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3810,7 +3839,7 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3820,7 +3849,7 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3845,7 +3874,7 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3865,9 +3894,9 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3899,7 +3928,7 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3907,19 +3936,25 @@ impl<'a> CustomerDeploymentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeleteCall<'a>
-    where  {
+pub struct CustomerDeploymentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentDeleteCall<'a, S> {}
 
-impl<'a> CustomerDeploymentDeleteCall<'a> {
+impl<'a, S> CustomerDeploymentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4066,7 +4101,7 @@ impl<'a> CustomerDeploymentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4076,7 +4111,7 @@ impl<'a> CustomerDeploymentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4101,7 +4136,7 @@ impl<'a> CustomerDeploymentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4121,9 +4156,9 @@ impl<'a> CustomerDeploymentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4155,7 +4190,7 @@ impl<'a> CustomerDeploymentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4163,19 +4198,25 @@ impl<'a> CustomerDeploymentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentGetCall<'a>
-    where  {
+pub struct CustomerDeploymentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentGetCall<'a, S> {}
 
-impl<'a> CustomerDeploymentGetCall<'a> {
+impl<'a, S> CustomerDeploymentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4322,7 +4363,7 @@ impl<'a> CustomerDeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4332,7 +4373,7 @@ impl<'a> CustomerDeploymentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4357,7 +4398,7 @@ impl<'a> CustomerDeploymentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4377,9 +4418,9 @@ impl<'a> CustomerDeploymentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4411,7 +4452,7 @@ impl<'a> CustomerDeploymentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4422,10 +4463,10 @@ impl<'a> CustomerDeploymentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentListCall<'a>
-    where  {
+pub struct CustomerDeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4435,9 +4476,15 @@ pub struct CustomerDeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentListCall<'a, S> {}
 
-impl<'a> CustomerDeploymentListCall<'a> {
+impl<'a, S> CustomerDeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4593,28 +4640,28 @@ impl<'a> CustomerDeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4624,7 +4671,7 @@ impl<'a> CustomerDeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4649,7 +4696,7 @@ impl<'a> CustomerDeploymentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4669,9 +4716,9 @@ impl<'a> CustomerDeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4704,7 +4751,7 @@ impl<'a> CustomerDeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4717,10 +4764,10 @@ impl<'a> CustomerDeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentMoveCall<'a>
-    where  {
+pub struct CustomerDeploymentMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveDeploymentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4728,9 +4775,15 @@ pub struct CustomerDeploymentMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentMoveCall<'a, S> {}
 
-impl<'a> CustomerDeploymentMoveCall<'a> {
+impl<'a, S> CustomerDeploymentMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4890,7 +4943,7 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> CustomerDeploymentMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> CustomerDeploymentMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4900,7 +4953,7 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4910,7 +4963,7 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4935,7 +4988,7 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4955,9 +5008,9 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4990,7 +5043,7 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5004,10 +5057,10 @@ impl<'a> CustomerDeploymentMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentPatchCall<'a>
-    where  {
+pub struct CustomerDeploymentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDeployment,
     _name: String,
     _update_mask: Option<String>,
@@ -5016,9 +5069,15 @@ pub struct CustomerDeploymentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeploymentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeploymentPatchCall<'a, S> {}
 
-impl<'a> CustomerDeploymentPatchCall<'a> {
+impl<'a, S> CustomerDeploymentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5181,7 +5240,7 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentPatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5191,14 +5250,14 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5208,7 +5267,7 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5233,7 +5292,7 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5253,9 +5312,9 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeploymentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5288,7 +5347,7 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5301,10 +5360,10 @@ impl<'a> CustomerDeploymentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceCreateCall<'a>
-    where  {
+pub struct CustomerDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5312,9 +5371,15 @@ pub struct CustomerDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceCreateCall<'a, S> {}
 
-impl<'a> CustomerDeviceCreateCall<'a> {
+impl<'a, S> CustomerDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5474,7 +5539,7 @@ impl<'a> CustomerDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5484,7 +5549,7 @@ impl<'a> CustomerDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5494,7 +5559,7 @@ impl<'a> CustomerDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5519,7 +5584,7 @@ impl<'a> CustomerDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5539,9 +5604,9 @@ impl<'a> CustomerDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5574,7 +5639,7 @@ impl<'a> CustomerDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5587,10 +5652,10 @@ impl<'a> CustomerDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceCreateSignedCall<'a>
-    where  {
+pub struct CustomerDeviceCreateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5598,9 +5663,15 @@ pub struct CustomerDeviceCreateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceCreateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceCreateSignedCall<'a, S> {}
 
-impl<'a> CustomerDeviceCreateSignedCall<'a> {
+impl<'a, S> CustomerDeviceCreateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5760,7 +5831,7 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeviceCreateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeviceCreateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5770,7 +5841,7 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateSignedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateSignedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5780,7 +5851,7 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5805,7 +5876,7 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5825,9 +5896,9 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceCreateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceCreateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5859,7 +5930,7 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5867,19 +5938,25 @@ impl<'a> CustomerDeviceCreateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceDeleteCall<'a>
-    where  {
+pub struct CustomerDeviceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceDeleteCall<'a, S> {}
 
-impl<'a> CustomerDeviceDeleteCall<'a> {
+impl<'a, S> CustomerDeviceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6026,7 +6103,7 @@ impl<'a> CustomerDeviceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6036,7 +6113,7 @@ impl<'a> CustomerDeviceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6061,7 +6138,7 @@ impl<'a> CustomerDeviceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6081,9 +6158,9 @@ impl<'a> CustomerDeviceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6115,7 +6192,7 @@ impl<'a> CustomerDeviceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6123,19 +6200,25 @@ impl<'a> CustomerDeviceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceGetCall<'a>
-    where  {
+pub struct CustomerDeviceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceGetCall<'a, S> {}
 
-impl<'a> CustomerDeviceGetCall<'a> {
+impl<'a, S> CustomerDeviceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6282,7 +6365,7 @@ impl<'a> CustomerDeviceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6292,7 +6375,7 @@ impl<'a> CustomerDeviceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6317,7 +6400,7 @@ impl<'a> CustomerDeviceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6337,9 +6420,9 @@ impl<'a> CustomerDeviceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6371,7 +6454,7 @@ impl<'a> CustomerDeviceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6382,10 +6465,10 @@ impl<'a> CustomerDeviceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceListCall<'a>
-    where  {
+pub struct CustomerDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6395,9 +6478,15 @@ pub struct CustomerDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceListCall<'a, S> {}
 
-impl<'a> CustomerDeviceListCall<'a> {
+impl<'a, S> CustomerDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6553,28 +6642,28 @@ impl<'a> CustomerDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6584,7 +6673,7 @@ impl<'a> CustomerDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6609,7 +6698,7 @@ impl<'a> CustomerDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6629,9 +6718,9 @@ impl<'a> CustomerDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6664,7 +6753,7 @@ impl<'a> CustomerDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6677,10 +6766,10 @@ impl<'a> CustomerDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceMoveCall<'a>
-    where  {
+pub struct CustomerDeviceMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6688,9 +6777,15 @@ pub struct CustomerDeviceMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceMoveCall<'a, S> {}
 
-impl<'a> CustomerDeviceMoveCall<'a> {
+impl<'a, S> CustomerDeviceMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6850,7 +6945,7 @@ impl<'a> CustomerDeviceMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> CustomerDeviceMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> CustomerDeviceMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6860,7 +6955,7 @@ impl<'a> CustomerDeviceMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6870,7 +6965,7 @@ impl<'a> CustomerDeviceMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6895,7 +6990,7 @@ impl<'a> CustomerDeviceMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6915,9 +7010,9 @@ impl<'a> CustomerDeviceMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6950,7 +7045,7 @@ impl<'a> CustomerDeviceMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6964,10 +7059,10 @@ impl<'a> CustomerDeviceMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDevicePatchCall<'a>
-    where  {
+pub struct CustomerDevicePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _name: String,
     _update_mask: Option<String>,
@@ -6976,9 +7071,15 @@ pub struct CustomerDevicePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDevicePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDevicePatchCall<'a, S> {}
 
-impl<'a> CustomerDevicePatchCall<'a> {
+impl<'a, S> CustomerDevicePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7141,7 +7242,7 @@ impl<'a> CustomerDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDevicePatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDevicePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7151,14 +7252,14 @@ impl<'a> CustomerDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDevicePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDevicePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerDevicePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerDevicePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7168,7 +7269,7 @@ impl<'a> CustomerDevicePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDevicePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDevicePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7193,7 +7294,7 @@ impl<'a> CustomerDevicePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDevicePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDevicePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7213,9 +7314,9 @@ impl<'a> CustomerDevicePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDevicePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDevicePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7248,7 +7349,7 @@ impl<'a> CustomerDevicePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7261,10 +7362,10 @@ impl<'a> CustomerDevicePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceSignDeviceCall<'a>
-    where  {
+pub struct CustomerDeviceSignDeviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalSignDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7272,9 +7373,15 @@ pub struct CustomerDeviceSignDeviceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceSignDeviceCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceSignDeviceCall<'a, S> {}
 
-impl<'a> CustomerDeviceSignDeviceCall<'a> {
+impl<'a, S> CustomerDeviceSignDeviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7434,7 +7541,7 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> CustomerDeviceSignDeviceCall<'a> {
+    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> CustomerDeviceSignDeviceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7444,7 +7551,7 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceSignDeviceCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceSignDeviceCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7454,7 +7561,7 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceSignDeviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceSignDeviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7479,7 +7586,7 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceSignDeviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceSignDeviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7499,9 +7606,9 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceSignDeviceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceSignDeviceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7534,7 +7641,7 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7547,10 +7654,10 @@ impl<'a> CustomerDeviceSignDeviceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceUpdateSignedCall<'a>
-    where  {
+pub struct CustomerDeviceUpdateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalUpdateSignedDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7558,9 +7665,15 @@ pub struct CustomerDeviceUpdateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerDeviceUpdateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerDeviceUpdateSignedCall<'a, S> {}
 
-impl<'a> CustomerDeviceUpdateSignedCall<'a> {
+impl<'a, S> CustomerDeviceUpdateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7720,7 +7833,7 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> CustomerDeviceUpdateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> CustomerDeviceUpdateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7730,7 +7843,7 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceUpdateSignedCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceUpdateSignedCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7740,7 +7853,7 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceUpdateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceUpdateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7765,7 +7878,7 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceUpdateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceUpdateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7785,9 +7898,9 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceUpdateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerDeviceUpdateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7820,7 +7933,7 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7833,10 +7946,10 @@ impl<'a> CustomerDeviceUpdateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeploymentCreateCall<'a>
-    where  {
+pub struct CustomerNodeDeploymentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDeployment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7844,9 +7957,15 @@ pub struct CustomerNodeDeploymentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeDeploymentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeDeploymentCreateCall<'a, S> {}
 
-impl<'a> CustomerNodeDeploymentCreateCall<'a> {
+impl<'a, S> CustomerNodeDeploymentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8006,7 +8125,7 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerNodeDeploymentCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerNodeDeploymentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8016,7 +8135,7 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8026,7 +8145,7 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8051,7 +8170,7 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8071,9 +8190,9 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeploymentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeDeploymentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8105,7 +8224,7 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8116,10 +8235,10 @@ impl<'a> CustomerNodeDeploymentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeploymentListCall<'a>
-    where  {
+pub struct CustomerNodeDeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8129,9 +8248,15 @@ pub struct CustomerNodeDeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeDeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeDeploymentListCall<'a, S> {}
 
-impl<'a> CustomerNodeDeploymentListCall<'a> {
+impl<'a, S> CustomerNodeDeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8287,28 +8412,28 @@ impl<'a> CustomerNodeDeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeploymentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeploymentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8318,7 +8443,7 @@ impl<'a> CustomerNodeDeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8343,7 +8468,7 @@ impl<'a> CustomerNodeDeploymentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8363,9 +8488,9 @@ impl<'a> CustomerNodeDeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeDeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8398,7 +8523,7 @@ impl<'a> CustomerNodeDeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8411,10 +8536,10 @@ impl<'a> CustomerNodeDeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeviceCreateCall<'a>
-    where  {
+pub struct CustomerNodeDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8422,9 +8547,15 @@ pub struct CustomerNodeDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeDeviceCreateCall<'a, S> {}
 
-impl<'a> CustomerNodeDeviceCreateCall<'a> {
+impl<'a, S> CustomerNodeDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8584,7 +8715,7 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerNodeDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerNodeDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8594,7 +8725,7 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8604,7 +8735,7 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8629,7 +8760,7 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8649,9 +8780,9 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8684,7 +8815,7 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8697,10 +8828,10 @@ impl<'a> CustomerNodeDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeviceCreateSignedCall<'a>
-    where  {
+pub struct CustomerNodeDeviceCreateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8708,9 +8839,15 @@ pub struct CustomerNodeDeviceCreateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeDeviceCreateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeDeviceCreateSignedCall<'a, S> {}
 
-impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
+impl<'a, S> CustomerNodeDeviceCreateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8870,7 +9007,7 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerNodeDeviceCreateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerNodeDeviceCreateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8880,7 +9017,7 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateSignedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateSignedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8890,7 +9027,7 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8915,7 +9052,7 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8935,9 +9072,9 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceCreateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeDeviceCreateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8969,7 +9106,7 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8980,10 +9117,10 @@ impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeviceListCall<'a>
-    where  {
+pub struct CustomerNodeDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8993,9 +9130,15 @@ pub struct CustomerNodeDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeDeviceListCall<'a, S> {}
 
-impl<'a> CustomerNodeDeviceListCall<'a> {
+impl<'a, S> CustomerNodeDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9151,28 +9294,28 @@ impl<'a> CustomerNodeDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9182,7 +9325,7 @@ impl<'a> CustomerNodeDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9207,7 +9350,7 @@ impl<'a> CustomerNodeDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9227,9 +9370,9 @@ impl<'a> CustomerNodeDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9262,7 +9405,7 @@ impl<'a> CustomerNodeDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9275,10 +9418,10 @@ impl<'a> CustomerNodeDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeNodeCreateCall<'a>
-    where  {
+pub struct CustomerNodeNodeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9286,9 +9429,15 @@ pub struct CustomerNodeNodeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeNodeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeNodeCreateCall<'a, S> {}
 
-impl<'a> CustomerNodeNodeCreateCall<'a> {
+impl<'a, S> CustomerNodeNodeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9448,7 +9597,7 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeNodeCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeNodeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9458,7 +9607,7 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -9468,7 +9617,7 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9493,7 +9642,7 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9513,9 +9662,9 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeNodeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeNodeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9547,7 +9696,7 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9558,10 +9707,10 @@ impl<'a> CustomerNodeNodeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeNodeListCall<'a>
-    where  {
+pub struct CustomerNodeNodeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9571,9 +9720,15 @@ pub struct CustomerNodeNodeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeNodeListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeNodeListCall<'a, S> {}
 
-impl<'a> CustomerNodeNodeListCall<'a> {
+impl<'a, S> CustomerNodeNodeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9729,28 +9884,28 @@ impl<'a> CustomerNodeNodeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeNodeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeNodeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9760,7 +9915,7 @@ impl<'a> CustomerNodeNodeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9785,7 +9940,7 @@ impl<'a> CustomerNodeNodeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9805,9 +9960,9 @@ impl<'a> CustomerNodeNodeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeNodeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeNodeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9840,7 +9995,7 @@ impl<'a> CustomerNodeNodeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9853,10 +10008,10 @@ impl<'a> CustomerNodeNodeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeCreateCall<'a>
-    where  {
+pub struct CustomerNodeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9864,9 +10019,15 @@ pub struct CustomerNodeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeCreateCall<'a, S> {}
 
-impl<'a> CustomerNodeCreateCall<'a> {
+impl<'a, S> CustomerNodeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10026,7 +10187,7 @@ impl<'a> CustomerNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10036,7 +10197,7 @@ impl<'a> CustomerNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -10046,7 +10207,7 @@ impl<'a> CustomerNodeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10071,7 +10232,7 @@ impl<'a> CustomerNodeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10091,9 +10252,9 @@ impl<'a> CustomerNodeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10125,7 +10286,7 @@ impl<'a> CustomerNodeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10133,19 +10294,25 @@ impl<'a> CustomerNodeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeleteCall<'a>
-    where  {
+pub struct CustomerNodeDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeDeleteCall<'a, S> {}
 
-impl<'a> CustomerNodeDeleteCall<'a> {
+impl<'a, S> CustomerNodeDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10292,7 +10459,7 @@ impl<'a> CustomerNodeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodeDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodeDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10302,7 +10469,7 @@ impl<'a> CustomerNodeDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10327,7 +10494,7 @@ impl<'a> CustomerNodeDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10347,9 +10514,9 @@ impl<'a> CustomerNodeDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10381,7 +10548,7 @@ impl<'a> CustomerNodeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10389,19 +10556,25 @@ impl<'a> CustomerNodeDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeGetCall<'a>
-    where  {
+pub struct CustomerNodeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeGetCall<'a, S> {}
 
-impl<'a> CustomerNodeGetCall<'a> {
+impl<'a, S> CustomerNodeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10548,7 +10721,7 @@ impl<'a> CustomerNodeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10558,7 +10731,7 @@ impl<'a> CustomerNodeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10583,7 +10756,7 @@ impl<'a> CustomerNodeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10603,9 +10776,9 @@ impl<'a> CustomerNodeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10637,7 +10810,7 @@ impl<'a> CustomerNodeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10648,10 +10821,10 @@ impl<'a> CustomerNodeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeListCall<'a>
-    where  {
+pub struct CustomerNodeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10661,9 +10834,15 @@ pub struct CustomerNodeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeListCall<'a, S> {}
 
-impl<'a> CustomerNodeListCall<'a> {
+impl<'a, S> CustomerNodeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10819,28 +10998,28 @@ impl<'a> CustomerNodeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10850,7 +11029,7 @@ impl<'a> CustomerNodeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10875,7 +11054,7 @@ impl<'a> CustomerNodeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10895,9 +11074,9 @@ impl<'a> CustomerNodeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10930,7 +11109,7 @@ impl<'a> CustomerNodeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10943,10 +11122,10 @@ impl<'a> CustomerNodeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeMoveCall<'a>
-    where  {
+pub struct CustomerNodeMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveNodeRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10954,9 +11133,15 @@ pub struct CustomerNodeMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodeMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodeMoveCall<'a, S> {}
 
-impl<'a> CustomerNodeMoveCall<'a> {
+impl<'a, S> CustomerNodeMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11116,7 +11301,7 @@ impl<'a> CustomerNodeMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> CustomerNodeMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> CustomerNodeMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11126,7 +11311,7 @@ impl<'a> CustomerNodeMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodeMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodeMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11136,7 +11321,7 @@ impl<'a> CustomerNodeMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11161,7 +11346,7 @@ impl<'a> CustomerNodeMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11181,9 +11366,9 @@ impl<'a> CustomerNodeMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodeMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11216,7 +11401,7 @@ impl<'a> CustomerNodeMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11230,10 +11415,10 @@ impl<'a> CustomerNodeMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodePatchCall<'a>
-    where  {
+pub struct CustomerNodePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalNode,
     _name: String,
     _update_mask: Option<String>,
@@ -11242,9 +11427,15 @@ pub struct CustomerNodePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerNodePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerNodePatchCall<'a, S> {}
 
-impl<'a> CustomerNodePatchCall<'a> {
+impl<'a, S> CustomerNodePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11407,7 +11598,7 @@ impl<'a> CustomerNodePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodePatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11417,14 +11608,14 @@ impl<'a> CustomerNodePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerNodePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerNodePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11434,7 +11625,7 @@ impl<'a> CustomerNodePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11459,7 +11650,7 @@ impl<'a> CustomerNodePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11479,9 +11670,9 @@ impl<'a> CustomerNodePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerNodePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11513,7 +11704,7 @@ impl<'a> CustomerNodePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11521,19 +11712,25 @@ impl<'a> CustomerNodePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerGetCall<'a>
-    where  {
+pub struct CustomerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerGetCall<'a, S> {}
 
-impl<'a> CustomerGetCall<'a> {
+impl<'a, S> CustomerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11680,7 +11877,7 @@ impl<'a> CustomerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11690,7 +11887,7 @@ impl<'a> CustomerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11715,7 +11912,7 @@ impl<'a> CustomerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11735,9 +11932,9 @@ impl<'a> CustomerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11769,7 +11966,7 @@ impl<'a> CustomerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11779,10 +11976,10 @@ impl<'a> CustomerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerListCall<'a>
-    where  {
+pub struct CustomerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11790,9 +11987,15 @@ pub struct CustomerListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerListCall<'a, S> {}
 
-impl<'a> CustomerListCall<'a> {
+impl<'a, S> CustomerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11916,14 +12119,14 @@ impl<'a> CustomerListCall<'a> {
     /// A pagination token returned from a previous call to ListCustomers that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of customers to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -11933,7 +12136,7 @@ impl<'a> CustomerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11958,7 +12161,7 @@ impl<'a> CustomerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11978,9 +12181,9 @@ impl<'a> CustomerListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12013,7 +12216,7 @@ impl<'a> CustomerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12027,10 +12230,10 @@ impl<'a> CustomerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPatchCall<'a>
-    where  {
+pub struct CustomerPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCustomer,
     _name: String,
     _update_mask: Option<String>,
@@ -12039,9 +12242,15 @@ pub struct CustomerPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerPatchCall<'a, S> {}
 
-impl<'a> CustomerPatchCall<'a> {
+impl<'a, S> CustomerPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12204,7 +12413,7 @@ impl<'a> CustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCustomer) -> CustomerPatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCustomer) -> CustomerPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12214,14 +12423,14 @@ impl<'a> CustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CustomerPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12231,7 +12440,7 @@ impl<'a> CustomerPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12256,7 +12465,7 @@ impl<'a> CustomerPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12276,9 +12485,9 @@ impl<'a> CustomerPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12310,7 +12519,7 @@ impl<'a> CustomerPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12318,19 +12527,25 @@ impl<'a> CustomerPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceDeleteCall<'a>
-    where  {
+pub struct DeploymentDeviceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDeviceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDeviceDeleteCall<'a, S> {}
 
-impl<'a> DeploymentDeviceDeleteCall<'a> {
+impl<'a, S> DeploymentDeviceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12477,7 +12692,7 @@ impl<'a> DeploymentDeviceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12487,7 +12702,7 @@ impl<'a> DeploymentDeviceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12512,7 +12727,7 @@ impl<'a> DeploymentDeviceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12532,9 +12747,9 @@ impl<'a> DeploymentDeviceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDeviceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12566,7 +12781,7 @@ impl<'a> DeploymentDeviceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12574,19 +12789,25 @@ impl<'a> DeploymentDeviceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceGetCall<'a>
-    where  {
+pub struct DeploymentDeviceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDeviceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDeviceGetCall<'a, S> {}
 
-impl<'a> DeploymentDeviceGetCall<'a> {
+impl<'a, S> DeploymentDeviceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12733,7 +12954,7 @@ impl<'a> DeploymentDeviceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12743,7 +12964,7 @@ impl<'a> DeploymentDeviceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12768,7 +12989,7 @@ impl<'a> DeploymentDeviceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12788,9 +13009,9 @@ impl<'a> DeploymentDeviceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDeviceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12823,7 +13044,7 @@ impl<'a> DeploymentDeviceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12836,10 +13057,10 @@ impl<'a> DeploymentDeviceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceMoveCall<'a>
-    where  {
+pub struct DeploymentDeviceMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12847,9 +13068,15 @@ pub struct DeploymentDeviceMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDeviceMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDeviceMoveCall<'a, S> {}
 
-impl<'a> DeploymentDeviceMoveCall<'a> {
+impl<'a, S> DeploymentDeviceMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13009,7 +13236,7 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> DeploymentDeviceMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> DeploymentDeviceMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13019,7 +13246,7 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13029,7 +13256,7 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13054,7 +13281,7 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13074,9 +13301,9 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDeviceMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13109,7 +13336,7 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13123,10 +13350,10 @@ impl<'a> DeploymentDeviceMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDevicePatchCall<'a>
-    where  {
+pub struct DeploymentDevicePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _name: String,
     _update_mask: Option<String>,
@@ -13135,9 +13362,15 @@ pub struct DeploymentDevicePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDevicePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDevicePatchCall<'a, S> {}
 
-impl<'a> DeploymentDevicePatchCall<'a> {
+impl<'a, S> DeploymentDevicePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13300,7 +13533,7 @@ impl<'a> DeploymentDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> DeploymentDevicePatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> DeploymentDevicePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13310,14 +13543,14 @@ impl<'a> DeploymentDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -13327,7 +13560,7 @@ impl<'a> DeploymentDevicePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDevicePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDevicePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13352,7 +13585,7 @@ impl<'a> DeploymentDevicePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDevicePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDevicePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13372,9 +13605,9 @@ impl<'a> DeploymentDevicePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDevicePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDevicePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13407,7 +13640,7 @@ impl<'a> DeploymentDevicePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13420,10 +13653,10 @@ impl<'a> DeploymentDevicePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceSignDeviceCall<'a>
-    where  {
+pub struct DeploymentDeviceSignDeviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalSignDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13431,9 +13664,15 @@ pub struct DeploymentDeviceSignDeviceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDeviceSignDeviceCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDeviceSignDeviceCall<'a, S> {}
 
-impl<'a> DeploymentDeviceSignDeviceCall<'a> {
+impl<'a, S> DeploymentDeviceSignDeviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13593,7 +13832,7 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> DeploymentDeviceSignDeviceCall<'a> {
+    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> DeploymentDeviceSignDeviceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13603,7 +13842,7 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceSignDeviceCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceSignDeviceCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13613,7 +13852,7 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceSignDeviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceSignDeviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13638,7 +13877,7 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceSignDeviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceSignDeviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13658,9 +13897,9 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceSignDeviceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDeviceSignDeviceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13693,7 +13932,7 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13706,10 +13945,10 @@ impl<'a> DeploymentDeviceSignDeviceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceUpdateSignedCall<'a>
-    where  {
+pub struct DeploymentDeviceUpdateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalUpdateSignedDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13717,9 +13956,15 @@ pub struct DeploymentDeviceUpdateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDeviceUpdateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDeviceUpdateSignedCall<'a, S> {}
 
-impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
+impl<'a, S> DeploymentDeviceUpdateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13879,7 +14124,7 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> DeploymentDeviceUpdateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> DeploymentDeviceUpdateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13889,7 +14134,7 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceUpdateSignedCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceUpdateSignedCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13899,7 +14144,7 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceUpdateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceUpdateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13924,7 +14169,7 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceUpdateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceUpdateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13944,9 +14189,9 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceUpdateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDeviceUpdateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13978,7 +14223,7 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13986,19 +14231,25 @@ impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentGetCall<'a>
-    where  {
+pub struct DeploymentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentGetCall<'a, S> {}
 
-impl<'a> DeploymentGetCall<'a> {
+impl<'a, S> DeploymentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14145,7 +14396,7 @@ impl<'a> DeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DeploymentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14155,7 +14406,7 @@ impl<'a> DeploymentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14180,7 +14431,7 @@ impl<'a> DeploymentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14200,9 +14451,9 @@ impl<'a> DeploymentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14235,7 +14486,7 @@ impl<'a> DeploymentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14248,19 +14499,25 @@ impl<'a> DeploymentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InstallerGenerateSecretCall<'a>
-    where  {
+pub struct InstallerGenerateSecretCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalGenerateSecretRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InstallerGenerateSecretCall<'a> {}
+impl<'a, S> client::CallBuilder for InstallerGenerateSecretCall<'a, S> {}
 
-impl<'a> InstallerGenerateSecretCall<'a> {
+impl<'a, S> InstallerGenerateSecretCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14394,7 +14651,7 @@ impl<'a> InstallerGenerateSecretCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a> {
+    pub fn request(mut self, new_value: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14404,7 +14661,7 @@ impl<'a> InstallerGenerateSecretCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerGenerateSecretCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerGenerateSecretCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14429,7 +14686,7 @@ impl<'a> InstallerGenerateSecretCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InstallerGenerateSecretCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InstallerGenerateSecretCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14449,9 +14706,9 @@ impl<'a> InstallerGenerateSecretCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InstallerGenerateSecretCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InstallerGenerateSecretCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14484,7 +14741,7 @@ impl<'a> InstallerGenerateSecretCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14497,19 +14754,25 @@ impl<'a> InstallerGenerateSecretCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InstallerValidateCall<'a>
-    where  {
+pub struct InstallerValidateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalValidateInstallerRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InstallerValidateCall<'a> {}
+impl<'a, S> client::CallBuilder for InstallerValidateCall<'a, S> {}
 
-impl<'a> InstallerValidateCall<'a> {
+impl<'a, S> InstallerValidateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14643,7 +14906,7 @@ impl<'a> InstallerValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14653,7 +14916,7 @@ impl<'a> InstallerValidateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerValidateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerValidateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14678,7 +14941,7 @@ impl<'a> InstallerValidateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InstallerValidateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InstallerValidateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14698,9 +14961,9 @@ impl<'a> InstallerValidateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InstallerValidateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InstallerValidateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14733,7 +14996,7 @@ impl<'a> InstallerValidateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14746,10 +15009,10 @@ impl<'a> InstallerValidateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeviceCreateCall<'a>
-    where  {
+pub struct NodeDeploymentDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14757,9 +15020,15 @@ pub struct NodeDeploymentDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentDeviceCreateCall<'a, S> {}
 
-impl<'a> NodeDeploymentDeviceCreateCall<'a> {
+impl<'a, S> NodeDeploymentDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14919,7 +15188,7 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeploymentDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeploymentDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14929,7 +15198,7 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -14939,7 +15208,7 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14964,7 +15233,7 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14984,9 +15253,9 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15019,7 +15288,7 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15032,10 +15301,10 @@ impl<'a> NodeDeploymentDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeviceCreateSignedCall<'a>
-    where  {
+pub struct NodeDeploymentDeviceCreateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15043,9 +15312,15 @@ pub struct NodeDeploymentDeviceCreateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentDeviceCreateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentDeviceCreateSignedCall<'a, S> {}
 
-impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
+impl<'a, S> NodeDeploymentDeviceCreateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15205,7 +15480,7 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeploymentDeviceCreateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeploymentDeviceCreateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15215,7 +15490,7 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateSignedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateSignedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -15225,7 +15500,7 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15250,7 +15525,7 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15270,9 +15545,9 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceCreateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentDeviceCreateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15304,7 +15579,7 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15315,10 +15590,10 @@ impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeviceListCall<'a>
-    where  {
+pub struct NodeDeploymentDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15328,9 +15603,15 @@ pub struct NodeDeploymentDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentDeviceListCall<'a, S> {}
 
-impl<'a> NodeDeploymentDeviceListCall<'a> {
+impl<'a, S> NodeDeploymentDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15486,28 +15767,28 @@ impl<'a> NodeDeploymentDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -15517,7 +15798,7 @@ impl<'a> NodeDeploymentDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15542,7 +15823,7 @@ impl<'a> NodeDeploymentDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15562,9 +15843,9 @@ impl<'a> NodeDeploymentDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15596,7 +15877,7 @@ impl<'a> NodeDeploymentDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15604,19 +15885,25 @@ impl<'a> NodeDeploymentDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeleteCall<'a>
-    where  {
+pub struct NodeDeploymentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentDeleteCall<'a, S> {}
 
-impl<'a> NodeDeploymentDeleteCall<'a> {
+impl<'a, S> NodeDeploymentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15763,7 +16050,7 @@ impl<'a> NodeDeploymentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15773,7 +16060,7 @@ impl<'a> NodeDeploymentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15798,7 +16085,7 @@ impl<'a> NodeDeploymentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15818,9 +16105,9 @@ impl<'a> NodeDeploymentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15852,7 +16139,7 @@ impl<'a> NodeDeploymentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15860,19 +16147,25 @@ impl<'a> NodeDeploymentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentGetCall<'a>
-    where  {
+pub struct NodeDeploymentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentGetCall<'a, S> {}
 
-impl<'a> NodeDeploymentGetCall<'a> {
+impl<'a, S> NodeDeploymentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16019,7 +16312,7 @@ impl<'a> NodeDeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16029,7 +16322,7 @@ impl<'a> NodeDeploymentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16054,7 +16347,7 @@ impl<'a> NodeDeploymentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16074,9 +16367,9 @@ impl<'a> NodeDeploymentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16108,7 +16401,7 @@ impl<'a> NodeDeploymentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16119,10 +16412,10 @@ impl<'a> NodeDeploymentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentListCall<'a>
-    where  {
+pub struct NodeDeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16132,9 +16425,15 @@ pub struct NodeDeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentListCall<'a, S> {}
 
-impl<'a> NodeDeploymentListCall<'a> {
+impl<'a, S> NodeDeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16290,28 +16589,28 @@ impl<'a> NodeDeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeDeploymentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeDeploymentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -16321,7 +16620,7 @@ impl<'a> NodeDeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16346,7 +16645,7 @@ impl<'a> NodeDeploymentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16366,9 +16665,9 @@ impl<'a> NodeDeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16401,7 +16700,7 @@ impl<'a> NodeDeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16414,10 +16713,10 @@ impl<'a> NodeDeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentMoveCall<'a>
-    where  {
+pub struct NodeDeploymentMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveDeploymentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16425,9 +16724,15 @@ pub struct NodeDeploymentMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentMoveCall<'a, S> {}
 
-impl<'a> NodeDeploymentMoveCall<'a> {
+impl<'a, S> NodeDeploymentMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16587,7 +16892,7 @@ impl<'a> NodeDeploymentMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> NodeDeploymentMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> NodeDeploymentMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16597,7 +16902,7 @@ impl<'a> NodeDeploymentMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16607,7 +16912,7 @@ impl<'a> NodeDeploymentMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16632,7 +16937,7 @@ impl<'a> NodeDeploymentMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16652,9 +16957,9 @@ impl<'a> NodeDeploymentMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16687,7 +16992,7 @@ impl<'a> NodeDeploymentMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16701,10 +17006,10 @@ impl<'a> NodeDeploymentMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentPatchCall<'a>
-    where  {
+pub struct NodeDeploymentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDeployment,
     _name: String,
     _update_mask: Option<String>,
@@ -16713,9 +17018,15 @@ pub struct NodeDeploymentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeploymentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeploymentPatchCall<'a, S> {}
 
-impl<'a> NodeDeploymentPatchCall<'a> {
+impl<'a, S> NodeDeploymentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16878,7 +17189,7 @@ impl<'a> NodeDeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeDeploymentPatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeDeploymentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16888,14 +17199,14 @@ impl<'a> NodeDeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -16905,7 +17216,7 @@ impl<'a> NodeDeploymentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16930,7 +17241,7 @@ impl<'a> NodeDeploymentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16950,9 +17261,9 @@ impl<'a> NodeDeploymentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeploymentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16985,7 +17296,7 @@ impl<'a> NodeDeploymentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16998,10 +17309,10 @@ impl<'a> NodeDeploymentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceCreateCall<'a>
-    where  {
+pub struct NodeDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17009,9 +17320,15 @@ pub struct NodeDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceCreateCall<'a, S> {}
 
-impl<'a> NodeDeviceCreateCall<'a> {
+impl<'a, S> NodeDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17171,7 +17488,7 @@ impl<'a> NodeDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17181,7 +17498,7 @@ impl<'a> NodeDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -17191,7 +17508,7 @@ impl<'a> NodeDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17216,7 +17533,7 @@ impl<'a> NodeDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17236,9 +17553,9 @@ impl<'a> NodeDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17271,7 +17588,7 @@ impl<'a> NodeDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17284,10 +17601,10 @@ impl<'a> NodeDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceCreateSignedCall<'a>
-    where  {
+pub struct NodeDeviceCreateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17295,9 +17612,15 @@ pub struct NodeDeviceCreateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceCreateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceCreateSignedCall<'a, S> {}
 
-impl<'a> NodeDeviceCreateSignedCall<'a> {
+impl<'a, S> NodeDeviceCreateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17457,7 +17780,7 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeviceCreateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeviceCreateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17467,7 +17790,7 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateSignedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateSignedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -17477,7 +17800,7 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17502,7 +17825,7 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17522,9 +17845,9 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceCreateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceCreateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17556,7 +17879,7 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17564,19 +17887,25 @@ impl<'a> NodeDeviceCreateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceDeleteCall<'a>
-    where  {
+pub struct NodeDeviceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceDeleteCall<'a, S> {}
 
-impl<'a> NodeDeviceDeleteCall<'a> {
+impl<'a, S> NodeDeviceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17723,7 +18052,7 @@ impl<'a> NodeDeviceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17733,7 +18062,7 @@ impl<'a> NodeDeviceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17758,7 +18087,7 @@ impl<'a> NodeDeviceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17778,9 +18107,9 @@ impl<'a> NodeDeviceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17812,7 +18141,7 @@ impl<'a> NodeDeviceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17820,19 +18149,25 @@ impl<'a> NodeDeviceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceGetCall<'a>
-    where  {
+pub struct NodeDeviceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceGetCall<'a, S> {}
 
-impl<'a> NodeDeviceGetCall<'a> {
+impl<'a, S> NodeDeviceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17979,7 +18314,7 @@ impl<'a> NodeDeviceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17989,7 +18324,7 @@ impl<'a> NodeDeviceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18014,7 +18349,7 @@ impl<'a> NodeDeviceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18034,9 +18369,9 @@ impl<'a> NodeDeviceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18068,7 +18403,7 @@ impl<'a> NodeDeviceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18079,10 +18414,10 @@ impl<'a> NodeDeviceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceListCall<'a>
-    where  {
+pub struct NodeDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18092,9 +18427,15 @@ pub struct NodeDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceListCall<'a, S> {}
 
-impl<'a> NodeDeviceListCall<'a> {
+impl<'a, S> NodeDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18250,28 +18591,28 @@ impl<'a> NodeDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -18281,7 +18622,7 @@ impl<'a> NodeDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18306,7 +18647,7 @@ impl<'a> NodeDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18326,9 +18667,9 @@ impl<'a> NodeDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18361,7 +18702,7 @@ impl<'a> NodeDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18374,10 +18715,10 @@ impl<'a> NodeDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceMoveCall<'a>
-    where  {
+pub struct NodeDeviceMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18385,9 +18726,15 @@ pub struct NodeDeviceMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceMoveCall<'a, S> {}
 
-impl<'a> NodeDeviceMoveCall<'a> {
+impl<'a, S> NodeDeviceMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18547,7 +18894,7 @@ impl<'a> NodeDeviceMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> NodeDeviceMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> NodeDeviceMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18557,7 +18904,7 @@ impl<'a> NodeDeviceMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18567,7 +18914,7 @@ impl<'a> NodeDeviceMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18592,7 +18939,7 @@ impl<'a> NodeDeviceMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18612,9 +18959,9 @@ impl<'a> NodeDeviceMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18647,7 +18994,7 @@ impl<'a> NodeDeviceMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18661,10 +19008,10 @@ impl<'a> NodeDeviceMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDevicePatchCall<'a>
-    where  {
+pub struct NodeDevicePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _name: String,
     _update_mask: Option<String>,
@@ -18673,9 +19020,15 @@ pub struct NodeDevicePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDevicePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDevicePatchCall<'a, S> {}
 
-impl<'a> NodeDevicePatchCall<'a> {
+impl<'a, S> NodeDevicePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18838,7 +19191,7 @@ impl<'a> NodeDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDevicePatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDevicePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18848,14 +19201,14 @@ impl<'a> NodeDevicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDevicePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDevicePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> NodeDevicePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> NodeDevicePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -18865,7 +19218,7 @@ impl<'a> NodeDevicePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDevicePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDevicePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18890,7 +19243,7 @@ impl<'a> NodeDevicePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDevicePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDevicePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18910,9 +19263,9 @@ impl<'a> NodeDevicePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDevicePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDevicePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18945,7 +19298,7 @@ impl<'a> NodeDevicePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18958,10 +19311,10 @@ impl<'a> NodeDevicePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceSignDeviceCall<'a>
-    where  {
+pub struct NodeDeviceSignDeviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalSignDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18969,9 +19322,15 @@ pub struct NodeDeviceSignDeviceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceSignDeviceCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceSignDeviceCall<'a, S> {}
 
-impl<'a> NodeDeviceSignDeviceCall<'a> {
+impl<'a, S> NodeDeviceSignDeviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19131,7 +19490,7 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> NodeDeviceSignDeviceCall<'a> {
+    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> NodeDeviceSignDeviceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19141,7 +19500,7 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceSignDeviceCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceSignDeviceCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19151,7 +19510,7 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceSignDeviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceSignDeviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19176,7 +19535,7 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceSignDeviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceSignDeviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19196,9 +19555,9 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceSignDeviceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceSignDeviceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19231,7 +19590,7 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19244,10 +19603,10 @@ impl<'a> NodeDeviceSignDeviceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceUpdateSignedCall<'a>
-    where  {
+pub struct NodeDeviceUpdateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalUpdateSignedDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19255,9 +19614,15 @@ pub struct NodeDeviceUpdateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeDeviceUpdateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeDeviceUpdateSignedCall<'a, S> {}
 
-impl<'a> NodeDeviceUpdateSignedCall<'a> {
+impl<'a, S> NodeDeviceUpdateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19417,7 +19782,7 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> NodeDeviceUpdateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> NodeDeviceUpdateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19427,7 +19792,7 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceUpdateSignedCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceUpdateSignedCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19437,7 +19802,7 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceUpdateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceUpdateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19462,7 +19827,7 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceUpdateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceUpdateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19482,9 +19847,9 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceUpdateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeDeviceUpdateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19517,7 +19882,7 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19530,10 +19895,10 @@ impl<'a> NodeDeviceUpdateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeploymentCreateCall<'a>
-    where  {
+pub struct NodeNodeDeploymentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDeployment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19541,9 +19906,15 @@ pub struct NodeNodeDeploymentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeDeploymentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeDeploymentCreateCall<'a, S> {}
 
-impl<'a> NodeNodeDeploymentCreateCall<'a> {
+impl<'a, S> NodeNodeDeploymentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19703,7 +20074,7 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeNodeDeploymentCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeNodeDeploymentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19713,7 +20084,7 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -19723,7 +20094,7 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19748,7 +20119,7 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19768,9 +20139,9 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeploymentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeDeploymentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19802,7 +20173,7 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19813,10 +20184,10 @@ impl<'a> NodeNodeDeploymentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeploymentListCall<'a>
-    where  {
+pub struct NodeNodeDeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -19826,9 +20197,15 @@ pub struct NodeNodeDeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeDeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeDeploymentListCall<'a, S> {}
 
-impl<'a> NodeNodeDeploymentListCall<'a> {
+impl<'a, S> NodeNodeDeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19984,28 +20361,28 @@ impl<'a> NodeNodeDeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeploymentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeploymentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -20015,7 +20392,7 @@ impl<'a> NodeNodeDeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20040,7 +20417,7 @@ impl<'a> NodeNodeDeploymentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20060,9 +20437,9 @@ impl<'a> NodeNodeDeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeDeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20095,7 +20472,7 @@ impl<'a> NodeNodeDeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20108,10 +20485,10 @@ impl<'a> NodeNodeDeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeviceCreateCall<'a>
-    where  {
+pub struct NodeNodeDeviceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20119,9 +20496,15 @@ pub struct NodeNodeDeviceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeDeviceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeDeviceCreateCall<'a, S> {}
 
-impl<'a> NodeNodeDeviceCreateCall<'a> {
+impl<'a, S> NodeNodeDeviceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20281,7 +20664,7 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeNodeDeviceCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeNodeDeviceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20291,7 +20674,7 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -20301,7 +20684,7 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20326,7 +20709,7 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20346,9 +20729,9 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeDeviceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20381,7 +20764,7 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20394,10 +20777,10 @@ impl<'a> NodeNodeDeviceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeviceCreateSignedCall<'a>
-    where  {
+pub struct NodeNodeDeviceCreateSignedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20405,9 +20788,15 @@ pub struct NodeNodeDeviceCreateSignedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeDeviceCreateSignedCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeDeviceCreateSignedCall<'a, S> {}
 
-impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
+impl<'a, S> NodeNodeDeviceCreateSignedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20567,7 +20956,7 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeNodeDeviceCreateSignedCall<'a> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeNodeDeviceCreateSignedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20577,7 +20966,7 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateSignedCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateSignedCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -20587,7 +20976,7 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateSignedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateSignedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20612,7 +21001,7 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateSignedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateSignedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20632,9 +21021,9 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceCreateSignedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeDeviceCreateSignedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20666,7 +21055,7 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20677,10 +21066,10 @@ impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeviceListCall<'a>
-    where  {
+pub struct NodeNodeDeviceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20690,9 +21079,15 @@ pub struct NodeNodeDeviceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeDeviceListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeDeviceListCall<'a, S> {}
 
-impl<'a> NodeNodeDeviceListCall<'a> {
+impl<'a, S> NodeNodeDeviceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20848,28 +21243,28 @@ impl<'a> NodeNodeDeviceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeviceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeviceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -20879,7 +21274,7 @@ impl<'a> NodeNodeDeviceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20904,7 +21299,7 @@ impl<'a> NodeNodeDeviceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20924,9 +21319,9 @@ impl<'a> NodeNodeDeviceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeDeviceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20959,7 +21354,7 @@ impl<'a> NodeNodeDeviceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20972,10 +21367,10 @@ impl<'a> NodeNodeDeviceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeNodeCreateCall<'a>
-    where  {
+pub struct NodeNodeNodeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20983,9 +21378,15 @@ pub struct NodeNodeNodeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeNodeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeNodeCreateCall<'a, S> {}
 
-impl<'a> NodeNodeNodeCreateCall<'a> {
+impl<'a, S> NodeNodeNodeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21145,7 +21546,7 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeNodeCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeNodeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21155,7 +21556,7 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21165,7 +21566,7 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21190,7 +21591,7 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21210,9 +21611,9 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeNodeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeNodeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21244,7 +21645,7 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21255,10 +21656,10 @@ impl<'a> NodeNodeNodeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeNodeListCall<'a>
-    where  {
+pub struct NodeNodeNodeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -21268,9 +21669,15 @@ pub struct NodeNodeNodeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeNodeListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeNodeListCall<'a, S> {}
 
-impl<'a> NodeNodeNodeListCall<'a> {
+impl<'a, S> NodeNodeNodeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21426,28 +21833,28 @@ impl<'a> NodeNodeNodeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeNodeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeNodeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeNodeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeNodeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeNodeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeNodeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -21457,7 +21864,7 @@ impl<'a> NodeNodeNodeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21482,7 +21889,7 @@ impl<'a> NodeNodeNodeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21502,9 +21909,9 @@ impl<'a> NodeNodeNodeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeNodeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeNodeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21537,7 +21944,7 @@ impl<'a> NodeNodeNodeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21550,10 +21957,10 @@ impl<'a> NodeNodeNodeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeCreateCall<'a>
-    where  {
+pub struct NodeNodeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21561,9 +21968,15 @@ pub struct NodeNodeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeCreateCall<'a, S> {}
 
-impl<'a> NodeNodeCreateCall<'a> {
+impl<'a, S> NodeNodeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21723,7 +22136,7 @@ impl<'a> NodeNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeCreateCall<'a> {
+    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21733,7 +22146,7 @@ impl<'a> NodeNodeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21743,7 +22156,7 @@ impl<'a> NodeNodeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21768,7 +22181,7 @@ impl<'a> NodeNodeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21788,9 +22201,9 @@ impl<'a> NodeNodeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21822,7 +22235,7 @@ impl<'a> NodeNodeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21830,19 +22243,25 @@ impl<'a> NodeNodeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeleteCall<'a>
-    where  {
+pub struct NodeNodeDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeDeleteCall<'a, S> {}
 
-impl<'a> NodeNodeDeleteCall<'a> {
+impl<'a, S> NodeNodeDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21989,7 +22408,7 @@ impl<'a> NodeNodeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodeDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeNodeDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -21999,7 +22418,7 @@ impl<'a> NodeNodeDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22024,7 +22443,7 @@ impl<'a> NodeNodeDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22044,9 +22463,9 @@ impl<'a> NodeNodeDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22078,7 +22497,7 @@ impl<'a> NodeNodeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22086,19 +22505,25 @@ impl<'a> NodeNodeDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeGetCall<'a>
-    where  {
+pub struct NodeNodeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeGetCall<'a, S> {}
 
-impl<'a> NodeNodeGetCall<'a> {
+impl<'a, S> NodeNodeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22245,7 +22670,7 @@ impl<'a> NodeNodeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeNodeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22255,7 +22680,7 @@ impl<'a> NodeNodeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22280,7 +22705,7 @@ impl<'a> NodeNodeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22300,9 +22725,9 @@ impl<'a> NodeNodeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22334,7 +22759,7 @@ impl<'a> NodeNodeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22345,10 +22770,10 @@ impl<'a> NodeNodeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeListCall<'a>
-    where  {
+pub struct NodeNodeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -22358,9 +22783,15 @@ pub struct NodeNodeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeListCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeListCall<'a, S> {}
 
-impl<'a> NodeNodeListCall<'a> {
+impl<'a, S> NodeNodeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22516,28 +22947,28 @@ impl<'a> NodeNodeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -22547,7 +22978,7 @@ impl<'a> NodeNodeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22572,7 +23003,7 @@ impl<'a> NodeNodeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22592,9 +23023,9 @@ impl<'a> NodeNodeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22627,7 +23058,7 @@ impl<'a> NodeNodeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22640,10 +23071,10 @@ impl<'a> NodeNodeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeMoveCall<'a>
-    where  {
+pub struct NodeNodeMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalMoveNodeRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22651,9 +23082,15 @@ pub struct NodeNodeMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodeMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodeMoveCall<'a, S> {}
 
-impl<'a> NodeNodeMoveCall<'a> {
+impl<'a, S> NodeNodeMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22813,7 +23250,7 @@ impl<'a> NodeNodeMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> NodeNodeMoveCall<'a> {
+    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> NodeNodeMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22823,7 +23260,7 @@ impl<'a> NodeNodeMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodeMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeNodeMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22833,7 +23270,7 @@ impl<'a> NodeNodeMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22858,7 +23295,7 @@ impl<'a> NodeNodeMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22878,9 +23315,9 @@ impl<'a> NodeNodeMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodeMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22913,7 +23350,7 @@ impl<'a> NodeNodeMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22927,10 +23364,10 @@ impl<'a> NodeNodeMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodePatchCall<'a>
-    where  {
+pub struct NodeNodePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalNode,
     _name: String,
     _update_mask: Option<String>,
@@ -22939,9 +23376,15 @@ pub struct NodeNodePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeNodePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeNodePatchCall<'a, S> {}
 
-impl<'a> NodeNodePatchCall<'a> {
+impl<'a, S> NodeNodePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23104,7 +23547,7 @@ impl<'a> NodeNodePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodePatchCall<'a> {
+    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23114,14 +23557,14 @@ impl<'a> NodeNodePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeNodePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> NodeNodePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> NodeNodePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -23131,7 +23574,7 @@ impl<'a> NodeNodePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23156,7 +23599,7 @@ impl<'a> NodeNodePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23176,9 +23619,9 @@ impl<'a> NodeNodePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeNodePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23210,7 +23653,7 @@ impl<'a> NodeNodePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23218,19 +23661,25 @@ impl<'a> NodeNodePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeGetCall<'a>
-    where  {
+pub struct NodeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NodeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NodeGetCall<'a, S> {}
 
-impl<'a> NodeGetCall<'a> {
+impl<'a, S> NodeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23377,7 +23826,7 @@ impl<'a> NodeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> NodeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -23387,7 +23836,7 @@ impl<'a> NodeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23412,7 +23861,7 @@ impl<'a> NodeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23432,9 +23881,9 @@ impl<'a> NodeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NodeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23467,7 +23916,7 @@ impl<'a> NodeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23480,19 +23929,25 @@ impl<'a> NodeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicyGetCall<'a>
-    where  {
+pub struct PolicyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalGetPolicyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PolicyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PolicyGetCall<'a, S> {}
 
-impl<'a> PolicyGetCall<'a> {
+impl<'a, S> PolicyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23626,7 +24081,7 @@ impl<'a> PolicyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalGetPolicyRequest) -> PolicyGetCall<'a> {
+    pub fn request(mut self, new_value: SasPortalGetPolicyRequest) -> PolicyGetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23636,7 +24091,7 @@ impl<'a> PolicyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23661,7 +24116,7 @@ impl<'a> PolicyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PolicyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23681,9 +24136,9 @@ impl<'a> PolicyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PolicyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23716,7 +24171,7 @@ impl<'a> PolicyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23729,19 +24184,25 @@ impl<'a> PolicyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicySetCall<'a>
-    where  {
+pub struct PolicySetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalSetPolicyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PolicySetCall<'a> {}
+impl<'a, S> client::CallBuilder for PolicySetCall<'a, S> {}
 
-impl<'a> PolicySetCall<'a> {
+impl<'a, S> PolicySetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23875,7 +24336,7 @@ impl<'a> PolicySetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSetPolicyRequest) -> PolicySetCall<'a> {
+    pub fn request(mut self, new_value: SasPortalSetPolicyRequest) -> PolicySetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23885,7 +24346,7 @@ impl<'a> PolicySetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicySetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicySetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23910,7 +24371,7 @@ impl<'a> PolicySetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicySetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PolicySetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23930,9 +24391,9 @@ impl<'a> PolicySetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicySetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PolicySetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23965,7 +24426,7 @@ impl<'a> PolicySetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SASPortalTesting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23978,19 +24439,25 @@ impl<'a> PolicySetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicyTestCall<'a>
-    where  {
+pub struct PolicyTestCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SASPortalTesting<>,
+    hub: &'a SASPortalTesting<S>,
     _request: SasPortalTestPermissionsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PolicyTestCall<'a> {}
+impl<'a, S> client::CallBuilder for PolicyTestCall<'a, S> {}
 
-impl<'a> PolicyTestCall<'a> {
+impl<'a, S> PolicyTestCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24124,7 +24591,7 @@ impl<'a> PolicyTestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a> {
+    pub fn request(mut self, new_value: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24134,7 +24601,7 @@ impl<'a> PolicyTestCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyTestCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyTestCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24159,7 +24626,7 @@ impl<'a> PolicyTestCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyTestCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PolicyTestCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24179,9 +24646,9 @@ impl<'a> PolicyTestCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyTestCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PolicyTestCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

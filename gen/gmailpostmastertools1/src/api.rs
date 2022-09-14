@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -105,34 +110,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PostmasterTools<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PostmasterTools<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PostmasterTools<> {}
+impl<'a, S> client::Hub for PostmasterTools<S> {}
 
-impl<'a, > PostmasterTools<> {
+impl<'a, S> PostmasterTools<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PostmasterTools<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PostmasterTools<S> {
         PostmasterTools {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://gmailpostmastertools.googleapis.com/".to_string(),
             _root_url: "https://gmailpostmastertools.googleapis.com/".to_string(),
         }
     }
 
-    pub fn domains(&'a self) -> DomainMethods<'a> {
+    pub fn domains(&'a self) -> DomainMethods<'a, S> {
         DomainMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -359,22 +364,22 @@ impl client::ResponseResult for TrafficStats {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `list(...)`, `traffic_stats_get(...)` and `traffic_stats_list(...)`
 /// // to build up your call.
 /// let rb = hub.domains();
 /// # }
 /// ```
-pub struct DomainMethods<'a>
-    where  {
+pub struct DomainMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PostmasterTools<>,
+    hub: &'a PostmasterTools<S>,
 }
 
-impl<'a> client::MethodsBuilder for DomainMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DomainMethods<'a, S> {}
 
-impl<'a> DomainMethods<'a> {
+impl<'a, S> DomainMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -383,7 +388,7 @@ impl<'a> DomainMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the traffic statistics to get. E.g., domains/mymail.mydomain.com/trafficStats/20160807.
-    pub fn traffic_stats_get(&self, name: &str) -> DomainTrafficStatGetCall<'a> {
+    pub fn traffic_stats_get(&self, name: &str) -> DomainTrafficStatGetCall<'a, S> {
         DomainTrafficStatGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -400,7 +405,7 @@ impl<'a> DomainMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the domain whose traffic statistics we'd like to list. It should have the form `domains/{domain_name}`, where domain_name is the fully qualified domain name.
-    pub fn traffic_stats_list(&self, parent: &str) -> DomainTrafficStatListCall<'a> {
+    pub fn traffic_stats_list(&self, parent: &str) -> DomainTrafficStatListCall<'a, S> {
         DomainTrafficStatListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -425,7 +430,7 @@ impl<'a> DomainMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the domain. It should have the form `domains/{domain_name}`, where domain_name is the fully qualified domain name.
-    pub fn get(&self, name: &str) -> DomainGetCall<'a> {
+    pub fn get(&self, name: &str) -> DomainGetCall<'a, S> {
         DomainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -438,7 +443,7 @@ impl<'a> DomainMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the domains that have been registered by the client. The order of domains in the response is unspecified and non-deterministic. Newly created domains will not necessarily be added to the end of this list.
-    pub fn list(&self) -> DomainListCall<'a> {
+    pub fn list(&self) -> DomainListCall<'a, S> {
         DomainListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -480,7 +485,7 @@ impl<'a> DomainMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -488,19 +493,25 @@ impl<'a> DomainMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DomainTrafficStatGetCall<'a>
-    where  {
+pub struct DomainTrafficStatGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PostmasterTools<>,
+    hub: &'a PostmasterTools<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DomainTrafficStatGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DomainTrafficStatGetCall<'a, S> {}
 
-impl<'a> DomainTrafficStatGetCall<'a> {
+impl<'a, S> DomainTrafficStatGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -647,7 +658,7 @@ impl<'a> DomainTrafficStatGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DomainTrafficStatGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DomainTrafficStatGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -657,7 +668,7 @@ impl<'a> DomainTrafficStatGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainTrafficStatGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainTrafficStatGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -682,7 +693,7 @@ impl<'a> DomainTrafficStatGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DomainTrafficStatGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DomainTrafficStatGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -702,9 +713,9 @@ impl<'a> DomainTrafficStatGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DomainTrafficStatGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DomainTrafficStatGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -736,7 +747,7 @@ impl<'a> DomainTrafficStatGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -752,10 +763,10 @@ impl<'a> DomainTrafficStatGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DomainTrafficStatListCall<'a>
-    where  {
+pub struct DomainTrafficStatListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PostmasterTools<>,
+    hub: &'a PostmasterTools<S>,
     _parent: String,
     _start_date_year: Option<i32>,
     _start_date_month: Option<i32>,
@@ -770,9 +781,15 @@ pub struct DomainTrafficStatListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DomainTrafficStatListCall<'a> {}
+impl<'a, S> client::CallBuilder for DomainTrafficStatListCall<'a, S> {}
 
-impl<'a> DomainTrafficStatListCall<'a> {
+impl<'a, S> DomainTrafficStatListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -943,63 +960,63 @@ impl<'a> DomainTrafficStatListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DomainTrafficStatListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> DomainTrafficStatListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
     ///
     /// Sets the *start date.year* query property to the given value.
-    pub fn start_date_year(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn start_date_year(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._start_date_year = Some(new_value);
         self
     }
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
     ///
     /// Sets the *start date.month* query property to the given value.
-    pub fn start_date_month(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn start_date_month(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._start_date_month = Some(new_value);
         self
     }
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
     ///
     /// Sets the *start date.day* query property to the given value.
-    pub fn start_date_day(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn start_date_day(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._start_date_day = Some(new_value);
         self
     }
     /// The next_page_token value returned from a previous List request, if any. This is the value of ListTrafficStatsResponse.next_page_token returned from the previous call to `ListTrafficStats` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DomainTrafficStatListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DomainTrafficStatListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer TrafficStats than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
     ///
     /// Sets the *end date.year* query property to the given value.
-    pub fn end_date_year(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn end_date_year(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._end_date_year = Some(new_value);
         self
     }
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
     ///
     /// Sets the *end date.month* query property to the given value.
-    pub fn end_date_month(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn end_date_month(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._end_date_month = Some(new_value);
         self
     }
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
     ///
     /// Sets the *end date.day* query property to the given value.
-    pub fn end_date_day(mut self, new_value: i32) -> DomainTrafficStatListCall<'a> {
+    pub fn end_date_day(mut self, new_value: i32) -> DomainTrafficStatListCall<'a, S> {
         self._end_date_day = Some(new_value);
         self
     }
@@ -1009,7 +1026,7 @@ impl<'a> DomainTrafficStatListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainTrafficStatListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainTrafficStatListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1034,7 +1051,7 @@ impl<'a> DomainTrafficStatListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DomainTrafficStatListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DomainTrafficStatListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1054,9 +1071,9 @@ impl<'a> DomainTrafficStatListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DomainTrafficStatListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DomainTrafficStatListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1088,7 +1105,7 @@ impl<'a> DomainTrafficStatListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1096,19 +1113,25 @@ impl<'a> DomainTrafficStatListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DomainGetCall<'a>
-    where  {
+pub struct DomainGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PostmasterTools<>,
+    hub: &'a PostmasterTools<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DomainGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DomainGetCall<'a, S> {}
 
-impl<'a> DomainGetCall<'a> {
+impl<'a, S> DomainGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1255,7 +1278,7 @@ impl<'a> DomainGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DomainGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> DomainGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1265,7 +1288,7 @@ impl<'a> DomainGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1290,7 +1313,7 @@ impl<'a> DomainGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DomainGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DomainGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1310,9 +1333,9 @@ impl<'a> DomainGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DomainGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DomainGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1344,7 +1367,7 @@ impl<'a> DomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PostmasterTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1354,10 +1377,10 @@ impl<'a> DomainGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DomainListCall<'a>
-    where  {
+pub struct DomainListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PostmasterTools<>,
+    hub: &'a PostmasterTools<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1365,9 +1388,15 @@ pub struct DomainListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DomainListCall<'a> {}
+impl<'a, S> client::CallBuilder for DomainListCall<'a, S> {}
 
-impl<'a> DomainListCall<'a> {
+impl<'a, S> DomainListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1491,14 +1520,14 @@ impl<'a> DomainListCall<'a> {
     /// The next_page_token value returned from a previous List request, if any. This is the value of ListDomainsResponse.next_page_token returned from the previous call to `ListDomains` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DomainListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DomainListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer domains than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DomainListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> DomainListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1508,7 +1537,7 @@ impl<'a> DomainListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1533,7 +1562,7 @@ impl<'a> DomainListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DomainListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DomainListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1553,9 +1582,9 @@ impl<'a> DomainListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DomainListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DomainListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

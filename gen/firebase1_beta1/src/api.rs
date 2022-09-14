@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -83,7 +88,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -115,40 +120,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct FirebaseManagement<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct FirebaseManagement<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for FirebaseManagement<> {}
+impl<'a, S> client::Hub for FirebaseManagement<S> {}
 
-impl<'a, > FirebaseManagement<> {
+impl<'a, S> FirebaseManagement<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseManagement<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> FirebaseManagement<S> {
         FirebaseManagement {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://firebase.googleapis.com/".to_string(),
             _root_url: "https://firebase.googleapis.com/".to_string(),
         }
     }
 
-    pub fn available_projects(&'a self) -> AvailableProjectMethods<'a> {
+    pub fn available_projects(&'a self) -> AvailableProjectMethods<'a, S> {
         AvailableProjectMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -947,27 +952,27 @@ impl client::ResponseResult for WebAppConfig {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.available_projects();
 /// # }
 /// ```
-pub struct AvailableProjectMethods<'a>
-    where  {
+pub struct AvailableProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for AvailableProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AvailableProjectMethods<'a, S> {}
 
-impl<'a> AvailableProjectMethods<'a> {
+impl<'a, S> AvailableProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists each [Google Cloud Platform (GCP) `Project`] (https://cloud.google.com/resource-manager/reference/rest/v1/projects) that can have Firebase resources added to it. A Project will only be listed if: - The caller has sufficient [Google IAM](https://cloud.google.com/iam) permissions to call AddFirebase. - The Project is not already a FirebaseProject. - The Project is not in an Organization which has policies that prevent Firebase resources from being added. 
-    pub fn list(&self) -> AvailableProjectListCall<'a> {
+    pub fn list(&self) -> AvailableProjectListCall<'a, S> {
         AvailableProjectListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1002,22 +1007,22 @@ impl<'a> AvailableProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1026,7 +1031,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1060,22 +1065,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_firebase(...)`, `add_google_analytics(...)`, `android_apps_create(...)`, `android_apps_get(...)`, `android_apps_get_config(...)`, `android_apps_list(...)`, `android_apps_patch(...)`, `android_apps_sha_create(...)`, `android_apps_sha_delete(...)`, `android_apps_sha_list(...)`, `available_locations_list(...)`, `default_location_finalize(...)`, `get(...)`, `get_admin_sdk_config(...)`, `get_analytics_details(...)`, `ios_apps_create(...)`, `ios_apps_get(...)`, `ios_apps_get_config(...)`, `ios_apps_list(...)`, `ios_apps_patch(...)`, `list(...)`, `patch(...)`, `remove_analytics(...)`, `search_apps(...)`, `web_apps_create(...)`, `web_apps_get(...)`, `web_apps_get_config(...)`, `web_apps_list(...)` and `web_apps_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1085,7 +1090,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the parent AndroidApp to which to add a ShaCertificate, in the format: projects/PROJECT_IDENTIFIER/androidApps/ APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn android_apps_sha_create(&self, request: ShaCertificate, parent: &str) -> ProjectAndroidAppShaCreateCall<'a> {
+    pub fn android_apps_sha_create(&self, request: ShaCertificate, parent: &str) -> ProjectAndroidAppShaCreateCall<'a, S> {
         ProjectAndroidAppShaCreateCall {
             hub: self.hub,
             _request: request,
@@ -1103,7 +1108,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the ShaCertificate to remove from the parent AndroidApp, in the format: projects/PROJECT_IDENTIFIER/androidApps/APP_ID /sha/SHA_HASH Refer to the `ShaCertificate` [`name`](../projects.androidApps.sha#ShaCertificate.FIELDS.name) field for details about PROJECT_IDENTIFIER, APP_ID, and SHA_HASH values. You can obtain the full resource name of the `ShaCertificate` from the response of [`ListShaCertificates`](../projects.androidApps.sha/list) or the original [`CreateShaCertificate`](../projects.androidApps.sha/create).
-    pub fn android_apps_sha_delete(&self, name: &str) -> ProjectAndroidAppShaDeleteCall<'a> {
+    pub fn android_apps_sha_delete(&self, name: &str) -> ProjectAndroidAppShaDeleteCall<'a, S> {
         ProjectAndroidAppShaDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1120,7 +1125,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the parent AndroidApp for which to list each associated ShaCertificate, in the format: projects/PROJECT_IDENTIFIER /androidApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn android_apps_sha_list(&self, parent: &str) -> ProjectAndroidAppShaListCall<'a> {
+    pub fn android_apps_sha_list(&self, parent: &str) -> ProjectAndroidAppShaListCall<'a, S> {
         ProjectAndroidAppShaListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1138,7 +1143,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the parent FirebaseProject in which to create an AndroidApp, in the format: projects/PROJECT_IDENTIFIER/androidApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn android_apps_create(&self, request: AndroidApp, parent: &str) -> ProjectAndroidAppCreateCall<'a> {
+    pub fn android_apps_create(&self, request: AndroidApp, parent: &str) -> ProjectAndroidAppCreateCall<'a, S> {
         ProjectAndroidAppCreateCall {
             hub: self.hub,
             _request: request,
@@ -1156,7 +1161,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the AndroidApp, in the format: projects/ PROJECT_IDENTIFIER/androidApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn android_apps_get(&self, name: &str) -> ProjectAndroidAppGetCall<'a> {
+    pub fn android_apps_get(&self, name: &str) -> ProjectAndroidAppGetCall<'a, S> {
         ProjectAndroidAppGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1173,7 +1178,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the AndroidApp configuration to download, in the format: projects/PROJECT_IDENTIFIER/androidApps/APP_ID/config Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/androidApps/APP_ID Refer to the `AndroidApp` [`name`](../projects.androidApps#AndroidApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn android_apps_get_config(&self, name: &str) -> ProjectAndroidAppGetConfigCall<'a> {
+    pub fn android_apps_get_config(&self, name: &str) -> ProjectAndroidAppGetConfigCall<'a, S> {
         ProjectAndroidAppGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1190,7 +1195,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the parent FirebaseProject for which to list each associated AndroidApp, in the format: projects/PROJECT_IDENTIFIER /androidApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn android_apps_list(&self, parent: &str) -> ProjectAndroidAppListCall<'a> {
+    pub fn android_apps_list(&self, parent: &str) -> ProjectAndroidAppListCall<'a, S> {
         ProjectAndroidAppListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1210,7 +1215,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the AndroidApp, in the format: projects/ PROJECT_IDENTIFIER/androidApps/APP_ID * PROJECT_IDENTIFIER: the parent Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](../projects.androidApps#AndroidApp.FIELDS.app_id)).
-    pub fn android_apps_patch(&self, request: AndroidApp, name: &str) -> ProjectAndroidAppPatchCall<'a> {
+    pub fn android_apps_patch(&self, request: AndroidApp, name: &str) -> ProjectAndroidAppPatchCall<'a, S> {
         ProjectAndroidAppPatchCall {
             hub: self.hub,
             _request: request,
@@ -1229,7 +1234,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The FirebaseProject for which to list GCP resource locations, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values. If no unique project identifier is specified (that is, `projects/-`), the returned list does not take into account org-specific or project-specific location restrictions.
-    pub fn available_locations_list(&self, parent: &str) -> ProjectAvailableLocationListCall<'a> {
+    pub fn available_locations_list(&self, parent: &str) -> ProjectAvailableLocationListCall<'a, S> {
         ProjectAvailableLocationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1249,7 +1254,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the FirebaseProject for which the default GCP resource location will be set, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn default_location_finalize(&self, request: FinalizeDefaultLocationRequest, parent: &str) -> ProjectDefaultLocationFinalizeCall<'a> {
+    pub fn default_location_finalize(&self, request: FinalizeDefaultLocationRequest, parent: &str) -> ProjectDefaultLocationFinalizeCall<'a, S> {
         ProjectDefaultLocationFinalizeCall {
             hub: self.hub,
             _request: request,
@@ -1268,7 +1273,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the parent FirebaseProject in which to create an IosApp, in the format: projects/PROJECT_IDENTIFIER/iosApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn ios_apps_create(&self, request: IosApp, parent: &str) -> ProjectIosAppCreateCall<'a> {
+    pub fn ios_apps_create(&self, request: IosApp, parent: &str) -> ProjectIosAppCreateCall<'a, S> {
         ProjectIosAppCreateCall {
             hub: self.hub,
             _request: request,
@@ -1286,7 +1291,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the IosApp, in the format: projects/PROJECT_IDENTIFIER /iosApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/iosApps/APP_ID Refer to the `IosApp` [`name`](../projects.iosApps#IosApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn ios_apps_get(&self, name: &str) -> ProjectIosAppGetCall<'a> {
+    pub fn ios_apps_get(&self, name: &str) -> ProjectIosAppGetCall<'a, S> {
         ProjectIosAppGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1303,7 +1308,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the App configuration to download, in the format: projects/PROJECT_IDENTIFIER/iosApps/APP_ID/config Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/iosApps/APP_ID Refer to the `IosApp` [`name`](../projects.iosApps#IosApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn ios_apps_get_config(&self, name: &str) -> ProjectIosAppGetConfigCall<'a> {
+    pub fn ios_apps_get_config(&self, name: &str) -> ProjectIosAppGetConfigCall<'a, S> {
         ProjectIosAppGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1320,7 +1325,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the parent FirebaseProject for which to list each associated IosApp, in the format: projects/PROJECT_IDENTIFIER/iosApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn ios_apps_list(&self, parent: &str) -> ProjectIosAppListCall<'a> {
+    pub fn ios_apps_list(&self, parent: &str) -> ProjectIosAppListCall<'a, S> {
         ProjectIosAppListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1340,7 +1345,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the IosApp, in the format: projects/PROJECT_IDENTIFIER /iosApps/APP_ID * PROJECT_IDENTIFIER: the parent Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](../projects.iosApps#IosApp.FIELDS.app_id)).
-    pub fn ios_apps_patch(&self, request: IosApp, name: &str) -> ProjectIosAppPatchCall<'a> {
+    pub fn ios_apps_patch(&self, request: IosApp, name: &str) -> ProjectIosAppPatchCall<'a, S> {
         ProjectIosAppPatchCall {
             hub: self.hub,
             _request: request,
@@ -1360,7 +1365,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the parent FirebaseProject in which to create a WebApp, in the format: projects/PROJECT_IDENTIFIER/webApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn web_apps_create(&self, request: WebApp, parent: &str) -> ProjectWebAppCreateCall<'a> {
+    pub fn web_apps_create(&self, request: WebApp, parent: &str) -> ProjectWebAppCreateCall<'a, S> {
         ProjectWebAppCreateCall {
             hub: self.hub,
             _request: request,
@@ -1378,7 +1383,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the WebApp, in the format: projects/PROJECT_IDENTIFIER /webApps/APP_ID Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/webApps/APP_ID Refer to the `WebApp` [`name`](../projects.webApps#WebApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn web_apps_get(&self, name: &str) -> ProjectWebAppGetCall<'a> {
+    pub fn web_apps_get(&self, name: &str) -> ProjectWebAppGetCall<'a, S> {
         ProjectWebAppGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1395,7 +1400,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the WebApp configuration to download, in the format: projects/PROJECT_IDENTIFIER/webApps/APP_ID/config Since an APP_ID is a unique identifier, the Unique Resource from Sub-Collection access pattern may be used here, in the format: projects/-/webApps/APP_ID Refer to the `WebApp` [`name`](../projects.webApps#WebApp.FIELDS.name) field for details about PROJECT_IDENTIFIER and APP_ID values.
-    pub fn web_apps_get_config(&self, name: &str) -> ProjectWebAppGetConfigCall<'a> {
+    pub fn web_apps_get_config(&self, name: &str) -> ProjectWebAppGetConfigCall<'a, S> {
         ProjectWebAppGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1412,7 +1417,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the parent FirebaseProject for which to list each associated WebApp, in the format: projects/PROJECT_IDENTIFIER/webApps Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn web_apps_list(&self, parent: &str) -> ProjectWebAppListCall<'a> {
+    pub fn web_apps_list(&self, parent: &str) -> ProjectWebAppListCall<'a, S> {
         ProjectWebAppListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1432,7 +1437,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the WebApp, in the format: projects/PROJECT_IDENTIFIER /webApps/APP_ID * PROJECT_IDENTIFIER: the parent Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`. * APP_ID: the globally unique, Firebase-assigned identifier for the App (see [`appId`](../projects.webApps#WebApp.FIELDS.app_id)).
-    pub fn web_apps_patch(&self, request: WebApp, name: &str) -> ProjectWebAppPatchCall<'a> {
+    pub fn web_apps_patch(&self, request: WebApp, name: &str) -> ProjectWebAppPatchCall<'a, S> {
         ProjectWebAppPatchCall {
             hub: self.hub,
             _request: request,
@@ -1452,7 +1457,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The resource name of the GCP `Project` to which Firebase resources will be added, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values. After calling `AddFirebase`, the unique Project identifiers ( [`projectNumber`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_number) and [`projectId`](https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project.FIELDS.project_id)) of the underlying GCP `Project` are also the identifiers of the FirebaseProject.
-    pub fn add_firebase(&self, request: AddFirebaseRequest, project: &str) -> ProjectAddFirebaseCall<'a> {
+    pub fn add_firebase(&self, request: AddFirebaseRequest, project: &str) -> ProjectAddFirebaseCall<'a, S> {
         ProjectAddFirebaseCall {
             hub: self.hub,
             _request: request,
@@ -1471,7 +1476,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the FirebaseProject to link to an existing Google Analytics account, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn add_google_analytics(&self, request: AddGoogleAnalyticsRequest, parent: &str) -> ProjectAddGoogleAnalyticCall<'a> {
+    pub fn add_google_analytics(&self, request: AddGoogleAnalyticsRequest, parent: &str) -> ProjectAddGoogleAnalyticCall<'a, S> {
         ProjectAddGoogleAnalyticCall {
             hub: self.hub,
             _request: request,
@@ -1489,7 +1494,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the FirebaseProject, in the format: projects/ PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn get(&self, name: &str) -> ProjectGetCall<'a> {
+    pub fn get(&self, name: &str) -> ProjectGetCall<'a, S> {
         ProjectGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1506,7 +1511,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the FirebaseProject, in the format: projects/ PROJECT_IDENTIFIER/adminSdkConfig Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn get_admin_sdk_config(&self, name: &str) -> ProjectGetAdminSdkConfigCall<'a> {
+    pub fn get_admin_sdk_config(&self, name: &str) -> ProjectGetAdminSdkConfigCall<'a, S> {
         ProjectGetAdminSdkConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1523,7 +1528,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the FirebaseProject, in the format: projects/ PROJECT_IDENTIFIER/analyticsDetails Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn get_analytics_details(&self, name: &str) -> ProjectGetAnalyticsDetailCall<'a> {
+    pub fn get_analytics_details(&self, name: &str) -> ProjectGetAnalyticsDetailCall<'a, S> {
         ProjectGetAnalyticsDetailCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1536,7 +1541,7 @@ impl<'a> ProjectMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists each FirebaseProject accessible to the caller. The elements are returned in no particular order, but they will be a consistent view of the Projects when additional requests are made with a `pageToken`. This method is eventually consistent with Project mutations, which means newly provisioned Projects and recent modifications to existing Projects might not be reflected in the set of Projects. The list will include only ACTIVE Projects. Use GetFirebaseProject for consistent reads as well as for additional Project details.
-    pub fn list(&self) -> ProjectListCall<'a> {
+    pub fn list(&self) -> ProjectListCall<'a, S> {
         ProjectListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1555,7 +1560,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the Project, in the format: projects/PROJECT_IDENTIFIER PROJECT_IDENTIFIER: the Project's [`ProjectNumber`](../projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](../projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510). Note that the value for PROJECT_IDENTIFIER in any response body will be the `ProjectId`.
-    pub fn patch(&self, request: FirebaseProject, name: &str) -> ProjectPatchCall<'a> {
+    pub fn patch(&self, request: FirebaseProject, name: &str) -> ProjectPatchCall<'a, S> {
         ProjectPatchCall {
             hub: self.hub,
             _request: request,
@@ -1575,7 +1580,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the FirebaseProject to unlink from its Google Analytics account, in the format: projects/PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn remove_analytics(&self, request: RemoveAnalyticsRequest, parent: &str) -> ProjectRemoveAnalyticCall<'a> {
+    pub fn remove_analytics(&self, request: RemoveAnalyticsRequest, parent: &str) -> ProjectRemoveAnalyticCall<'a, S> {
         ProjectRemoveAnalyticCall {
             hub: self.hub,
             _request: request,
@@ -1593,7 +1598,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The parent FirebaseProject for which to list Apps, in the format: projects/ PROJECT_IDENTIFIER Refer to the `FirebaseProject` [`name`](../projects#FirebaseProject.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn search_apps(&self, parent: &str) -> ProjectSearchAppCall<'a> {
+    pub fn search_apps(&self, parent: &str) -> ProjectSearchAppCall<'a, S> {
         ProjectSearchAppCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1637,7 +1642,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1647,10 +1652,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AvailableProjectListCall<'a>
-    where  {
+pub struct AvailableProjectListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1658,9 +1663,15 @@ pub struct AvailableProjectListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AvailableProjectListCall<'a> {}
+impl<'a, S> client::CallBuilder for AvailableProjectListCall<'a, S> {}
 
-impl<'a> AvailableProjectListCall<'a> {
+impl<'a, S> AvailableProjectListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1784,14 +1795,14 @@ impl<'a> AvailableProjectListCall<'a> {
     /// Token returned from a previous call to `ListAvailableProjects` indicating where in the set of Projects to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AvailableProjectListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AvailableProjectListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Projects to return in the response. The server may return fewer than this value at its discretion. If no value is specified (or too large a value is specified), the server will impose its own limit. This value cannot be negative.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AvailableProjectListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AvailableProjectListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1801,7 +1812,7 @@ impl<'a> AvailableProjectListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AvailableProjectListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AvailableProjectListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1826,7 +1837,7 @@ impl<'a> AvailableProjectListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AvailableProjectListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AvailableProjectListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1846,9 +1857,9 @@ impl<'a> AvailableProjectListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AvailableProjectListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AvailableProjectListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1880,7 +1891,7 @@ impl<'a> AvailableProjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1888,19 +1899,25 @@ impl<'a> AvailableProjectListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2047,7 +2064,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2057,7 +2074,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2082,7 +2099,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2102,9 +2119,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2137,7 +2154,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2150,10 +2167,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppShaCreateCall<'a>
-    where  {
+pub struct ProjectAndroidAppShaCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: ShaCertificate,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2161,9 +2178,15 @@ pub struct ProjectAndroidAppShaCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppShaCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppShaCreateCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppShaCreateCall<'a> {
+impl<'a, S> ProjectAndroidAppShaCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2323,7 +2346,7 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShaCertificate) -> ProjectAndroidAppShaCreateCall<'a> {
+    pub fn request(mut self, new_value: ShaCertificate) -> ProjectAndroidAppShaCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2333,7 +2356,7 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppShaCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppShaCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2343,7 +2366,7 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppShaCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppShaCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2368,7 +2391,7 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppShaCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppShaCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2388,9 +2411,9 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppShaCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppShaCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2422,7 +2445,7 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2430,19 +2453,25 @@ impl<'a> ProjectAndroidAppShaCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppShaDeleteCall<'a>
-    where  {
+pub struct ProjectAndroidAppShaDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppShaDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppShaDeleteCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
+impl<'a, S> ProjectAndroidAppShaDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2589,7 +2618,7 @@ impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppShaDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppShaDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2599,7 +2628,7 @@ impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppShaDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppShaDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2624,7 +2653,7 @@ impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppShaDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppShaDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2644,9 +2673,9 @@ impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppShaDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppShaDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2678,7 +2707,7 @@ impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2686,19 +2715,25 @@ impl<'a> ProjectAndroidAppShaDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppShaListCall<'a>
-    where  {
+pub struct ProjectAndroidAppShaListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppShaListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppShaListCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppShaListCall<'a> {
+impl<'a, S> ProjectAndroidAppShaListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2845,7 +2880,7 @@ impl<'a> ProjectAndroidAppShaListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppShaListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppShaListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2855,7 +2890,7 @@ impl<'a> ProjectAndroidAppShaListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppShaListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppShaListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2880,7 +2915,7 @@ impl<'a> ProjectAndroidAppShaListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppShaListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppShaListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2900,9 +2935,9 @@ impl<'a> ProjectAndroidAppShaListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppShaListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppShaListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2935,7 +2970,7 @@ impl<'a> ProjectAndroidAppShaListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2948,10 +2983,10 @@ impl<'a> ProjectAndroidAppShaListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppCreateCall<'a>
-    where  {
+pub struct ProjectAndroidAppCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: AndroidApp,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2959,9 +2994,15 @@ pub struct ProjectAndroidAppCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppCreateCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppCreateCall<'a> {
+impl<'a, S> ProjectAndroidAppCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3121,7 +3162,7 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AndroidApp) -> ProjectAndroidAppCreateCall<'a> {
+    pub fn request(mut self, new_value: AndroidApp) -> ProjectAndroidAppCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3131,7 +3172,7 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3141,7 +3182,7 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3166,7 +3207,7 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3186,9 +3227,9 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3220,7 +3261,7 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3228,19 +3269,25 @@ impl<'a> ProjectAndroidAppCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppGetCall<'a>
-    where  {
+pub struct ProjectAndroidAppGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppGetCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppGetCall<'a> {
+impl<'a, S> ProjectAndroidAppGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3387,7 +3434,7 @@ impl<'a> ProjectAndroidAppGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3397,7 +3444,7 @@ impl<'a> ProjectAndroidAppGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3422,7 +3469,7 @@ impl<'a> ProjectAndroidAppGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3442,9 +3489,9 @@ impl<'a> ProjectAndroidAppGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3476,7 +3523,7 @@ impl<'a> ProjectAndroidAppGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3484,19 +3531,25 @@ impl<'a> ProjectAndroidAppGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppGetConfigCall<'a>
-    where  {
+pub struct ProjectAndroidAppGetConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppGetConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppGetConfigCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppGetConfigCall<'a> {
+impl<'a, S> ProjectAndroidAppGetConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3643,7 +3696,7 @@ impl<'a> ProjectAndroidAppGetConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppGetConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppGetConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3653,7 +3706,7 @@ impl<'a> ProjectAndroidAppGetConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppGetConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppGetConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3678,7 +3731,7 @@ impl<'a> ProjectAndroidAppGetConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppGetConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppGetConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3698,9 +3751,9 @@ impl<'a> ProjectAndroidAppGetConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppGetConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppGetConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3732,7 +3785,7 @@ impl<'a> ProjectAndroidAppGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3742,10 +3795,10 @@ impl<'a> ProjectAndroidAppGetConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppListCall<'a>
-    where  {
+pub struct ProjectAndroidAppListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3754,9 +3807,15 @@ pub struct ProjectAndroidAppListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppListCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppListCall<'a> {
+impl<'a, S> ProjectAndroidAppListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3909,21 +3968,21 @@ impl<'a> ProjectAndroidAppListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAndroidAppListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `ListAndroidApps` indicating where in the set of Apps to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAndroidAppListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectAndroidAppListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Apps to return in the response. The server may return fewer than this at its discretion. If no value is specified (or too large a value is specified), then the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAndroidAppListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectAndroidAppListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3933,7 +3992,7 @@ impl<'a> ProjectAndroidAppListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3958,7 +4017,7 @@ impl<'a> ProjectAndroidAppListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3978,9 +4037,9 @@ impl<'a> ProjectAndroidAppListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4013,7 +4072,7 @@ impl<'a> ProjectAndroidAppListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4027,10 +4086,10 @@ impl<'a> ProjectAndroidAppListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAndroidAppPatchCall<'a>
-    where  {
+pub struct ProjectAndroidAppPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: AndroidApp,
     _name: String,
     _update_mask: Option<String>,
@@ -4039,9 +4098,15 @@ pub struct ProjectAndroidAppPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAndroidAppPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAndroidAppPatchCall<'a, S> {}
 
-impl<'a> ProjectAndroidAppPatchCall<'a> {
+impl<'a, S> ProjectAndroidAppPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4204,7 +4269,7 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AndroidApp) -> ProjectAndroidAppPatchCall<'a> {
+    pub fn request(mut self, new_value: AndroidApp) -> ProjectAndroidAppPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4214,14 +4279,14 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAndroidAppPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies which fields to update. Note that the fields `name`, `app_id`, `project_id`, and `package_name` are all immutable.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAndroidAppPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAndroidAppPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4231,7 +4296,7 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAndroidAppPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4256,7 +4321,7 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAndroidAppPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4276,9 +4341,9 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAndroidAppPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAndroidAppPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4310,7 +4375,7 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4320,10 +4385,10 @@ impl<'a> ProjectAndroidAppPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAvailableLocationListCall<'a>
-    where  {
+pub struct ProjectAvailableLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4332,9 +4397,15 @@ pub struct ProjectAvailableLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAvailableLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAvailableLocationListCall<'a, S> {}
 
-impl<'a> ProjectAvailableLocationListCall<'a> {
+impl<'a, S> ProjectAvailableLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4487,21 +4558,21 @@ impl<'a> ProjectAvailableLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAvailableLocationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAvailableLocationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `ListAvailableLocations` indicating where in the list of locations to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAvailableLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectAvailableLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of locations to return in the response. The server may return fewer than this value at its discretion. If no value is specified (or too large a value is specified), then the server will impose its own limit. This value cannot be negative.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAvailableLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectAvailableLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4511,7 +4582,7 @@ impl<'a> ProjectAvailableLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAvailableLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAvailableLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4536,7 +4607,7 @@ impl<'a> ProjectAvailableLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAvailableLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAvailableLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4556,9 +4627,9 @@ impl<'a> ProjectAvailableLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAvailableLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAvailableLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4591,7 +4662,7 @@ impl<'a> ProjectAvailableLocationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4604,10 +4675,10 @@ impl<'a> ProjectAvailableLocationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectDefaultLocationFinalizeCall<'a>
-    where  {
+pub struct ProjectDefaultLocationFinalizeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: FinalizeDefaultLocationRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4615,9 +4686,15 @@ pub struct ProjectDefaultLocationFinalizeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectDefaultLocationFinalizeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectDefaultLocationFinalizeCall<'a, S> {}
 
-impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
+impl<'a, S> ProjectDefaultLocationFinalizeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4777,7 +4854,7 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FinalizeDefaultLocationRequest) -> ProjectDefaultLocationFinalizeCall<'a> {
+    pub fn request(mut self, new_value: FinalizeDefaultLocationRequest) -> ProjectDefaultLocationFinalizeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4787,7 +4864,7 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectDefaultLocationFinalizeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectDefaultLocationFinalizeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4797,7 +4874,7 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDefaultLocationFinalizeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDefaultLocationFinalizeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4822,7 +4899,7 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectDefaultLocationFinalizeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDefaultLocationFinalizeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4842,9 +4919,9 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDefaultLocationFinalizeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectDefaultLocationFinalizeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4877,7 +4954,7 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4890,10 +4967,10 @@ impl<'a> ProjectDefaultLocationFinalizeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIosAppCreateCall<'a>
-    where  {
+pub struct ProjectIosAppCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: IosApp,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4901,9 +4978,15 @@ pub struct ProjectIosAppCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIosAppCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIosAppCreateCall<'a, S> {}
 
-impl<'a> ProjectIosAppCreateCall<'a> {
+impl<'a, S> ProjectIosAppCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5063,7 +5146,7 @@ impl<'a> ProjectIosAppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IosApp) -> ProjectIosAppCreateCall<'a> {
+    pub fn request(mut self, new_value: IosApp) -> ProjectIosAppCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5073,7 +5156,7 @@ impl<'a> ProjectIosAppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectIosAppCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectIosAppCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5083,7 +5166,7 @@ impl<'a> ProjectIosAppCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5108,7 +5191,7 @@ impl<'a> ProjectIosAppCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5128,9 +5211,9 @@ impl<'a> ProjectIosAppCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIosAppCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIosAppCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5162,7 +5245,7 @@ impl<'a> ProjectIosAppCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5170,19 +5253,25 @@ impl<'a> ProjectIosAppCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIosAppGetCall<'a>
-    where  {
+pub struct ProjectIosAppGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIosAppGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIosAppGetCall<'a, S> {}
 
-impl<'a> ProjectIosAppGetCall<'a> {
+impl<'a, S> ProjectIosAppGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5329,7 +5418,7 @@ impl<'a> ProjectIosAppGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectIosAppGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectIosAppGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5339,7 +5428,7 @@ impl<'a> ProjectIosAppGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5364,7 +5453,7 @@ impl<'a> ProjectIosAppGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5384,9 +5473,9 @@ impl<'a> ProjectIosAppGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIosAppGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIosAppGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5418,7 +5507,7 @@ impl<'a> ProjectIosAppGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5426,19 +5515,25 @@ impl<'a> ProjectIosAppGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIosAppGetConfigCall<'a>
-    where  {
+pub struct ProjectIosAppGetConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIosAppGetConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIosAppGetConfigCall<'a, S> {}
 
-impl<'a> ProjectIosAppGetConfigCall<'a> {
+impl<'a, S> ProjectIosAppGetConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5585,7 +5680,7 @@ impl<'a> ProjectIosAppGetConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectIosAppGetConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectIosAppGetConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5595,7 +5690,7 @@ impl<'a> ProjectIosAppGetConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppGetConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppGetConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5620,7 +5715,7 @@ impl<'a> ProjectIosAppGetConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppGetConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppGetConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5640,9 +5735,9 @@ impl<'a> ProjectIosAppGetConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIosAppGetConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIosAppGetConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5674,7 +5769,7 @@ impl<'a> ProjectIosAppGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5684,10 +5779,10 @@ impl<'a> ProjectIosAppGetConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIosAppListCall<'a>
-    where  {
+pub struct ProjectIosAppListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5696,9 +5791,15 @@ pub struct ProjectIosAppListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIosAppListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIosAppListCall<'a, S> {}
 
-impl<'a> ProjectIosAppListCall<'a> {
+impl<'a, S> ProjectIosAppListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5851,21 +5952,21 @@ impl<'a> ProjectIosAppListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectIosAppListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectIosAppListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `ListIosApps` indicating where in the set of Apps to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectIosAppListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectIosAppListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Apps to return in the response. The server may return fewer than this at its discretion. If no value is specified (or too large a value is specified), the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectIosAppListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectIosAppListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5875,7 +5976,7 @@ impl<'a> ProjectIosAppListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5900,7 +6001,7 @@ impl<'a> ProjectIosAppListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5920,9 +6021,9 @@ impl<'a> ProjectIosAppListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIosAppListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIosAppListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5955,7 +6056,7 @@ impl<'a> ProjectIosAppListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5969,10 +6070,10 @@ impl<'a> ProjectIosAppListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIosAppPatchCall<'a>
-    where  {
+pub struct ProjectIosAppPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: IosApp,
     _name: String,
     _update_mask: Option<String>,
@@ -5981,9 +6082,15 @@ pub struct ProjectIosAppPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIosAppPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIosAppPatchCall<'a, S> {}
 
-impl<'a> ProjectIosAppPatchCall<'a> {
+impl<'a, S> ProjectIosAppPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6146,7 +6253,7 @@ impl<'a> ProjectIosAppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IosApp) -> ProjectIosAppPatchCall<'a> {
+    pub fn request(mut self, new_value: IosApp) -> ProjectIosAppPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6156,14 +6263,14 @@ impl<'a> ProjectIosAppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectIosAppPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectIosAppPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies which fields to update. Note that the fields `name`, `appId`, `projectId`, and `bundleId` are all immutable.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectIosAppPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectIosAppPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6173,7 +6280,7 @@ impl<'a> ProjectIosAppPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIosAppPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6198,7 +6305,7 @@ impl<'a> ProjectIosAppPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIosAppPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6218,9 +6325,9 @@ impl<'a> ProjectIosAppPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIosAppPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIosAppPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6253,7 +6360,7 @@ impl<'a> ProjectIosAppPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6266,10 +6373,10 @@ impl<'a> ProjectIosAppPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectWebAppCreateCall<'a>
-    where  {
+pub struct ProjectWebAppCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: WebApp,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6277,9 +6384,15 @@ pub struct ProjectWebAppCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectWebAppCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectWebAppCreateCall<'a, S> {}
 
-impl<'a> ProjectWebAppCreateCall<'a> {
+impl<'a, S> ProjectWebAppCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6439,7 +6552,7 @@ impl<'a> ProjectWebAppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WebApp) -> ProjectWebAppCreateCall<'a> {
+    pub fn request(mut self, new_value: WebApp) -> ProjectWebAppCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6449,7 +6562,7 @@ impl<'a> ProjectWebAppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectWebAppCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectWebAppCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6459,7 +6572,7 @@ impl<'a> ProjectWebAppCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6484,7 +6597,7 @@ impl<'a> ProjectWebAppCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6504,9 +6617,9 @@ impl<'a> ProjectWebAppCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectWebAppCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectWebAppCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6538,7 +6651,7 @@ impl<'a> ProjectWebAppCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6546,19 +6659,25 @@ impl<'a> ProjectWebAppCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectWebAppGetCall<'a>
-    where  {
+pub struct ProjectWebAppGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectWebAppGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectWebAppGetCall<'a, S> {}
 
-impl<'a> ProjectWebAppGetCall<'a> {
+impl<'a, S> ProjectWebAppGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6705,7 +6824,7 @@ impl<'a> ProjectWebAppGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectWebAppGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectWebAppGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6715,7 +6834,7 @@ impl<'a> ProjectWebAppGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6740,7 +6859,7 @@ impl<'a> ProjectWebAppGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6760,9 +6879,9 @@ impl<'a> ProjectWebAppGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectWebAppGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectWebAppGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6794,7 +6913,7 @@ impl<'a> ProjectWebAppGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6802,19 +6921,25 @@ impl<'a> ProjectWebAppGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectWebAppGetConfigCall<'a>
-    where  {
+pub struct ProjectWebAppGetConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectWebAppGetConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectWebAppGetConfigCall<'a, S> {}
 
-impl<'a> ProjectWebAppGetConfigCall<'a> {
+impl<'a, S> ProjectWebAppGetConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6961,7 +7086,7 @@ impl<'a> ProjectWebAppGetConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectWebAppGetConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectWebAppGetConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6971,7 +7096,7 @@ impl<'a> ProjectWebAppGetConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppGetConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppGetConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6996,7 +7121,7 @@ impl<'a> ProjectWebAppGetConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppGetConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppGetConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7016,9 +7141,9 @@ impl<'a> ProjectWebAppGetConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectWebAppGetConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectWebAppGetConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7050,7 +7175,7 @@ impl<'a> ProjectWebAppGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7060,10 +7185,10 @@ impl<'a> ProjectWebAppGetConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectWebAppListCall<'a>
-    where  {
+pub struct ProjectWebAppListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7072,9 +7197,15 @@ pub struct ProjectWebAppListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectWebAppListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectWebAppListCall<'a, S> {}
 
-impl<'a> ProjectWebAppListCall<'a> {
+impl<'a, S> ProjectWebAppListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7227,21 +7358,21 @@ impl<'a> ProjectWebAppListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectWebAppListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectWebAppListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `ListWebApps` indicating where in the set of Apps to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectWebAppListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectWebAppListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Apps to return in the response. The server may return fewer than this value at its discretion. If no value is specified (or too large a value is specified), then the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectWebAppListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectWebAppListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7251,7 +7382,7 @@ impl<'a> ProjectWebAppListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7276,7 +7407,7 @@ impl<'a> ProjectWebAppListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7296,9 +7427,9 @@ impl<'a> ProjectWebAppListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectWebAppListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectWebAppListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7331,7 +7462,7 @@ impl<'a> ProjectWebAppListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7345,10 +7476,10 @@ impl<'a> ProjectWebAppListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectWebAppPatchCall<'a>
-    where  {
+pub struct ProjectWebAppPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: WebApp,
     _name: String,
     _update_mask: Option<String>,
@@ -7357,9 +7488,15 @@ pub struct ProjectWebAppPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectWebAppPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectWebAppPatchCall<'a, S> {}
 
-impl<'a> ProjectWebAppPatchCall<'a> {
+impl<'a, S> ProjectWebAppPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7522,7 +7659,7 @@ impl<'a> ProjectWebAppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WebApp) -> ProjectWebAppPatchCall<'a> {
+    pub fn request(mut self, new_value: WebApp) -> ProjectWebAppPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7532,14 +7669,14 @@ impl<'a> ProjectWebAppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectWebAppPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectWebAppPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies which fields to update. Note that the fields `name`, `appId`, and `projectId` are all immutable.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectWebAppPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectWebAppPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7549,7 +7686,7 @@ impl<'a> ProjectWebAppPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectWebAppPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7574,7 +7711,7 @@ impl<'a> ProjectWebAppPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectWebAppPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7594,9 +7731,9 @@ impl<'a> ProjectWebAppPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectWebAppPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectWebAppPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7629,7 +7766,7 @@ impl<'a> ProjectWebAppPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7642,10 +7779,10 @@ impl<'a> ProjectWebAppPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAddFirebaseCall<'a>
-    where  {
+pub struct ProjectAddFirebaseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: AddFirebaseRequest,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7653,9 +7790,15 @@ pub struct ProjectAddFirebaseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAddFirebaseCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAddFirebaseCall<'a, S> {}
 
-impl<'a> ProjectAddFirebaseCall<'a> {
+impl<'a, S> ProjectAddFirebaseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7815,7 +7958,7 @@ impl<'a> ProjectAddFirebaseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddFirebaseRequest) -> ProjectAddFirebaseCall<'a> {
+    pub fn request(mut self, new_value: AddFirebaseRequest) -> ProjectAddFirebaseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7825,7 +7968,7 @@ impl<'a> ProjectAddFirebaseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectAddFirebaseCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ProjectAddFirebaseCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -7835,7 +7978,7 @@ impl<'a> ProjectAddFirebaseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAddFirebaseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAddFirebaseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7860,7 +8003,7 @@ impl<'a> ProjectAddFirebaseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAddFirebaseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAddFirebaseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7880,9 +8023,9 @@ impl<'a> ProjectAddFirebaseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAddFirebaseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAddFirebaseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7915,7 +8058,7 @@ impl<'a> ProjectAddFirebaseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7928,10 +8071,10 @@ impl<'a> ProjectAddFirebaseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAddGoogleAnalyticCall<'a>
-    where  {
+pub struct ProjectAddGoogleAnalyticCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: AddGoogleAnalyticsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7939,9 +8082,15 @@ pub struct ProjectAddGoogleAnalyticCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAddGoogleAnalyticCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAddGoogleAnalyticCall<'a, S> {}
 
-impl<'a> ProjectAddGoogleAnalyticCall<'a> {
+impl<'a, S> ProjectAddGoogleAnalyticCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8101,7 +8250,7 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddGoogleAnalyticsRequest) -> ProjectAddGoogleAnalyticCall<'a> {
+    pub fn request(mut self, new_value: AddGoogleAnalyticsRequest) -> ProjectAddGoogleAnalyticCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8111,7 +8260,7 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAddGoogleAnalyticCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAddGoogleAnalyticCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8121,7 +8270,7 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAddGoogleAnalyticCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAddGoogleAnalyticCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8146,7 +8295,7 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAddGoogleAnalyticCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAddGoogleAnalyticCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8166,9 +8315,9 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAddGoogleAnalyticCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAddGoogleAnalyticCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8200,7 +8349,7 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8208,19 +8357,25 @@ impl<'a> ProjectAddGoogleAnalyticCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetCall<'a>
-    where  {
+pub struct ProjectGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetCall<'a, S> {}
 
-impl<'a> ProjectGetCall<'a> {
+impl<'a, S> ProjectGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8367,7 +8522,7 @@ impl<'a> ProjectGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8377,7 +8532,7 @@ impl<'a> ProjectGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8402,7 +8557,7 @@ impl<'a> ProjectGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8422,9 +8577,9 @@ impl<'a> ProjectGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8456,7 +8611,7 @@ impl<'a> ProjectGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8464,19 +8619,25 @@ impl<'a> ProjectGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetAdminSdkConfigCall<'a>
-    where  {
+pub struct ProjectGetAdminSdkConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetAdminSdkConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetAdminSdkConfigCall<'a, S> {}
 
-impl<'a> ProjectGetAdminSdkConfigCall<'a> {
+impl<'a, S> ProjectGetAdminSdkConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8623,7 +8784,7 @@ impl<'a> ProjectGetAdminSdkConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectGetAdminSdkConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectGetAdminSdkConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8633,7 +8794,7 @@ impl<'a> ProjectGetAdminSdkConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAdminSdkConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAdminSdkConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8658,7 +8819,7 @@ impl<'a> ProjectGetAdminSdkConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAdminSdkConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAdminSdkConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8678,9 +8839,9 @@ impl<'a> ProjectGetAdminSdkConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetAdminSdkConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetAdminSdkConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8712,7 +8873,7 @@ impl<'a> ProjectGetAdminSdkConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8720,19 +8881,25 @@ impl<'a> ProjectGetAdminSdkConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetAnalyticsDetailCall<'a>
-    where  {
+pub struct ProjectGetAnalyticsDetailCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetAnalyticsDetailCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetAnalyticsDetailCall<'a, S> {}
 
-impl<'a> ProjectGetAnalyticsDetailCall<'a> {
+impl<'a, S> ProjectGetAnalyticsDetailCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8879,7 +9046,7 @@ impl<'a> ProjectGetAnalyticsDetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectGetAnalyticsDetailCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectGetAnalyticsDetailCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8889,7 +9056,7 @@ impl<'a> ProjectGetAnalyticsDetailCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAnalyticsDetailCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAnalyticsDetailCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8914,7 +9081,7 @@ impl<'a> ProjectGetAnalyticsDetailCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAnalyticsDetailCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAnalyticsDetailCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8934,9 +9101,9 @@ impl<'a> ProjectGetAnalyticsDetailCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetAnalyticsDetailCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetAnalyticsDetailCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8968,7 +9135,7 @@ impl<'a> ProjectGetAnalyticsDetailCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8978,10 +9145,10 @@ impl<'a> ProjectGetAnalyticsDetailCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectListCall<'a>
-    where  {
+pub struct ProjectListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8989,9 +9156,15 @@ pub struct ProjectListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectListCall<'a, S> {}
 
-impl<'a> ProjectListCall<'a> {
+impl<'a, S> ProjectListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9115,14 +9288,14 @@ impl<'a> ProjectListCall<'a> {
     /// Token returned from a previous call to `ListFirebaseProjects` indicating where in the set of Projects to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Projects to return in the response. The server may return fewer than this at its discretion. If no value is specified (or too large a value is specified), the server will impose its own limit. This value cannot be negative.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -9132,7 +9305,7 @@ impl<'a> ProjectListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9157,7 +9330,7 @@ impl<'a> ProjectListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9177,9 +9350,9 @@ impl<'a> ProjectListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9212,7 +9385,7 @@ impl<'a> ProjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9226,10 +9399,10 @@ impl<'a> ProjectListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectPatchCall<'a>
-    where  {
+pub struct ProjectPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: FirebaseProject,
     _name: String,
     _update_mask: Option<String>,
@@ -9238,9 +9411,15 @@ pub struct ProjectPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectPatchCall<'a, S> {}
 
-impl<'a> ProjectPatchCall<'a> {
+impl<'a, S> ProjectPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9403,7 +9582,7 @@ impl<'a> ProjectPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FirebaseProject) -> ProjectPatchCall<'a> {
+    pub fn request(mut self, new_value: FirebaseProject) -> ProjectPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9413,14 +9592,14 @@ impl<'a> ProjectPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies which fields to update. If this list is empty, then no state will be updated. Note that the fields `name`, `projectId`, and `projectNumber` are all immutable.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9430,7 +9609,7 @@ impl<'a> ProjectPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9455,7 +9634,7 @@ impl<'a> ProjectPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9475,9 +9654,9 @@ impl<'a> ProjectPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9510,7 +9689,7 @@ impl<'a> ProjectPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9523,10 +9702,10 @@ impl<'a> ProjectPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRemoveAnalyticCall<'a>
-    where  {
+pub struct ProjectRemoveAnalyticCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _request: RemoveAnalyticsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9534,9 +9713,15 @@ pub struct ProjectRemoveAnalyticCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRemoveAnalyticCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRemoveAnalyticCall<'a, S> {}
 
-impl<'a> ProjectRemoveAnalyticCall<'a> {
+impl<'a, S> ProjectRemoveAnalyticCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9696,7 +9881,7 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveAnalyticsRequest) -> ProjectRemoveAnalyticCall<'a> {
+    pub fn request(mut self, new_value: RemoveAnalyticsRequest) -> ProjectRemoveAnalyticCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9706,7 +9891,7 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRemoveAnalyticCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRemoveAnalyticCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -9716,7 +9901,7 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRemoveAnalyticCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRemoveAnalyticCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9741,7 +9926,7 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRemoveAnalyticCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRemoveAnalyticCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9761,9 +9946,9 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRemoveAnalyticCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRemoveAnalyticCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9795,7 +9980,7 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9806,10 +9991,10 @@ impl<'a> ProjectRemoveAnalyticCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSearchAppCall<'a>
-    where  {
+pub struct ProjectSearchAppCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseManagement<>,
+    hub: &'a FirebaseManagement<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9819,9 +10004,15 @@ pub struct ProjectSearchAppCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSearchAppCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSearchAppCall<'a, S> {}
 
-impl<'a> ProjectSearchAppCall<'a> {
+impl<'a, S> ProjectSearchAppCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9977,28 +10168,28 @@ impl<'a> ProjectSearchAppCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSearchAppCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSearchAppCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `SearchFirebaseApps` indicating where in the set of Apps to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSearchAppCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSearchAppCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Apps to return in the response. The server may return fewer than this value at its discretion. If no value is specified (or too large a value is specified), then the server will impose its own limit. This value cannot be negative.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSearchAppCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSearchAppCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A query string compatible with Google's [AIP-160](https://google.aip.dev/160) standard. Use any of the following fields in a query: * [`app_id`](../projects.apps#FirebaseAppInfo.FIELDS.app_id) * [`namespace`](../projects.apps#FirebaseAppInfo.FIELDS.namespace) * [`platform`](../projects.apps#FirebaseAppInfo.FIELDS.platform) We also support the following "virtual" fields (fields which are not actually part of the returned resource object, but can be queried as if they are pre-populated with specific values): * `sha1_hash`: This field is considered to be a repeated `string` field, populated with the list of all SHA-1 certificate fingerprints registered with the app. This list is empty if the app is not an Android app. * `sha256_hash`: This field is considered to be a repeated `string` field, populated with the list of all SHA-256 certificate fingerprints registered with the app. This list is empty if the app is not an Android app. * `app_store_id`: This field is considered to be a singular `string` field, populated with the Apple App Store ID registered with the app. This field is empty if the app is not an iOS app. * `team_id`: This field is considered to be a singular `string` field, populated with the Apple team ID registered with the app. This field is empty if the app is not an iOS app.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectSearchAppCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectSearchAppCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10008,7 +10199,7 @@ impl<'a> ProjectSearchAppCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSearchAppCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSearchAppCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10033,7 +10224,7 @@ impl<'a> ProjectSearchAppCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSearchAppCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSearchAppCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10053,9 +10244,9 @@ impl<'a> ProjectSearchAppCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSearchAppCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSearchAppCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

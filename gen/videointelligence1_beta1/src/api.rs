@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudVideoIntelligence::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudVideoIntelligence::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudVideoIntelligence<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudVideoIntelligence<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudVideoIntelligence<> {}
+impl<'a, S> client::Hub for CloudVideoIntelligence<S> {}
 
-impl<'a, > CloudVideoIntelligence<> {
+impl<'a, S> CloudVideoIntelligence<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudVideoIntelligence<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudVideoIntelligence<S> {
         CloudVideoIntelligence {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://videointelligence.googleapis.com/".to_string(),
             _root_url: "https://videointelligence.googleapis.com/".to_string(),
         }
     }
 
-    pub fn videos(&'a self) -> VideoMethods<'a> {
+    pub fn videos(&'a self) -> VideoMethods<'a, S> {
         VideoMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -398,22 +403,22 @@ impl client::Part for GoogleRpc_Status {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudVideoIntelligence::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudVideoIntelligence::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `annotate(...)`
 /// // to build up your call.
 /// let rb = hub.videos();
 /// # }
 /// ```
-pub struct VideoMethods<'a>
-    where  {
+pub struct VideoMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudVideoIntelligence<>,
+    hub: &'a CloudVideoIntelligence<S>,
 }
 
-impl<'a> client::MethodsBuilder for VideoMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VideoMethods<'a, S> {}
 
-impl<'a> VideoMethods<'a> {
+impl<'a, S> VideoMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -425,7 +430,7 @@ impl<'a> VideoMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn annotate(&self, request: GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest) -> VideoAnnotateCall<'a> {
+    pub fn annotate(&self, request: GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest) -> VideoAnnotateCall<'a, S> {
         VideoAnnotateCall {
             hub: self.hub,
             _request: request,
@@ -470,7 +475,7 @@ impl<'a> VideoMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudVideoIntelligence::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudVideoIntelligence::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -483,19 +488,25 @@ impl<'a> VideoMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoAnnotateCall<'a>
-    where  {
+pub struct VideoAnnotateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudVideoIntelligence<>,
+    hub: &'a CloudVideoIntelligence<S>,
     _request: GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VideoAnnotateCall<'a> {}
+impl<'a, S> client::CallBuilder for VideoAnnotateCall<'a, S> {}
 
-impl<'a> VideoAnnotateCall<'a> {
+impl<'a, S> VideoAnnotateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -629,7 +640,7 @@ impl<'a> VideoAnnotateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest) -> VideoAnnotateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest) -> VideoAnnotateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -639,7 +650,7 @@ impl<'a> VideoAnnotateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAnnotateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAnnotateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -666,7 +677,7 @@ impl<'a> VideoAnnotateCall<'a> {
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *bearer_token* (query-string) - OAuth bearer token.
-    pub fn param<T>(mut self, name: T, value: T) -> VideoAnnotateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoAnnotateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -686,9 +697,9 @@ impl<'a> VideoAnnotateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoAnnotateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VideoAnnotateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

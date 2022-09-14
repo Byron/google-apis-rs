@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,37 +112,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Firebaseappcheck<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Firebaseappcheck<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Firebaseappcheck<> {}
+impl<'a, S> client::Hub for Firebaseappcheck<S> {}
 
-impl<'a, > Firebaseappcheck<> {
+impl<'a, S> Firebaseappcheck<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Firebaseappcheck<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Firebaseappcheck<S> {
         Firebaseappcheck {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://firebaseappcheck.googleapis.com/".to_string(),
             _root_url: "https://firebaseappcheck.googleapis.com/".to_string(),
         }
     }
 
-    pub fn jwks(&'a self) -> JwkMethods<'a> {
+    pub fn jwks(&'a self) -> JwkMethods<'a, S> {
         JwkMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -861,22 +866,22 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.jwks();
 /// # }
 /// ```
-pub struct JwkMethods<'a>
-    where  {
+pub struct JwkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
 }
 
-impl<'a> client::MethodsBuilder for JwkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for JwkMethods<'a, S> {}
 
-impl<'a> JwkMethods<'a> {
+impl<'a, S> JwkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -885,7 +890,7 @@ impl<'a> JwkMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name to the public JWK set. Must always be exactly the string `jwks`.
-    pub fn get(&self, name: &str) -> JwkGetCall<'a> {
+    pub fn get(&self, name: &str) -> JwkGetCall<'a, S> {
         JwkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -919,22 +924,22 @@ impl<'a> JwkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `apps_app_attest_config_batch_get(...)`, `apps_app_attest_config_get(...)`, `apps_app_attest_config_patch(...)`, `apps_debug_tokens_create(...)`, `apps_debug_tokens_delete(...)`, `apps_debug_tokens_get(...)`, `apps_debug_tokens_list(...)`, `apps_debug_tokens_patch(...)`, `apps_device_check_config_batch_get(...)`, `apps_device_check_config_get(...)`, `apps_device_check_config_patch(...)`, `apps_exchange_app_attest_assertion(...)`, `apps_exchange_app_attest_attestation(...)`, `apps_exchange_custom_token(...)`, `apps_exchange_debug_token(...)`, `apps_exchange_device_check_token(...)`, `apps_exchange_recaptcha_enterprise_token(...)`, `apps_exchange_recaptcha_token(...)`, `apps_exchange_safety_net_token(...)`, `apps_generate_app_attest_challenge(...)`, `apps_recaptcha_config_batch_get(...)`, `apps_recaptcha_config_get(...)`, `apps_recaptcha_config_patch(...)`, `apps_recaptcha_enterprise_config_batch_get(...)`, `apps_recaptcha_enterprise_config_get(...)`, `apps_recaptcha_enterprise_config_patch(...)`, `apps_safety_net_config_batch_get(...)`, `apps_safety_net_config_get(...)`, `apps_safety_net_config_patch(...)`, `services_batch_update(...)`, `services_get(...)`, `services_list(...)` and `services_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -943,7 +948,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent project name shared by all AppAttestConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails.
-    pub fn apps_app_attest_config_batch_get(&self, parent: &str) -> ProjectAppAppAttestConfigBatchGetCall<'a> {
+    pub fn apps_app_attest_config_batch_get(&self, parent: &str) -> ProjectAppAppAttestConfigBatchGetCall<'a, S> {
         ProjectAppAppAttestConfigBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -961,7 +966,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the AppAttestConfig, in the format: ``` projects/{project_number}/apps/{app_id}/appAttestConfig ```
-    pub fn apps_app_attest_config_get(&self, name: &str) -> ProjectAppAppAttestConfigGetCall<'a> {
+    pub fn apps_app_attest_config_get(&self, name: &str) -> ProjectAppAppAttestConfigGetCall<'a, S> {
         ProjectAppAppAttestConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -979,7 +984,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the App Attest configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/appAttestConfig ```
-    pub fn apps_app_attest_config_patch(&self, request: GoogleFirebaseAppcheckV1betaAppAttestConfig, name: &str) -> ProjectAppAppAttestConfigPatchCall<'a> {
+    pub fn apps_app_attest_config_patch(&self, request: GoogleFirebaseAppcheckV1betaAppAttestConfig, name: &str) -> ProjectAppAppAttestConfigPatchCall<'a, S> {
         ProjectAppAppAttestConfigPatchCall {
             hub: self.hub,
             _request: request,
@@ -999,7 +1004,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The relative resource name of the parent app in which the specified DebugToken will be created, in the format: ``` projects/{project_number}/apps/{app_id} ```
-    pub fn apps_debug_tokens_create(&self, request: GoogleFirebaseAppcheckV1betaDebugToken, parent: &str) -> ProjectAppDebugTokenCreateCall<'a> {
+    pub fn apps_debug_tokens_create(&self, request: GoogleFirebaseAppcheckV1betaDebugToken, parent: &str) -> ProjectAppDebugTokenCreateCall<'a, S> {
         ProjectAppDebugTokenCreateCall {
             hub: self.hub,
             _request: request,
@@ -1017,7 +1022,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the DebugToken to delete, in the format: ``` projects/{project_number}/apps/{app_id}/debugTokens/{debug_token_id} ```
-    pub fn apps_debug_tokens_delete(&self, name: &str) -> ProjectAppDebugTokenDeleteCall<'a> {
+    pub fn apps_debug_tokens_delete(&self, name: &str) -> ProjectAppDebugTokenDeleteCall<'a, S> {
         ProjectAppDebugTokenDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1034,7 +1039,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the debug token, in the format: ``` projects/{project_number}/apps/{app_id}/debugTokens/{debug_token_id} ```
-    pub fn apps_debug_tokens_get(&self, name: &str) -> ProjectAppDebugTokenGetCall<'a> {
+    pub fn apps_debug_tokens_get(&self, name: &str) -> ProjectAppDebugTokenGetCall<'a, S> {
         ProjectAppDebugTokenGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1051,7 +1056,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The relative resource name of the parent app for which to list each associated DebugToken, in the format: ``` projects/{project_number}/apps/{app_id} ```
-    pub fn apps_debug_tokens_list(&self, parent: &str) -> ProjectAppDebugTokenListCall<'a> {
+    pub fn apps_debug_tokens_list(&self, parent: &str) -> ProjectAppDebugTokenListCall<'a, S> {
         ProjectAppDebugTokenListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1071,7 +1076,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the debug token, in the format: ``` projects/{project_number}/apps/{app_id}/debugTokens/{debug_token_id} ```
-    pub fn apps_debug_tokens_patch(&self, request: GoogleFirebaseAppcheckV1betaDebugToken, name: &str) -> ProjectAppDebugTokenPatchCall<'a> {
+    pub fn apps_debug_tokens_patch(&self, request: GoogleFirebaseAppcheckV1betaDebugToken, name: &str) -> ProjectAppDebugTokenPatchCall<'a, S> {
         ProjectAppDebugTokenPatchCall {
             hub: self.hub,
             _request: request,
@@ -1090,7 +1095,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent project name shared by all DeviceCheckConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails.
-    pub fn apps_device_check_config_batch_get(&self, parent: &str) -> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
+    pub fn apps_device_check_config_batch_get(&self, parent: &str) -> ProjectAppDeviceCheckConfigBatchGetCall<'a, S> {
         ProjectAppDeviceCheckConfigBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1108,7 +1113,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the DeviceCheckConfig, in the format: ``` projects/{project_number}/apps/{app_id}/deviceCheckConfig ```
-    pub fn apps_device_check_config_get(&self, name: &str) -> ProjectAppDeviceCheckConfigGetCall<'a> {
+    pub fn apps_device_check_config_get(&self, name: &str) -> ProjectAppDeviceCheckConfigGetCall<'a, S> {
         ProjectAppDeviceCheckConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1126,7 +1131,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the DeviceCheck configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/deviceCheckConfig ```
-    pub fn apps_device_check_config_patch(&self, request: GoogleFirebaseAppcheckV1betaDeviceCheckConfig, name: &str) -> ProjectAppDeviceCheckConfigPatchCall<'a> {
+    pub fn apps_device_check_config_patch(&self, request: GoogleFirebaseAppcheckV1betaDeviceCheckConfig, name: &str) -> ProjectAppDeviceCheckConfigPatchCall<'a, S> {
         ProjectAppDeviceCheckConfigPatchCall {
             hub: self.hub,
             _request: request,
@@ -1145,7 +1150,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent project name shared by all RecaptchaConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails.
-    pub fn apps_recaptcha_config_batch_get(&self, parent: &str) -> ProjectAppRecaptchaConfigBatchGetCall<'a> {
+    pub fn apps_recaptcha_config_batch_get(&self, parent: &str) -> ProjectAppRecaptchaConfigBatchGetCall<'a, S> {
         ProjectAppRecaptchaConfigBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1163,7 +1168,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the RecaptchaConfig, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaConfig ```
-    pub fn apps_recaptcha_config_get(&self, name: &str) -> ProjectAppRecaptchaConfigGetCall<'a> {
+    pub fn apps_recaptcha_config_get(&self, name: &str) -> ProjectAppRecaptchaConfigGetCall<'a, S> {
         ProjectAppRecaptchaConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1181,7 +1186,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the reCAPTCHA v3 configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaConfig ```
-    pub fn apps_recaptcha_config_patch(&self, request: GoogleFirebaseAppcheckV1betaRecaptchaConfig, name: &str) -> ProjectAppRecaptchaConfigPatchCall<'a> {
+    pub fn apps_recaptcha_config_patch(&self, request: GoogleFirebaseAppcheckV1betaRecaptchaConfig, name: &str) -> ProjectAppRecaptchaConfigPatchCall<'a, S> {
         ProjectAppRecaptchaConfigPatchCall {
             hub: self.hub,
             _request: request,
@@ -1200,7 +1205,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent project name shared by all RecaptchaEnterpriseConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails.
-    pub fn apps_recaptcha_enterprise_config_batch_get(&self, parent: &str) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
+    pub fn apps_recaptcha_enterprise_config_batch_get(&self, parent: &str) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S> {
         ProjectAppRecaptchaEnterpriseConfigBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1218,7 +1223,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the RecaptchaEnterpriseConfig, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaEnterpriseConfig ```
-    pub fn apps_recaptcha_enterprise_config_get(&self, name: &str) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
+    pub fn apps_recaptcha_enterprise_config_get(&self, name: &str) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S> {
         ProjectAppRecaptchaEnterpriseConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1236,7 +1241,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the reCAPTCHA Enterprise configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaEnterpriseConfig ```
-    pub fn apps_recaptcha_enterprise_config_patch(&self, request: GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig, name: &str) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
+    pub fn apps_recaptcha_enterprise_config_patch(&self, request: GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig, name: &str) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S> {
         ProjectAppRecaptchaEnterpriseConfigPatchCall {
             hub: self.hub,
             _request: request,
@@ -1255,7 +1260,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent project name shared by all SafetyNetConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails.
-    pub fn apps_safety_net_config_batch_get(&self, parent: &str) -> ProjectAppSafetyNetConfigBatchGetCall<'a> {
+    pub fn apps_safety_net_config_batch_get(&self, parent: &str) -> ProjectAppSafetyNetConfigBatchGetCall<'a, S> {
         ProjectAppSafetyNetConfigBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1273,7 +1278,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the SafetyNetConfig, in the format: ``` projects/{project_number}/apps/{app_id}/safetyNetConfig ```
-    pub fn apps_safety_net_config_get(&self, name: &str) -> ProjectAppSafetyNetConfigGetCall<'a> {
+    pub fn apps_safety_net_config_get(&self, name: &str) -> ProjectAppSafetyNetConfigGetCall<'a, S> {
         ProjectAppSafetyNetConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1291,7 +1296,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the SafetyNet configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/safetyNetConfig ```
-    pub fn apps_safety_net_config_patch(&self, request: GoogleFirebaseAppcheckV1betaSafetyNetConfig, name: &str) -> ProjectAppSafetyNetConfigPatchCall<'a> {
+    pub fn apps_safety_net_config_patch(&self, request: GoogleFirebaseAppcheckV1betaSafetyNetConfig, name: &str) -> ProjectAppSafetyNetConfigPatchCall<'a, S> {
         ProjectAppSafetyNetConfigPatchCall {
             hub: self.hub,
             _request: request,
@@ -1311,7 +1316,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_app_attest_assertion(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest, app: &str) -> ProjectAppExchangeAppAttestAssertionCall<'a> {
+    pub fn apps_exchange_app_attest_assertion(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest, app: &str) -> ProjectAppExchangeAppAttestAssertionCall<'a, S> {
         ProjectAppExchangeAppAttestAssertionCall {
             hub: self.hub,
             _request: request,
@@ -1330,7 +1335,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_app_attest_attestation(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest, app: &str) -> ProjectAppExchangeAppAttestAttestationCall<'a> {
+    pub fn apps_exchange_app_attest_attestation(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest, app: &str) -> ProjectAppExchangeAppAttestAttestationCall<'a, S> {
         ProjectAppExchangeAppAttestAttestationCall {
             hub: self.hub,
             _request: request,
@@ -1349,7 +1354,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_custom_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest, app: &str) -> ProjectAppExchangeCustomTokenCall<'a> {
+    pub fn apps_exchange_custom_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest, app: &str) -> ProjectAppExchangeCustomTokenCall<'a, S> {
         ProjectAppExchangeCustomTokenCall {
             hub: self.hub,
             _request: request,
@@ -1368,7 +1373,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_debug_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest, app: &str) -> ProjectAppExchangeDebugTokenCall<'a> {
+    pub fn apps_exchange_debug_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest, app: &str) -> ProjectAppExchangeDebugTokenCall<'a, S> {
         ProjectAppExchangeDebugTokenCall {
             hub: self.hub,
             _request: request,
@@ -1387,7 +1392,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_device_check_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest, app: &str) -> ProjectAppExchangeDeviceCheckTokenCall<'a> {
+    pub fn apps_exchange_device_check_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest, app: &str) -> ProjectAppExchangeDeviceCheckTokenCall<'a, S> {
         ProjectAppExchangeDeviceCheckTokenCall {
             hub: self.hub,
             _request: request,
@@ -1406,7 +1411,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the web app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_recaptcha_enterprise_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest, app: &str) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
+    pub fn apps_exchange_recaptcha_enterprise_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest, app: &str) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S> {
         ProjectAppExchangeRecaptchaEnterpriseTokenCall {
             hub: self.hub,
             _request: request,
@@ -1425,7 +1430,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the web app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_recaptcha_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest, app: &str) -> ProjectAppExchangeRecaptchaTokenCall<'a> {
+    pub fn apps_exchange_recaptcha_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest, app: &str) -> ProjectAppExchangeRecaptchaTokenCall<'a, S> {
         ProjectAppExchangeRecaptchaTokenCall {
             hub: self.hub,
             _request: request,
@@ -1444,7 +1449,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the Android app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_exchange_safety_net_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest, app: &str) -> ProjectAppExchangeSafetyNetTokenCall<'a> {
+    pub fn apps_exchange_safety_net_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest, app: &str) -> ProjectAppExchangeSafetyNetTokenCall<'a, S> {
         ProjectAppExchangeSafetyNetTokenCall {
             hub: self.hub,
             _request: request,
@@ -1463,7 +1468,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
-    pub fn apps_generate_app_attest_challenge(&self, request: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest, app: &str) -> ProjectAppGenerateAppAttestChallengeCall<'a> {
+    pub fn apps_generate_app_attest_challenge(&self, request: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest, app: &str) -> ProjectAppGenerateAppAttestChallengeCall<'a, S> {
         ProjectAppGenerateAppAttestChallengeCall {
             hub: self.hub,
             _request: request,
@@ -1482,7 +1487,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent project name shared by all Service configurations being updated, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails.
-    pub fn services_batch_update(&self, request: GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest, parent: &str) -> ProjectServiceBatchUpdateCall<'a> {
+    pub fn services_batch_update(&self, request: GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest, parent: &str) -> ProjectServiceBatchUpdateCall<'a, S> {
         ProjectServiceBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1500,7 +1505,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore)
-    pub fn services_get(&self, name: &str) -> ProjectServiceGetCall<'a> {
+    pub fn services_get(&self, name: &str) -> ProjectServiceGetCall<'a, S> {
         ProjectServiceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1517,7 +1522,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The relative resource name of the parent project for which to list each associated Service, in the format: ``` projects/{project_number} ```
-    pub fn services_list(&self, parent: &str) -> ProjectServiceListCall<'a> {
+    pub fn services_list(&self, parent: &str) -> ProjectServiceListCall<'a, S> {
         ProjectServiceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1537,7 +1542,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The relative resource name of the service configuration object, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore)
-    pub fn services_patch(&self, request: GoogleFirebaseAppcheckV1betaService, name: &str) -> ProjectServicePatchCall<'a> {
+    pub fn services_patch(&self, request: GoogleFirebaseAppcheckV1betaService, name: &str) -> ProjectServicePatchCall<'a, S> {
         ProjectServicePatchCall {
             hub: self.hub,
             _request: request,
@@ -1580,7 +1585,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1588,19 +1593,25 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JwkGetCall<'a>
-    where  {
+pub struct JwkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JwkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for JwkGetCall<'a, S> {}
 
-impl<'a> JwkGetCall<'a> {
+impl<'a, S> JwkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1747,7 +1758,7 @@ impl<'a> JwkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> JwkGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> JwkGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1757,7 +1768,7 @@ impl<'a> JwkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JwkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JwkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1782,7 +1793,7 @@ impl<'a> JwkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JwkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JwkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1802,9 +1813,9 @@ impl<'a> JwkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JwkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JwkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1836,7 +1847,7 @@ impl<'a> JwkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1845,10 +1856,10 @@ impl<'a> JwkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppAppAttestConfigBatchGetCall<'a>
-    where  {
+pub struct ProjectAppAppAttestConfigBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1856,9 +1867,15 @@ pub struct ProjectAppAppAttestConfigBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppAppAttestConfigBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppAppAttestConfigBatchGetCall<'a, S> {}
 
-impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
+impl<'a, S> ProjectAppAppAttestConfigBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2010,7 +2027,7 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppAppAttestConfigBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppAppAttestConfigBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2018,7 +2035,7 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> ProjectAppAppAttestConfigBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> ProjectAppAppAttestConfigBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -2028,7 +2045,7 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppAppAttestConfigBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppAppAttestConfigBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2053,7 +2070,7 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppAppAttestConfigBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppAppAttestConfigBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2073,9 +2090,9 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppAppAttestConfigBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppAppAttestConfigBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2107,7 +2124,7 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2115,19 +2132,25 @@ impl<'a> ProjectAppAppAttestConfigBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppAppAttestConfigGetCall<'a>
-    where  {
+pub struct ProjectAppAppAttestConfigGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppAppAttestConfigGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppAppAttestConfigGetCall<'a, S> {}
 
-impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
+impl<'a, S> ProjectAppAppAttestConfigGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2274,7 +2297,7 @@ impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppAppAttestConfigGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppAppAttestConfigGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2284,7 +2307,7 @@ impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppAppAttestConfigGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppAppAttestConfigGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2309,7 +2332,7 @@ impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppAppAttestConfigGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppAppAttestConfigGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2329,9 +2352,9 @@ impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppAppAttestConfigGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppAppAttestConfigGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2364,7 +2387,7 @@ impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2378,10 +2401,10 @@ impl<'a> ProjectAppAppAttestConfigGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppAppAttestConfigPatchCall<'a>
-    where  {
+pub struct ProjectAppAppAttestConfigPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaAppAttestConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -2390,9 +2413,15 @@ pub struct ProjectAppAppAttestConfigPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppAppAttestConfigPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppAppAttestConfigPatchCall<'a, S> {}
 
-impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
+impl<'a, S> ProjectAppAppAttestConfigPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2555,7 +2584,7 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaAppAttestConfig) -> ProjectAppAppAttestConfigPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaAppAttestConfig) -> ProjectAppAppAttestConfigPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2565,14 +2594,14 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppAppAttestConfigPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppAppAttestConfigPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the AppAttestConfig Gets to update. Example: `token_ttl`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAppAppAttestConfigPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAppAppAttestConfigPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2582,7 +2611,7 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppAppAttestConfigPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppAppAttestConfigPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2607,7 +2636,7 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppAppAttestConfigPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppAppAttestConfigPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2627,9 +2656,9 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppAppAttestConfigPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppAppAttestConfigPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2662,7 +2691,7 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2675,10 +2704,10 @@ impl<'a> ProjectAppAppAttestConfigPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDebugTokenCreateCall<'a>
-    where  {
+pub struct ProjectAppDebugTokenCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaDebugToken,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2686,9 +2715,15 @@ pub struct ProjectAppDebugTokenCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDebugTokenCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDebugTokenCreateCall<'a, S> {}
 
-impl<'a> ProjectAppDebugTokenCreateCall<'a> {
+impl<'a, S> ProjectAppDebugTokenCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2848,7 +2883,7 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaDebugToken) -> ProjectAppDebugTokenCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaDebugToken) -> ProjectAppDebugTokenCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2858,7 +2893,7 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppDebugTokenCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppDebugTokenCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2868,7 +2903,7 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2893,7 +2928,7 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2913,9 +2948,9 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDebugTokenCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDebugTokenCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2947,7 +2982,7 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2955,19 +2990,25 @@ impl<'a> ProjectAppDebugTokenCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDebugTokenDeleteCall<'a>
-    where  {
+pub struct ProjectAppDebugTokenDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDebugTokenDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDebugTokenDeleteCall<'a, S> {}
 
-impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
+impl<'a, S> ProjectAppDebugTokenDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3114,7 +3155,7 @@ impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppDebugTokenDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppDebugTokenDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3124,7 +3165,7 @@ impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3149,7 +3190,7 @@ impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3169,9 +3210,9 @@ impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDebugTokenDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDebugTokenDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3203,7 +3244,7 @@ impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3211,19 +3252,25 @@ impl<'a> ProjectAppDebugTokenDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDebugTokenGetCall<'a>
-    where  {
+pub struct ProjectAppDebugTokenGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDebugTokenGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDebugTokenGetCall<'a, S> {}
 
-impl<'a> ProjectAppDebugTokenGetCall<'a> {
+impl<'a, S> ProjectAppDebugTokenGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3370,7 +3417,7 @@ impl<'a> ProjectAppDebugTokenGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppDebugTokenGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppDebugTokenGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3380,7 +3427,7 @@ impl<'a> ProjectAppDebugTokenGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3405,7 +3452,7 @@ impl<'a> ProjectAppDebugTokenGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3425,9 +3472,9 @@ impl<'a> ProjectAppDebugTokenGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDebugTokenGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDebugTokenGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3459,7 +3506,7 @@ impl<'a> ProjectAppDebugTokenGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3469,10 +3516,10 @@ impl<'a> ProjectAppDebugTokenGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDebugTokenListCall<'a>
-    where  {
+pub struct ProjectAppDebugTokenListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3481,9 +3528,15 @@ pub struct ProjectAppDebugTokenListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDebugTokenListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDebugTokenListCall<'a, S> {}
 
-impl<'a> ProjectAppDebugTokenListCall<'a> {
+impl<'a, S> ProjectAppDebugTokenListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3636,21 +3689,21 @@ impl<'a> ProjectAppDebugTokenListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppDebugTokenListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppDebugTokenListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to ListDebugTokens indicating where in the set of DebugTokens to resume listing. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to ListDebugTokens must match the call that provided the page token; if they do not match, the result is undefined.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAppDebugTokenListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectAppDebugTokenListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of DebugTokens to return in the response. Note that an app can have at most 20 debug tokens. The server may return fewer than this at its own discretion. If no value is specified (or too large a value is specified), the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAppDebugTokenListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectAppDebugTokenListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3660,7 +3713,7 @@ impl<'a> ProjectAppDebugTokenListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3685,7 +3738,7 @@ impl<'a> ProjectAppDebugTokenListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3705,9 +3758,9 @@ impl<'a> ProjectAppDebugTokenListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDebugTokenListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDebugTokenListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3740,7 +3793,7 @@ impl<'a> ProjectAppDebugTokenListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3754,10 +3807,10 @@ impl<'a> ProjectAppDebugTokenListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDebugTokenPatchCall<'a>
-    where  {
+pub struct ProjectAppDebugTokenPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaDebugToken,
     _name: String,
     _update_mask: Option<String>,
@@ -3766,9 +3819,15 @@ pub struct ProjectAppDebugTokenPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDebugTokenPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDebugTokenPatchCall<'a, S> {}
 
-impl<'a> ProjectAppDebugTokenPatchCall<'a> {
+impl<'a, S> ProjectAppDebugTokenPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3931,7 +3990,7 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaDebugToken) -> ProjectAppDebugTokenPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaDebugToken) -> ProjectAppDebugTokenPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3941,14 +4000,14 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppDebugTokenPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppDebugTokenPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the DebugToken to update. Example: `display_name`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAppDebugTokenPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAppDebugTokenPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3958,7 +4017,7 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDebugTokenPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3983,7 +4042,7 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDebugTokenPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4003,9 +4062,9 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDebugTokenPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDebugTokenPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4037,7 +4096,7 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4046,10 +4105,10 @@ impl<'a> ProjectAppDebugTokenPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDeviceCheckConfigBatchGetCall<'a>
-    where  {
+pub struct ProjectAppDeviceCheckConfigBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4057,9 +4116,15 @@ pub struct ProjectAppDeviceCheckConfigBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDeviceCheckConfigBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDeviceCheckConfigBatchGetCall<'a, S> {}
 
-impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
+impl<'a, S> ProjectAppDeviceCheckConfigBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4211,7 +4276,7 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4219,7 +4284,7 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -4229,7 +4294,7 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDeviceCheckConfigBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4254,7 +4319,7 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDeviceCheckConfigBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDeviceCheckConfigBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4274,9 +4339,9 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDeviceCheckConfigBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDeviceCheckConfigBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4308,7 +4373,7 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4316,19 +4381,25 @@ impl<'a> ProjectAppDeviceCheckConfigBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDeviceCheckConfigGetCall<'a>
-    where  {
+pub struct ProjectAppDeviceCheckConfigGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDeviceCheckConfigGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDeviceCheckConfigGetCall<'a, S> {}
 
-impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
+impl<'a, S> ProjectAppDeviceCheckConfigGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4475,7 +4546,7 @@ impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4485,7 +4556,7 @@ impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDeviceCheckConfigGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDeviceCheckConfigGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4510,7 +4581,7 @@ impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDeviceCheckConfigGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDeviceCheckConfigGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4530,9 +4601,9 @@ impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDeviceCheckConfigGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDeviceCheckConfigGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4565,7 +4636,7 @@ impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4579,10 +4650,10 @@ impl<'a> ProjectAppDeviceCheckConfigGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppDeviceCheckConfigPatchCall<'a>
-    where  {
+pub struct ProjectAppDeviceCheckConfigPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaDeviceCheckConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -4591,9 +4662,15 @@ pub struct ProjectAppDeviceCheckConfigPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppDeviceCheckConfigPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppDeviceCheckConfigPatchCall<'a, S> {}
 
-impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
+impl<'a, S> ProjectAppDeviceCheckConfigPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4756,7 +4833,7 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaDeviceCheckConfig) -> ProjectAppDeviceCheckConfigPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaDeviceCheckConfig) -> ProjectAppDeviceCheckConfigPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4766,14 +4843,14 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the DeviceCheckConfig Gets to update. Example: `key_id,private_key`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAppDeviceCheckConfigPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4783,7 +4860,7 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDeviceCheckConfigPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppDeviceCheckConfigPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4808,7 +4885,7 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDeviceCheckConfigPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppDeviceCheckConfigPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4828,9 +4905,9 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppDeviceCheckConfigPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppDeviceCheckConfigPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4862,7 +4939,7 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4871,10 +4948,10 @@ impl<'a> ProjectAppDeviceCheckConfigPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppRecaptchaConfigBatchGetCall<'a>
-    where  {
+pub struct ProjectAppRecaptchaConfigBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4882,9 +4959,15 @@ pub struct ProjectAppRecaptchaConfigBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppRecaptchaConfigBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppRecaptchaConfigBatchGetCall<'a, S> {}
 
-impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
+impl<'a, S> ProjectAppRecaptchaConfigBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5036,7 +5119,7 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppRecaptchaConfigBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppRecaptchaConfigBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5044,7 +5127,7 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> ProjectAppRecaptchaConfigBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> ProjectAppRecaptchaConfigBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -5054,7 +5137,7 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaConfigBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaConfigBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5079,7 +5162,7 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaConfigBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaConfigBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5099,9 +5182,9 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppRecaptchaConfigBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppRecaptchaConfigBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5133,7 +5216,7 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5141,19 +5224,25 @@ impl<'a> ProjectAppRecaptchaConfigBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppRecaptchaConfigGetCall<'a>
-    where  {
+pub struct ProjectAppRecaptchaConfigGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppRecaptchaConfigGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppRecaptchaConfigGetCall<'a, S> {}
 
-impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
+impl<'a, S> ProjectAppRecaptchaConfigGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5300,7 +5389,7 @@ impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaConfigGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaConfigGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5310,7 +5399,7 @@ impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaConfigGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaConfigGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5335,7 +5424,7 @@ impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaConfigGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaConfigGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5355,9 +5444,9 @@ impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppRecaptchaConfigGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppRecaptchaConfigGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5390,7 +5479,7 @@ impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5404,10 +5493,10 @@ impl<'a> ProjectAppRecaptchaConfigGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppRecaptchaConfigPatchCall<'a>
-    where  {
+pub struct ProjectAppRecaptchaConfigPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaRecaptchaConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -5416,9 +5505,15 @@ pub struct ProjectAppRecaptchaConfigPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppRecaptchaConfigPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppRecaptchaConfigPatchCall<'a, S> {}
 
-impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
+impl<'a, S> ProjectAppRecaptchaConfigPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5581,7 +5676,7 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaRecaptchaConfig) -> ProjectAppRecaptchaConfigPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaRecaptchaConfig) -> ProjectAppRecaptchaConfigPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5591,14 +5686,14 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaConfigPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaConfigPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the RecaptchaConfig to update. Example: `site_secret`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAppRecaptchaConfigPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAppRecaptchaConfigPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5608,7 +5703,7 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaConfigPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaConfigPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5633,7 +5728,7 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaConfigPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaConfigPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5653,9 +5748,9 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppRecaptchaConfigPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppRecaptchaConfigPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5687,7 +5782,7 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5696,10 +5791,10 @@ impl<'a> ProjectAppRecaptchaConfigPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a>
-    where  {
+pub struct ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5707,9 +5802,15 @@ pub struct ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S> {}
 
-impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
+impl<'a, S> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5861,7 +5962,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5869,7 +5970,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -5879,7 +5980,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5904,7 +6005,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5924,9 +6025,9 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5958,7 +6059,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5966,19 +6067,25 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppRecaptchaEnterpriseConfigGetCall<'a>
-    where  {
+pub struct ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S> {}
 
-impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
+impl<'a, S> ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6125,7 +6232,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6135,7 +6242,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6160,7 +6267,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6180,9 +6287,9 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppRecaptchaEnterpriseConfigGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6215,7 +6322,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6229,10 +6336,10 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppRecaptchaEnterpriseConfigPatchCall<'a>
-    where  {
+pub struct ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -6241,9 +6348,15 @@ pub struct ProjectAppRecaptchaEnterpriseConfigPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S> {}
 
-impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
+impl<'a, S> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6406,7 +6519,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6416,14 +6529,14 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the RecaptchaEnterpriseConfig to update. Example: `site_key`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6433,7 +6546,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6458,7 +6571,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6478,9 +6591,9 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6512,7 +6625,7 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6521,10 +6634,10 @@ impl<'a> ProjectAppRecaptchaEnterpriseConfigPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppSafetyNetConfigBatchGetCall<'a>
-    where  {
+pub struct ProjectAppSafetyNetConfigBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6532,9 +6645,15 @@ pub struct ProjectAppSafetyNetConfigBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppSafetyNetConfigBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppSafetyNetConfigBatchGetCall<'a, S> {}
 
-impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
+impl<'a, S> ProjectAppSafetyNetConfigBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6686,7 +6805,7 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAppSafetyNetConfigBatchGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAppSafetyNetConfigBatchGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6694,7 +6813,7 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> ProjectAppSafetyNetConfigBatchGetCall<'a> {
+    pub fn add_names(mut self, new_value: &str) -> ProjectAppSafetyNetConfigBatchGetCall<'a, S> {
         self._names.push(new_value.to_string());
         self
     }
@@ -6704,7 +6823,7 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppSafetyNetConfigBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppSafetyNetConfigBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6729,7 +6848,7 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppSafetyNetConfigBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppSafetyNetConfigBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6749,9 +6868,9 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppSafetyNetConfigBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppSafetyNetConfigBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6783,7 +6902,7 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6791,19 +6910,25 @@ impl<'a> ProjectAppSafetyNetConfigBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppSafetyNetConfigGetCall<'a>
-    where  {
+pub struct ProjectAppSafetyNetConfigGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppSafetyNetConfigGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppSafetyNetConfigGetCall<'a, S> {}
 
-impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
+impl<'a, S> ProjectAppSafetyNetConfigGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6950,7 +7075,7 @@ impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppSafetyNetConfigGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppSafetyNetConfigGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6960,7 +7085,7 @@ impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppSafetyNetConfigGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppSafetyNetConfigGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6985,7 +7110,7 @@ impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppSafetyNetConfigGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppSafetyNetConfigGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7005,9 +7130,9 @@ impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppSafetyNetConfigGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppSafetyNetConfigGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7040,7 +7165,7 @@ impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7054,10 +7179,10 @@ impl<'a> ProjectAppSafetyNetConfigGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppSafetyNetConfigPatchCall<'a>
-    where  {
+pub struct ProjectAppSafetyNetConfigPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaSafetyNetConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -7066,9 +7191,15 @@ pub struct ProjectAppSafetyNetConfigPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppSafetyNetConfigPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppSafetyNetConfigPatchCall<'a, S> {}
 
-impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
+impl<'a, S> ProjectAppSafetyNetConfigPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7231,7 +7362,7 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaSafetyNetConfig) -> ProjectAppSafetyNetConfigPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaSafetyNetConfig) -> ProjectAppSafetyNetConfigPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7241,14 +7372,14 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectAppSafetyNetConfigPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectAppSafetyNetConfigPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the SafetyNetConfig Gets to update. Example: `token_ttl`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectAppSafetyNetConfigPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectAppSafetyNetConfigPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7258,7 +7389,7 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppSafetyNetConfigPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppSafetyNetConfigPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7283,7 +7414,7 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppSafetyNetConfigPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppSafetyNetConfigPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7303,9 +7434,9 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppSafetyNetConfigPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppSafetyNetConfigPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7338,7 +7469,7 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7351,10 +7482,10 @@ impl<'a> ProjectAppSafetyNetConfigPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeAppAttestAssertionCall<'a>
-    where  {
+pub struct ProjectAppExchangeAppAttestAssertionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7362,9 +7493,15 @@ pub struct ProjectAppExchangeAppAttestAssertionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeAppAttestAssertionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeAppAttestAssertionCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
+impl<'a, S> ProjectAppExchangeAppAttestAssertionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7524,7 +7661,7 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest) -> ProjectAppExchangeAppAttestAssertionCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest) -> ProjectAppExchangeAppAttestAssertionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7534,7 +7671,7 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeAppAttestAssertionCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeAppAttestAssertionCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -7544,7 +7681,7 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeAppAttestAssertionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeAppAttestAssertionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7569,7 +7706,7 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeAppAttestAssertionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeAppAttestAssertionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7589,9 +7726,9 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeAppAttestAssertionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeAppAttestAssertionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7624,7 +7761,7 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7637,10 +7774,10 @@ impl<'a> ProjectAppExchangeAppAttestAssertionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeAppAttestAttestationCall<'a>
-    where  {
+pub struct ProjectAppExchangeAppAttestAttestationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7648,9 +7785,15 @@ pub struct ProjectAppExchangeAppAttestAttestationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeAppAttestAttestationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeAppAttestAttestationCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
+impl<'a, S> ProjectAppExchangeAppAttestAttestationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7810,7 +7953,7 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest) -> ProjectAppExchangeAppAttestAttestationCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest) -> ProjectAppExchangeAppAttestAttestationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7820,7 +7963,7 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeAppAttestAttestationCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeAppAttestAttestationCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -7830,7 +7973,7 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeAppAttestAttestationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeAppAttestAttestationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7855,7 +7998,7 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeAppAttestAttestationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeAppAttestAttestationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7875,9 +8018,9 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeAppAttestAttestationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeAppAttestAttestationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7910,7 +8053,7 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7923,10 +8066,10 @@ impl<'a> ProjectAppExchangeAppAttestAttestationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeCustomTokenCall<'a>
-    where  {
+pub struct ProjectAppExchangeCustomTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7934,9 +8077,15 @@ pub struct ProjectAppExchangeCustomTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeCustomTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeCustomTokenCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
+impl<'a, S> ProjectAppExchangeCustomTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8096,7 +8245,7 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest) -> ProjectAppExchangeCustomTokenCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest) -> ProjectAppExchangeCustomTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8106,7 +8255,7 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeCustomTokenCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeCustomTokenCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -8116,7 +8265,7 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeCustomTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeCustomTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8141,7 +8290,7 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeCustomTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeCustomTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8161,9 +8310,9 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeCustomTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeCustomTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8196,7 +8345,7 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8209,10 +8358,10 @@ impl<'a> ProjectAppExchangeCustomTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeDebugTokenCall<'a>
-    where  {
+pub struct ProjectAppExchangeDebugTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8220,9 +8369,15 @@ pub struct ProjectAppExchangeDebugTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeDebugTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeDebugTokenCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
+impl<'a, S> ProjectAppExchangeDebugTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8382,7 +8537,7 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest) -> ProjectAppExchangeDebugTokenCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest) -> ProjectAppExchangeDebugTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8392,7 +8547,7 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeDebugTokenCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeDebugTokenCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -8402,7 +8557,7 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeDebugTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeDebugTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8427,7 +8582,7 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeDebugTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeDebugTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8447,9 +8602,9 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeDebugTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeDebugTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8482,7 +8637,7 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8495,10 +8650,10 @@ impl<'a> ProjectAppExchangeDebugTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeDeviceCheckTokenCall<'a>
-    where  {
+pub struct ProjectAppExchangeDeviceCheckTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8506,9 +8661,15 @@ pub struct ProjectAppExchangeDeviceCheckTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeDeviceCheckTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeDeviceCheckTokenCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
+impl<'a, S> ProjectAppExchangeDeviceCheckTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8668,7 +8829,7 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest) -> ProjectAppExchangeDeviceCheckTokenCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest) -> ProjectAppExchangeDeviceCheckTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8678,7 +8839,7 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeDeviceCheckTokenCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeDeviceCheckTokenCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -8688,7 +8849,7 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeDeviceCheckTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeDeviceCheckTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8713,7 +8874,7 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeDeviceCheckTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeDeviceCheckTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8733,9 +8894,9 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeDeviceCheckTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeDeviceCheckTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8768,7 +8929,7 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8781,10 +8942,10 @@ impl<'a> ProjectAppExchangeDeviceCheckTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a>
-    where  {
+pub struct ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8792,9 +8953,15 @@ pub struct ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
+impl<'a, S> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8954,7 +9121,7 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8964,7 +9131,7 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -8974,7 +9141,7 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8999,7 +9166,7 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9019,9 +9186,9 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9054,7 +9221,7 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9067,10 +9234,10 @@ impl<'a> ProjectAppExchangeRecaptchaEnterpriseTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeRecaptchaTokenCall<'a>
-    where  {
+pub struct ProjectAppExchangeRecaptchaTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9078,9 +9245,15 @@ pub struct ProjectAppExchangeRecaptchaTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeRecaptchaTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeRecaptchaTokenCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
+impl<'a, S> ProjectAppExchangeRecaptchaTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9240,7 +9413,7 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest) -> ProjectAppExchangeRecaptchaTokenCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest) -> ProjectAppExchangeRecaptchaTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9250,7 +9423,7 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeRecaptchaTokenCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeRecaptchaTokenCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -9260,7 +9433,7 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeRecaptchaTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeRecaptchaTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9285,7 +9458,7 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeRecaptchaTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeRecaptchaTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9305,9 +9478,9 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeRecaptchaTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeRecaptchaTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9340,7 +9513,7 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9353,10 +9526,10 @@ impl<'a> ProjectAppExchangeRecaptchaTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppExchangeSafetyNetTokenCall<'a>
-    where  {
+pub struct ProjectAppExchangeSafetyNetTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9364,9 +9537,15 @@ pub struct ProjectAppExchangeSafetyNetTokenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppExchangeSafetyNetTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppExchangeSafetyNetTokenCall<'a, S> {}
 
-impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
+impl<'a, S> ProjectAppExchangeSafetyNetTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9526,7 +9705,7 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest) -> ProjectAppExchangeSafetyNetTokenCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest) -> ProjectAppExchangeSafetyNetTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9536,7 +9715,7 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeSafetyNetTokenCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppExchangeSafetyNetTokenCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -9546,7 +9725,7 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeSafetyNetTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppExchangeSafetyNetTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9571,7 +9750,7 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeSafetyNetTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppExchangeSafetyNetTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9591,9 +9770,9 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppExchangeSafetyNetTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppExchangeSafetyNetTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9626,7 +9805,7 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9639,10 +9818,10 @@ impl<'a> ProjectAppExchangeSafetyNetTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAppGenerateAppAttestChallengeCall<'a>
-    where  {
+pub struct ProjectAppGenerateAppAttestChallengeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest,
     _app: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9650,9 +9829,15 @@ pub struct ProjectAppGenerateAppAttestChallengeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAppGenerateAppAttestChallengeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAppGenerateAppAttestChallengeCall<'a, S> {}
 
-impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
+impl<'a, S> ProjectAppGenerateAppAttestChallengeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9812,7 +9997,7 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest) -> ProjectAppGenerateAppAttestChallengeCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest) -> ProjectAppGenerateAppAttestChallengeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9822,7 +10007,7 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn app(mut self, new_value: &str) -> ProjectAppGenerateAppAttestChallengeCall<'a> {
+    pub fn app(mut self, new_value: &str) -> ProjectAppGenerateAppAttestChallengeCall<'a, S> {
         self._app = new_value.to_string();
         self
     }
@@ -9832,7 +10017,7 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppGenerateAppAttestChallengeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAppGenerateAppAttestChallengeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9857,7 +10042,7 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppGenerateAppAttestChallengeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAppGenerateAppAttestChallengeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9877,9 +10062,9 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAppGenerateAppAttestChallengeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAppGenerateAppAttestChallengeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9912,7 +10097,7 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9925,10 +10110,10 @@ impl<'a> ProjectAppGenerateAppAttestChallengeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceBatchUpdateCall<'a>
-    where  {
+pub struct ProjectServiceBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9936,9 +10121,15 @@ pub struct ProjectServiceBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectServiceBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectServiceBatchUpdateCall<'a, S> {}
 
-impl<'a> ProjectServiceBatchUpdateCall<'a> {
+impl<'a, S> ProjectServiceBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10098,7 +10289,7 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest) -> ProjectServiceBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest) -> ProjectServiceBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10108,7 +10299,7 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectServiceBatchUpdateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectServiceBatchUpdateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -10118,7 +10309,7 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10143,7 +10334,7 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10163,9 +10354,9 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectServiceBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10197,7 +10388,7 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10205,19 +10396,25 @@ impl<'a> ProjectServiceBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceGetCall<'a>
-    where  {
+pub struct ProjectServiceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectServiceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectServiceGetCall<'a, S> {}
 
-impl<'a> ProjectServiceGetCall<'a> {
+impl<'a, S> ProjectServiceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10364,7 +10561,7 @@ impl<'a> ProjectServiceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectServiceGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10374,7 +10571,7 @@ impl<'a> ProjectServiceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10399,7 +10596,7 @@ impl<'a> ProjectServiceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10419,9 +10616,9 @@ impl<'a> ProjectServiceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectServiceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10453,7 +10650,7 @@ impl<'a> ProjectServiceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10463,10 +10660,10 @@ impl<'a> ProjectServiceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceListCall<'a>
-    where  {
+pub struct ProjectServiceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10475,9 +10672,15 @@ pub struct ProjectServiceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectServiceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectServiceListCall<'a, S> {}
 
-impl<'a> ProjectServiceListCall<'a> {
+impl<'a, S> ProjectServiceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10630,21 +10833,21 @@ impl<'a> ProjectServiceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectServiceListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectServiceListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to ListServices indicating where in the set of Services to resume listing. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to ListServices must match the call that provided the page token; if they do not match, the result is undefined.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectServiceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectServiceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of Services to return in the response. Only explicitly configured services are returned. The server may return fewer than this at its own discretion. If no value is specified (or too large a value is specified), the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectServiceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectServiceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -10654,7 +10857,7 @@ impl<'a> ProjectServiceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10679,7 +10882,7 @@ impl<'a> ProjectServiceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10699,9 +10902,9 @@ impl<'a> ProjectServiceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectServiceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10734,7 +10937,7 @@ impl<'a> ProjectServiceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10748,10 +10951,10 @@ impl<'a> ProjectServiceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServicePatchCall<'a>
-    where  {
+pub struct ProjectServicePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Firebaseappcheck<>,
+    hub: &'a Firebaseappcheck<S>,
     _request: GoogleFirebaseAppcheckV1betaService,
     _name: String,
     _update_mask: Option<String>,
@@ -10760,9 +10963,15 @@ pub struct ProjectServicePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectServicePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectServicePatchCall<'a, S> {}
 
-impl<'a> ProjectServicePatchCall<'a> {
+impl<'a, S> ProjectServicePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10925,7 +11134,7 @@ impl<'a> ProjectServicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaService) -> ProjectServicePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleFirebaseAppcheckV1betaService) -> ProjectServicePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10935,14 +11144,14 @@ impl<'a> ProjectServicePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServicePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectServicePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. A comma-separated list of names of fields in the Service to update. Example: `enforcement_mode`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectServicePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectServicePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10952,7 +11161,7 @@ impl<'a> ProjectServicePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServicePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServicePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10977,7 +11186,7 @@ impl<'a> ProjectServicePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServicePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServicePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10997,9 +11206,9 @@ impl<'a> ProjectServicePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServicePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectServicePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

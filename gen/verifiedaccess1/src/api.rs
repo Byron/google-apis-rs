@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Verifiedaccess<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Verifiedaccess<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Verifiedaccess<> {}
+impl<'a, S> client::Hub for Verifiedaccess<S> {}
 
-impl<'a, > Verifiedaccess<> {
+impl<'a, S> Verifiedaccess<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Verifiedaccess<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Verifiedaccess<S> {
         Verifiedaccess {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://verifiedaccess.googleapis.com/".to_string(),
             _root_url: "https://verifiedaccess.googleapis.com/".to_string(),
         }
     }
 
-    pub fn challenge(&'a self) -> ChallengeMethods<'a> {
+    pub fn challenge(&'a self) -> ChallengeMethods<'a, S> {
         ChallengeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -285,22 +290,22 @@ impl client::ResponseResult for VerifyChallengeResponseResult {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)` and `verify(...)`
 /// // to build up your call.
 /// let rb = hub.challenge();
 /// # }
 /// ```
-pub struct ChallengeMethods<'a>
-    where  {
+pub struct ChallengeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Verifiedaccess<>,
+    hub: &'a Verifiedaccess<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChallengeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChallengeMethods<'a, S> {}
 
-impl<'a> ChallengeMethods<'a> {
+impl<'a, S> ChallengeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -309,7 +314,7 @@ impl<'a> ChallengeMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Empty) -> ChallengeCreateCall<'a> {
+    pub fn create(&self, request: Empty) -> ChallengeCreateCall<'a, S> {
         ChallengeCreateCall {
             hub: self.hub,
             _request: request,
@@ -326,7 +331,7 @@ impl<'a> ChallengeMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify(&self, request: VerifyChallengeResponseRequest) -> ChallengeVerifyCall<'a> {
+    pub fn verify(&self, request: VerifyChallengeResponseRequest) -> ChallengeVerifyCall<'a, S> {
         ChallengeVerifyCall {
             hub: self.hub,
             _request: request,
@@ -368,7 +373,7 @@ impl<'a> ChallengeMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -381,19 +386,25 @@ impl<'a> ChallengeMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChallengeCreateCall<'a>
-    where  {
+pub struct ChallengeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Verifiedaccess<>,
+    hub: &'a Verifiedaccess<S>,
     _request: Empty,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChallengeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ChallengeCreateCall<'a, S> {}
 
-impl<'a> ChallengeCreateCall<'a> {
+impl<'a, S> ChallengeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -527,7 +538,7 @@ impl<'a> ChallengeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Empty) -> ChallengeCreateCall<'a> {
+    pub fn request(mut self, new_value: Empty) -> ChallengeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -537,7 +548,7 @@ impl<'a> ChallengeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChallengeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChallengeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -562,7 +573,7 @@ impl<'a> ChallengeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChallengeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChallengeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -582,9 +593,9 @@ impl<'a> ChallengeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChallengeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChallengeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -617,7 +628,7 @@ impl<'a> ChallengeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Verifiedaccess::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -630,19 +641,25 @@ impl<'a> ChallengeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChallengeVerifyCall<'a>
-    where  {
+pub struct ChallengeVerifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Verifiedaccess<>,
+    hub: &'a Verifiedaccess<S>,
     _request: VerifyChallengeResponseRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChallengeVerifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ChallengeVerifyCall<'a, S> {}
 
-impl<'a> ChallengeVerifyCall<'a> {
+impl<'a, S> ChallengeVerifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -776,7 +793,7 @@ impl<'a> ChallengeVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: VerifyChallengeResponseRequest) -> ChallengeVerifyCall<'a> {
+    pub fn request(mut self, new_value: VerifyChallengeResponseRequest) -> ChallengeVerifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -786,7 +803,7 @@ impl<'a> ChallengeVerifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChallengeVerifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChallengeVerifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -811,7 +828,7 @@ impl<'a> ChallengeVerifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChallengeVerifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChallengeVerifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -831,9 +848,9 @@ impl<'a> ChallengeVerifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChallengeVerifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChallengeVerifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

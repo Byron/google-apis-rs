@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,37 +109,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AuthorizedBuyersMarketplace<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AuthorizedBuyersMarketplace<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AuthorizedBuyersMarketplace<> {}
+impl<'a, S> client::Hub for AuthorizedBuyersMarketplace<S> {}
 
-impl<'a, > AuthorizedBuyersMarketplace<> {
+impl<'a, S> AuthorizedBuyersMarketplace<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AuthorizedBuyersMarketplace<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AuthorizedBuyersMarketplace<S> {
         AuthorizedBuyersMarketplace {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://authorizedbuyersmarketplace.googleapis.com/".to_string(),
             _root_url: "https://authorizedbuyersmarketplace.googleapis.com/".to_string(),
         }
     }
 
-    pub fn bidders(&'a self) -> BidderMethods<'a> {
+    pub fn bidders(&'a self) -> BidderMethods<'a, S> {
         BidderMethods { hub: &self }
     }
-    pub fn buyers(&'a self) -> BuyerMethods<'a> {
+    pub fn buyers(&'a self) -> BuyerMethods<'a, S> {
         BuyerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1605,22 +1610,22 @@ impl client::Part for VideoTargeting {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `finalized_deals_list(...)`
 /// // to build up your call.
 /// let rb = hub.bidders();
 /// # }
 /// ```
-pub struct BidderMethods<'a>
-    where  {
+pub struct BidderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
 }
 
-impl<'a> client::MethodsBuilder for BidderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BidderMethods<'a, S> {}
 
-impl<'a> BidderMethods<'a> {
+impl<'a, S> BidderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1629,7 +1634,7 @@ impl<'a> BidderMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The buyer to list the finalized deals for, in the format: `buyers/{accountId}`. When used to list finalized deals for a bidder, its buyers and clients, in the format `bidders/{accountId}`.
-    pub fn finalized_deals_list(&self, parent: &str) -> BidderFinalizedDealListCall<'a> {
+    pub fn finalized_deals_list(&self, parent: &str) -> BidderFinalizedDealListCall<'a, S> {
         BidderFinalizedDealListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1667,22 +1672,22 @@ impl<'a> BidderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `auction_packages_get(...)`, `auction_packages_list(...)`, `auction_packages_subscribe(...)`, `auction_packages_subscribe_clients(...)`, `auction_packages_unsubscribe(...)`, `auction_packages_unsubscribe_clients(...)`, `clients_activate(...)`, `clients_create(...)`, `clients_deactivate(...)`, `clients_get(...)`, `clients_list(...)`, `clients_patch(...)`, `clients_users_activate(...)`, `clients_users_create(...)`, `clients_users_deactivate(...)`, `clients_users_delete(...)`, `clients_users_get(...)`, `clients_users_list(...)`, `finalized_deals_add_creative(...)`, `finalized_deals_get(...)`, `finalized_deals_list(...)`, `finalized_deals_pause(...)`, `finalized_deals_resume(...)`, `finalized_deals_set_ready_to_serve(...)`, `proposals_accept(...)`, `proposals_add_note(...)`, `proposals_cancel_negotiation(...)`, `proposals_deals_batch_update(...)`, `proposals_deals_get(...)`, `proposals_deals_list(...)`, `proposals_deals_patch(...)`, `proposals_get(...)`, `proposals_list(...)`, `proposals_patch(...)`, `proposals_send_rfp(...)`, `publisher_profiles_get(...)` and `publisher_profiles_list(...)`
 /// // to build up your call.
 /// let rb = hub.buyers();
 /// # }
 /// ```
-pub struct BuyerMethods<'a>
-    where  {
+pub struct BuyerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
 }
 
-impl<'a> client::MethodsBuilder for BuyerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BuyerMethods<'a, S> {}
 
-impl<'a> BuyerMethods<'a> {
+impl<'a, S> BuyerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1691,7 +1696,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of auction package to get. Format: `buyers/{accountId}/auctionPackages/{auctionPackageId}`
-    pub fn auction_packages_get(&self, name: &str) -> BuyerAuctionPackageGetCall<'a> {
+    pub fn auction_packages_get(&self, name: &str) -> BuyerAuctionPackageGetCall<'a, S> {
         BuyerAuctionPackageGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1708,7 +1713,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the parent buyer that can access the auction package. Format: `buyers/{accountId}`
-    pub fn auction_packages_list(&self, parent: &str) -> BuyerAuctionPackageListCall<'a> {
+    pub fn auction_packages_list(&self, parent: &str) -> BuyerAuctionPackageListCall<'a, S> {
         BuyerAuctionPackageListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1728,7 +1733,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the auction package. Format: `buyers/{accountId}/auctionPackages/{auctionPackageId}`
-    pub fn auction_packages_subscribe(&self, request: SubscribeAuctionPackageRequest, name: &str) -> BuyerAuctionPackageSubscribeCall<'a> {
+    pub fn auction_packages_subscribe(&self, request: SubscribeAuctionPackageRequest, name: &str) -> BuyerAuctionPackageSubscribeCall<'a, S> {
         BuyerAuctionPackageSubscribeCall {
             hub: self.hub,
             _request: request,
@@ -1747,7 +1752,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `auctionPackage` - Required. Name of the auction package. Format: `buyers/{accountId}/auctionPackages/{auctionPackageId}`
-    pub fn auction_packages_subscribe_clients(&self, request: SubscribeClientsRequest, auction_package: &str) -> BuyerAuctionPackageSubscribeClientCall<'a> {
+    pub fn auction_packages_subscribe_clients(&self, request: SubscribeClientsRequest, auction_package: &str) -> BuyerAuctionPackageSubscribeClientCall<'a, S> {
         BuyerAuctionPackageSubscribeClientCall {
             hub: self.hub,
             _request: request,
@@ -1766,7 +1771,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the auction package. Format: `buyers/{accountId}/auctionPackages/{auctionPackageId}`
-    pub fn auction_packages_unsubscribe(&self, request: UnsubscribeAuctionPackageRequest, name: &str) -> BuyerAuctionPackageUnsubscribeCall<'a> {
+    pub fn auction_packages_unsubscribe(&self, request: UnsubscribeAuctionPackageRequest, name: &str) -> BuyerAuctionPackageUnsubscribeCall<'a, S> {
         BuyerAuctionPackageUnsubscribeCall {
             hub: self.hub,
             _request: request,
@@ -1785,7 +1790,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `auctionPackage` - Required. Name of the auction package. Format: `buyers/{accountId}/auctionPackages/{auctionPackageId}`
-    pub fn auction_packages_unsubscribe_clients(&self, request: UnsubscribeClientsRequest, auction_package: &str) -> BuyerAuctionPackageUnsubscribeClientCall<'a> {
+    pub fn auction_packages_unsubscribe_clients(&self, request: UnsubscribeClientsRequest, auction_package: &str) -> BuyerAuctionPackageUnsubscribeClientCall<'a, S> {
         BuyerAuctionPackageUnsubscribeClientCall {
             hub: self.hub,
             _request: request,
@@ -1804,7 +1809,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}/clientUsers/{userId}`
-    pub fn clients_users_activate(&self, request: ActivateClientUserRequest, name: &str) -> BuyerClientUserActivateCall<'a> {
+    pub fn clients_users_activate(&self, request: ActivateClientUserRequest, name: &str) -> BuyerClientUserActivateCall<'a, S> {
         BuyerClientUserActivateCall {
             hub: self.hub,
             _request: request,
@@ -1823,7 +1828,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the client. Format: `buyers/{accountId}/clients/{clientAccountId}`
-    pub fn clients_users_create(&self, request: ClientUser, parent: &str) -> BuyerClientUserCreateCall<'a> {
+    pub fn clients_users_create(&self, request: ClientUser, parent: &str) -> BuyerClientUserCreateCall<'a, S> {
         BuyerClientUserCreateCall {
             hub: self.hub,
             _request: request,
@@ -1842,7 +1847,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}/clientUsers/{userId}`
-    pub fn clients_users_deactivate(&self, request: DeactivateClientUserRequest, name: &str) -> BuyerClientUserDeactivateCall<'a> {
+    pub fn clients_users_deactivate(&self, request: DeactivateClientUserRequest, name: &str) -> BuyerClientUserDeactivateCall<'a, S> {
         BuyerClientUserDeactivateCall {
             hub: self.hub,
             _request: request,
@@ -1860,7 +1865,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}/clientUsers/{userId}`
-    pub fn clients_users_delete(&self, name: &str) -> BuyerClientUserDeleteCall<'a> {
+    pub fn clients_users_delete(&self, name: &str) -> BuyerClientUserDeleteCall<'a, S> {
         BuyerClientUserDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1877,7 +1882,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}/clientUsers/{userId}`
-    pub fn clients_users_get(&self, name: &str) -> BuyerClientUserGetCall<'a> {
+    pub fn clients_users_get(&self, name: &str) -> BuyerClientUserGetCall<'a, S> {
         BuyerClientUserGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1894,7 +1899,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the client. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}`
-    pub fn clients_users_list(&self, parent: &str) -> BuyerClientUserListCall<'a> {
+    pub fn clients_users_list(&self, parent: &str) -> BuyerClientUserListCall<'a, S> {
         BuyerClientUserListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1914,7 +1919,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}`
-    pub fn clients_activate(&self, request: ActivateClientRequest, name: &str) -> BuyerClientActivateCall<'a> {
+    pub fn clients_activate(&self, request: ActivateClientRequest, name: &str) -> BuyerClientActivateCall<'a, S> {
         BuyerClientActivateCall {
             hub: self.hub,
             _request: request,
@@ -1933,7 +1938,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the buyer. Format: `buyers/{accountId}`
-    pub fn clients_create(&self, request: Client, parent: &str) -> BuyerClientCreateCall<'a> {
+    pub fn clients_create(&self, request: Client, parent: &str) -> BuyerClientCreateCall<'a, S> {
         BuyerClientCreateCall {
             hub: self.hub,
             _request: request,
@@ -1952,7 +1957,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format: `buyers/{buyerAccountId}/clients/{clientAccountId}`
-    pub fn clients_deactivate(&self, request: DeactivateClientRequest, name: &str) -> BuyerClientDeactivateCall<'a> {
+    pub fn clients_deactivate(&self, request: DeactivateClientRequest, name: &str) -> BuyerClientDeactivateCall<'a, S> {
         BuyerClientDeactivateCall {
             hub: self.hub,
             _request: request,
@@ -1970,7 +1975,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: `buyers/{accountId}/clients/{clientAccountId}`
-    pub fn clients_get(&self, name: &str) -> BuyerClientGetCall<'a> {
+    pub fn clients_get(&self, name: &str) -> BuyerClientGetCall<'a, S> {
         BuyerClientGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1987,7 +1992,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the buyer. Format: `buyers/{accountId}`
-    pub fn clients_list(&self, parent: &str) -> BuyerClientListCall<'a> {
+    pub fn clients_list(&self, parent: &str) -> BuyerClientListCall<'a, S> {
         BuyerClientListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2008,7 +2013,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the client. Format: `buyers/{accountId}/clients/{clientAccountId}`
-    pub fn clients_patch(&self, request: Client, name: &str) -> BuyerClientPatchCall<'a> {
+    pub fn clients_patch(&self, request: Client, name: &str) -> BuyerClientPatchCall<'a, S> {
         BuyerClientPatchCall {
             hub: self.hub,
             _request: request,
@@ -2028,7 +2033,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `deal` - Required. Name of the finalized deal in the format of: `buyers/{accountId}/finalizedDeals/{dealId}`
-    pub fn finalized_deals_add_creative(&self, request: AddCreativeRequest, deal: &str) -> BuyerFinalizedDealAddCreativeCall<'a> {
+    pub fn finalized_deals_add_creative(&self, request: AddCreativeRequest, deal: &str) -> BuyerFinalizedDealAddCreativeCall<'a, S> {
         BuyerFinalizedDealAddCreativeCall {
             hub: self.hub,
             _request: request,
@@ -2046,7 +2051,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}`
-    pub fn finalized_deals_get(&self, name: &str) -> BuyerFinalizedDealGetCall<'a> {
+    pub fn finalized_deals_get(&self, name: &str) -> BuyerFinalizedDealGetCall<'a, S> {
         BuyerFinalizedDealGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2063,7 +2068,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The buyer to list the finalized deals for, in the format: `buyers/{accountId}`. When used to list finalized deals for a bidder, its buyers and clients, in the format `bidders/{accountId}`.
-    pub fn finalized_deals_list(&self, parent: &str) -> BuyerFinalizedDealListCall<'a> {
+    pub fn finalized_deals_list(&self, parent: &str) -> BuyerFinalizedDealListCall<'a, S> {
         BuyerFinalizedDealListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2085,7 +2090,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}`
-    pub fn finalized_deals_pause(&self, request: PauseFinalizedDealRequest, name: &str) -> BuyerFinalizedDealPauseCall<'a> {
+    pub fn finalized_deals_pause(&self, request: PauseFinalizedDealRequest, name: &str) -> BuyerFinalizedDealPauseCall<'a, S> {
         BuyerFinalizedDealPauseCall {
             hub: self.hub,
             _request: request,
@@ -2104,7 +2109,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}`
-    pub fn finalized_deals_resume(&self, request: ResumeFinalizedDealRequest, name: &str) -> BuyerFinalizedDealResumeCall<'a> {
+    pub fn finalized_deals_resume(&self, request: ResumeFinalizedDealRequest, name: &str) -> BuyerFinalizedDealResumeCall<'a, S> {
         BuyerFinalizedDealResumeCall {
             hub: self.hub,
             _request: request,
@@ -2123,7 +2128,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `deal` - Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}`
-    pub fn finalized_deals_set_ready_to_serve(&self, request: SetReadyToServeRequest, deal: &str) -> BuyerFinalizedDealSetReadyToServeCall<'a> {
+    pub fn finalized_deals_set_ready_to_serve(&self, request: SetReadyToServeRequest, deal: &str) -> BuyerFinalizedDealSetReadyToServeCall<'a, S> {
         BuyerFinalizedDealSetReadyToServeCall {
             hub: self.hub,
             _request: request,
@@ -2142,7 +2147,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the proposal containing the deals to batch update. Format: buyers/{accountId}/proposals/{proposalId}
-    pub fn proposals_deals_batch_update(&self, request: BatchUpdateDealsRequest, parent: &str) -> BuyerProposalDealBatchUpdateCall<'a> {
+    pub fn proposals_deals_batch_update(&self, request: BatchUpdateDealsRequest, parent: &str) -> BuyerProposalDealBatchUpdateCall<'a, S> {
         BuyerProposalDealBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2160,7 +2165,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: buyers/{accountId}/proposals/{proposalId}/deals/{dealId}
-    pub fn proposals_deals_get(&self, name: &str) -> BuyerProposalDealGetCall<'a> {
+    pub fn proposals_deals_get(&self, name: &str) -> BuyerProposalDealGetCall<'a, S> {
         BuyerProposalDealGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2177,7 +2182,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the proposal containing the deals to retrieve. Format: buyers/{accountId}/proposals/{proposalId}
-    pub fn proposals_deals_list(&self, parent: &str) -> BuyerProposalDealListCall<'a> {
+    pub fn proposals_deals_list(&self, parent: &str) -> BuyerProposalDealListCall<'a, S> {
         BuyerProposalDealListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2197,7 +2202,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The unique identifier of the deal. Auto-generated by the server when a deal is created. Format: buyers/{accountId}/proposals/{proposalId}/deals/{dealId}
-    pub fn proposals_deals_patch(&self, request: Deal, name: &str) -> BuyerProposalDealPatchCall<'a> {
+    pub fn proposals_deals_patch(&self, request: Deal, name: &str) -> BuyerProposalDealPatchCall<'a, S> {
         BuyerProposalDealPatchCall {
             hub: self.hub,
             _request: request,
@@ -2217,7 +2222,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the proposal. Format: `buyers/{accountId}/proposals/{proposalId}`
-    pub fn proposals_accept(&self, request: AcceptProposalRequest, name: &str) -> BuyerProposalAcceptCall<'a> {
+    pub fn proposals_accept(&self, request: AcceptProposalRequest, name: &str) -> BuyerProposalAcceptCall<'a, S> {
         BuyerProposalAcceptCall {
             hub: self.hub,
             _request: request,
@@ -2236,7 +2241,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `proposal` - Name of the proposal. Format: `buyers/{accountId}/proposals/{proposalId}`
-    pub fn proposals_add_note(&self, request: AddNoteRequest, proposal: &str) -> BuyerProposalAddNoteCall<'a> {
+    pub fn proposals_add_note(&self, request: AddNoteRequest, proposal: &str) -> BuyerProposalAddNoteCall<'a, S> {
         BuyerProposalAddNoteCall {
             hub: self.hub,
             _request: request,
@@ -2255,7 +2260,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `proposal` - Name of the proposal. Format: `buyers/{accountId}/proposals/{proposalId}`
-    pub fn proposals_cancel_negotiation(&self, request: CancelNegotiationRequest, proposal: &str) -> BuyerProposalCancelNegotiationCall<'a> {
+    pub fn proposals_cancel_negotiation(&self, request: CancelNegotiationRequest, proposal: &str) -> BuyerProposalCancelNegotiationCall<'a, S> {
         BuyerProposalCancelNegotiationCall {
             hub: self.hub,
             _request: request,
@@ -2273,7 +2278,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the proposal. Format: `buyers/{accountId}/proposals/{proposalId}`
-    pub fn proposals_get(&self, name: &str) -> BuyerProposalGetCall<'a> {
+    pub fn proposals_get(&self, name: &str) -> BuyerProposalGetCall<'a, S> {
         BuyerProposalGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2290,7 +2295,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Parent that owns the collection of proposals Format: `buyers/{accountId}`
-    pub fn proposals_list(&self, parent: &str) -> BuyerProposalListCall<'a> {
+    pub fn proposals_list(&self, parent: &str) -> BuyerProposalListCall<'a, S> {
         BuyerProposalListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2311,7 +2316,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The name of the proposal serving as a unique identifier. Format: buyers/{accountId}/proposals/{proposalId}
-    pub fn proposals_patch(&self, request: Proposal, name: &str) -> BuyerProposalPatchCall<'a> {
+    pub fn proposals_patch(&self, request: Proposal, name: &str) -> BuyerProposalPatchCall<'a, S> {
         BuyerProposalPatchCall {
             hub: self.hub,
             _request: request,
@@ -2331,7 +2336,7 @@ impl<'a> BuyerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `buyer` - Required. The current buyer who is sending the RFP in the format: `buyers/{accountId}`.
-    pub fn proposals_send_rfp(&self, request: SendRfpRequest, buyer: &str) -> BuyerProposalSendRfpCall<'a> {
+    pub fn proposals_send_rfp(&self, request: SendRfpRequest, buyer: &str) -> BuyerProposalSendRfpCall<'a, S> {
         BuyerProposalSendRfpCall {
             hub: self.hub,
             _request: request,
@@ -2349,7 +2354,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the publisher profile. Format: `buyers/{buyerId}/publisherProfiles/{publisherProfileId}`
-    pub fn publisher_profiles_get(&self, name: &str) -> BuyerPublisherProfileGetCall<'a> {
+    pub fn publisher_profiles_get(&self, name: &str) -> BuyerPublisherProfileGetCall<'a, S> {
         BuyerPublisherProfileGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2366,7 +2371,7 @@ impl<'a> BuyerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Parent that owns the collection of publisher profiles Format: `buyers/{buyerId}`
-    pub fn publisher_profiles_list(&self, parent: &str) -> BuyerPublisherProfileListCall<'a> {
+    pub fn publisher_profiles_list(&self, parent: &str) -> BuyerPublisherProfileListCall<'a, S> {
         BuyerPublisherProfileListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2410,7 +2415,7 @@ impl<'a> BuyerMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2422,10 +2427,10 @@ impl<'a> BuyerMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BidderFinalizedDealListCall<'a>
-    where  {
+pub struct BidderFinalizedDealListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2436,9 +2441,15 @@ pub struct BidderFinalizedDealListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BidderFinalizedDealListCall<'a> {}
+impl<'a, S> client::CallBuilder for BidderFinalizedDealListCall<'a, S> {}
 
-impl<'a> BidderFinalizedDealListCall<'a> {
+impl<'a, S> BidderFinalizedDealListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2597,35 +2608,35 @@ impl<'a> BidderFinalizedDealListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token as returned from ListFinalizedDealsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If requested more than 500, the server will return 500 results per page. If unspecified, the server will pick a default page size of 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BidderFinalizedDealListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BidderFinalizedDealListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An optional query string to sort finalized deals using the [Cloud API sorting syntax](https://cloud.google.com/apis/design/design_patterns#sorting_order). If no sort order is specified, results will be returned in an arbitrary order. Supported columns for sorting are: * deal.displayName * deal.createTime * deal.updateTime * deal.flightStartTime * deal.flightEndTime * rtbMetrics.bidRequests7Days * rtbMetrics.bids7Days * rtbMetrics.adImpressions7Days * rtbMetrics.bidRate7Days * rtbMetrics.filteredBidRate7Days * rtbMetrics.mustBidRateCurrentMonth Example: 'deal.displayName, deal.updateTime desc'
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional query string using the [Cloud API list filtering syntax](https://developers.google.com/authorized-buyers/apis/guides/v2/list-filters) Supported columns for filtering are: * deal.displayName * deal.dealType * deal.createTime * deal.updateTime * deal.flightStartTime * deal.flightEndTime * dealServingStatus
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> BidderFinalizedDealListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2635,7 +2646,7 @@ impl<'a> BidderFinalizedDealListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFinalizedDealListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BidderFinalizedDealListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2660,7 +2671,7 @@ impl<'a> BidderFinalizedDealListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BidderFinalizedDealListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BidderFinalizedDealListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2680,9 +2691,9 @@ impl<'a> BidderFinalizedDealListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BidderFinalizedDealListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BidderFinalizedDealListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2714,7 +2725,7 @@ impl<'a> BidderFinalizedDealListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2722,19 +2733,25 @@ impl<'a> BidderFinalizedDealListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerAuctionPackageGetCall<'a>
-    where  {
+pub struct BuyerAuctionPackageGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerAuctionPackageGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerAuctionPackageGetCall<'a, S> {}
 
-impl<'a> BuyerAuctionPackageGetCall<'a> {
+impl<'a, S> BuyerAuctionPackageGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2881,7 +2898,7 @@ impl<'a> BuyerAuctionPackageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerAuctionPackageGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerAuctionPackageGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2891,7 +2908,7 @@ impl<'a> BuyerAuctionPackageGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2916,7 +2933,7 @@ impl<'a> BuyerAuctionPackageGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2936,9 +2953,9 @@ impl<'a> BuyerAuctionPackageGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerAuctionPackageGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerAuctionPackageGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2970,7 +2987,7 @@ impl<'a> BuyerAuctionPackageGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2980,10 +2997,10 @@ impl<'a> BuyerAuctionPackageGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerAuctionPackageListCall<'a>
-    where  {
+pub struct BuyerAuctionPackageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2992,9 +3009,15 @@ pub struct BuyerAuctionPackageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerAuctionPackageListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerAuctionPackageListCall<'a, S> {}
 
-impl<'a> BuyerAuctionPackageListCall<'a> {
+impl<'a, S> BuyerAuctionPackageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3147,21 +3170,21 @@ impl<'a> BuyerAuctionPackageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerAuctionPackageListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerAuctionPackageListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token as returned. ListAuctionPackagesResponse.nextPageToken
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerAuctionPackageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerAuctionPackageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. Max allowed page size is 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerAuctionPackageListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerAuctionPackageListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3171,7 +3194,7 @@ impl<'a> BuyerAuctionPackageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3196,7 +3219,7 @@ impl<'a> BuyerAuctionPackageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3216,9 +3239,9 @@ impl<'a> BuyerAuctionPackageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerAuctionPackageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerAuctionPackageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3251,7 +3274,7 @@ impl<'a> BuyerAuctionPackageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3264,10 +3287,10 @@ impl<'a> BuyerAuctionPackageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerAuctionPackageSubscribeCall<'a>
-    where  {
+pub struct BuyerAuctionPackageSubscribeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: SubscribeAuctionPackageRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3275,9 +3298,15 @@ pub struct BuyerAuctionPackageSubscribeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerAuctionPackageSubscribeCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerAuctionPackageSubscribeCall<'a, S> {}
 
-impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
+impl<'a, S> BuyerAuctionPackageSubscribeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3437,7 +3466,7 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SubscribeAuctionPackageRequest) -> BuyerAuctionPackageSubscribeCall<'a> {
+    pub fn request(mut self, new_value: SubscribeAuctionPackageRequest) -> BuyerAuctionPackageSubscribeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3447,7 +3476,7 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerAuctionPackageSubscribeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerAuctionPackageSubscribeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3457,7 +3486,7 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageSubscribeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageSubscribeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3482,7 +3511,7 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageSubscribeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageSubscribeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3502,9 +3531,9 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerAuctionPackageSubscribeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerAuctionPackageSubscribeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3537,7 +3566,7 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3550,10 +3579,10 @@ impl<'a> BuyerAuctionPackageSubscribeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerAuctionPackageSubscribeClientCall<'a>
-    where  {
+pub struct BuyerAuctionPackageSubscribeClientCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: SubscribeClientsRequest,
     _auction_package: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3561,9 +3590,15 @@ pub struct BuyerAuctionPackageSubscribeClientCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerAuctionPackageSubscribeClientCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerAuctionPackageSubscribeClientCall<'a, S> {}
 
-impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
+impl<'a, S> BuyerAuctionPackageSubscribeClientCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3723,7 +3758,7 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SubscribeClientsRequest) -> BuyerAuctionPackageSubscribeClientCall<'a> {
+    pub fn request(mut self, new_value: SubscribeClientsRequest) -> BuyerAuctionPackageSubscribeClientCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3733,7 +3768,7 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn auction_package(mut self, new_value: &str) -> BuyerAuctionPackageSubscribeClientCall<'a> {
+    pub fn auction_package(mut self, new_value: &str) -> BuyerAuctionPackageSubscribeClientCall<'a, S> {
         self._auction_package = new_value.to_string();
         self
     }
@@ -3743,7 +3778,7 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageSubscribeClientCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageSubscribeClientCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3768,7 +3803,7 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageSubscribeClientCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageSubscribeClientCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3788,9 +3823,9 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerAuctionPackageSubscribeClientCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerAuctionPackageSubscribeClientCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3823,7 +3858,7 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3836,10 +3871,10 @@ impl<'a> BuyerAuctionPackageSubscribeClientCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerAuctionPackageUnsubscribeCall<'a>
-    where  {
+pub struct BuyerAuctionPackageUnsubscribeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: UnsubscribeAuctionPackageRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3847,9 +3882,15 @@ pub struct BuyerAuctionPackageUnsubscribeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerAuctionPackageUnsubscribeCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerAuctionPackageUnsubscribeCall<'a, S> {}
 
-impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
+impl<'a, S> BuyerAuctionPackageUnsubscribeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4009,7 +4050,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnsubscribeAuctionPackageRequest) -> BuyerAuctionPackageUnsubscribeCall<'a> {
+    pub fn request(mut self, new_value: UnsubscribeAuctionPackageRequest) -> BuyerAuctionPackageUnsubscribeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4019,7 +4060,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerAuctionPackageUnsubscribeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerAuctionPackageUnsubscribeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4029,7 +4070,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageUnsubscribeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageUnsubscribeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4054,7 +4095,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageUnsubscribeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageUnsubscribeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4074,9 +4115,9 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerAuctionPackageUnsubscribeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerAuctionPackageUnsubscribeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4109,7 +4150,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4122,10 +4163,10 @@ impl<'a> BuyerAuctionPackageUnsubscribeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerAuctionPackageUnsubscribeClientCall<'a>
-    where  {
+pub struct BuyerAuctionPackageUnsubscribeClientCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: UnsubscribeClientsRequest,
     _auction_package: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4133,9 +4174,15 @@ pub struct BuyerAuctionPackageUnsubscribeClientCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerAuctionPackageUnsubscribeClientCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerAuctionPackageUnsubscribeClientCall<'a, S> {}
 
-impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
+impl<'a, S> BuyerAuctionPackageUnsubscribeClientCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4295,7 +4342,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnsubscribeClientsRequest) -> BuyerAuctionPackageUnsubscribeClientCall<'a> {
+    pub fn request(mut self, new_value: UnsubscribeClientsRequest) -> BuyerAuctionPackageUnsubscribeClientCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4305,7 +4352,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn auction_package(mut self, new_value: &str) -> BuyerAuctionPackageUnsubscribeClientCall<'a> {
+    pub fn auction_package(mut self, new_value: &str) -> BuyerAuctionPackageUnsubscribeClientCall<'a, S> {
         self._auction_package = new_value.to_string();
         self
     }
@@ -4315,7 +4362,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageUnsubscribeClientCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerAuctionPackageUnsubscribeClientCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4340,7 +4387,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageUnsubscribeClientCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerAuctionPackageUnsubscribeClientCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4360,9 +4407,9 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerAuctionPackageUnsubscribeClientCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerAuctionPackageUnsubscribeClientCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4395,7 +4442,7 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4408,10 +4455,10 @@ impl<'a> BuyerAuctionPackageUnsubscribeClientCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientUserActivateCall<'a>
-    where  {
+pub struct BuyerClientUserActivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: ActivateClientUserRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4419,9 +4466,15 @@ pub struct BuyerClientUserActivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientUserActivateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientUserActivateCall<'a, S> {}
 
-impl<'a> BuyerClientUserActivateCall<'a> {
+impl<'a, S> BuyerClientUserActivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4581,7 +4634,7 @@ impl<'a> BuyerClientUserActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ActivateClientUserRequest) -> BuyerClientUserActivateCall<'a> {
+    pub fn request(mut self, new_value: ActivateClientUserRequest) -> BuyerClientUserActivateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4591,7 +4644,7 @@ impl<'a> BuyerClientUserActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientUserActivateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientUserActivateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4601,7 +4654,7 @@ impl<'a> BuyerClientUserActivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserActivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserActivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4626,7 +4679,7 @@ impl<'a> BuyerClientUserActivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserActivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserActivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4646,9 +4699,9 @@ impl<'a> BuyerClientUserActivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientUserActivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientUserActivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4681,7 +4734,7 @@ impl<'a> BuyerClientUserActivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4694,10 +4747,10 @@ impl<'a> BuyerClientUserActivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientUserCreateCall<'a>
-    where  {
+pub struct BuyerClientUserCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: ClientUser,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4705,9 +4758,15 @@ pub struct BuyerClientUserCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientUserCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientUserCreateCall<'a, S> {}
 
-impl<'a> BuyerClientUserCreateCall<'a> {
+impl<'a, S> BuyerClientUserCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4867,7 +4926,7 @@ impl<'a> BuyerClientUserCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClientUser) -> BuyerClientUserCreateCall<'a> {
+    pub fn request(mut self, new_value: ClientUser) -> BuyerClientUserCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4877,7 +4936,7 @@ impl<'a> BuyerClientUserCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerClientUserCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerClientUserCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4887,7 +4946,7 @@ impl<'a> BuyerClientUserCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4912,7 +4971,7 @@ impl<'a> BuyerClientUserCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4932,9 +4991,9 @@ impl<'a> BuyerClientUserCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientUserCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientUserCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4967,7 +5026,7 @@ impl<'a> BuyerClientUserCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4980,10 +5039,10 @@ impl<'a> BuyerClientUserCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientUserDeactivateCall<'a>
-    where  {
+pub struct BuyerClientUserDeactivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: DeactivateClientUserRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4991,9 +5050,15 @@ pub struct BuyerClientUserDeactivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientUserDeactivateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientUserDeactivateCall<'a, S> {}
 
-impl<'a> BuyerClientUserDeactivateCall<'a> {
+impl<'a, S> BuyerClientUserDeactivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5153,7 +5218,7 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeactivateClientUserRequest) -> BuyerClientUserDeactivateCall<'a> {
+    pub fn request(mut self, new_value: DeactivateClientUserRequest) -> BuyerClientUserDeactivateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5163,7 +5228,7 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientUserDeactivateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientUserDeactivateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5173,7 +5238,7 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserDeactivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserDeactivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5198,7 +5263,7 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserDeactivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserDeactivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5218,9 +5283,9 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientUserDeactivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientUserDeactivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5252,7 +5317,7 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5260,19 +5325,25 @@ impl<'a> BuyerClientUserDeactivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientUserDeleteCall<'a>
-    where  {
+pub struct BuyerClientUserDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientUserDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientUserDeleteCall<'a, S> {}
 
-impl<'a> BuyerClientUserDeleteCall<'a> {
+impl<'a, S> BuyerClientUserDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5419,7 +5490,7 @@ impl<'a> BuyerClientUserDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientUserDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientUserDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5429,7 +5500,7 @@ impl<'a> BuyerClientUserDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5454,7 +5525,7 @@ impl<'a> BuyerClientUserDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5474,9 +5545,9 @@ impl<'a> BuyerClientUserDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientUserDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientUserDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5508,7 +5579,7 @@ impl<'a> BuyerClientUserDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5516,19 +5587,25 @@ impl<'a> BuyerClientUserDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientUserGetCall<'a>
-    where  {
+pub struct BuyerClientUserGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientUserGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientUserGetCall<'a, S> {}
 
-impl<'a> BuyerClientUserGetCall<'a> {
+impl<'a, S> BuyerClientUserGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5675,7 +5752,7 @@ impl<'a> BuyerClientUserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientUserGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientUserGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5685,7 +5762,7 @@ impl<'a> BuyerClientUserGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5710,7 +5787,7 @@ impl<'a> BuyerClientUserGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5730,9 +5807,9 @@ impl<'a> BuyerClientUserGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientUserGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientUserGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5764,7 +5841,7 @@ impl<'a> BuyerClientUserGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5774,10 +5851,10 @@ impl<'a> BuyerClientUserGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientUserListCall<'a>
-    where  {
+pub struct BuyerClientUserListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5786,9 +5863,15 @@ pub struct BuyerClientUserListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientUserListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientUserListCall<'a, S> {}
 
-impl<'a> BuyerClientUserListCall<'a> {
+impl<'a, S> BuyerClientUserListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5941,21 +6024,21 @@ impl<'a> BuyerClientUserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerClientUserListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerClientUserListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListClientUsersResponse.nextPageToken returned from the previous call to the list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerClientUserListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerClientUserListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. If left blank, a default page size of 500 will be applied.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerClientUserListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerClientUserListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5965,7 +6048,7 @@ impl<'a> BuyerClientUserListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientUserListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5990,7 +6073,7 @@ impl<'a> BuyerClientUserListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientUserListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6010,9 +6093,9 @@ impl<'a> BuyerClientUserListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientUserListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientUserListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6045,7 +6128,7 @@ impl<'a> BuyerClientUserListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6058,10 +6141,10 @@ impl<'a> BuyerClientUserListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientActivateCall<'a>
-    where  {
+pub struct BuyerClientActivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: ActivateClientRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6069,9 +6152,15 @@ pub struct BuyerClientActivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientActivateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientActivateCall<'a, S> {}
 
-impl<'a> BuyerClientActivateCall<'a> {
+impl<'a, S> BuyerClientActivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6231,7 +6320,7 @@ impl<'a> BuyerClientActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ActivateClientRequest) -> BuyerClientActivateCall<'a> {
+    pub fn request(mut self, new_value: ActivateClientRequest) -> BuyerClientActivateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6241,7 +6330,7 @@ impl<'a> BuyerClientActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientActivateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientActivateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6251,7 +6340,7 @@ impl<'a> BuyerClientActivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientActivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientActivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6276,7 +6365,7 @@ impl<'a> BuyerClientActivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientActivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientActivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6296,9 +6385,9 @@ impl<'a> BuyerClientActivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientActivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientActivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6331,7 +6420,7 @@ impl<'a> BuyerClientActivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6344,10 +6433,10 @@ impl<'a> BuyerClientActivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientCreateCall<'a>
-    where  {
+pub struct BuyerClientCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: Client,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6355,9 +6444,15 @@ pub struct BuyerClientCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientCreateCall<'a, S> {}
 
-impl<'a> BuyerClientCreateCall<'a> {
+impl<'a, S> BuyerClientCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6517,7 +6612,7 @@ impl<'a> BuyerClientCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Client) -> BuyerClientCreateCall<'a> {
+    pub fn request(mut self, new_value: Client) -> BuyerClientCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6527,7 +6622,7 @@ impl<'a> BuyerClientCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerClientCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerClientCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6537,7 +6632,7 @@ impl<'a> BuyerClientCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6562,7 +6657,7 @@ impl<'a> BuyerClientCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6582,9 +6677,9 @@ impl<'a> BuyerClientCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6617,7 +6712,7 @@ impl<'a> BuyerClientCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6630,10 +6725,10 @@ impl<'a> BuyerClientCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientDeactivateCall<'a>
-    where  {
+pub struct BuyerClientDeactivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: DeactivateClientRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6641,9 +6736,15 @@ pub struct BuyerClientDeactivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientDeactivateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientDeactivateCall<'a, S> {}
 
-impl<'a> BuyerClientDeactivateCall<'a> {
+impl<'a, S> BuyerClientDeactivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6803,7 +6904,7 @@ impl<'a> BuyerClientDeactivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeactivateClientRequest) -> BuyerClientDeactivateCall<'a> {
+    pub fn request(mut self, new_value: DeactivateClientRequest) -> BuyerClientDeactivateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6813,7 +6914,7 @@ impl<'a> BuyerClientDeactivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientDeactivateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientDeactivateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6823,7 +6924,7 @@ impl<'a> BuyerClientDeactivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientDeactivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientDeactivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6848,7 +6949,7 @@ impl<'a> BuyerClientDeactivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientDeactivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientDeactivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6868,9 +6969,9 @@ impl<'a> BuyerClientDeactivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientDeactivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientDeactivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6902,7 +7003,7 @@ impl<'a> BuyerClientDeactivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6910,19 +7011,25 @@ impl<'a> BuyerClientDeactivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientGetCall<'a>
-    where  {
+pub struct BuyerClientGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientGetCall<'a, S> {}
 
-impl<'a> BuyerClientGetCall<'a> {
+impl<'a, S> BuyerClientGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7069,7 +7176,7 @@ impl<'a> BuyerClientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7079,7 +7186,7 @@ impl<'a> BuyerClientGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7104,7 +7211,7 @@ impl<'a> BuyerClientGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7124,9 +7231,9 @@ impl<'a> BuyerClientGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7158,7 +7265,7 @@ impl<'a> BuyerClientGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7169,10 +7276,10 @@ impl<'a> BuyerClientGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientListCall<'a>
-    where  {
+pub struct BuyerClientListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7182,9 +7289,15 @@ pub struct BuyerClientListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientListCall<'a, S> {}
 
-impl<'a> BuyerClientListCall<'a> {
+impl<'a, S> BuyerClientListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7340,28 +7453,28 @@ impl<'a> BuyerClientListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerClientListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerClientListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListClientsResponse.nextPageToken returned from the previous call to the list method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerClientListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerClientListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. If left blank, a default page size of 500 will be applied.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerClientListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerClientListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Query string using the [Filtering Syntax](https://developers.google.com/authorized-buyers/apis/guides/v2/list-filters) Supported fields for filtering are: * partnerClientId Use this field to filter the clients by the partnerClientId. For example, if the partnerClientId of the client is "1234", the value of this field should be `partnerClientId = "1234"`, in order to get only the client whose partnerClientId is "1234" in the response.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BuyerClientListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> BuyerClientListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7371,7 +7484,7 @@ impl<'a> BuyerClientListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7396,7 +7509,7 @@ impl<'a> BuyerClientListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7416,9 +7529,9 @@ impl<'a> BuyerClientListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7451,7 +7564,7 @@ impl<'a> BuyerClientListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7465,10 +7578,10 @@ impl<'a> BuyerClientListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerClientPatchCall<'a>
-    where  {
+pub struct BuyerClientPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: Client,
     _name: String,
     _update_mask: Option<String>,
@@ -7477,9 +7590,15 @@ pub struct BuyerClientPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerClientPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerClientPatchCall<'a, S> {}
 
-impl<'a> BuyerClientPatchCall<'a> {
+impl<'a, S> BuyerClientPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7642,7 +7761,7 @@ impl<'a> BuyerClientPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Client) -> BuyerClientPatchCall<'a> {
+    pub fn request(mut self, new_value: Client) -> BuyerClientPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7652,14 +7771,14 @@ impl<'a> BuyerClientPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerClientPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerClientPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// List of fields to be updated. If empty or unspecified, the service will update all fields populated in the update request excluding the output only fields and primitive fields with default value. Note that explicit field mask is required in order to reset a primitive field back to its default value, e.g. false for boolean fields, 0 for integer fields. A special field mask consisting of a single path "*" can be used to indicate full replacement(the equivalent of PUT method), updatable fields unset or unspecified in the input will be cleared or set to default value. Output only fields will be ignored regardless of the value of updateMask.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> BuyerClientPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> BuyerClientPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7669,7 +7788,7 @@ impl<'a> BuyerClientPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerClientPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7694,7 +7813,7 @@ impl<'a> BuyerClientPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerClientPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7714,9 +7833,9 @@ impl<'a> BuyerClientPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerClientPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerClientPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7749,7 +7868,7 @@ impl<'a> BuyerClientPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7762,10 +7881,10 @@ impl<'a> BuyerClientPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerFinalizedDealAddCreativeCall<'a>
-    where  {
+pub struct BuyerFinalizedDealAddCreativeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: AddCreativeRequest,
     _deal: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7773,9 +7892,15 @@ pub struct BuyerFinalizedDealAddCreativeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerFinalizedDealAddCreativeCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerFinalizedDealAddCreativeCall<'a, S> {}
 
-impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
+impl<'a, S> BuyerFinalizedDealAddCreativeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7935,7 +8060,7 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddCreativeRequest) -> BuyerFinalizedDealAddCreativeCall<'a> {
+    pub fn request(mut self, new_value: AddCreativeRequest) -> BuyerFinalizedDealAddCreativeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7945,7 +8070,7 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deal(mut self, new_value: &str) -> BuyerFinalizedDealAddCreativeCall<'a> {
+    pub fn deal(mut self, new_value: &str) -> BuyerFinalizedDealAddCreativeCall<'a, S> {
         self._deal = new_value.to_string();
         self
     }
@@ -7955,7 +8080,7 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealAddCreativeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealAddCreativeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7980,7 +8105,7 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealAddCreativeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealAddCreativeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8000,9 +8125,9 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerFinalizedDealAddCreativeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerFinalizedDealAddCreativeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8034,7 +8159,7 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8042,19 +8167,25 @@ impl<'a> BuyerFinalizedDealAddCreativeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerFinalizedDealGetCall<'a>
-    where  {
+pub struct BuyerFinalizedDealGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerFinalizedDealGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerFinalizedDealGetCall<'a, S> {}
 
-impl<'a> BuyerFinalizedDealGetCall<'a> {
+impl<'a, S> BuyerFinalizedDealGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8201,7 +8332,7 @@ impl<'a> BuyerFinalizedDealGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerFinalizedDealGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerFinalizedDealGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8211,7 +8342,7 @@ impl<'a> BuyerFinalizedDealGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8236,7 +8367,7 @@ impl<'a> BuyerFinalizedDealGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8256,9 +8387,9 @@ impl<'a> BuyerFinalizedDealGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerFinalizedDealGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerFinalizedDealGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8290,7 +8421,7 @@ impl<'a> BuyerFinalizedDealGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8302,10 +8433,10 @@ impl<'a> BuyerFinalizedDealGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerFinalizedDealListCall<'a>
-    where  {
+pub struct BuyerFinalizedDealListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8316,9 +8447,15 @@ pub struct BuyerFinalizedDealListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerFinalizedDealListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerFinalizedDealListCall<'a, S> {}
 
-impl<'a> BuyerFinalizedDealListCall<'a> {
+impl<'a, S> BuyerFinalizedDealListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8477,35 +8614,35 @@ impl<'a> BuyerFinalizedDealListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token as returned from ListFinalizedDealsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If requested more than 500, the server will return 500 results per page. If unspecified, the server will pick a default page size of 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerFinalizedDealListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerFinalizedDealListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An optional query string to sort finalized deals using the [Cloud API sorting syntax](https://cloud.google.com/apis/design/design_patterns#sorting_order). If no sort order is specified, results will be returned in an arbitrary order. Supported columns for sorting are: * deal.displayName * deal.createTime * deal.updateTime * deal.flightStartTime * deal.flightEndTime * rtbMetrics.bidRequests7Days * rtbMetrics.bids7Days * rtbMetrics.adImpressions7Days * rtbMetrics.bidRate7Days * rtbMetrics.filteredBidRate7Days * rtbMetrics.mustBidRateCurrentMonth Example: 'deal.displayName, deal.updateTime desc'
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional query string using the [Cloud API list filtering syntax](https://developers.google.com/authorized-buyers/apis/guides/v2/list-filters) Supported columns for filtering are: * deal.displayName * deal.dealType * deal.createTime * deal.updateTime * deal.flightStartTime * deal.flightEndTime * dealServingStatus
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> BuyerFinalizedDealListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8515,7 +8652,7 @@ impl<'a> BuyerFinalizedDealListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8540,7 +8677,7 @@ impl<'a> BuyerFinalizedDealListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8560,9 +8697,9 @@ impl<'a> BuyerFinalizedDealListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerFinalizedDealListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerFinalizedDealListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8595,7 +8732,7 @@ impl<'a> BuyerFinalizedDealListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8608,10 +8745,10 @@ impl<'a> BuyerFinalizedDealListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerFinalizedDealPauseCall<'a>
-    where  {
+pub struct BuyerFinalizedDealPauseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: PauseFinalizedDealRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8619,9 +8756,15 @@ pub struct BuyerFinalizedDealPauseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerFinalizedDealPauseCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerFinalizedDealPauseCall<'a, S> {}
 
-impl<'a> BuyerFinalizedDealPauseCall<'a> {
+impl<'a, S> BuyerFinalizedDealPauseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8781,7 +8924,7 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PauseFinalizedDealRequest) -> BuyerFinalizedDealPauseCall<'a> {
+    pub fn request(mut self, new_value: PauseFinalizedDealRequest) -> BuyerFinalizedDealPauseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8791,7 +8934,7 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerFinalizedDealPauseCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerFinalizedDealPauseCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8801,7 +8944,7 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealPauseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealPauseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8826,7 +8969,7 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealPauseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealPauseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8846,9 +8989,9 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerFinalizedDealPauseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerFinalizedDealPauseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8881,7 +9024,7 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8894,10 +9037,10 @@ impl<'a> BuyerFinalizedDealPauseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerFinalizedDealResumeCall<'a>
-    where  {
+pub struct BuyerFinalizedDealResumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: ResumeFinalizedDealRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8905,9 +9048,15 @@ pub struct BuyerFinalizedDealResumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerFinalizedDealResumeCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerFinalizedDealResumeCall<'a, S> {}
 
-impl<'a> BuyerFinalizedDealResumeCall<'a> {
+impl<'a, S> BuyerFinalizedDealResumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9067,7 +9216,7 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResumeFinalizedDealRequest) -> BuyerFinalizedDealResumeCall<'a> {
+    pub fn request(mut self, new_value: ResumeFinalizedDealRequest) -> BuyerFinalizedDealResumeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9077,7 +9226,7 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerFinalizedDealResumeCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerFinalizedDealResumeCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9087,7 +9236,7 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealResumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealResumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9112,7 +9261,7 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealResumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealResumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9132,9 +9281,9 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerFinalizedDealResumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerFinalizedDealResumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9167,7 +9316,7 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9180,10 +9329,10 @@ impl<'a> BuyerFinalizedDealResumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerFinalizedDealSetReadyToServeCall<'a>
-    where  {
+pub struct BuyerFinalizedDealSetReadyToServeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: SetReadyToServeRequest,
     _deal: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9191,9 +9340,15 @@ pub struct BuyerFinalizedDealSetReadyToServeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerFinalizedDealSetReadyToServeCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerFinalizedDealSetReadyToServeCall<'a, S> {}
 
-impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
+impl<'a, S> BuyerFinalizedDealSetReadyToServeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9353,7 +9508,7 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetReadyToServeRequest) -> BuyerFinalizedDealSetReadyToServeCall<'a> {
+    pub fn request(mut self, new_value: SetReadyToServeRequest) -> BuyerFinalizedDealSetReadyToServeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9363,7 +9518,7 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deal(mut self, new_value: &str) -> BuyerFinalizedDealSetReadyToServeCall<'a> {
+    pub fn deal(mut self, new_value: &str) -> BuyerFinalizedDealSetReadyToServeCall<'a, S> {
         self._deal = new_value.to_string();
         self
     }
@@ -9373,7 +9528,7 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealSetReadyToServeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerFinalizedDealSetReadyToServeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9398,7 +9553,7 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealSetReadyToServeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerFinalizedDealSetReadyToServeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9418,9 +9573,9 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerFinalizedDealSetReadyToServeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerFinalizedDealSetReadyToServeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9453,7 +9608,7 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9466,10 +9621,10 @@ impl<'a> BuyerFinalizedDealSetReadyToServeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalDealBatchUpdateCall<'a>
-    where  {
+pub struct BuyerProposalDealBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: BatchUpdateDealsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9477,9 +9632,15 @@ pub struct BuyerProposalDealBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalDealBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalDealBatchUpdateCall<'a, S> {}
 
-impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
+impl<'a, S> BuyerProposalDealBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9639,7 +9800,7 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateDealsRequest) -> BuyerProposalDealBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: BatchUpdateDealsRequest) -> BuyerProposalDealBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9649,7 +9810,7 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerProposalDealBatchUpdateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerProposalDealBatchUpdateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -9659,7 +9820,7 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9684,7 +9845,7 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9704,9 +9865,9 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalDealBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalDealBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9738,7 +9899,7 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9746,19 +9907,25 @@ impl<'a> BuyerProposalDealBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalDealGetCall<'a>
-    where  {
+pub struct BuyerProposalDealGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalDealGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalDealGetCall<'a, S> {}
 
-impl<'a> BuyerProposalDealGetCall<'a> {
+impl<'a, S> BuyerProposalDealGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9905,7 +10072,7 @@ impl<'a> BuyerProposalDealGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerProposalDealGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerProposalDealGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9915,7 +10082,7 @@ impl<'a> BuyerProposalDealGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9940,7 +10107,7 @@ impl<'a> BuyerProposalDealGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9960,9 +10127,9 @@ impl<'a> BuyerProposalDealGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalDealGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalDealGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9994,7 +10161,7 @@ impl<'a> BuyerProposalDealGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10004,10 +10171,10 @@ impl<'a> BuyerProposalDealGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalDealListCall<'a>
-    where  {
+pub struct BuyerProposalDealListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10016,9 +10183,15 @@ pub struct BuyerProposalDealListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalDealListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalDealListCall<'a, S> {}
 
-impl<'a> BuyerProposalDealListCall<'a> {
+impl<'a, S> BuyerProposalDealListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10171,21 +10344,21 @@ impl<'a> BuyerProposalDealListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerProposalDealListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerProposalDealListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token as returned from ListDealsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerProposalDealListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerProposalDealListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If requested more than 500, the server will return 500 results per page. If unspecified, the server will pick a default page size of 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerProposalDealListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerProposalDealListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -10195,7 +10368,7 @@ impl<'a> BuyerProposalDealListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10220,7 +10393,7 @@ impl<'a> BuyerProposalDealListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10240,9 +10413,9 @@ impl<'a> BuyerProposalDealListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalDealListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalDealListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10275,7 +10448,7 @@ impl<'a> BuyerProposalDealListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10289,10 +10462,10 @@ impl<'a> BuyerProposalDealListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalDealPatchCall<'a>
-    where  {
+pub struct BuyerProposalDealPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: Deal,
     _name: String,
     _update_mask: Option<String>,
@@ -10301,9 +10474,15 @@ pub struct BuyerProposalDealPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalDealPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalDealPatchCall<'a, S> {}
 
-impl<'a> BuyerProposalDealPatchCall<'a> {
+impl<'a, S> BuyerProposalDealPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10466,7 +10645,7 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Deal) -> BuyerProposalDealPatchCall<'a> {
+    pub fn request(mut self, new_value: Deal) -> BuyerProposalDealPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10476,14 +10655,14 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerProposalDealPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerProposalDealPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// List of fields to be updated. If empty or unspecified, the service will update all fields populated in the update request excluding the output only fields and primitive fields with default value. Note that explicit field mask is required in order to reset a primitive field back to its default value, e.g. false for boolean fields, 0 for integer fields. A special field mask consisting of a single path "*" can be used to indicate full replacement(the equivalent of PUT method), updatable fields unset or unspecified in the input will be cleared or set to default value. Output only fields will be ignored regardless of the value of updateMask.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> BuyerProposalDealPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> BuyerProposalDealPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10493,7 +10672,7 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalDealPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10518,7 +10697,7 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalDealPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10538,9 +10717,9 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalDealPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalDealPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10573,7 +10752,7 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10586,10 +10765,10 @@ impl<'a> BuyerProposalDealPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalAcceptCall<'a>
-    where  {
+pub struct BuyerProposalAcceptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: AcceptProposalRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10597,9 +10776,15 @@ pub struct BuyerProposalAcceptCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalAcceptCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalAcceptCall<'a, S> {}
 
-impl<'a> BuyerProposalAcceptCall<'a> {
+impl<'a, S> BuyerProposalAcceptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10759,7 +10944,7 @@ impl<'a> BuyerProposalAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AcceptProposalRequest) -> BuyerProposalAcceptCall<'a> {
+    pub fn request(mut self, new_value: AcceptProposalRequest) -> BuyerProposalAcceptCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10769,7 +10954,7 @@ impl<'a> BuyerProposalAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerProposalAcceptCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerProposalAcceptCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10779,7 +10964,7 @@ impl<'a> BuyerProposalAcceptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalAcceptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalAcceptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10804,7 +10989,7 @@ impl<'a> BuyerProposalAcceptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalAcceptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalAcceptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10824,9 +11009,9 @@ impl<'a> BuyerProposalAcceptCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalAcceptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalAcceptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10859,7 +11044,7 @@ impl<'a> BuyerProposalAcceptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10872,10 +11057,10 @@ impl<'a> BuyerProposalAcceptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalAddNoteCall<'a>
-    where  {
+pub struct BuyerProposalAddNoteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: AddNoteRequest,
     _proposal: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10883,9 +11068,15 @@ pub struct BuyerProposalAddNoteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalAddNoteCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalAddNoteCall<'a, S> {}
 
-impl<'a> BuyerProposalAddNoteCall<'a> {
+impl<'a, S> BuyerProposalAddNoteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11045,7 +11236,7 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddNoteRequest) -> BuyerProposalAddNoteCall<'a> {
+    pub fn request(mut self, new_value: AddNoteRequest) -> BuyerProposalAddNoteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11055,7 +11246,7 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal(mut self, new_value: &str) -> BuyerProposalAddNoteCall<'a> {
+    pub fn proposal(mut self, new_value: &str) -> BuyerProposalAddNoteCall<'a, S> {
         self._proposal = new_value.to_string();
         self
     }
@@ -11065,7 +11256,7 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalAddNoteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalAddNoteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11090,7 +11281,7 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalAddNoteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalAddNoteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11110,9 +11301,9 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalAddNoteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalAddNoteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11145,7 +11336,7 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11158,10 +11349,10 @@ impl<'a> BuyerProposalAddNoteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalCancelNegotiationCall<'a>
-    where  {
+pub struct BuyerProposalCancelNegotiationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: CancelNegotiationRequest,
     _proposal: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11169,9 +11360,15 @@ pub struct BuyerProposalCancelNegotiationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalCancelNegotiationCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalCancelNegotiationCall<'a, S> {}
 
-impl<'a> BuyerProposalCancelNegotiationCall<'a> {
+impl<'a, S> BuyerProposalCancelNegotiationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11331,7 +11528,7 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelNegotiationRequest) -> BuyerProposalCancelNegotiationCall<'a> {
+    pub fn request(mut self, new_value: CancelNegotiationRequest) -> BuyerProposalCancelNegotiationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11341,7 +11538,7 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn proposal(mut self, new_value: &str) -> BuyerProposalCancelNegotiationCall<'a> {
+    pub fn proposal(mut self, new_value: &str) -> BuyerProposalCancelNegotiationCall<'a, S> {
         self._proposal = new_value.to_string();
         self
     }
@@ -11351,7 +11548,7 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalCancelNegotiationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalCancelNegotiationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11376,7 +11573,7 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalCancelNegotiationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalCancelNegotiationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11396,9 +11593,9 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalCancelNegotiationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalCancelNegotiationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11430,7 +11627,7 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11438,19 +11635,25 @@ impl<'a> BuyerProposalCancelNegotiationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalGetCall<'a>
-    where  {
+pub struct BuyerProposalGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalGetCall<'a, S> {}
 
-impl<'a> BuyerProposalGetCall<'a> {
+impl<'a, S> BuyerProposalGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11597,7 +11800,7 @@ impl<'a> BuyerProposalGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerProposalGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerProposalGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11607,7 +11810,7 @@ impl<'a> BuyerProposalGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11632,7 +11835,7 @@ impl<'a> BuyerProposalGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11652,9 +11855,9 @@ impl<'a> BuyerProposalGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11686,7 +11889,7 @@ impl<'a> BuyerProposalGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11697,10 +11900,10 @@ impl<'a> BuyerProposalGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalListCall<'a>
-    where  {
+pub struct BuyerProposalListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11710,9 +11913,15 @@ pub struct BuyerProposalListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalListCall<'a, S> {}
 
-impl<'a> BuyerProposalListCall<'a> {
+impl<'a, S> BuyerProposalListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11868,28 +12077,28 @@ impl<'a> BuyerProposalListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerProposalListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerProposalListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token as returned from ListProposalsResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerProposalListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerProposalListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If unspecified, the server will put a size of 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerProposalListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerProposalListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional query string using the [Cloud API list filtering syntax](https://developers.google.com/authorized-buyers/apis/guides/v2/list-filters) Supported columns for filtering are: * displayName * dealType * updateTime * state
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BuyerProposalListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> BuyerProposalListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11899,7 +12108,7 @@ impl<'a> BuyerProposalListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11924,7 +12133,7 @@ impl<'a> BuyerProposalListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11944,9 +12153,9 @@ impl<'a> BuyerProposalListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11979,7 +12188,7 @@ impl<'a> BuyerProposalListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11993,10 +12202,10 @@ impl<'a> BuyerProposalListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalPatchCall<'a>
-    where  {
+pub struct BuyerProposalPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: Proposal,
     _name: String,
     _update_mask: Option<String>,
@@ -12005,9 +12214,15 @@ pub struct BuyerProposalPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalPatchCall<'a, S> {}
 
-impl<'a> BuyerProposalPatchCall<'a> {
+impl<'a, S> BuyerProposalPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12170,7 +12385,7 @@ impl<'a> BuyerProposalPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Proposal) -> BuyerProposalPatchCall<'a> {
+    pub fn request(mut self, new_value: Proposal) -> BuyerProposalPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12180,14 +12395,14 @@ impl<'a> BuyerProposalPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerProposalPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerProposalPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// List of fields to be updated. If empty or unspecified, the service will update all fields populated in the update request excluding the output only fields and primitive fields with default value. Note that explicit field mask is required in order to reset a primitive field back to its default value, e.g. false for boolean fields, 0 for integer fields. A special field mask consisting of a single path "*" can be used to indicate full replacement(the equivalent of PUT method), updatable fields unset or unspecified in the input will be cleared or set to default value. Output only fields will be ignored regardless of the value of updateMask.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> BuyerProposalPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> BuyerProposalPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12197,7 +12412,7 @@ impl<'a> BuyerProposalPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12222,7 +12437,7 @@ impl<'a> BuyerProposalPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12242,9 +12457,9 @@ impl<'a> BuyerProposalPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12277,7 +12492,7 @@ impl<'a> BuyerProposalPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12290,10 +12505,10 @@ impl<'a> BuyerProposalPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerProposalSendRfpCall<'a>
-    where  {
+pub struct BuyerProposalSendRfpCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _request: SendRfpRequest,
     _buyer: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12301,9 +12516,15 @@ pub struct BuyerProposalSendRfpCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerProposalSendRfpCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerProposalSendRfpCall<'a, S> {}
 
-impl<'a> BuyerProposalSendRfpCall<'a> {
+impl<'a, S> BuyerProposalSendRfpCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12463,7 +12684,7 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SendRfpRequest) -> BuyerProposalSendRfpCall<'a> {
+    pub fn request(mut self, new_value: SendRfpRequest) -> BuyerProposalSendRfpCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12473,7 +12694,7 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn buyer(mut self, new_value: &str) -> BuyerProposalSendRfpCall<'a> {
+    pub fn buyer(mut self, new_value: &str) -> BuyerProposalSendRfpCall<'a, S> {
         self._buyer = new_value.to_string();
         self
     }
@@ -12483,7 +12704,7 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalSendRfpCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerProposalSendRfpCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12508,7 +12729,7 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalSendRfpCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerProposalSendRfpCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12528,9 +12749,9 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerProposalSendRfpCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerProposalSendRfpCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12562,7 +12783,7 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12570,19 +12791,25 @@ impl<'a> BuyerProposalSendRfpCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerPublisherProfileGetCall<'a>
-    where  {
+pub struct BuyerPublisherProfileGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerPublisherProfileGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerPublisherProfileGetCall<'a, S> {}
 
-impl<'a> BuyerPublisherProfileGetCall<'a> {
+impl<'a, S> BuyerPublisherProfileGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12729,7 +12956,7 @@ impl<'a> BuyerPublisherProfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BuyerPublisherProfileGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> BuyerPublisherProfileGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12739,7 +12966,7 @@ impl<'a> BuyerPublisherProfileGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerPublisherProfileGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerPublisherProfileGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12764,7 +12991,7 @@ impl<'a> BuyerPublisherProfileGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerPublisherProfileGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerPublisherProfileGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12784,9 +13011,9 @@ impl<'a> BuyerPublisherProfileGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerPublisherProfileGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerPublisherProfileGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12818,7 +13045,7 @@ impl<'a> BuyerPublisherProfileGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12829,10 +13056,10 @@ impl<'a> BuyerPublisherProfileGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BuyerPublisherProfileListCall<'a>
-    where  {
+pub struct BuyerPublisherProfileListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AuthorizedBuyersMarketplace<>,
+    hub: &'a AuthorizedBuyersMarketplace<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12842,9 +13069,15 @@ pub struct BuyerPublisherProfileListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BuyerPublisherProfileListCall<'a> {}
+impl<'a, S> client::CallBuilder for BuyerPublisherProfileListCall<'a, S> {}
 
-impl<'a> BuyerPublisherProfileListCall<'a> {
+impl<'a, S> BuyerPublisherProfileListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13000,28 +13233,28 @@ impl<'a> BuyerPublisherProfileListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BuyerPublisherProfileListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> BuyerPublisherProfileListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token as returned from a previous ListPublisherProfilesResponse.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BuyerPublisherProfileListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BuyerPublisherProfileListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The server may return fewer results than requested. If requested more than 500, the server will return 500 results per page. If unspecified, the server will pick a default page size of 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BuyerPublisherProfileListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BuyerPublisherProfileListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional query string using the [Cloud API list filtering] (https://developers.google.com/authorized-buyers/apis/guides/v2/list-filters) syntax.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BuyerPublisherProfileListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> BuyerPublisherProfileListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -13031,7 +13264,7 @@ impl<'a> BuyerPublisherProfileListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerPublisherProfileListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BuyerPublisherProfileListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13056,7 +13289,7 @@ impl<'a> BuyerPublisherProfileListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BuyerPublisherProfileListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BuyerPublisherProfileListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13076,9 +13309,9 @@ impl<'a> BuyerPublisherProfileListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BuyerPublisherProfileListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BuyerPublisherProfileListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

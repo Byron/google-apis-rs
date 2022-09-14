@@ -1,6 +1,6 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/api/README.md.mako'
+This file was generated automatically from 'src/generator/templates/api/README.md.mako'
 DO NOT EDIT !
 -->
 The `google-drive3` library allows access to all features of the *Google drive* service.
@@ -235,3 +235,4 @@ under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 
 [repo-license]: https://github.com/Byron/google-apis-rsblob/main/LICENSE.md
+

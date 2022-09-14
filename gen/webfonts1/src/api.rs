@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Webfonts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Webfonts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -76,34 +81,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Webfonts<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Webfonts<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Webfonts<> {}
+impl<'a, S> client::Hub for Webfonts<S> {}
 
-impl<'a, > Webfonts<> {
+impl<'a, S> Webfonts<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Webfonts<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Webfonts<S> {
         Webfonts {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://webfonts.googleapis.com/".to_string(),
             _root_url: "https://webfonts.googleapis.com/".to_string(),
         }
     }
 
-    pub fn webfonts(&'a self) -> WebfontMethods<'a> {
+    pub fn webfonts(&'a self) -> WebfontMethods<'a, S> {
         WebfontMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -210,27 +215,27 @@ impl client::ResponseResult for WebfontList {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Webfonts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Webfonts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.webfonts();
 /// # }
 /// ```
-pub struct WebfontMethods<'a>
-    where  {
+pub struct WebfontMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Webfonts<>,
+    hub: &'a Webfonts<S>,
 }
 
-impl<'a> client::MethodsBuilder for WebfontMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for WebfontMethods<'a, S> {}
 
-impl<'a> WebfontMethods<'a> {
+impl<'a, S> WebfontMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the list of fonts currently served by the Google Fonts Developer API.
-    pub fn list(&self) -> WebfontListCall<'a> {
+    pub fn list(&self) -> WebfontListCall<'a, S> {
         WebfontListCall {
             hub: self.hub,
             _sort: Default::default(),
@@ -270,7 +275,7 @@ impl<'a> WebfontMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Webfonts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Webfonts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -279,18 +284,24 @@ impl<'a> WebfontMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebfontListCall<'a>
-    where  {
+pub struct WebfontListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Webfonts<>,
+    hub: &'a Webfonts<S>,
     _sort: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for WebfontListCall<'a> {}
+impl<'a, S> client::CallBuilder for WebfontListCall<'a, S> {}
 
-impl<'a> WebfontListCall<'a> {
+impl<'a, S> WebfontListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -405,7 +416,7 @@ impl<'a> WebfontListCall<'a> {
     /// Enables sorting of the list.
     ///
     /// Sets the *sort* query property to the given value.
-    pub fn sort(mut self, new_value: &str) -> WebfontListCall<'a> {
+    pub fn sort(mut self, new_value: &str) -> WebfontListCall<'a, S> {
         self._sort = Some(new_value.to_string());
         self
     }
@@ -415,7 +426,7 @@ impl<'a> WebfontListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebfontListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebfontListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -440,7 +451,7 @@ impl<'a> WebfontListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WebfontListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebfontListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

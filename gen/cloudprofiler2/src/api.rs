@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -79,7 +84,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -112,34 +117,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudProfiler<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudProfiler<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudProfiler<> {}
+impl<'a, S> client::Hub for CloudProfiler<S> {}
 
-impl<'a, > CloudProfiler<> {
+impl<'a, S> CloudProfiler<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudProfiler<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudProfiler<S> {
         CloudProfiler {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudprofiler.googleapis.com/".to_string(),
             _root_url: "https://cloudprofiler.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -265,22 +270,22 @@ impl client::ResponseResult for Profile {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `profiles_create(...)`, `profiles_create_offline(...)` and `profiles_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudProfiler<>,
+    hub: &'a CloudProfiler<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -290,7 +295,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Parent project to create the profile in.
-    pub fn profiles_create(&self, request: CreateProfileRequest, parent: &str) -> ProjectProfileCreateCall<'a> {
+    pub fn profiles_create(&self, request: CreateProfileRequest, parent: &str) -> ProjectProfileCreateCall<'a, S> {
         ProjectProfileCreateCall {
             hub: self.hub,
             _request: request,
@@ -309,7 +314,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Parent project to create the profile in.
-    pub fn profiles_create_offline(&self, request: Profile, parent: &str) -> ProjectProfileCreateOfflineCall<'a> {
+    pub fn profiles_create_offline(&self, request: Profile, parent: &str) -> ProjectProfileCreateOfflineCall<'a, S> {
         ProjectProfileCreateOfflineCall {
             hub: self.hub,
             _request: request,
@@ -328,7 +333,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Opaque, server-assigned, unique ID for this profile.
-    pub fn profiles_patch(&self, request: Profile, name: &str) -> ProjectProfilePatchCall<'a> {
+    pub fn profiles_patch(&self, request: Profile, name: &str) -> ProjectProfilePatchCall<'a, S> {
         ProjectProfilePatchCall {
             hub: self.hub,
             _request: request,
@@ -372,7 +377,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -385,10 +390,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProfileCreateCall<'a>
-    where  {
+pub struct ProjectProfileCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudProfiler<>,
+    hub: &'a CloudProfiler<S>,
     _request: CreateProfileRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -396,9 +401,15 @@ pub struct ProjectProfileCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectProfileCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectProfileCreateCall<'a, S> {}
 
-impl<'a> ProjectProfileCreateCall<'a> {
+impl<'a, S> ProjectProfileCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -558,7 +569,7 @@ impl<'a> ProjectProfileCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateProfileRequest) -> ProjectProfileCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateProfileRequest) -> ProjectProfileCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -568,7 +579,7 @@ impl<'a> ProjectProfileCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -578,7 +589,7 @@ impl<'a> ProjectProfileCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -603,7 +614,7 @@ impl<'a> ProjectProfileCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -623,9 +634,9 @@ impl<'a> ProjectProfileCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfileCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectProfileCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -658,7 +669,7 @@ impl<'a> ProjectProfileCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -671,10 +682,10 @@ impl<'a> ProjectProfileCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProfileCreateOfflineCall<'a>
-    where  {
+pub struct ProjectProfileCreateOfflineCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudProfiler<>,
+    hub: &'a CloudProfiler<S>,
     _request: Profile,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -682,9 +693,15 @@ pub struct ProjectProfileCreateOfflineCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectProfileCreateOfflineCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectProfileCreateOfflineCall<'a, S> {}
 
-impl<'a> ProjectProfileCreateOfflineCall<'a> {
+impl<'a, S> ProjectProfileCreateOfflineCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -844,7 +861,7 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Profile) -> ProjectProfileCreateOfflineCall<'a> {
+    pub fn request(mut self, new_value: Profile) -> ProjectProfileCreateOfflineCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -854,7 +871,7 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateOfflineCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateOfflineCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -864,7 +881,7 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateOfflineCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateOfflineCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -889,7 +906,7 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateOfflineCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateOfflineCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -909,9 +926,9 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfileCreateOfflineCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectProfileCreateOfflineCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -944,7 +961,7 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudProfiler::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -958,10 +975,10 @@ impl<'a> ProjectProfileCreateOfflineCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProfilePatchCall<'a>
-    where  {
+pub struct ProjectProfilePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudProfiler<>,
+    hub: &'a CloudProfiler<S>,
     _request: Profile,
     _name: String,
     _update_mask: Option<String>,
@@ -970,9 +987,15 @@ pub struct ProjectProfilePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectProfilePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectProfilePatchCall<'a, S> {}
 
-impl<'a> ProjectProfilePatchCall<'a> {
+impl<'a, S> ProjectProfilePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1135,7 +1158,7 @@ impl<'a> ProjectProfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Profile) -> ProjectProfilePatchCall<'a> {
+    pub fn request(mut self, new_value: Profile) -> ProjectProfilePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1145,14 +1168,14 @@ impl<'a> ProjectProfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectProfilePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectProfilePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Field mask used to specify the fields to be overwritten. Currently only profile_bytes and labels fields are supported by UpdateProfile, so only those fields can be specified in the mask. When no mask is provided, all fields are overwritten.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectProfilePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectProfilePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -1162,7 +1185,7 @@ impl<'a> ProjectProfilePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfilePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfilePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1187,7 +1210,7 @@ impl<'a> ProjectProfilePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfilePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfilePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1207,9 +1230,9 @@ impl<'a> ProjectProfilePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfilePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectProfilePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

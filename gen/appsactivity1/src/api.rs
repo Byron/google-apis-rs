@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Appsactivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Appsactivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,34 +109,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Appsactivity<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Appsactivity<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Appsactivity<> {}
+impl<'a, S> client::Hub for Appsactivity<S> {}
 
-impl<'a, > Appsactivity<> {
+impl<'a, S> Appsactivity<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Appsactivity<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Appsactivity<S> {
         Appsactivity {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/appsactivity/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethods<'a> {
+    pub fn activities(&'a self) -> ActivityMethods<'a, S> {
         ActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -408,27 +413,27 @@ impl client::Part for User {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Appsactivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Appsactivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a>
-    where  {
+pub struct ActivityMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Appsactivity<>,
+    hub: &'a Appsactivity<S>,
 }
 
-impl<'a> client::MethodsBuilder for ActivityMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ActivityMethods<'a, S> {}
 
-impl<'a> ActivityMethods<'a> {
+impl<'a, S> ActivityMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of activities visible to the current logged in user. Visible activities are determined by the visibility settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter.
-    pub fn list(&self) -> ActivityListCall<'a> {
+    pub fn list(&self) -> ActivityListCall<'a, S> {
         ActivityListCall {
             hub: self.hub,
             _user_id: Default::default(),
@@ -475,7 +480,7 @@ impl<'a> ActivityMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appsactivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appsactivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -490,10 +495,10 @@ impl<'a> ActivityMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityListCall<'a>
-    where  {
+pub struct ActivityListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appsactivity<>,
+    hub: &'a Appsactivity<S>,
     _user_id: Option<String>,
     _source: Option<String>,
     _page_token: Option<String>,
@@ -506,9 +511,15 @@ pub struct ActivityListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ActivityListCall<'a> {}
+impl<'a, S> client::CallBuilder for ActivityListCall<'a, S> {}
 
-impl<'a> ActivityListCall<'a> {
+impl<'a, S> ActivityListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -647,7 +658,7 @@ impl<'a> ActivityListCall<'a> {
     /// The ID used for ACL checks (does not filter the resulting event list by the assigned value). Use the special value me to indicate the currently authenticated user.
     ///
     /// Sets the *user id* query property to the given value.
-    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._user_id = Some(new_value.to_string());
         self
     }
@@ -655,42 +666,42 @@ impl<'a> ActivityListCall<'a> {
     /// - drive.google.com
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// A token to retrieve a specific page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of events to return on a page. The response includes a continuation token if there are more events.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.
     ///
     /// Sets the *grouping strategy* query property to the given value.
-    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._grouping_strategy = Some(new_value.to_string());
         self
     }
     /// Identifies the Drive item to return activities for.
     ///
     /// Sets the *drive.file id* query property to the given value.
-    pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._drive_file_id = Some(new_value.to_string());
         self
     }
     /// Identifies the Drive folder containing the items for which to return activities.
     ///
     /// Sets the *drive.ancestor id* query property to the given value.
-    pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a> {
+    pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a, S> {
         self._drive_ancestor_id = Some(new_value.to_string());
         self
     }
@@ -700,7 +711,7 @@ impl<'a> ActivityListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -721,7 +732,7 @@ impl<'a> ActivityListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -741,9 +752,9 @@ impl<'a> ActivityListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ActivityListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

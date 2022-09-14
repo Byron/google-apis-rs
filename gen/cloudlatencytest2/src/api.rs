@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Cloudlatencytest<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Cloudlatencytest<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Cloudlatencytest<> {}
+impl<'a, S> client::Hub for Cloudlatencytest<S> {}
 
-impl<'a, > Cloudlatencytest<> {
+impl<'a, S> Cloudlatencytest<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Cloudlatencytest<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Cloudlatencytest<S> {
         Cloudlatencytest {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudlatencytest-pa.googleapis.com/v2/statscollection/".to_string(),
             _root_url: "https://cloudlatencytest-pa.googleapis.com/".to_string(),
         }
     }
 
-    pub fn statscollection(&'a self) -> StatscollectionMethods<'a> {
+    pub fn statscollection(&'a self) -> StatscollectionMethods<'a, S> {
         StatscollectionMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -312,22 +317,22 @@ impl client::Part for StringValue {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `updateaggregatedstats(...)` and `updatestats(...)`
 /// // to build up your call.
 /// let rb = hub.statscollection();
 /// # }
 /// ```
-pub struct StatscollectionMethods<'a>
-    where  {
+pub struct StatscollectionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudlatencytest<>,
+    hub: &'a Cloudlatencytest<S>,
 }
 
-impl<'a> client::MethodsBuilder for StatscollectionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for StatscollectionMethods<'a, S> {}
 
-impl<'a> StatscollectionMethods<'a> {
+impl<'a, S> StatscollectionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -336,7 +341,7 @@ impl<'a> StatscollectionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn updateaggregatedstats(&self, request: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a> {
+    pub fn updateaggregatedstats(&self, request: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, S> {
         StatscollectionUpdateaggregatedstatCall {
             hub: self.hub,
             _request: request,
@@ -353,7 +358,7 @@ impl<'a> StatscollectionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn updatestats(&self, request: Stats) -> StatscollectionUpdatestatCall<'a> {
+    pub fn updatestats(&self, request: Stats) -> StatscollectionUpdatestatCall<'a, S> {
         StatscollectionUpdatestatCall {
             hub: self.hub,
             _request: request,
@@ -395,7 +400,7 @@ impl<'a> StatscollectionMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -408,19 +413,25 @@ impl<'a> StatscollectionMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StatscollectionUpdateaggregatedstatCall<'a>
-    where  {
+pub struct StatscollectionUpdateaggregatedstatCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudlatencytest<>,
+    hub: &'a Cloudlatencytest<S>,
     _request: AggregatedStats,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StatscollectionUpdateaggregatedstatCall<'a> {}
+impl<'a, S> client::CallBuilder for StatscollectionUpdateaggregatedstatCall<'a, S> {}
 
-impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
+impl<'a, S> StatscollectionUpdateaggregatedstatCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -554,7 +565,7 @@ impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a> {
+    pub fn request(mut self, new_value: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -564,7 +575,7 @@ impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdateaggregatedstatCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdateaggregatedstatCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -585,7 +596,7 @@ impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdateaggregatedstatCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdateaggregatedstatCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -605,9 +616,9 @@ impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StatscollectionUpdateaggregatedstatCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StatscollectionUpdateaggregatedstatCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -640,7 +651,7 @@ impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Cloudlatencytest::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -653,19 +664,25 @@ impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StatscollectionUpdatestatCall<'a>
-    where  {
+pub struct StatscollectionUpdatestatCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Cloudlatencytest<>,
+    hub: &'a Cloudlatencytest<S>,
     _request: Stats,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for StatscollectionUpdatestatCall<'a> {}
+impl<'a, S> client::CallBuilder for StatscollectionUpdatestatCall<'a, S> {}
 
-impl<'a> StatscollectionUpdatestatCall<'a> {
+impl<'a, S> StatscollectionUpdatestatCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -799,7 +816,7 @@ impl<'a> StatscollectionUpdatestatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Stats) -> StatscollectionUpdatestatCall<'a> {
+    pub fn request(mut self, new_value: Stats) -> StatscollectionUpdatestatCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -809,7 +826,7 @@ impl<'a> StatscollectionUpdatestatCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdatestatCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdatestatCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -830,7 +847,7 @@ impl<'a> StatscollectionUpdatestatCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdatestatCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdatestatCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -850,9 +867,9 @@ impl<'a> StatscollectionUpdatestatCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StatscollectionUpdatestatCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> StatscollectionUpdatestatCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

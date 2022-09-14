@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,34 +112,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct IdentityToolkit<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct IdentityToolkit<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for IdentityToolkit<> {}
+impl<'a, S> client::Hub for IdentityToolkit<S> {}
 
-impl<'a, > IdentityToolkit<> {
+impl<'a, S> IdentityToolkit<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> IdentityToolkit<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> IdentityToolkit<S> {
         IdentityToolkit {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/identitytoolkit/v3/relyingparty/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn relyingparty(&'a self) -> RelyingpartyMethods<'a> {
+    pub fn relyingparty(&'a self) -> RelyingpartyMethods<'a, S> {
         RelyingpartyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1779,22 +1784,22 @@ impl client::Part for UserInfoProviderUserInfo {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `email_link_signin(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `send_verification_code(...)`, `set_account_info(...)`, `set_project_config(...)`, `sign_out_user(...)`, `signup_new_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)`, `verify_password(...)` and `verify_phone_number(...)`
 /// // to build up your call.
 /// let rb = hub.relyingparty();
 /// # }
 /// ```
-pub struct RelyingpartyMethods<'a>
-    where  {
+pub struct RelyingpartyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
 }
 
-impl<'a> client::MethodsBuilder for RelyingpartyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RelyingpartyMethods<'a, S> {}
 
-impl<'a> RelyingpartyMethods<'a> {
+impl<'a, S> RelyingpartyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1803,7 +1808,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create_auth_uri(&self, request: IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a> {
+    pub fn create_auth_uri(&self, request: IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, S> {
         RelyingpartyCreateAuthUriCall {
             hub: self.hub,
             _request: request,
@@ -1820,7 +1825,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn delete_account(&self, request: IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a> {
+    pub fn delete_account(&self, request: IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, S> {
         RelyingpartyDeleteAccountCall {
             hub: self.hub,
             _request: request,
@@ -1837,7 +1842,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn download_account(&self, request: IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a> {
+    pub fn download_account(&self, request: IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, S> {
         RelyingpartyDownloadAccountCall {
             hub: self.hub,
             _request: request,
@@ -1854,7 +1859,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn email_link_signin(&self, request: IdentitytoolkitRelyingpartyEmailLinkSigninRequest) -> RelyingpartyEmailLinkSigninCall<'a> {
+    pub fn email_link_signin(&self, request: IdentitytoolkitRelyingpartyEmailLinkSigninRequest) -> RelyingpartyEmailLinkSigninCall<'a, S> {
         RelyingpartyEmailLinkSigninCall {
             hub: self.hub,
             _request: request,
@@ -1871,7 +1876,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_account_info(&self, request: IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a> {
+    pub fn get_account_info(&self, request: IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, S> {
         RelyingpartyGetAccountInfoCall {
             hub: self.hub,
             _request: request,
@@ -1888,7 +1893,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_oob_confirmation_code(&self, request: Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a> {
+    pub fn get_oob_confirmation_code(&self, request: Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, S> {
         RelyingpartyGetOobConfirmationCodeCall {
             hub: self.hub,
             _request: request,
@@ -1901,7 +1906,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get project configuration.
-    pub fn get_project_config(&self) -> RelyingpartyGetProjectConfigCall<'a> {
+    pub fn get_project_config(&self) -> RelyingpartyGetProjectConfigCall<'a, S> {
         RelyingpartyGetProjectConfigCall {
             hub: self.hub,
             _project_number: Default::default(),
@@ -1915,7 +1920,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get token signing public key.
-    pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a> {
+    pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a, S> {
         RelyingpartyGetPublicKeyCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1927,7 +1932,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get recaptcha secure param.
-    pub fn get_recaptcha_param(&self) -> RelyingpartyGetRecaptchaParamCall<'a> {
+    pub fn get_recaptcha_param(&self) -> RelyingpartyGetRecaptchaParamCall<'a, S> {
         RelyingpartyGetRecaptchaParamCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1943,7 +1948,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_password(&self, request: IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a> {
+    pub fn reset_password(&self, request: IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, S> {
         RelyingpartyResetPasswordCall {
             hub: self.hub,
             _request: request,
@@ -1960,7 +1965,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn send_verification_code(&self, request: IdentitytoolkitRelyingpartySendVerificationCodeRequest) -> RelyingpartySendVerificationCodeCall<'a> {
+    pub fn send_verification_code(&self, request: IdentitytoolkitRelyingpartySendVerificationCodeRequest) -> RelyingpartySendVerificationCodeCall<'a, S> {
         RelyingpartySendVerificationCodeCall {
             hub: self.hub,
             _request: request,
@@ -1977,7 +1982,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn set_account_info(&self, request: IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a> {
+    pub fn set_account_info(&self, request: IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, S> {
         RelyingpartySetAccountInfoCall {
             hub: self.hub,
             _request: request,
@@ -1994,7 +1999,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn set_project_config(&self, request: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a> {
+    pub fn set_project_config(&self, request: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a, S> {
         RelyingpartySetProjectConfigCall {
             hub: self.hub,
             _request: request,
@@ -2011,7 +2016,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn sign_out_user(&self, request: IdentitytoolkitRelyingpartySignOutUserRequest) -> RelyingpartySignOutUserCall<'a> {
+    pub fn sign_out_user(&self, request: IdentitytoolkitRelyingpartySignOutUserRequest) -> RelyingpartySignOutUserCall<'a, S> {
         RelyingpartySignOutUserCall {
             hub: self.hub,
             _request: request,
@@ -2028,7 +2033,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn signup_new_user(&self, request: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a> {
+    pub fn signup_new_user(&self, request: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a, S> {
         RelyingpartySignupNewUserCall {
             hub: self.hub,
             _request: request,
@@ -2045,7 +2050,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn upload_account(&self, request: IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a> {
+    pub fn upload_account(&self, request: IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, S> {
         RelyingpartyUploadAccountCall {
             hub: self.hub,
             _request: request,
@@ -2062,7 +2067,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_assertion(&self, request: IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a> {
+    pub fn verify_assertion(&self, request: IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, S> {
         RelyingpartyVerifyAssertionCall {
             hub: self.hub,
             _request: request,
@@ -2079,7 +2084,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_custom_token(&self, request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest) -> RelyingpartyVerifyCustomTokenCall<'a> {
+    pub fn verify_custom_token(&self, request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest) -> RelyingpartyVerifyCustomTokenCall<'a, S> {
         RelyingpartyVerifyCustomTokenCall {
             hub: self.hub,
             _request: request,
@@ -2096,7 +2101,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_password(&self, request: IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a> {
+    pub fn verify_password(&self, request: IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, S> {
         RelyingpartyVerifyPasswordCall {
             hub: self.hub,
             _request: request,
@@ -2113,7 +2118,7 @@ impl<'a> RelyingpartyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn verify_phone_number(&self, request: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest) -> RelyingpartyVerifyPhoneNumberCall<'a> {
+    pub fn verify_phone_number(&self, request: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest) -> RelyingpartyVerifyPhoneNumberCall<'a, S> {
         RelyingpartyVerifyPhoneNumberCall {
             hub: self.hub,
             _request: request,
@@ -2155,7 +2160,7 @@ impl<'a> RelyingpartyMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2168,19 +2173,25 @@ impl<'a> RelyingpartyMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyCreateAuthUriCall<'a>
-    where  {
+pub struct RelyingpartyCreateAuthUriCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyCreateAuthUriRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyCreateAuthUriCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyCreateAuthUriCall<'a, S> {}
 
-impl<'a> RelyingpartyCreateAuthUriCall<'a> {
+impl<'a, S> RelyingpartyCreateAuthUriCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2314,7 +2325,7 @@ impl<'a> RelyingpartyCreateAuthUriCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2324,7 +2335,7 @@ impl<'a> RelyingpartyCreateAuthUriCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyCreateAuthUriCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyCreateAuthUriCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2345,7 +2356,7 @@ impl<'a> RelyingpartyCreateAuthUriCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyCreateAuthUriCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyCreateAuthUriCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2365,9 +2376,9 @@ impl<'a> RelyingpartyCreateAuthUriCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyCreateAuthUriCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyCreateAuthUriCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2400,7 +2411,7 @@ impl<'a> RelyingpartyCreateAuthUriCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2413,19 +2424,25 @@ impl<'a> RelyingpartyCreateAuthUriCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyDeleteAccountCall<'a>
-    where  {
+pub struct RelyingpartyDeleteAccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyDeleteAccountRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyDeleteAccountCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyDeleteAccountCall<'a, S> {}
 
-impl<'a> RelyingpartyDeleteAccountCall<'a> {
+impl<'a, S> RelyingpartyDeleteAccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2559,7 +2576,7 @@ impl<'a> RelyingpartyDeleteAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2569,7 +2586,7 @@ impl<'a> RelyingpartyDeleteAccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyDeleteAccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyDeleteAccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2590,7 +2607,7 @@ impl<'a> RelyingpartyDeleteAccountCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDeleteAccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDeleteAccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2610,9 +2627,9 @@ impl<'a> RelyingpartyDeleteAccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyDeleteAccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyDeleteAccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2645,7 +2662,7 @@ impl<'a> RelyingpartyDeleteAccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2658,19 +2675,25 @@ impl<'a> RelyingpartyDeleteAccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyDownloadAccountCall<'a>
-    where  {
+pub struct RelyingpartyDownloadAccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyDownloadAccountRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyDownloadAccountCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyDownloadAccountCall<'a, S> {}
 
-impl<'a> RelyingpartyDownloadAccountCall<'a> {
+impl<'a, S> RelyingpartyDownloadAccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2804,7 +2827,7 @@ impl<'a> RelyingpartyDownloadAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2814,7 +2837,7 @@ impl<'a> RelyingpartyDownloadAccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyDownloadAccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyDownloadAccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2835,7 +2858,7 @@ impl<'a> RelyingpartyDownloadAccountCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDownloadAccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDownloadAccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2855,9 +2878,9 @@ impl<'a> RelyingpartyDownloadAccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyDownloadAccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyDownloadAccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2890,7 +2913,7 @@ impl<'a> RelyingpartyDownloadAccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2903,19 +2926,25 @@ impl<'a> RelyingpartyDownloadAccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyEmailLinkSigninCall<'a>
-    where  {
+pub struct RelyingpartyEmailLinkSigninCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyEmailLinkSigninRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyEmailLinkSigninCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyEmailLinkSigninCall<'a, S> {}
 
-impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
+impl<'a, S> RelyingpartyEmailLinkSigninCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3049,7 +3078,7 @@ impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyEmailLinkSigninRequest) -> RelyingpartyEmailLinkSigninCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyEmailLinkSigninRequest) -> RelyingpartyEmailLinkSigninCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3059,7 +3088,7 @@ impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyEmailLinkSigninCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyEmailLinkSigninCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3080,7 +3109,7 @@ impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyEmailLinkSigninCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyEmailLinkSigninCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3100,9 +3129,9 @@ impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyEmailLinkSigninCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyEmailLinkSigninCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3135,7 +3164,7 @@ impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3148,19 +3177,25 @@ impl<'a> RelyingpartyEmailLinkSigninCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyGetAccountInfoCall<'a>
-    where  {
+pub struct RelyingpartyGetAccountInfoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyGetAccountInfoRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyGetAccountInfoCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyGetAccountInfoCall<'a, S> {}
 
-impl<'a> RelyingpartyGetAccountInfoCall<'a> {
+impl<'a, S> RelyingpartyGetAccountInfoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3294,7 +3329,7 @@ impl<'a> RelyingpartyGetAccountInfoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3304,7 +3339,7 @@ impl<'a> RelyingpartyGetAccountInfoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetAccountInfoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetAccountInfoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3325,7 +3360,7 @@ impl<'a> RelyingpartyGetAccountInfoCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetAccountInfoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetAccountInfoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3345,9 +3380,9 @@ impl<'a> RelyingpartyGetAccountInfoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetAccountInfoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyGetAccountInfoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3380,7 +3415,7 @@ impl<'a> RelyingpartyGetAccountInfoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3393,19 +3428,25 @@ impl<'a> RelyingpartyGetAccountInfoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyGetOobConfirmationCodeCall<'a>
-    where  {
+pub struct RelyingpartyGetOobConfirmationCodeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: Relyingparty,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyGetOobConfirmationCodeCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyGetOobConfirmationCodeCall<'a, S> {}
 
-impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
+impl<'a, S> RelyingpartyGetOobConfirmationCodeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3539,7 +3580,7 @@ impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a> {
+    pub fn request(mut self, new_value: Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3549,7 +3590,7 @@ impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetOobConfirmationCodeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetOobConfirmationCodeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3570,7 +3611,7 @@ impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetOobConfirmationCodeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetOobConfirmationCodeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3590,9 +3631,9 @@ impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetOobConfirmationCodeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyGetOobConfirmationCodeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3624,7 +3665,7 @@ impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3634,10 +3675,10 @@ impl<'a> RelyingpartyGetOobConfirmationCodeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyGetProjectConfigCall<'a>
-    where  {
+pub struct RelyingpartyGetProjectConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _project_number: Option<String>,
     _delegated_project_number: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3645,9 +3686,15 @@ pub struct RelyingpartyGetProjectConfigCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyGetProjectConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyGetProjectConfigCall<'a, S> {}
 
-impl<'a> RelyingpartyGetProjectConfigCall<'a> {
+impl<'a, S> RelyingpartyGetProjectConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3771,14 +3818,14 @@ impl<'a> RelyingpartyGetProjectConfigCall<'a> {
     /// GCP project number of the request.
     ///
     /// Sets the *project number* query property to the given value.
-    pub fn project_number(mut self, new_value: &str) -> RelyingpartyGetProjectConfigCall<'a> {
+    pub fn project_number(mut self, new_value: &str) -> RelyingpartyGetProjectConfigCall<'a, S> {
         self._project_number = Some(new_value.to_string());
         self
     }
     /// Delegated GCP project number of the request.
     ///
     /// Sets the *delegated project number* query property to the given value.
-    pub fn delegated_project_number(mut self, new_value: &str) -> RelyingpartyGetProjectConfigCall<'a> {
+    pub fn delegated_project_number(mut self, new_value: &str) -> RelyingpartyGetProjectConfigCall<'a, S> {
         self._delegated_project_number = Some(new_value.to_string());
         self
     }
@@ -3788,7 +3835,7 @@ impl<'a> RelyingpartyGetProjectConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetProjectConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetProjectConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3809,7 +3856,7 @@ impl<'a> RelyingpartyGetProjectConfigCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetProjectConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetProjectConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3829,9 +3876,9 @@ impl<'a> RelyingpartyGetProjectConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetProjectConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyGetProjectConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3863,7 +3910,7 @@ impl<'a> RelyingpartyGetProjectConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3871,18 +3918,24 @@ impl<'a> RelyingpartyGetProjectConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyGetPublicKeyCall<'a>
-    where  {
+pub struct RelyingpartyGetPublicKeyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyGetPublicKeyCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyGetPublicKeyCall<'a, S> {}
 
-impl<'a> RelyingpartyGetPublicKeyCall<'a> {
+impl<'a, S> RelyingpartyGetPublicKeyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4003,7 +4056,7 @@ impl<'a> RelyingpartyGetPublicKeyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetPublicKeyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetPublicKeyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4024,7 +4077,7 @@ impl<'a> RelyingpartyGetPublicKeyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4044,9 +4097,9 @@ impl<'a> RelyingpartyGetPublicKeyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetPublicKeyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyGetPublicKeyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4078,7 +4131,7 @@ impl<'a> RelyingpartyGetPublicKeyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4086,18 +4139,24 @@ impl<'a> RelyingpartyGetPublicKeyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyGetRecaptchaParamCall<'a>
-    where  {
+pub struct RelyingpartyGetRecaptchaParamCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyGetRecaptchaParamCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyGetRecaptchaParamCall<'a, S> {}
 
-impl<'a> RelyingpartyGetRecaptchaParamCall<'a> {
+impl<'a, S> RelyingpartyGetRecaptchaParamCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4218,7 +4277,7 @@ impl<'a> RelyingpartyGetRecaptchaParamCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetRecaptchaParamCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyGetRecaptchaParamCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4239,7 +4298,7 @@ impl<'a> RelyingpartyGetRecaptchaParamCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetRecaptchaParamCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetRecaptchaParamCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4259,9 +4318,9 @@ impl<'a> RelyingpartyGetRecaptchaParamCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyGetRecaptchaParamCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyGetRecaptchaParamCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4294,7 +4353,7 @@ impl<'a> RelyingpartyGetRecaptchaParamCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4307,19 +4366,25 @@ impl<'a> RelyingpartyGetRecaptchaParamCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyResetPasswordCall<'a>
-    where  {
+pub struct RelyingpartyResetPasswordCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyResetPasswordRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyResetPasswordCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyResetPasswordCall<'a, S> {}
 
-impl<'a> RelyingpartyResetPasswordCall<'a> {
+impl<'a, S> RelyingpartyResetPasswordCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4453,7 +4518,7 @@ impl<'a> RelyingpartyResetPasswordCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4463,7 +4528,7 @@ impl<'a> RelyingpartyResetPasswordCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyResetPasswordCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyResetPasswordCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4484,7 +4549,7 @@ impl<'a> RelyingpartyResetPasswordCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyResetPasswordCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyResetPasswordCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4504,9 +4569,9 @@ impl<'a> RelyingpartyResetPasswordCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyResetPasswordCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyResetPasswordCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4539,7 +4604,7 @@ impl<'a> RelyingpartyResetPasswordCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4552,19 +4617,25 @@ impl<'a> RelyingpartyResetPasswordCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartySendVerificationCodeCall<'a>
-    where  {
+pub struct RelyingpartySendVerificationCodeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartySendVerificationCodeRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartySendVerificationCodeCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartySendVerificationCodeCall<'a, S> {}
 
-impl<'a> RelyingpartySendVerificationCodeCall<'a> {
+impl<'a, S> RelyingpartySendVerificationCodeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4698,7 +4769,7 @@ impl<'a> RelyingpartySendVerificationCodeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySendVerificationCodeRequest) -> RelyingpartySendVerificationCodeCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySendVerificationCodeRequest) -> RelyingpartySendVerificationCodeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4708,7 +4779,7 @@ impl<'a> RelyingpartySendVerificationCodeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySendVerificationCodeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySendVerificationCodeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4729,7 +4800,7 @@ impl<'a> RelyingpartySendVerificationCodeCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySendVerificationCodeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySendVerificationCodeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4749,9 +4820,9 @@ impl<'a> RelyingpartySendVerificationCodeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySendVerificationCodeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartySendVerificationCodeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4784,7 +4855,7 @@ impl<'a> RelyingpartySendVerificationCodeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4797,19 +4868,25 @@ impl<'a> RelyingpartySendVerificationCodeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartySetAccountInfoCall<'a>
-    where  {
+pub struct RelyingpartySetAccountInfoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartySetAccountInfoRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartySetAccountInfoCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartySetAccountInfoCall<'a, S> {}
 
-impl<'a> RelyingpartySetAccountInfoCall<'a> {
+impl<'a, S> RelyingpartySetAccountInfoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4943,7 +5020,7 @@ impl<'a> RelyingpartySetAccountInfoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4953,7 +5030,7 @@ impl<'a> RelyingpartySetAccountInfoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySetAccountInfoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySetAccountInfoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4974,7 +5051,7 @@ impl<'a> RelyingpartySetAccountInfoCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetAccountInfoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetAccountInfoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4994,9 +5071,9 @@ impl<'a> RelyingpartySetAccountInfoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySetAccountInfoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartySetAccountInfoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5029,7 +5106,7 @@ impl<'a> RelyingpartySetAccountInfoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5042,19 +5119,25 @@ impl<'a> RelyingpartySetAccountInfoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartySetProjectConfigCall<'a>
-    where  {
+pub struct RelyingpartySetProjectConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartySetProjectConfigRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartySetProjectConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartySetProjectConfigCall<'a, S> {}
 
-impl<'a> RelyingpartySetProjectConfigCall<'a> {
+impl<'a, S> RelyingpartySetProjectConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5188,7 +5271,7 @@ impl<'a> RelyingpartySetProjectConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySetProjectConfigRequest) -> RelyingpartySetProjectConfigCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5198,7 +5281,7 @@ impl<'a> RelyingpartySetProjectConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySetProjectConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySetProjectConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5219,7 +5302,7 @@ impl<'a> RelyingpartySetProjectConfigCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetProjectConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetProjectConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5239,9 +5322,9 @@ impl<'a> RelyingpartySetProjectConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySetProjectConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartySetProjectConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5274,7 +5357,7 @@ impl<'a> RelyingpartySetProjectConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5287,19 +5370,25 @@ impl<'a> RelyingpartySetProjectConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartySignOutUserCall<'a>
-    where  {
+pub struct RelyingpartySignOutUserCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartySignOutUserRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartySignOutUserCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartySignOutUserCall<'a, S> {}
 
-impl<'a> RelyingpartySignOutUserCall<'a> {
+impl<'a, S> RelyingpartySignOutUserCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5433,7 +5522,7 @@ impl<'a> RelyingpartySignOutUserCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignOutUserRequest) -> RelyingpartySignOutUserCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignOutUserRequest) -> RelyingpartySignOutUserCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5443,7 +5532,7 @@ impl<'a> RelyingpartySignOutUserCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySignOutUserCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySignOutUserCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5464,7 +5553,7 @@ impl<'a> RelyingpartySignOutUserCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignOutUserCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignOutUserCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5484,9 +5573,9 @@ impl<'a> RelyingpartySignOutUserCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySignOutUserCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartySignOutUserCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5519,7 +5608,7 @@ impl<'a> RelyingpartySignOutUserCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5532,19 +5621,25 @@ impl<'a> RelyingpartySignOutUserCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartySignupNewUserCall<'a>
-    where  {
+pub struct RelyingpartySignupNewUserCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartySignupNewUserRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartySignupNewUserCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartySignupNewUserCall<'a, S> {}
 
-impl<'a> RelyingpartySignupNewUserCall<'a> {
+impl<'a, S> RelyingpartySignupNewUserCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5678,7 +5773,7 @@ impl<'a> RelyingpartySignupNewUserCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartySignupNewUserRequest) -> RelyingpartySignupNewUserCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5688,7 +5783,7 @@ impl<'a> RelyingpartySignupNewUserCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySignupNewUserCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartySignupNewUserCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5709,7 +5804,7 @@ impl<'a> RelyingpartySignupNewUserCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignupNewUserCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySignupNewUserCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5729,9 +5824,9 @@ impl<'a> RelyingpartySignupNewUserCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartySignupNewUserCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartySignupNewUserCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5764,7 +5859,7 @@ impl<'a> RelyingpartySignupNewUserCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5777,19 +5872,25 @@ impl<'a> RelyingpartySignupNewUserCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyUploadAccountCall<'a>
-    where  {
+pub struct RelyingpartyUploadAccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyUploadAccountRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyUploadAccountCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyUploadAccountCall<'a, S> {}
 
-impl<'a> RelyingpartyUploadAccountCall<'a> {
+impl<'a, S> RelyingpartyUploadAccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5923,7 +6024,7 @@ impl<'a> RelyingpartyUploadAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5933,7 +6034,7 @@ impl<'a> RelyingpartyUploadAccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyUploadAccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyUploadAccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5954,7 +6055,7 @@ impl<'a> RelyingpartyUploadAccountCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyUploadAccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyUploadAccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5974,9 +6075,9 @@ impl<'a> RelyingpartyUploadAccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyUploadAccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyUploadAccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6009,7 +6110,7 @@ impl<'a> RelyingpartyUploadAccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6022,19 +6123,25 @@ impl<'a> RelyingpartyUploadAccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyVerifyAssertionCall<'a>
-    where  {
+pub struct RelyingpartyVerifyAssertionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyVerifyAssertionRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyVerifyAssertionCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyVerifyAssertionCall<'a, S> {}
 
-impl<'a> RelyingpartyVerifyAssertionCall<'a> {
+impl<'a, S> RelyingpartyVerifyAssertionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6168,7 +6275,7 @@ impl<'a> RelyingpartyVerifyAssertionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6178,7 +6285,7 @@ impl<'a> RelyingpartyVerifyAssertionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyAssertionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyAssertionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6199,7 +6306,7 @@ impl<'a> RelyingpartyVerifyAssertionCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyAssertionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyAssertionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6219,9 +6326,9 @@ impl<'a> RelyingpartyVerifyAssertionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyVerifyAssertionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyVerifyAssertionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6254,7 +6361,7 @@ impl<'a> RelyingpartyVerifyAssertionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6267,19 +6374,25 @@ impl<'a> RelyingpartyVerifyAssertionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyVerifyCustomTokenCall<'a>
-    where  {
+pub struct RelyingpartyVerifyCustomTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyVerifyCustomTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyVerifyCustomTokenCall<'a, S> {}
 
-impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
+impl<'a, S> RelyingpartyVerifyCustomTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6413,7 +6526,7 @@ impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest) -> RelyingpartyVerifyCustomTokenCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyCustomTokenRequest) -> RelyingpartyVerifyCustomTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6423,7 +6536,7 @@ impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyCustomTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyCustomTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6444,7 +6557,7 @@ impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyCustomTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyCustomTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6464,9 +6577,9 @@ impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyVerifyCustomTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyVerifyCustomTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6499,7 +6612,7 @@ impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6512,19 +6625,25 @@ impl<'a> RelyingpartyVerifyCustomTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyVerifyPasswordCall<'a>
-    where  {
+pub struct RelyingpartyVerifyPasswordCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyVerifyPasswordRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyVerifyPasswordCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyVerifyPasswordCall<'a, S> {}
 
-impl<'a> RelyingpartyVerifyPasswordCall<'a> {
+impl<'a, S> RelyingpartyVerifyPasswordCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6658,7 +6777,7 @@ impl<'a> RelyingpartyVerifyPasswordCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6668,7 +6787,7 @@ impl<'a> RelyingpartyVerifyPasswordCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyPasswordCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyPasswordCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6689,7 +6808,7 @@ impl<'a> RelyingpartyVerifyPasswordCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPasswordCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPasswordCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6709,9 +6828,9 @@ impl<'a> RelyingpartyVerifyPasswordCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyVerifyPasswordCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyVerifyPasswordCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6744,7 +6863,7 @@ impl<'a> RelyingpartyVerifyPasswordCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6757,19 +6876,25 @@ impl<'a> RelyingpartyVerifyPasswordCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RelyingpartyVerifyPhoneNumberCall<'a>
-    where  {
+pub struct RelyingpartyVerifyPhoneNumberCall<'a, S>
+    where S: 'a {
 
-    hub: &'a IdentityToolkit<>,
+    hub: &'a IdentityToolkit<S>,
     _request: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RelyingpartyVerifyPhoneNumberCall<'a> {}
+impl<'a, S> client::CallBuilder for RelyingpartyVerifyPhoneNumberCall<'a, S> {}
 
-impl<'a> RelyingpartyVerifyPhoneNumberCall<'a> {
+impl<'a, S> RelyingpartyVerifyPhoneNumberCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6903,7 +7028,7 @@ impl<'a> RelyingpartyVerifyPhoneNumberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest) -> RelyingpartyVerifyPhoneNumberCall<'a> {
+    pub fn request(mut self, new_value: IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest) -> RelyingpartyVerifyPhoneNumberCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6913,7 +7038,7 @@ impl<'a> RelyingpartyVerifyPhoneNumberCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyPhoneNumberCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RelyingpartyVerifyPhoneNumberCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6934,7 +7059,7 @@ impl<'a> RelyingpartyVerifyPhoneNumberCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPhoneNumberCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPhoneNumberCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6954,9 +7079,9 @@ impl<'a> RelyingpartyVerifyPhoneNumberCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RelyingpartyVerifyPhoneNumberCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RelyingpartyVerifyPhoneNumberCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

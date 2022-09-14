@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -82,7 +87,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -112,37 +117,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct FirebaseHosting<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct FirebaseHosting<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for FirebaseHosting<> {}
+impl<'a, S> client::Hub for FirebaseHosting<S> {}
 
-impl<'a, > FirebaseHosting<> {
+impl<'a, S> FirebaseHosting<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseHosting<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> FirebaseHosting<S> {
         FirebaseHosting {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn sites(&'a self) -> SiteMethods<'a> {
+    pub fn sites(&'a self) -> SiteMethods<'a, S> {
         SiteMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -960,22 +965,22 @@ impl client::Part for VersionFile {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `operations_get(...)`, `sites_channels_create(...)`, `sites_channels_delete(...)`, `sites_channels_get(...)`, `sites_channels_list(...)`, `sites_channels_patch(...)`, `sites_channels_releases_create(...)`, `sites_channels_releases_list(...)`, `sites_create(...)`, `sites_delete(...)`, `sites_domains_create(...)`, `sites_domains_delete(...)`, `sites_domains_get(...)`, `sites_domains_list(...)`, `sites_domains_update(...)`, `sites_get(...)`, `sites_get_config(...)`, `sites_list(...)`, `sites_patch(...)`, `sites_releases_create(...)`, `sites_releases_list(...)`, `sites_update_config(...)`, `sites_versions_clone(...)`, `sites_versions_create(...)`, `sites_versions_delete(...)`, `sites_versions_files_list(...)`, `sites_versions_list(...)`, `sites_versions_patch(...)` and `sites_versions_populate_files(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -984,7 +989,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, S> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1002,7 +1007,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_releases_create(&self, request: Release, parent: &str) -> ProjectSiteChannelReleaseCreateCall<'a> {
+    pub fn sites_channels_releases_create(&self, request: Release, parent: &str) -> ProjectSiteChannelReleaseCreateCall<'a, S> {
         ProjectSiteChannelReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1021,7 +1026,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn sites_channels_releases_list(&self, parent: &str) -> ProjectSiteChannelReleaseListCall<'a> {
+    pub fn sites_channels_releases_list(&self, parent: &str) -> ProjectSiteChannelReleaseListCall<'a, S> {
         ProjectSiteChannelReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1041,7 +1046,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create this channel, in the format: sites/ SITE_ID
-    pub fn sites_channels_create(&self, request: Channel, parent: &str) -> ProjectSiteChannelCreateCall<'a> {
+    pub fn sites_channels_create(&self, request: Channel, parent: &str) -> ProjectSiteChannelCreateCall<'a, S> {
         ProjectSiteChannelCreateCall {
             hub: self.hub,
             _request: request,
@@ -1060,7 +1065,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_delete(&self, name: &str) -> ProjectSiteChannelDeleteCall<'a> {
+    pub fn sites_channels_delete(&self, name: &str) -> ProjectSiteChannelDeleteCall<'a, S> {
         ProjectSiteChannelDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1077,7 +1082,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_get(&self, name: &str) -> ProjectSiteChannelGetCall<'a> {
+    pub fn sites_channels_get(&self, name: &str) -> ProjectSiteChannelGetCall<'a, S> {
         ProjectSiteChannelGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1094,7 +1099,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site for which to list channels, in the format: sites/SITE_ID
-    pub fn sites_channels_list(&self, parent: &str) -> ProjectSiteChannelListCall<'a> {
+    pub fn sites_channels_list(&self, parent: &str) -> ProjectSiteChannelListCall<'a, S> {
         ProjectSiteChannelListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1114,7 +1119,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the channel, in the format: sites/ SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_patch(&self, request: Channel, name: &str) -> ProjectSiteChannelPatchCall<'a> {
+    pub fn sites_channels_patch(&self, request: Channel, name: &str) -> ProjectSiteChannelPatchCall<'a, S> {
         ProjectSiteChannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -1134,7 +1139,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent to create the domain association for, in the format: sites/site-name
-    pub fn sites_domains_create(&self, request: Domain, parent: &str) -> ProjectSiteDomainCreateCall<'a> {
+    pub fn sites_domains_create(&self, request: Domain, parent: &str) -> ProjectSiteDomainCreateCall<'a, S> {
         ProjectSiteDomainCreateCall {
             hub: self.hub,
             _request: request,
@@ -1152,7 +1157,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain association to delete.
-    pub fn sites_domains_delete(&self, name: &str) -> ProjectSiteDomainDeleteCall<'a> {
+    pub fn sites_domains_delete(&self, name: &str) -> ProjectSiteDomainDeleteCall<'a, S> {
         ProjectSiteDomainDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1169,7 +1174,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain configuration to get.
-    pub fn sites_domains_get(&self, name: &str) -> ProjectSiteDomainGetCall<'a> {
+    pub fn sites_domains_get(&self, name: &str) -> ProjectSiteDomainGetCall<'a, S> {
         ProjectSiteDomainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1186,7 +1191,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent for which to list domains, in the format: sites/ site-name
-    pub fn sites_domains_list(&self, parent: &str) -> ProjectSiteDomainListCall<'a> {
+    pub fn sites_domains_list(&self, parent: &str) -> ProjectSiteDomainListCall<'a, S> {
         ProjectSiteDomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1206,7 +1211,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the domain association to update or create, if an association doesn't already exist.
-    pub fn sites_domains_update(&self, request: Domain, name: &str) -> ProjectSiteDomainUpdateCall<'a> {
+    pub fn sites_domains_update(&self, request: Domain, name: &str) -> ProjectSiteDomainUpdateCall<'a, S> {
         ProjectSiteDomainUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1225,7 +1230,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_releases_create(&self, request: Release, parent: &str) -> ProjectSiteReleaseCreateCall<'a> {
+    pub fn sites_releases_create(&self, request: Release, parent: &str) -> ProjectSiteReleaseCreateCall<'a, S> {
         ProjectSiteReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1244,7 +1249,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn sites_releases_list(&self, parent: &str) -> ProjectSiteReleaseListCall<'a> {
+    pub fn sites_releases_list(&self, parent: &str) -> ProjectSiteReleaseListCall<'a, S> {
         ProjectSiteReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1263,7 +1268,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The version for which to list files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn sites_versions_files_list(&self, parent: &str) -> ProjectSiteVersionFileListCall<'a> {
+    pub fn sites_versions_files_list(&self, parent: &str) -> ProjectSiteVersionFileListCall<'a, S> {
         ProjectSiteVersionFileListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1284,7 +1289,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The target site for the cloned version, in the format: sites/ SITE_ID
-    pub fn sites_versions_clone(&self, request: CloneVersionRequest, parent: &str) -> ProjectSiteVersionCloneCall<'a> {
+    pub fn sites_versions_clone(&self, request: CloneVersionRequest, parent: &str) -> ProjectSiteVersionCloneCall<'a, S> {
         ProjectSiteVersionCloneCall {
             hub: self.hub,
             _request: request,
@@ -1303,7 +1308,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create the version, in the format: sites/ SITE_ID
-    pub fn sites_versions_create(&self, request: Version, parent: &str) -> ProjectSiteVersionCreateCall<'a> {
+    pub fn sites_versions_create(&self, request: Version, parent: &str) -> ProjectSiteVersionCreateCall<'a, S> {
         ProjectSiteVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1323,7 +1328,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the version, in the format: sites/SITE_ID/versions/VERSION_ID
-    pub fn sites_versions_delete(&self, name: &str) -> ProjectSiteVersionDeleteCall<'a> {
+    pub fn sites_versions_delete(&self, name: &str) -> ProjectSiteVersionDeleteCall<'a, S> {
         ProjectSiteVersionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1340,7 +1345,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list versions, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn sites_versions_list(&self, parent: &str) -> ProjectSiteVersionListCall<'a> {
+    pub fn sites_versions_list(&self, parent: &str) -> ProjectSiteVersionListCall<'a, S> {
         ProjectSiteVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1361,7 +1366,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the version, in the format: sites/ SITE_ID/versions/VERSION_ID This name is provided in the response body when you call [`CreateVersion`](sites.versions/create).
-    pub fn sites_versions_patch(&self, request: Version, name: &str) -> ProjectSiteVersionPatchCall<'a> {
+    pub fn sites_versions_patch(&self, request: Version, name: &str) -> ProjectSiteVersionPatchCall<'a, S> {
         ProjectSiteVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1381,7 +1386,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The version to which to add files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn sites_versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> ProjectSiteVersionPopulateFileCall<'a> {
+    pub fn sites_versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> ProjectSiteVersionPopulateFileCall<'a, S> {
         ProjectSiteVersionPopulateFileCall {
             hub: self.hub,
             _request: request,
@@ -1400,7 +1405,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The Firebase project in which to create a Hosting site, in the format: projects/PROJECT_IDENTIFIER Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn sites_create(&self, request: Site, parent: &str) -> ProjectSiteCreateCall<'a> {
+    pub fn sites_create(&self, request: Site, parent: &str) -> ProjectSiteCreateCall<'a, S> {
         ProjectSiteCreateCall {
             hub: self.hub,
             _request: request,
@@ -1419,7 +1424,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the Hosting site, in the format: projects/PROJECT_IDENTIFIER/sites/SITE_ID Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn sites_delete(&self, name: &str) -> ProjectSiteDeleteCall<'a> {
+    pub fn sites_delete(&self, name: &str) -> ProjectSiteDeleteCall<'a, S> {
         ProjectSiteDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1436,7 +1441,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the Hosting site, in the format: projects/PROJECT_IDENTIFIER/sites/SITE_ID Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values. Since a SITE_ID is a globally unique identifier, you can also use the unique sub-collection resource access pattern, in the format: projects/-/sites/SITE_ID
-    pub fn sites_get(&self, name: &str) -> ProjectSiteGetCall<'a> {
+    pub fn sites_get(&self, name: &str) -> ProjectSiteGetCall<'a, S> {
         ProjectSiteGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1453,7 +1458,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The site for which to get the SiteConfig, in the format: sites/ site-name/config
-    pub fn sites_get_config(&self, name: &str) -> ProjectSiteGetConfigCall<'a> {
+    pub fn sites_get_config(&self, name: &str) -> ProjectSiteGetConfigCall<'a, S> {
         ProjectSiteGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1470,7 +1475,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Firebase project for which to list sites, in the format: projects/PROJECT_IDENTIFIER Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn sites_list(&self, parent: &str) -> ProjectSiteListCall<'a> {
+    pub fn sites_list(&self, parent: &str) -> ProjectSiteListCall<'a, S> {
         ProjectSiteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1490,7 +1495,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The fully-qualified resource name of the Hosting site, in the format: projects/PROJECT_IDENTIFIER/sites/SITE_ID PROJECT_IDENTIFIER: the Firebase project's [`ProjectNumber`](https://firebase.google.com/docs/projects/api/reference/rest/v1beta1/projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](https://firebase.google.com/docs/projects/api/reference/rest/v1beta1/projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510).
-    pub fn sites_patch(&self, request: Site, name: &str) -> ProjectSitePatchCall<'a> {
+    pub fn sites_patch(&self, request: Site, name: &str) -> ProjectSitePatchCall<'a, S> {
         ProjectSitePatchCall {
             hub: self.hub,
             _request: request,
@@ -1510,7 +1515,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The site for which to update the SiteConfig, in the format: sites/ site-name/config
-    pub fn sites_update_config(&self, request: SiteConfig, name: &str) -> ProjectSiteUpdateConfigCall<'a> {
+    pub fn sites_update_config(&self, request: SiteConfig, name: &str) -> ProjectSiteUpdateConfigCall<'a, S> {
         ProjectSiteUpdateConfigCall {
             hub: self.hub,
             _request: request,
@@ -1546,22 +1551,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `channels_create(...)`, `channels_delete(...)`, `channels_get(...)`, `channels_list(...)`, `channels_patch(...)`, `channels_releases_create(...)`, `channels_releases_list(...)`, `domains_create(...)`, `domains_delete(...)`, `domains_get(...)`, `domains_list(...)`, `domains_update(...)`, `get_config(...)`, `releases_create(...)`, `releases_list(...)`, `update_config(...)`, `versions_clone(...)`, `versions_create(...)`, `versions_delete(...)`, `versions_files_list(...)`, `versions_list(...)`, `versions_patch(...)` and `versions_populate_files(...)`
 /// // to build up your call.
 /// let rb = hub.sites();
 /// # }
 /// ```
-pub struct SiteMethods<'a>
-    where  {
+pub struct SiteMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
 }
 
-impl<'a> client::MethodsBuilder for SiteMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SiteMethods<'a, S> {}
 
-impl<'a> SiteMethods<'a> {
+impl<'a, S> SiteMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1571,7 +1576,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn channels_releases_create(&self, request: Release, parent: &str) -> SiteChannelReleaseCreateCall<'a> {
+    pub fn channels_releases_create(&self, request: Release, parent: &str) -> SiteChannelReleaseCreateCall<'a, S> {
         SiteChannelReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1590,7 +1595,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn channels_releases_list(&self, parent: &str) -> SiteChannelReleaseListCall<'a> {
+    pub fn channels_releases_list(&self, parent: &str) -> SiteChannelReleaseListCall<'a, S> {
         SiteChannelReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1610,7 +1615,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create this channel, in the format: sites/ SITE_ID
-    pub fn channels_create(&self, request: Channel, parent: &str) -> SiteChannelCreateCall<'a> {
+    pub fn channels_create(&self, request: Channel, parent: &str) -> SiteChannelCreateCall<'a, S> {
         SiteChannelCreateCall {
             hub: self.hub,
             _request: request,
@@ -1629,7 +1634,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn channels_delete(&self, name: &str) -> SiteChannelDeleteCall<'a> {
+    pub fn channels_delete(&self, name: &str) -> SiteChannelDeleteCall<'a, S> {
         SiteChannelDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1646,7 +1651,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn channels_get(&self, name: &str) -> SiteChannelGetCall<'a> {
+    pub fn channels_get(&self, name: &str) -> SiteChannelGetCall<'a, S> {
         SiteChannelGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1663,7 +1668,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site for which to list channels, in the format: sites/SITE_ID
-    pub fn channels_list(&self, parent: &str) -> SiteChannelListCall<'a> {
+    pub fn channels_list(&self, parent: &str) -> SiteChannelListCall<'a, S> {
         SiteChannelListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1683,7 +1688,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the channel, in the format: sites/ SITE_ID/channels/CHANNEL_ID
-    pub fn channels_patch(&self, request: Channel, name: &str) -> SiteChannelPatchCall<'a> {
+    pub fn channels_patch(&self, request: Channel, name: &str) -> SiteChannelPatchCall<'a, S> {
         SiteChannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -1703,7 +1708,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent to create the domain association for, in the format: sites/site-name
-    pub fn domains_create(&self, request: Domain, parent: &str) -> SiteDomainCreateCall<'a> {
+    pub fn domains_create(&self, request: Domain, parent: &str) -> SiteDomainCreateCall<'a, S> {
         SiteDomainCreateCall {
             hub: self.hub,
             _request: request,
@@ -1721,7 +1726,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain association to delete.
-    pub fn domains_delete(&self, name: &str) -> SiteDomainDeleteCall<'a> {
+    pub fn domains_delete(&self, name: &str) -> SiteDomainDeleteCall<'a, S> {
         SiteDomainDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1738,7 +1743,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain configuration to get.
-    pub fn domains_get(&self, name: &str) -> SiteDomainGetCall<'a> {
+    pub fn domains_get(&self, name: &str) -> SiteDomainGetCall<'a, S> {
         SiteDomainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1755,7 +1760,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent for which to list domains, in the format: sites/ site-name
-    pub fn domains_list(&self, parent: &str) -> SiteDomainListCall<'a> {
+    pub fn domains_list(&self, parent: &str) -> SiteDomainListCall<'a, S> {
         SiteDomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1775,7 +1780,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the domain association to update or create, if an association doesn't already exist.
-    pub fn domains_update(&self, request: Domain, name: &str) -> SiteDomainUpdateCall<'a> {
+    pub fn domains_update(&self, request: Domain, name: &str) -> SiteDomainUpdateCall<'a, S> {
         SiteDomainUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1794,7 +1799,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn releases_create(&self, request: Release, parent: &str) -> SiteReleaseCreateCall<'a> {
+    pub fn releases_create(&self, request: Release, parent: &str) -> SiteReleaseCreateCall<'a, S> {
         SiteReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1813,7 +1818,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn releases_list(&self, parent: &str) -> SiteReleaseListCall<'a> {
+    pub fn releases_list(&self, parent: &str) -> SiteReleaseListCall<'a, S> {
         SiteReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1832,7 +1837,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The version for which to list files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn versions_files_list(&self, parent: &str) -> SiteVersionFileListCall<'a> {
+    pub fn versions_files_list(&self, parent: &str) -> SiteVersionFileListCall<'a, S> {
         SiteVersionFileListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1853,7 +1858,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The target site for the cloned version, in the format: sites/ SITE_ID
-    pub fn versions_clone(&self, request: CloneVersionRequest, parent: &str) -> SiteVersionCloneCall<'a> {
+    pub fn versions_clone(&self, request: CloneVersionRequest, parent: &str) -> SiteVersionCloneCall<'a, S> {
         SiteVersionCloneCall {
             hub: self.hub,
             _request: request,
@@ -1872,7 +1877,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create the version, in the format: sites/ SITE_ID
-    pub fn versions_create(&self, request: Version, parent: &str) -> SiteVersionCreateCall<'a> {
+    pub fn versions_create(&self, request: Version, parent: &str) -> SiteVersionCreateCall<'a, S> {
         SiteVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1892,7 +1897,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the version, in the format: sites/SITE_ID/versions/VERSION_ID
-    pub fn versions_delete(&self, name: &str) -> SiteVersionDeleteCall<'a> {
+    pub fn versions_delete(&self, name: &str) -> SiteVersionDeleteCall<'a, S> {
         SiteVersionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1909,7 +1914,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list versions, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn versions_list(&self, parent: &str) -> SiteVersionListCall<'a> {
+    pub fn versions_list(&self, parent: &str) -> SiteVersionListCall<'a, S> {
         SiteVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1930,7 +1935,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the version, in the format: sites/ SITE_ID/versions/VERSION_ID This name is provided in the response body when you call [`CreateVersion`](sites.versions/create).
-    pub fn versions_patch(&self, request: Version, name: &str) -> SiteVersionPatchCall<'a> {
+    pub fn versions_patch(&self, request: Version, name: &str) -> SiteVersionPatchCall<'a, S> {
         SiteVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1950,7 +1955,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The version to which to add files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> SiteVersionPopulateFileCall<'a> {
+    pub fn versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> SiteVersionPopulateFileCall<'a, S> {
         SiteVersionPopulateFileCall {
             hub: self.hub,
             _request: request,
@@ -1968,7 +1973,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The site for which to get the SiteConfig, in the format: sites/ site-name/config
-    pub fn get_config(&self, name: &str) -> SiteGetConfigCall<'a> {
+    pub fn get_config(&self, name: &str) -> SiteGetConfigCall<'a, S> {
         SiteGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1986,7 +1991,7 @@ impl<'a> SiteMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The site for which to update the SiteConfig, in the format: sites/ site-name/config
-    pub fn update_config(&self, request: SiteConfig, name: &str) -> SiteUpdateConfigCall<'a> {
+    pub fn update_config(&self, request: SiteConfig, name: &str) -> SiteUpdateConfigCall<'a, S> {
         SiteUpdateConfigCall {
             hub: self.hub,
             _request: request,
@@ -2029,7 +2034,7 @@ impl<'a> SiteMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2037,19 +2042,25 @@ impl<'a> SiteMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a>
-    where  {
+pub struct ProjectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationGetCall<'a, S> {}
 
-impl<'a> ProjectOperationGetCall<'a> {
+impl<'a, S> ProjectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2196,7 +2207,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2206,7 +2217,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2231,7 +2242,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2251,9 +2262,9 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2286,7 +2297,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2300,10 +2311,10 @@ impl<'a> ProjectOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelReleaseCreateCall<'a>
-    where  {
+pub struct ProjectSiteChannelReleaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -2312,9 +2323,15 @@ pub struct ProjectSiteChannelReleaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelReleaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelReleaseCreateCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
+impl<'a, S> ProjectSiteChannelReleaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2477,7 +2494,7 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> ProjectSiteChannelReleaseCreateCall<'a> {
+    pub fn request(mut self, new_value: Release) -> ProjectSiteChannelReleaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2487,14 +2504,14 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a> {
+    pub fn version_name(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a, S> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -2504,7 +2521,7 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2529,7 +2546,7 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2549,9 +2566,9 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelReleaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelReleaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2583,7 +2600,7 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2593,10 +2610,10 @@ impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelReleaseListCall<'a>
-    where  {
+pub struct ProjectSiteChannelReleaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2605,9 +2622,15 @@ pub struct ProjectSiteChannelReleaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelReleaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelReleaseListCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelReleaseListCall<'a> {
+impl<'a, S> ProjectSiteChannelReleaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2760,21 +2783,21 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelReleaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelReleaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2784,7 +2807,7 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2809,7 +2832,7 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2829,9 +2852,9 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelReleaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelReleaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2864,7 +2887,7 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2878,10 +2901,10 @@ impl<'a> ProjectSiteChannelReleaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelCreateCall<'a>
-    where  {
+pub struct ProjectSiteChannelCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Channel,
     _parent: String,
     _channel_id: Option<String>,
@@ -2890,9 +2913,15 @@ pub struct ProjectSiteChannelCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelCreateCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelCreateCall<'a> {
+impl<'a, S> ProjectSiteChannelCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3055,7 +3084,7 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelCreateCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3065,14 +3094,14 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Immutable. A unique ID within the site that identifies the channel.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -3082,7 +3111,7 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3107,7 +3136,7 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3127,9 +3156,9 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3161,7 +3190,7 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3169,19 +3198,25 @@ impl<'a> ProjectSiteChannelCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelDeleteCall<'a>
-    where  {
+pub struct ProjectSiteChannelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelDeleteCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelDeleteCall<'a> {
+impl<'a, S> ProjectSiteChannelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3328,7 +3363,7 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3338,7 +3373,7 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3363,7 +3398,7 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3383,9 +3418,9 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3417,7 +3452,7 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3425,19 +3460,25 @@ impl<'a> ProjectSiteChannelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelGetCall<'a>
-    where  {
+pub struct ProjectSiteChannelGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelGetCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelGetCall<'a> {
+impl<'a, S> ProjectSiteChannelGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3584,7 +3625,7 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3594,7 +3635,7 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3619,7 +3660,7 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3639,9 +3680,9 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3673,7 +3714,7 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3683,10 +3724,10 @@ impl<'a> ProjectSiteChannelGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelListCall<'a>
-    where  {
+pub struct ProjectSiteChannelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3695,9 +3736,15 @@ pub struct ProjectSiteChannelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelListCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelListCall<'a> {
+impl<'a, S> ProjectSiteChannelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3850,21 +3897,21 @@ impl<'a> ProjectSiteChannelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListChannels` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of channels to return. The service may return a lower number if fewer channels exist than this maximum number. If unspecified, defaults to 10. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3874,7 +3921,7 @@ impl<'a> ProjectSiteChannelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3899,7 +3946,7 @@ impl<'a> ProjectSiteChannelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3919,9 +3966,9 @@ impl<'a> ProjectSiteChannelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3954,7 +4001,7 @@ impl<'a> ProjectSiteChannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3968,10 +4015,10 @@ impl<'a> ProjectSiteChannelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelPatchCall<'a>
-    where  {
+pub struct ProjectSiteChannelPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Channel,
     _name: String,
     _update_mask: Option<String>,
@@ -3980,9 +4027,15 @@ pub struct ProjectSiteChannelPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteChannelPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteChannelPatchCall<'a, S> {}
 
-impl<'a> ProjectSiteChannelPatchCall<'a> {
+impl<'a, S> ProjectSiteChannelPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4145,7 +4198,7 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelPatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4155,14 +4208,14 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A comma-separated list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4172,7 +4225,7 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4197,7 +4250,7 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4217,9 +4270,9 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteChannelPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4252,7 +4305,7 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4265,10 +4318,10 @@ impl<'a> ProjectSiteChannelPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainCreateCall<'a>
-    where  {
+pub struct ProjectSiteDomainCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Domain,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4276,9 +4329,15 @@ pub struct ProjectSiteDomainCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteDomainCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteDomainCreateCall<'a, S> {}
 
-impl<'a> ProjectSiteDomainCreateCall<'a> {
+impl<'a, S> ProjectSiteDomainCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4438,7 +4497,7 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainCreateCall<'a> {
+    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4448,7 +4507,7 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4458,7 +4517,7 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4483,7 +4542,7 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4503,9 +4562,9 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteDomainCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4537,7 +4596,7 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4545,19 +4604,25 @@ impl<'a> ProjectSiteDomainCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainDeleteCall<'a>
-    where  {
+pub struct ProjectSiteDomainDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteDomainDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteDomainDeleteCall<'a, S> {}
 
-impl<'a> ProjectSiteDomainDeleteCall<'a> {
+impl<'a, S> ProjectSiteDomainDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4704,7 +4769,7 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4714,7 +4779,7 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4739,7 +4804,7 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4759,9 +4824,9 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteDomainDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4793,7 +4858,7 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4801,19 +4866,25 @@ impl<'a> ProjectSiteDomainDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainGetCall<'a>
-    where  {
+pub struct ProjectSiteDomainGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteDomainGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteDomainGetCall<'a, S> {}
 
-impl<'a> ProjectSiteDomainGetCall<'a> {
+impl<'a, S> ProjectSiteDomainGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4960,7 +5031,7 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4970,7 +5041,7 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4995,7 +5066,7 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5015,9 +5086,9 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteDomainGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5049,7 +5120,7 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5059,10 +5130,10 @@ impl<'a> ProjectSiteDomainGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainListCall<'a>
-    where  {
+pub struct ProjectSiteDomainListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5071,9 +5142,15 @@ pub struct ProjectSiteDomainListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteDomainListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteDomainListCall<'a, S> {}
 
-impl<'a> ProjectSiteDomainListCall<'a> {
+impl<'a, S> ProjectSiteDomainListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5226,21 +5303,21 @@ impl<'a> ProjectSiteDomainListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token from a previous request, if provided.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The page size to return. Defaults to 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteDomainListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteDomainListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5250,7 +5327,7 @@ impl<'a> ProjectSiteDomainListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5275,7 +5352,7 @@ impl<'a> ProjectSiteDomainListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5295,9 +5372,9 @@ impl<'a> ProjectSiteDomainListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteDomainListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5330,7 +5407,7 @@ impl<'a> ProjectSiteDomainListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5343,10 +5420,10 @@ impl<'a> ProjectSiteDomainListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainUpdateCall<'a>
-    where  {
+pub struct ProjectSiteDomainUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Domain,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5354,9 +5431,15 @@ pub struct ProjectSiteDomainUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteDomainUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteDomainUpdateCall<'a, S> {}
 
-impl<'a> ProjectSiteDomainUpdateCall<'a> {
+impl<'a, S> ProjectSiteDomainUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5516,7 +5599,7 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainUpdateCall<'a> {
+    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5526,7 +5609,7 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5536,7 +5619,7 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5561,7 +5644,7 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5581,9 +5664,9 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteDomainUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5616,7 +5699,7 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5630,10 +5713,10 @@ impl<'a> ProjectSiteDomainUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteReleaseCreateCall<'a>
-    where  {
+pub struct ProjectSiteReleaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -5642,9 +5725,15 @@ pub struct ProjectSiteReleaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteReleaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteReleaseCreateCall<'a, S> {}
 
-impl<'a> ProjectSiteReleaseCreateCall<'a> {
+impl<'a, S> ProjectSiteReleaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5807,7 +5896,7 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> ProjectSiteReleaseCreateCall<'a> {
+    pub fn request(mut self, new_value: Release) -> ProjectSiteReleaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5817,14 +5906,14 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a> {
+    pub fn version_name(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a, S> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -5834,7 +5923,7 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5859,7 +5948,7 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5879,9 +5968,9 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteReleaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5913,7 +6002,7 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5923,10 +6012,10 @@ impl<'a> ProjectSiteReleaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteReleaseListCall<'a>
-    where  {
+pub struct ProjectSiteReleaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5935,9 +6024,15 @@ pub struct ProjectSiteReleaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteReleaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteReleaseListCall<'a, S> {}
 
-impl<'a> ProjectSiteReleaseListCall<'a> {
+impl<'a, S> ProjectSiteReleaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6090,21 +6185,21 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteReleaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteReleaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6114,7 +6209,7 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6139,7 +6234,7 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6159,9 +6254,9 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteReleaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6193,7 +6288,7 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6204,10 +6299,10 @@ impl<'a> ProjectSiteReleaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionFileListCall<'a>
-    where  {
+pub struct ProjectSiteVersionFileListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _status: Option<String>,
     _page_token: Option<String>,
@@ -6217,9 +6312,15 @@ pub struct ProjectSiteVersionFileListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionFileListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionFileListCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionFileListCall<'a> {
+impl<'a, S> ProjectSiteVersionFileListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6375,28 +6476,28 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     ///  The type of files that should be listed for the specified version.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a> {
+    pub fn status(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, S> {
         self._status = Some(new_value.to_string());
         self
     }
     /// A token from a previous call to `ListVersionFiles` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of version files to return. The service may return a lower number if fewer version files exist than this maximum number. If unspecified, defaults to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionFileListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionFileListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6406,7 +6507,7 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionFileListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionFileListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6431,7 +6532,7 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionFileListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionFileListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6451,9 +6552,9 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionFileListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionFileListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6486,7 +6587,7 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6499,10 +6600,10 @@ impl<'a> ProjectSiteVersionFileListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionCloneCall<'a>
-    where  {
+pub struct ProjectSiteVersionCloneCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: CloneVersionRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6510,9 +6611,15 @@ pub struct ProjectSiteVersionCloneCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionCloneCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionCloneCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionCloneCall<'a> {
+impl<'a, S> ProjectSiteVersionCloneCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6672,7 +6779,7 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloneVersionRequest) -> ProjectSiteVersionCloneCall<'a> {
+    pub fn request(mut self, new_value: CloneVersionRequest) -> ProjectSiteVersionCloneCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6682,7 +6789,7 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCloneCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCloneCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6692,7 +6799,7 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCloneCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCloneCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6717,7 +6824,7 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCloneCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCloneCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6737,9 +6844,9 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCloneCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionCloneCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6772,7 +6879,7 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6787,10 +6894,10 @@ impl<'a> ProjectSiteVersionCloneCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionCreateCall<'a>
-    where  {
+pub struct ProjectSiteVersionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Version,
     _parent: String,
     _version_id: Option<String>,
@@ -6800,9 +6907,15 @@ pub struct ProjectSiteVersionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionCreateCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionCreateCall<'a> {
+impl<'a, S> ProjectSiteVersionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6968,7 +7081,7 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionCreateCall<'a> {
+    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6978,21 +7091,21 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A unique id for the new version. This is was only specified for legacy version creations, and should be blank.
     ///
     /// Sets the *version id* query property to the given value.
-    pub fn version_id(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a> {
+    pub fn version_id(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, S> {
         self._version_id = Some(new_value.to_string());
         self
     }
     /// The self-reported size of the version. This value is used for a pre-emptive quota check for legacy version uploads.
     ///
     /// Sets the *size bytes* query property to the given value.
-    pub fn size_bytes(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a> {
+    pub fn size_bytes(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, S> {
         self._size_bytes = Some(new_value.to_string());
         self
     }
@@ -7002,7 +7115,7 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7027,7 +7140,7 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7047,9 +7160,9 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7081,7 +7194,7 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7089,19 +7202,25 @@ impl<'a> ProjectSiteVersionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionDeleteCall<'a>
-    where  {
+pub struct ProjectSiteVersionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionDeleteCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionDeleteCall<'a> {
+impl<'a, S> ProjectSiteVersionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7248,7 +7367,7 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7258,7 +7377,7 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7283,7 +7402,7 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7303,9 +7422,9 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7337,7 +7456,7 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7348,10 +7467,10 @@ impl<'a> ProjectSiteVersionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionListCall<'a>
-    where  {
+pub struct ProjectSiteVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7361,9 +7480,15 @@ pub struct ProjectSiteVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionListCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionListCall<'a> {
+impl<'a, S> ProjectSiteVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7519,28 +7644,28 @@ impl<'a> ProjectSiteVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListVersions` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of versions to return. The service may return a lower number if fewer versions exist than this maximum number. If unspecified, defaults to 25. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter string used to return a subset of versions in the response. The currently supported fields for filtering are: `name`, `status`, and `create_time`. Learn more about filtering in Google's [AIP 160 standard](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7550,7 +7675,7 @@ impl<'a> ProjectSiteVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7575,7 +7700,7 @@ impl<'a> ProjectSiteVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7595,9 +7720,9 @@ impl<'a> ProjectSiteVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7630,7 +7755,7 @@ impl<'a> ProjectSiteVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7644,10 +7769,10 @@ impl<'a> ProjectSiteVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionPatchCall<'a>
-    where  {
+pub struct ProjectSiteVersionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Version,
     _name: String,
     _update_mask: Option<String>,
@@ -7656,9 +7781,15 @@ pub struct ProjectSiteVersionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionPatchCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionPatchCall<'a> {
+impl<'a, S> ProjectSiteVersionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7821,7 +7952,7 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionPatchCall<'a> {
+    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7831,14 +7962,14 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [version](../sites.versions) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`status`](../sites.versions#Version.FIELDS.status) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7848,7 +7979,7 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7873,7 +8004,7 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7893,9 +8024,9 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7928,7 +8059,7 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7941,10 +8072,10 @@ impl<'a> ProjectSiteVersionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionPopulateFileCall<'a>
-    where  {
+pub struct ProjectSiteVersionPopulateFileCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: PopulateVersionFilesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7952,9 +8083,15 @@ pub struct ProjectSiteVersionPopulateFileCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteVersionPopulateFileCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteVersionPopulateFileCall<'a, S> {}
 
-impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
+impl<'a, S> ProjectSiteVersionPopulateFileCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8114,7 +8251,7 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> ProjectSiteVersionPopulateFileCall<'a> {
+    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> ProjectSiteVersionPopulateFileCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8124,7 +8261,7 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionPopulateFileCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionPopulateFileCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8134,7 +8271,7 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPopulateFileCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPopulateFileCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8159,7 +8296,7 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPopulateFileCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPopulateFileCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8179,9 +8316,9 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPopulateFileCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteVersionPopulateFileCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8214,7 +8351,7 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8228,10 +8365,10 @@ impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteCreateCall<'a>
-    where  {
+pub struct ProjectSiteCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Site,
     _parent: String,
     _site_id: Option<String>,
@@ -8240,9 +8377,15 @@ pub struct ProjectSiteCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteCreateCall<'a, S> {}
 
-impl<'a> ProjectSiteCreateCall<'a> {
+impl<'a, S> ProjectSiteCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8405,7 +8548,7 @@ impl<'a> ProjectSiteCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Site) -> ProjectSiteCreateCall<'a> {
+    pub fn request(mut self, new_value: Site) -> ProjectSiteCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8415,14 +8558,14 @@ impl<'a> ProjectSiteCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Immutable. A globally unique identifier for the Hosting site. This identifier is used to construct the Firebase-provisioned subdomains for the site, so it must also be a valid domain name label.
     ///
     /// Sets the *site id* query property to the given value.
-    pub fn site_id(mut self, new_value: &str) -> ProjectSiteCreateCall<'a> {
+    pub fn site_id(mut self, new_value: &str) -> ProjectSiteCreateCall<'a, S> {
         self._site_id = Some(new_value.to_string());
         self
     }
@@ -8432,7 +8575,7 @@ impl<'a> ProjectSiteCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8457,7 +8600,7 @@ impl<'a> ProjectSiteCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8477,9 +8620,9 @@ impl<'a> ProjectSiteCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8511,7 +8654,7 @@ impl<'a> ProjectSiteCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8519,19 +8662,25 @@ impl<'a> ProjectSiteCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDeleteCall<'a>
-    where  {
+pub struct ProjectSiteDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteDeleteCall<'a, S> {}
 
-impl<'a> ProjectSiteDeleteCall<'a> {
+impl<'a, S> ProjectSiteDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8678,7 +8827,7 @@ impl<'a> ProjectSiteDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8688,7 +8837,7 @@ impl<'a> ProjectSiteDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8713,7 +8862,7 @@ impl<'a> ProjectSiteDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8733,9 +8882,9 @@ impl<'a> ProjectSiteDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8767,7 +8916,7 @@ impl<'a> ProjectSiteDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8775,19 +8924,25 @@ impl<'a> ProjectSiteDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteGetCall<'a>
-    where  {
+pub struct ProjectSiteGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteGetCall<'a, S> {}
 
-impl<'a> ProjectSiteGetCall<'a> {
+impl<'a, S> ProjectSiteGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8934,7 +9089,7 @@ impl<'a> ProjectSiteGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8944,7 +9099,7 @@ impl<'a> ProjectSiteGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8969,7 +9124,7 @@ impl<'a> ProjectSiteGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8989,9 +9144,9 @@ impl<'a> ProjectSiteGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9023,7 +9178,7 @@ impl<'a> ProjectSiteGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9031,19 +9186,25 @@ impl<'a> ProjectSiteGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteGetConfigCall<'a>
-    where  {
+pub struct ProjectSiteGetConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteGetConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteGetConfigCall<'a, S> {}
 
-impl<'a> ProjectSiteGetConfigCall<'a> {
+impl<'a, S> ProjectSiteGetConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9190,7 +9351,7 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteGetConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteGetConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9200,7 +9361,7 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9225,7 +9386,7 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9245,9 +9406,9 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteGetConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9279,7 +9440,7 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9289,10 +9450,10 @@ impl<'a> ProjectSiteGetConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteListCall<'a>
-    where  {
+pub struct ProjectSiteListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9301,9 +9462,15 @@ pub struct ProjectSiteListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteListCall<'a, S> {}
 
-impl<'a> ProjectSiteListCall<'a> {
+impl<'a, S> ProjectSiteListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9456,21 +9623,21 @@ impl<'a> ProjectSiteListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token from a previous call to `ListSites` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of sites to return. The service may return a lower number if fewer sites exist than this maximum number. If unspecified, defaults to 40.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -9480,7 +9647,7 @@ impl<'a> ProjectSiteListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9505,7 +9672,7 @@ impl<'a> ProjectSiteListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9525,9 +9692,9 @@ impl<'a> ProjectSiteListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9560,7 +9727,7 @@ impl<'a> ProjectSiteListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9574,10 +9741,10 @@ impl<'a> ProjectSiteListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSitePatchCall<'a>
-    where  {
+pub struct ProjectSitePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Site,
     _name: String,
     _update_mask: Option<String>,
@@ -9586,9 +9753,15 @@ pub struct ProjectSitePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSitePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSitePatchCall<'a, S> {}
 
-impl<'a> ProjectSitePatchCall<'a> {
+impl<'a, S> ProjectSitePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9751,7 +9924,7 @@ impl<'a> ProjectSitePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Site) -> ProjectSitePatchCall<'a> {
+    pub fn request(mut self, new_value: Site) -> ProjectSitePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9761,14 +9934,14 @@ impl<'a> ProjectSitePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSitePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSitePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your Site that you want to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSitePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSitePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9778,7 +9951,7 @@ impl<'a> ProjectSitePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSitePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSitePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9803,7 +9976,7 @@ impl<'a> ProjectSitePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSitePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSitePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9823,9 +9996,9 @@ impl<'a> ProjectSitePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSitePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSitePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9858,7 +10031,7 @@ impl<'a> ProjectSitePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9872,10 +10045,10 @@ impl<'a> ProjectSitePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteUpdateConfigCall<'a>
-    where  {
+pub struct ProjectSiteUpdateConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: SiteConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -9884,9 +10057,15 @@ pub struct ProjectSiteUpdateConfigCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSiteUpdateConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSiteUpdateConfigCall<'a, S> {}
 
-impl<'a> ProjectSiteUpdateConfigCall<'a> {
+impl<'a, S> ProjectSiteUpdateConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10049,7 +10228,7 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteConfig) -> ProjectSiteUpdateConfigCall<'a> {
+    pub fn request(mut self, new_value: SiteConfig) -> ProjectSiteUpdateConfigCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10059,14 +10238,14 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [site configuration](../sites.SiteConfig) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`max_versions`](../sites.SiteConfig.max_versions) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10076,7 +10255,7 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteUpdateConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteUpdateConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10101,7 +10280,7 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteUpdateConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteUpdateConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10121,9 +10300,9 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteUpdateConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSiteUpdateConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10156,7 +10335,7 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10170,10 +10349,10 @@ impl<'a> ProjectSiteUpdateConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelReleaseCreateCall<'a>
-    where  {
+pub struct SiteChannelReleaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -10182,9 +10361,15 @@ pub struct SiteChannelReleaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelReleaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelReleaseCreateCall<'a, S> {}
 
-impl<'a> SiteChannelReleaseCreateCall<'a> {
+impl<'a, S> SiteChannelReleaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10347,7 +10532,7 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> SiteChannelReleaseCreateCall<'a> {
+    pub fn request(mut self, new_value: Release) -> SiteChannelReleaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10357,14 +10542,14 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a> {
+    pub fn version_name(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a, S> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -10374,7 +10559,7 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10399,7 +10584,7 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10419,9 +10604,9 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelReleaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelReleaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10453,7 +10638,7 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10463,10 +10648,10 @@ impl<'a> SiteChannelReleaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelReleaseListCall<'a>
-    where  {
+pub struct SiteChannelReleaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10475,9 +10660,15 @@ pub struct SiteChannelReleaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelReleaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelReleaseListCall<'a, S> {}
 
-impl<'a> SiteChannelReleaseListCall<'a> {
+impl<'a, S> SiteChannelReleaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10630,21 +10821,21 @@ impl<'a> SiteChannelReleaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteChannelReleaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SiteChannelReleaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -10654,7 +10845,7 @@ impl<'a> SiteChannelReleaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10679,7 +10870,7 @@ impl<'a> SiteChannelReleaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10699,9 +10890,9 @@ impl<'a> SiteChannelReleaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelReleaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelReleaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10734,7 +10925,7 @@ impl<'a> SiteChannelReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10748,10 +10939,10 @@ impl<'a> SiteChannelReleaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelCreateCall<'a>
-    where  {
+pub struct SiteChannelCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Channel,
     _parent: String,
     _channel_id: Option<String>,
@@ -10760,9 +10951,15 @@ pub struct SiteChannelCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelCreateCall<'a, S> {}
 
-impl<'a> SiteChannelCreateCall<'a> {
+impl<'a, S> SiteChannelCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10925,7 +11122,7 @@ impl<'a> SiteChannelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> SiteChannelCreateCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> SiteChannelCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10935,14 +11132,14 @@ impl<'a> SiteChannelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Immutable. A unique ID within the site that identifies the channel.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> SiteChannelCreateCall<'a> {
+    pub fn channel_id(mut self, new_value: &str) -> SiteChannelCreateCall<'a, S> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -10952,7 +11149,7 @@ impl<'a> SiteChannelCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10977,7 +11174,7 @@ impl<'a> SiteChannelCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10997,9 +11194,9 @@ impl<'a> SiteChannelCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11031,7 +11228,7 @@ impl<'a> SiteChannelCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11039,19 +11236,25 @@ impl<'a> SiteChannelCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelDeleteCall<'a>
-    where  {
+pub struct SiteChannelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelDeleteCall<'a, S> {}
 
-impl<'a> SiteChannelDeleteCall<'a> {
+impl<'a, S> SiteChannelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11198,7 +11401,7 @@ impl<'a> SiteChannelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteChannelDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteChannelDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11208,7 +11411,7 @@ impl<'a> SiteChannelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11233,7 +11436,7 @@ impl<'a> SiteChannelDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11253,9 +11456,9 @@ impl<'a> SiteChannelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11287,7 +11490,7 @@ impl<'a> SiteChannelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11295,19 +11498,25 @@ impl<'a> SiteChannelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelGetCall<'a>
-    where  {
+pub struct SiteChannelGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelGetCall<'a, S> {}
 
-impl<'a> SiteChannelGetCall<'a> {
+impl<'a, S> SiteChannelGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11454,7 +11663,7 @@ impl<'a> SiteChannelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteChannelGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteChannelGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11464,7 +11673,7 @@ impl<'a> SiteChannelGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11489,7 +11698,7 @@ impl<'a> SiteChannelGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11509,9 +11718,9 @@ impl<'a> SiteChannelGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11543,7 +11752,7 @@ impl<'a> SiteChannelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11553,10 +11762,10 @@ impl<'a> SiteChannelGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelListCall<'a>
-    where  {
+pub struct SiteChannelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11565,9 +11774,15 @@ pub struct SiteChannelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelListCall<'a, S> {}
 
-impl<'a> SiteChannelListCall<'a> {
+impl<'a, S> SiteChannelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11720,21 +11935,21 @@ impl<'a> SiteChannelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListChannels` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteChannelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SiteChannelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of channels to return. The service may return a lower number if fewer channels exist than this maximum number. If unspecified, defaults to 10. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteChannelListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SiteChannelListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -11744,7 +11959,7 @@ impl<'a> SiteChannelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11769,7 +11984,7 @@ impl<'a> SiteChannelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11789,9 +12004,9 @@ impl<'a> SiteChannelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11824,7 +12039,7 @@ impl<'a> SiteChannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11838,10 +12053,10 @@ impl<'a> SiteChannelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelPatchCall<'a>
-    where  {
+pub struct SiteChannelPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Channel,
     _name: String,
     _update_mask: Option<String>,
@@ -11850,9 +12065,15 @@ pub struct SiteChannelPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteChannelPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteChannelPatchCall<'a, S> {}
 
-impl<'a> SiteChannelPatchCall<'a> {
+impl<'a, S> SiteChannelPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12015,7 +12236,7 @@ impl<'a> SiteChannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> SiteChannelPatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> SiteChannelPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12025,14 +12246,14 @@ impl<'a> SiteChannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteChannelPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteChannelPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A comma-separated list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SiteChannelPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> SiteChannelPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12042,7 +12263,7 @@ impl<'a> SiteChannelPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12067,7 +12288,7 @@ impl<'a> SiteChannelPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12087,9 +12308,9 @@ impl<'a> SiteChannelPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteChannelPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12122,7 +12343,7 @@ impl<'a> SiteChannelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12135,10 +12356,10 @@ impl<'a> SiteChannelPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainCreateCall<'a>
-    where  {
+pub struct SiteDomainCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Domain,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12146,9 +12367,15 @@ pub struct SiteDomainCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteDomainCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteDomainCreateCall<'a, S> {}
 
-impl<'a> SiteDomainCreateCall<'a> {
+impl<'a, S> SiteDomainCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12308,7 +12535,7 @@ impl<'a> SiteDomainCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> SiteDomainCreateCall<'a> {
+    pub fn request(mut self, new_value: Domain) -> SiteDomainCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12318,7 +12545,7 @@ impl<'a> SiteDomainCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteDomainCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteDomainCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12328,7 +12555,7 @@ impl<'a> SiteDomainCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12353,7 +12580,7 @@ impl<'a> SiteDomainCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12373,9 +12600,9 @@ impl<'a> SiteDomainCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteDomainCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12407,7 +12634,7 @@ impl<'a> SiteDomainCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12415,19 +12642,25 @@ impl<'a> SiteDomainCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainDeleteCall<'a>
-    where  {
+pub struct SiteDomainDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteDomainDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteDomainDeleteCall<'a, S> {}
 
-impl<'a> SiteDomainDeleteCall<'a> {
+impl<'a, S> SiteDomainDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12574,7 +12807,7 @@ impl<'a> SiteDomainDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteDomainDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteDomainDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12584,7 +12817,7 @@ impl<'a> SiteDomainDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12609,7 +12842,7 @@ impl<'a> SiteDomainDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12629,9 +12862,9 @@ impl<'a> SiteDomainDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteDomainDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12663,7 +12896,7 @@ impl<'a> SiteDomainDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12671,19 +12904,25 @@ impl<'a> SiteDomainDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainGetCall<'a>
-    where  {
+pub struct SiteDomainGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteDomainGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteDomainGetCall<'a, S> {}
 
-impl<'a> SiteDomainGetCall<'a> {
+impl<'a, S> SiteDomainGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12830,7 +13069,7 @@ impl<'a> SiteDomainGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteDomainGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteDomainGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12840,7 +13079,7 @@ impl<'a> SiteDomainGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12865,7 +13104,7 @@ impl<'a> SiteDomainGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12885,9 +13124,9 @@ impl<'a> SiteDomainGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteDomainGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12919,7 +13158,7 @@ impl<'a> SiteDomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12929,10 +13168,10 @@ impl<'a> SiteDomainGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainListCall<'a>
-    where  {
+pub struct SiteDomainListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12941,9 +13180,15 @@ pub struct SiteDomainListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteDomainListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteDomainListCall<'a, S> {}
 
-impl<'a> SiteDomainListCall<'a> {
+impl<'a, S> SiteDomainListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13096,21 +13341,21 @@ impl<'a> SiteDomainListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteDomainListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteDomainListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token from a previous request, if provided.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteDomainListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SiteDomainListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The page size to return. Defaults to 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteDomainListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SiteDomainListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -13120,7 +13365,7 @@ impl<'a> SiteDomainListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13145,7 +13390,7 @@ impl<'a> SiteDomainListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13165,9 +13410,9 @@ impl<'a> SiteDomainListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteDomainListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13200,7 +13445,7 @@ impl<'a> SiteDomainListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13213,10 +13458,10 @@ impl<'a> SiteDomainListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainUpdateCall<'a>
-    where  {
+pub struct SiteDomainUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Domain,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13224,9 +13469,15 @@ pub struct SiteDomainUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteDomainUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteDomainUpdateCall<'a, S> {}
 
-impl<'a> SiteDomainUpdateCall<'a> {
+impl<'a, S> SiteDomainUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13386,7 +13637,7 @@ impl<'a> SiteDomainUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> SiteDomainUpdateCall<'a> {
+    pub fn request(mut self, new_value: Domain) -> SiteDomainUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13396,7 +13647,7 @@ impl<'a> SiteDomainUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteDomainUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteDomainUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13406,7 +13657,7 @@ impl<'a> SiteDomainUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13431,7 +13682,7 @@ impl<'a> SiteDomainUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13451,9 +13702,9 @@ impl<'a> SiteDomainUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteDomainUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13486,7 +13737,7 @@ impl<'a> SiteDomainUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13500,10 +13751,10 @@ impl<'a> SiteDomainUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteReleaseCreateCall<'a>
-    where  {
+pub struct SiteReleaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -13512,9 +13763,15 @@ pub struct SiteReleaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteReleaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteReleaseCreateCall<'a, S> {}
 
-impl<'a> SiteReleaseCreateCall<'a> {
+impl<'a, S> SiteReleaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13677,7 +13934,7 @@ impl<'a> SiteReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> SiteReleaseCreateCall<'a> {
+    pub fn request(mut self, new_value: Release) -> SiteReleaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13687,14 +13944,14 @@ impl<'a> SiteReleaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteReleaseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteReleaseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> SiteReleaseCreateCall<'a> {
+    pub fn version_name(mut self, new_value: &str) -> SiteReleaseCreateCall<'a, S> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -13704,7 +13961,7 @@ impl<'a> SiteReleaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13729,7 +13986,7 @@ impl<'a> SiteReleaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13749,9 +14006,9 @@ impl<'a> SiteReleaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteReleaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteReleaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13783,7 +14040,7 @@ impl<'a> SiteReleaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13793,10 +14050,10 @@ impl<'a> SiteReleaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteReleaseListCall<'a>
-    where  {
+pub struct SiteReleaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13805,9 +14062,15 @@ pub struct SiteReleaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteReleaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteReleaseListCall<'a, S> {}
 
-impl<'a> SiteReleaseListCall<'a> {
+impl<'a, S> SiteReleaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13960,21 +14223,21 @@ impl<'a> SiteReleaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteReleaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteReleaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteReleaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SiteReleaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteReleaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SiteReleaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -13984,7 +14247,7 @@ impl<'a> SiteReleaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14009,7 +14272,7 @@ impl<'a> SiteReleaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14029,9 +14292,9 @@ impl<'a> SiteReleaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteReleaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteReleaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14063,7 +14326,7 @@ impl<'a> SiteReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14074,10 +14337,10 @@ impl<'a> SiteReleaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionFileListCall<'a>
-    where  {
+pub struct SiteVersionFileListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _status: Option<String>,
     _page_token: Option<String>,
@@ -14087,9 +14350,15 @@ pub struct SiteVersionFileListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionFileListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionFileListCall<'a, S> {}
 
-impl<'a> SiteVersionFileListCall<'a> {
+impl<'a, S> SiteVersionFileListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14245,28 +14514,28 @@ impl<'a> SiteVersionFileListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionFileListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionFileListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     ///  The type of files that should be listed for the specified version.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> SiteVersionFileListCall<'a> {
+    pub fn status(mut self, new_value: &str) -> SiteVersionFileListCall<'a, S> {
         self._status = Some(new_value.to_string());
         self
     }
     /// A token from a previous call to `ListVersionFiles` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteVersionFileListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SiteVersionFileListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of version files to return. The service may return a lower number if fewer version files exist than this maximum number. If unspecified, defaults to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteVersionFileListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SiteVersionFileListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14276,7 +14545,7 @@ impl<'a> SiteVersionFileListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionFileListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionFileListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14301,7 +14570,7 @@ impl<'a> SiteVersionFileListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionFileListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionFileListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14321,9 +14590,9 @@ impl<'a> SiteVersionFileListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionFileListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionFileListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14356,7 +14625,7 @@ impl<'a> SiteVersionFileListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14369,10 +14638,10 @@ impl<'a> SiteVersionFileListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionCloneCall<'a>
-    where  {
+pub struct SiteVersionCloneCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: CloneVersionRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14380,9 +14649,15 @@ pub struct SiteVersionCloneCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionCloneCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionCloneCall<'a, S> {}
 
-impl<'a> SiteVersionCloneCall<'a> {
+impl<'a, S> SiteVersionCloneCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14542,7 +14817,7 @@ impl<'a> SiteVersionCloneCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloneVersionRequest) -> SiteVersionCloneCall<'a> {
+    pub fn request(mut self, new_value: CloneVersionRequest) -> SiteVersionCloneCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14552,7 +14827,7 @@ impl<'a> SiteVersionCloneCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionCloneCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionCloneCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -14562,7 +14837,7 @@ impl<'a> SiteVersionCloneCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCloneCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCloneCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14587,7 +14862,7 @@ impl<'a> SiteVersionCloneCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCloneCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCloneCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14607,9 +14882,9 @@ impl<'a> SiteVersionCloneCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionCloneCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionCloneCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14642,7 +14917,7 @@ impl<'a> SiteVersionCloneCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14657,10 +14932,10 @@ impl<'a> SiteVersionCloneCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionCreateCall<'a>
-    where  {
+pub struct SiteVersionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Version,
     _parent: String,
     _version_id: Option<String>,
@@ -14670,9 +14945,15 @@ pub struct SiteVersionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionCreateCall<'a, S> {}
 
-impl<'a> SiteVersionCreateCall<'a> {
+impl<'a, S> SiteVersionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14838,7 +15119,7 @@ impl<'a> SiteVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> SiteVersionCreateCall<'a> {
+    pub fn request(mut self, new_value: Version) -> SiteVersionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14848,21 +15129,21 @@ impl<'a> SiteVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A unique id for the new version. This is was only specified for legacy version creations, and should be blank.
     ///
     /// Sets the *version id* query property to the given value.
-    pub fn version_id(mut self, new_value: &str) -> SiteVersionCreateCall<'a> {
+    pub fn version_id(mut self, new_value: &str) -> SiteVersionCreateCall<'a, S> {
         self._version_id = Some(new_value.to_string());
         self
     }
     /// The self-reported size of the version. This value is used for a pre-emptive quota check for legacy version uploads.
     ///
     /// Sets the *size bytes* query property to the given value.
-    pub fn size_bytes(mut self, new_value: &str) -> SiteVersionCreateCall<'a> {
+    pub fn size_bytes(mut self, new_value: &str) -> SiteVersionCreateCall<'a, S> {
         self._size_bytes = Some(new_value.to_string());
         self
     }
@@ -14872,7 +15153,7 @@ impl<'a> SiteVersionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14897,7 +15178,7 @@ impl<'a> SiteVersionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14917,9 +15198,9 @@ impl<'a> SiteVersionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14951,7 +15232,7 @@ impl<'a> SiteVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14959,19 +15240,25 @@ impl<'a> SiteVersionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionDeleteCall<'a>
-    where  {
+pub struct SiteVersionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionDeleteCall<'a, S> {}
 
-impl<'a> SiteVersionDeleteCall<'a> {
+impl<'a, S> SiteVersionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15118,7 +15405,7 @@ impl<'a> SiteVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteVersionDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteVersionDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15128,7 +15415,7 @@ impl<'a> SiteVersionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15153,7 +15440,7 @@ impl<'a> SiteVersionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15173,9 +15460,9 @@ impl<'a> SiteVersionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15207,7 +15494,7 @@ impl<'a> SiteVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15218,10 +15505,10 @@ impl<'a> SiteVersionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionListCall<'a>
-    where  {
+pub struct SiteVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15231,9 +15518,15 @@ pub struct SiteVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionListCall<'a, S> {}
 
-impl<'a> SiteVersionListCall<'a> {
+impl<'a, S> SiteVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15389,28 +15682,28 @@ impl<'a> SiteVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListVersions` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteVersionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SiteVersionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of versions to return. The service may return a lower number if fewer versions exist than this maximum number. If unspecified, defaults to 25. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteVersionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SiteVersionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter string used to return a subset of versions in the response. The currently supported fields for filtering are: `name`, `status`, and `create_time`. Learn more about filtering in Google's [AIP 160 standard](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> SiteVersionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> SiteVersionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -15420,7 +15713,7 @@ impl<'a> SiteVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15445,7 +15738,7 @@ impl<'a> SiteVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15465,9 +15758,9 @@ impl<'a> SiteVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15500,7 +15793,7 @@ impl<'a> SiteVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15514,10 +15807,10 @@ impl<'a> SiteVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionPatchCall<'a>
-    where  {
+pub struct SiteVersionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: Version,
     _name: String,
     _update_mask: Option<String>,
@@ -15526,9 +15819,15 @@ pub struct SiteVersionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionPatchCall<'a, S> {}
 
-impl<'a> SiteVersionPatchCall<'a> {
+impl<'a, S> SiteVersionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15691,7 +15990,7 @@ impl<'a> SiteVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> SiteVersionPatchCall<'a> {
+    pub fn request(mut self, new_value: Version) -> SiteVersionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15701,14 +16000,14 @@ impl<'a> SiteVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteVersionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteVersionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [version](../sites.versions) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`status`](../sites.versions#Version.FIELDS.status) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SiteVersionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> SiteVersionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15718,7 +16017,7 @@ impl<'a> SiteVersionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15743,7 +16042,7 @@ impl<'a> SiteVersionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15763,9 +16062,9 @@ impl<'a> SiteVersionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15798,7 +16097,7 @@ impl<'a> SiteVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15811,10 +16110,10 @@ impl<'a> SiteVersionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionPopulateFileCall<'a>
-    where  {
+pub struct SiteVersionPopulateFileCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: PopulateVersionFilesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15822,9 +16121,15 @@ pub struct SiteVersionPopulateFileCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteVersionPopulateFileCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteVersionPopulateFileCall<'a, S> {}
 
-impl<'a> SiteVersionPopulateFileCall<'a> {
+impl<'a, S> SiteVersionPopulateFileCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15984,7 +16289,7 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> SiteVersionPopulateFileCall<'a> {
+    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> SiteVersionPopulateFileCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15994,7 +16299,7 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionPopulateFileCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionPopulateFileCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -16004,7 +16309,7 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPopulateFileCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPopulateFileCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16029,7 +16334,7 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPopulateFileCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPopulateFileCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16049,9 +16354,9 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPopulateFileCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteVersionPopulateFileCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16083,7 +16388,7 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16091,19 +16396,25 @@ impl<'a> SiteVersionPopulateFileCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteGetConfigCall<'a>
-    where  {
+pub struct SiteGetConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteGetConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteGetConfigCall<'a, S> {}
 
-impl<'a> SiteGetConfigCall<'a> {
+impl<'a, S> SiteGetConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16250,7 +16561,7 @@ impl<'a> SiteGetConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteGetConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteGetConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16260,7 +16571,7 @@ impl<'a> SiteGetConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16285,7 +16596,7 @@ impl<'a> SiteGetConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteGetConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16305,9 +16616,9 @@ impl<'a> SiteGetConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteGetConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16340,7 +16651,7 @@ impl<'a> SiteGetConfigCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16354,10 +16665,10 @@ impl<'a> SiteGetConfigCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteUpdateConfigCall<'a>
-    where  {
+pub struct SiteUpdateConfigCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FirebaseHosting<>,
+    hub: &'a FirebaseHosting<S>,
     _request: SiteConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -16366,9 +16677,15 @@ pub struct SiteUpdateConfigCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteUpdateConfigCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteUpdateConfigCall<'a, S> {}
 
-impl<'a> SiteUpdateConfigCall<'a> {
+impl<'a, S> SiteUpdateConfigCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16531,7 +16848,7 @@ impl<'a> SiteUpdateConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteConfig) -> SiteUpdateConfigCall<'a> {
+    pub fn request(mut self, new_value: SiteConfig) -> SiteUpdateConfigCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16541,14 +16858,14 @@ impl<'a> SiteUpdateConfigCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteUpdateConfigCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteUpdateConfigCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [site configuration](../sites.SiteConfig) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`max_versions`](../sites.SiteConfig.max_versions) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SiteUpdateConfigCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> SiteUpdateConfigCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -16558,7 +16875,7 @@ impl<'a> SiteUpdateConfigCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteUpdateConfigCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteUpdateConfigCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16583,7 +16900,7 @@ impl<'a> SiteUpdateConfigCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteUpdateConfigCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteUpdateConfigCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16603,9 +16920,9 @@ impl<'a> SiteUpdateConfigCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteUpdateConfigCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteUpdateConfigCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

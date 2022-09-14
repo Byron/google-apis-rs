@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -83,7 +88,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -115,43 +120,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudUserAccounts<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudUserAccounts<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudUserAccounts<> {}
+impl<'a, S> client::Hub for CloudUserAccounts<S> {}
 
-impl<'a, > CloudUserAccounts<> {
+impl<'a, S> CloudUserAccounts<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudUserAccounts<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudUserAccounts<S> {
         CloudUserAccounts {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/clouduseraccounts/vm_beta/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn global_accounts_operations(&'a self) -> GlobalAccountsOperationMethods<'a> {
+    pub fn global_accounts_operations(&'a self) -> GlobalAccountsOperationMethods<'a, S> {
         GlobalAccountsOperationMethods { hub: &self }
     }
-    pub fn groups(&'a self) -> GroupMethods<'a> {
+    pub fn groups(&'a self) -> GroupMethods<'a, S> {
         GroupMethods { hub: &self }
     }
-    pub fn linux(&'a self) -> LinuxMethods<'a> {
+    pub fn linux(&'a self) -> LinuxMethods<'a, S> {
         LinuxMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a> {
+    pub fn users(&'a self) -> UserMethods<'a, S> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -698,22 +703,22 @@ impl client::Part for OperationWarningsData {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.global_accounts_operations();
 /// # }
 /// ```
-pub struct GlobalAccountsOperationMethods<'a>
-    where  {
+pub struct GlobalAccountsOperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
 }
 
-impl<'a> client::MethodsBuilder for GlobalAccountsOperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GlobalAccountsOperationMethods<'a, S> {}
 
-impl<'a> GlobalAccountsOperationMethods<'a> {
+impl<'a, S> GlobalAccountsOperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -723,7 +728,7 @@ impl<'a> GlobalAccountsOperationMethods<'a> {
     ///
     /// * `project` - Project ID for this request.
     /// * `operation` - Name of the Operations resource to delete.
-    pub fn delete(&self, project: &str, operation: &str) -> GlobalAccountsOperationDeleteCall<'a> {
+    pub fn delete(&self, project: &str, operation: &str) -> GlobalAccountsOperationDeleteCall<'a, S> {
         GlobalAccountsOperationDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -742,7 +747,7 @@ impl<'a> GlobalAccountsOperationMethods<'a> {
     ///
     /// * `project` - Project ID for this request.
     /// * `operation` - Name of the Operations resource to return.
-    pub fn get(&self, project: &str, operation: &str) -> GlobalAccountsOperationGetCall<'a> {
+    pub fn get(&self, project: &str, operation: &str) -> GlobalAccountsOperationGetCall<'a, S> {
         GlobalAccountsOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -760,7 +765,7 @@ impl<'a> GlobalAccountsOperationMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - Project ID for this request.
-    pub fn list(&self, project: &str) -> GlobalAccountsOperationListCall<'a> {
+    pub fn list(&self, project: &str) -> GlobalAccountsOperationListCall<'a, S> {
         GlobalAccountsOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -798,22 +803,22 @@ impl<'a> GlobalAccountsOperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_member(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `remove_member(...)`
 /// // to build up your call.
 /// let rb = hub.groups();
 /// # }
 /// ```
-pub struct GroupMethods<'a>
-    where  {
+pub struct GroupMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
 }
 
-impl<'a> client::MethodsBuilder for GroupMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GroupMethods<'a, S> {}
 
-impl<'a> GroupMethods<'a> {
+impl<'a, S> GroupMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -824,7 +829,7 @@ impl<'a> GroupMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
     /// * `groupName` - Name of the group for this request.
-    pub fn add_member(&self, request: GroupsAddMemberRequest, project: &str, group_name: &str) -> GroupAddMemberCall<'a> {
+    pub fn add_member(&self, request: GroupsAddMemberRequest, project: &str, group_name: &str) -> GroupAddMemberCall<'a, S> {
         GroupAddMemberCall {
             hub: self.hub,
             _request: request,
@@ -844,7 +849,7 @@ impl<'a> GroupMethods<'a> {
     ///
     /// * `project` - Project ID for this request.
     /// * `groupName` - Name of the Group resource to delete.
-    pub fn delete(&self, project: &str, group_name: &str) -> GroupDeleteCall<'a> {
+    pub fn delete(&self, project: &str, group_name: &str) -> GroupDeleteCall<'a, S> {
         GroupDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -863,7 +868,7 @@ impl<'a> GroupMethods<'a> {
     ///
     /// * `project` - Project ID for this request.
     /// * `groupName` - Name of the Group resource to return.
-    pub fn get(&self, project: &str, group_name: &str) -> GroupGetCall<'a> {
+    pub fn get(&self, project: &str, group_name: &str) -> GroupGetCall<'a, S> {
         GroupGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -882,7 +887,7 @@ impl<'a> GroupMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
-    pub fn insert(&self, request: Group, project: &str) -> GroupInsertCall<'a> {
+    pub fn insert(&self, request: Group, project: &str) -> GroupInsertCall<'a, S> {
         GroupInsertCall {
             hub: self.hub,
             _request: request,
@@ -900,7 +905,7 @@ impl<'a> GroupMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - Project ID for this request.
-    pub fn list(&self, project: &str) -> GroupListCall<'a> {
+    pub fn list(&self, project: &str) -> GroupListCall<'a, S> {
         GroupListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -923,7 +928,7 @@ impl<'a> GroupMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
     /// * `groupName` - Name of the group for this request.
-    pub fn remove_member(&self, request: GroupsRemoveMemberRequest, project: &str, group_name: &str) -> GroupRemoveMemberCall<'a> {
+    pub fn remove_member(&self, request: GroupsRemoveMemberRequest, project: &str, group_name: &str) -> GroupRemoveMemberCall<'a, S> {
         GroupRemoveMemberCall {
             hub: self.hub,
             _request: request,
@@ -959,22 +964,22 @@ impl<'a> GroupMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_authorized_keys_view(...)` and `get_linux_account_views(...)`
 /// // to build up your call.
 /// let rb = hub.linux();
 /// # }
 /// ```
-pub struct LinuxMethods<'a>
-    where  {
+pub struct LinuxMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
 }
 
-impl<'a> client::MethodsBuilder for LinuxMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LinuxMethods<'a, S> {}
 
-impl<'a> LinuxMethods<'a> {
+impl<'a, S> LinuxMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -986,7 +991,7 @@ impl<'a> LinuxMethods<'a> {
     /// * `zone` - Name of the zone for this request.
     /// * `user` - The user account for which you want to get a list of authorized public keys.
     /// * `instance` - The fully-qualified URL of the virtual machine requesting the view.
-    pub fn get_authorized_keys_view(&self, project: &str, zone: &str, user: &str, instance: &str) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn get_authorized_keys_view(&self, project: &str, zone: &str, user: &str, instance: &str) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         LinuxGetAuthorizedKeysViewCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1009,7 +1014,7 @@ impl<'a> LinuxMethods<'a> {
     /// * `project` - Project ID for this request.
     /// * `zone` - Name of the zone for this request.
     /// * `instance` - The fully-qualified URL of the virtual machine requesting the views.
-    pub fn get_linux_account_views(&self, project: &str, zone: &str, instance: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn get_linux_account_views(&self, project: &str, zone: &str, instance: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         LinuxGetLinuxAccountViewCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1049,22 +1054,22 @@ impl<'a> LinuxMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_public_key(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `remove_public_key(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a>
-    where  {
+pub struct UserMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
 }
 
-impl<'a> client::MethodsBuilder for UserMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UserMethods<'a, S> {}
 
-impl<'a> UserMethods<'a> {
+impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1075,7 +1080,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
     /// * `user` - Name of the user for this request.
-    pub fn add_public_key(&self, request: PublicKey, project: &str, user: &str) -> UserAddPublicKeyCall<'a> {
+    pub fn add_public_key(&self, request: PublicKey, project: &str, user: &str) -> UserAddPublicKeyCall<'a, S> {
         UserAddPublicKeyCall {
             hub: self.hub,
             _request: request,
@@ -1095,7 +1100,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `project` - Project ID for this request.
     /// * `user` - Name of the user resource to delete.
-    pub fn delete(&self, project: &str, user: &str) -> UserDeleteCall<'a> {
+    pub fn delete(&self, project: &str, user: &str) -> UserDeleteCall<'a, S> {
         UserDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1114,7 +1119,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `project` - Project ID for this request.
     /// * `user` - Name of the user resource to return.
-    pub fn get(&self, project: &str, user: &str) -> UserGetCall<'a> {
+    pub fn get(&self, project: &str, user: &str) -> UserGetCall<'a, S> {
         UserGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1133,7 +1138,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
-    pub fn insert(&self, request: User, project: &str) -> UserInsertCall<'a> {
+    pub fn insert(&self, request: User, project: &str) -> UserInsertCall<'a, S> {
         UserInsertCall {
             hub: self.hub,
             _request: request,
@@ -1151,7 +1156,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - Project ID for this request.
-    pub fn list(&self, project: &str) -> UserListCall<'a> {
+    pub fn list(&self, project: &str) -> UserListCall<'a, S> {
         UserListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1174,7 +1179,7 @@ impl<'a> UserMethods<'a> {
     /// * `project` - Project ID for this request.
     /// * `user` - Name of the user for this request.
     /// * `fingerprint` - The fingerprint of the public key to delete. Public keys are identified by their fingerprint, which is defined by RFC4716 to be the MD5 digest of the public key.
-    pub fn remove_public_key(&self, project: &str, user: &str, fingerprint: &str) -> UserRemovePublicKeyCall<'a> {
+    pub fn remove_public_key(&self, project: &str, user: &str, fingerprint: &str) -> UserRemovePublicKeyCall<'a, S> {
         UserRemovePublicKeyCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1217,7 +1222,7 @@ impl<'a> UserMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1225,10 +1230,10 @@ impl<'a> UserMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GlobalAccountsOperationDeleteCall<'a>
-    where  {
+pub struct GlobalAccountsOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _operation: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1236,9 +1241,15 @@ pub struct GlobalAccountsOperationDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GlobalAccountsOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for GlobalAccountsOperationDeleteCall<'a, S> {}
 
-impl<'a> GlobalAccountsOperationDeleteCall<'a> {
+impl<'a, S> GlobalAccountsOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1371,7 +1382,7 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GlobalAccountsOperationDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GlobalAccountsOperationDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1381,7 +1392,7 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> GlobalAccountsOperationDeleteCall<'a> {
+    pub fn operation(mut self, new_value: &str) -> GlobalAccountsOperationDeleteCall<'a, S> {
         self._operation = new_value.to_string();
         self
     }
@@ -1391,7 +1402,7 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GlobalAccountsOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GlobalAccountsOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1412,7 +1423,7 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GlobalAccountsOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GlobalAccountsOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1432,9 +1443,9 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GlobalAccountsOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GlobalAccountsOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1466,7 +1477,7 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1474,10 +1485,10 @@ impl<'a> GlobalAccountsOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GlobalAccountsOperationGetCall<'a>
-    where  {
+pub struct GlobalAccountsOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _operation: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1485,9 +1496,15 @@ pub struct GlobalAccountsOperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GlobalAccountsOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for GlobalAccountsOperationGetCall<'a, S> {}
 
-impl<'a> GlobalAccountsOperationGetCall<'a> {
+impl<'a, S> GlobalAccountsOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1631,7 +1648,7 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GlobalAccountsOperationGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GlobalAccountsOperationGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1641,7 +1658,7 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> GlobalAccountsOperationGetCall<'a> {
+    pub fn operation(mut self, new_value: &str) -> GlobalAccountsOperationGetCall<'a, S> {
         self._operation = new_value.to_string();
         self
     }
@@ -1651,7 +1668,7 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GlobalAccountsOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GlobalAccountsOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1672,7 +1689,7 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GlobalAccountsOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GlobalAccountsOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1692,9 +1709,9 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GlobalAccountsOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GlobalAccountsOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1726,7 +1743,7 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1738,10 +1755,10 @@ impl<'a> GlobalAccountsOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GlobalAccountsOperationListCall<'a>
-    where  {
+pub struct GlobalAccountsOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -1752,9 +1769,15 @@ pub struct GlobalAccountsOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GlobalAccountsOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for GlobalAccountsOperationListCall<'a, S> {}
 
-impl<'a> GlobalAccountsOperationListCall<'a> {
+impl<'a, S> GlobalAccountsOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1909,14 +1932,14 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1927,14 +1950,14 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
     /// Currently, only sorting by name or creationTimestamp desc is supported.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> GlobalAccountsOperationListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> GlobalAccountsOperationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -1949,7 +1972,7 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> GlobalAccountsOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1959,7 +1982,7 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GlobalAccountsOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GlobalAccountsOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1980,7 +2003,7 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GlobalAccountsOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GlobalAccountsOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2000,9 +2023,9 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GlobalAccountsOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GlobalAccountsOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2035,7 +2058,7 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2048,10 +2071,10 @@ impl<'a> GlobalAccountsOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupAddMemberCall<'a>
-    where  {
+pub struct GroupAddMemberCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _request: GroupsAddMemberRequest,
     _project: String,
     _group_name: String,
@@ -2060,9 +2083,15 @@ pub struct GroupAddMemberCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupAddMemberCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupAddMemberCall<'a, S> {}
 
-impl<'a> GroupAddMemberCall<'a> {
+impl<'a, S> GroupAddMemberCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2219,7 +2248,7 @@ impl<'a> GroupAddMemberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GroupsAddMemberRequest) -> GroupAddMemberCall<'a> {
+    pub fn request(mut self, new_value: GroupsAddMemberRequest) -> GroupAddMemberCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2229,7 +2258,7 @@ impl<'a> GroupAddMemberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GroupAddMemberCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GroupAddMemberCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2239,7 +2268,7 @@ impl<'a> GroupAddMemberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_name(mut self, new_value: &str) -> GroupAddMemberCall<'a> {
+    pub fn group_name(mut self, new_value: &str) -> GroupAddMemberCall<'a, S> {
         self._group_name = new_value.to_string();
         self
     }
@@ -2249,7 +2278,7 @@ impl<'a> GroupAddMemberCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupAddMemberCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupAddMemberCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2270,7 +2299,7 @@ impl<'a> GroupAddMemberCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupAddMemberCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupAddMemberCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2290,9 +2319,9 @@ impl<'a> GroupAddMemberCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAddMemberCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupAddMemberCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2324,7 +2353,7 @@ impl<'a> GroupAddMemberCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2332,10 +2361,10 @@ impl<'a> GroupAddMemberCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupDeleteCall<'a>
-    where  {
+pub struct GroupDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _group_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2343,9 +2372,15 @@ pub struct GroupDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupDeleteCall<'a, S> {}
 
-impl<'a> GroupDeleteCall<'a> {
+impl<'a, S> GroupDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2489,7 +2524,7 @@ impl<'a> GroupDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GroupDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GroupDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2499,7 +2534,7 @@ impl<'a> GroupDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_name(mut self, new_value: &str) -> GroupDeleteCall<'a> {
+    pub fn group_name(mut self, new_value: &str) -> GroupDeleteCall<'a, S> {
         self._group_name = new_value.to_string();
         self
     }
@@ -2509,7 +2544,7 @@ impl<'a> GroupDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2530,7 +2565,7 @@ impl<'a> GroupDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2550,9 +2585,9 @@ impl<'a> GroupDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2584,7 +2619,7 @@ impl<'a> GroupDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2592,10 +2627,10 @@ impl<'a> GroupDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupGetCall<'a>
-    where  {
+pub struct GroupGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _group_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2603,9 +2638,15 @@ pub struct GroupGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupGetCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupGetCall<'a, S> {}
 
-impl<'a> GroupGetCall<'a> {
+impl<'a, S> GroupGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2749,7 +2790,7 @@ impl<'a> GroupGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GroupGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GroupGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2759,7 +2800,7 @@ impl<'a> GroupGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_name(mut self, new_value: &str) -> GroupGetCall<'a> {
+    pub fn group_name(mut self, new_value: &str) -> GroupGetCall<'a, S> {
         self._group_name = new_value.to_string();
         self
     }
@@ -2769,7 +2810,7 @@ impl<'a> GroupGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2790,7 +2831,7 @@ impl<'a> GroupGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2810,9 +2851,9 @@ impl<'a> GroupGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2845,7 +2886,7 @@ impl<'a> GroupGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2858,10 +2899,10 @@ impl<'a> GroupGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupInsertCall<'a>
-    where  {
+pub struct GroupInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _request: Group,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2869,9 +2910,15 @@ pub struct GroupInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupInsertCall<'a, S> {}
 
-impl<'a> GroupInsertCall<'a> {
+impl<'a, S> GroupInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3027,7 +3074,7 @@ impl<'a> GroupInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Group) -> GroupInsertCall<'a> {
+    pub fn request(mut self, new_value: Group) -> GroupInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3037,7 +3084,7 @@ impl<'a> GroupInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GroupInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GroupInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3047,7 +3094,7 @@ impl<'a> GroupInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3068,7 +3115,7 @@ impl<'a> GroupInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3088,9 +3135,9 @@ impl<'a> GroupInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3122,7 +3169,7 @@ impl<'a> GroupInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3134,10 +3181,10 @@ impl<'a> GroupInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupListCall<'a>
-    where  {
+pub struct GroupListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -3148,9 +3195,15 @@ pub struct GroupListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupListCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupListCall<'a, S> {}
 
-impl<'a> GroupListCall<'a> {
+impl<'a, S> GroupListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3305,14 +3358,14 @@ impl<'a> GroupListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GroupListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GroupListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3323,14 +3376,14 @@ impl<'a> GroupListCall<'a> {
     /// Currently, only sorting by name or creationTimestamp desc is supported.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> GroupListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> GroupListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> GroupListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> GroupListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -3345,7 +3398,7 @@ impl<'a> GroupListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> GroupListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> GroupListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3355,7 +3408,7 @@ impl<'a> GroupListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3376,7 +3429,7 @@ impl<'a> GroupListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3396,9 +3449,9 @@ impl<'a> GroupListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3431,7 +3484,7 @@ impl<'a> GroupListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3444,10 +3497,10 @@ impl<'a> GroupListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupRemoveMemberCall<'a>
-    where  {
+pub struct GroupRemoveMemberCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _request: GroupsRemoveMemberRequest,
     _project: String,
     _group_name: String,
@@ -3456,9 +3509,15 @@ pub struct GroupRemoveMemberCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupRemoveMemberCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupRemoveMemberCall<'a, S> {}
 
-impl<'a> GroupRemoveMemberCall<'a> {
+impl<'a, S> GroupRemoveMemberCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3615,7 +3674,7 @@ impl<'a> GroupRemoveMemberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GroupsRemoveMemberRequest) -> GroupRemoveMemberCall<'a> {
+    pub fn request(mut self, new_value: GroupsRemoveMemberRequest) -> GroupRemoveMemberCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3625,7 +3684,7 @@ impl<'a> GroupRemoveMemberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> GroupRemoveMemberCall<'a> {
+    pub fn project(mut self, new_value: &str) -> GroupRemoveMemberCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3635,7 +3694,7 @@ impl<'a> GroupRemoveMemberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_name(mut self, new_value: &str) -> GroupRemoveMemberCall<'a> {
+    pub fn group_name(mut self, new_value: &str) -> GroupRemoveMemberCall<'a, S> {
         self._group_name = new_value.to_string();
         self
     }
@@ -3645,7 +3704,7 @@ impl<'a> GroupRemoveMemberCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupRemoveMemberCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupRemoveMemberCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3666,7 +3725,7 @@ impl<'a> GroupRemoveMemberCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupRemoveMemberCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupRemoveMemberCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3686,9 +3745,9 @@ impl<'a> GroupRemoveMemberCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupRemoveMemberCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupRemoveMemberCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3720,7 +3779,7 @@ impl<'a> GroupRemoveMemberCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3729,10 +3788,10 @@ impl<'a> GroupRemoveMemberCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LinuxGetAuthorizedKeysViewCall<'a>
-    where  {
+pub struct LinuxGetAuthorizedKeysViewCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _zone: String,
     _user: String,
@@ -3743,9 +3802,15 @@ pub struct LinuxGetAuthorizedKeysViewCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LinuxGetAuthorizedKeysViewCall<'a> {}
+impl<'a, S> client::CallBuilder for LinuxGetAuthorizedKeysViewCall<'a, S> {}
 
-impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
+impl<'a, S> LinuxGetAuthorizedKeysViewCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3894,7 +3959,7 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn project(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3904,7 +3969,7 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -3914,7 +3979,7 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn user(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         self._user = new_value.to_string();
         self
     }
@@ -3924,14 +3989,14 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn instance(mut self, new_value: &str) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         self._instance = new_value.to_string();
         self
     }
     /// Whether the view was requested as part of a user-initiated login.
     ///
     /// Sets the *login* query property to the given value.
-    pub fn login(mut self, new_value: bool) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn login(mut self, new_value: bool) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         self._login = Some(new_value);
         self
     }
@@ -3941,7 +4006,7 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinuxGetAuthorizedKeysViewCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinuxGetAuthorizedKeysViewCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3962,7 +4027,7 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> LinuxGetAuthorizedKeysViewCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LinuxGetAuthorizedKeysViewCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3982,9 +4047,9 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LinuxGetAuthorizedKeysViewCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LinuxGetAuthorizedKeysViewCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4016,7 +4081,7 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4028,10 +4093,10 @@ impl<'a> LinuxGetAuthorizedKeysViewCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LinuxGetLinuxAccountViewCall<'a>
-    where  {
+pub struct LinuxGetLinuxAccountViewCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _zone: String,
     _instance: String,
@@ -4044,9 +4109,15 @@ pub struct LinuxGetLinuxAccountViewCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LinuxGetLinuxAccountViewCall<'a> {}
+impl<'a, S> client::CallBuilder for LinuxGetLinuxAccountViewCall<'a, S> {}
 
-impl<'a> LinuxGetLinuxAccountViewCall<'a> {
+impl<'a, S> LinuxGetLinuxAccountViewCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4203,7 +4274,7 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn project(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -4213,7 +4284,7 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -4223,14 +4294,14 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn instance(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._instance = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4241,14 +4312,14 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     /// Currently, only sorting by name or creationTimestamp desc is supported.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4263,7 +4334,7 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4273,7 +4344,7 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinuxGetLinuxAccountViewCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LinuxGetLinuxAccountViewCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4294,7 +4365,7 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> LinuxGetLinuxAccountViewCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LinuxGetLinuxAccountViewCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4314,9 +4385,9 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LinuxGetLinuxAccountViewCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LinuxGetLinuxAccountViewCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4349,7 +4420,7 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4362,10 +4433,10 @@ impl<'a> LinuxGetLinuxAccountViewCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserAddPublicKeyCall<'a>
-    where  {
+pub struct UserAddPublicKeyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _request: PublicKey,
     _project: String,
     _user: String,
@@ -4374,9 +4445,15 @@ pub struct UserAddPublicKeyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserAddPublicKeyCall<'a> {}
+impl<'a, S> client::CallBuilder for UserAddPublicKeyCall<'a, S> {}
 
-impl<'a> UserAddPublicKeyCall<'a> {
+impl<'a, S> UserAddPublicKeyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4533,7 +4610,7 @@ impl<'a> UserAddPublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PublicKey) -> UserAddPublicKeyCall<'a> {
+    pub fn request(mut self, new_value: PublicKey) -> UserAddPublicKeyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4543,7 +4620,7 @@ impl<'a> UserAddPublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> UserAddPublicKeyCall<'a> {
+    pub fn project(mut self, new_value: &str) -> UserAddPublicKeyCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -4553,7 +4630,7 @@ impl<'a> UserAddPublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user(mut self, new_value: &str) -> UserAddPublicKeyCall<'a> {
+    pub fn user(mut self, new_value: &str) -> UserAddPublicKeyCall<'a, S> {
         self._user = new_value.to_string();
         self
     }
@@ -4563,7 +4640,7 @@ impl<'a> UserAddPublicKeyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserAddPublicKeyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserAddPublicKeyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4584,7 +4661,7 @@ impl<'a> UserAddPublicKeyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> UserAddPublicKeyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserAddPublicKeyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4604,9 +4681,9 @@ impl<'a> UserAddPublicKeyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserAddPublicKeyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserAddPublicKeyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4638,7 +4715,7 @@ impl<'a> UserAddPublicKeyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4646,10 +4723,10 @@ impl<'a> UserAddPublicKeyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDeleteCall<'a>
-    where  {
+pub struct UserDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _user: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4657,9 +4734,15 @@ pub struct UserDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDeleteCall<'a, S> {}
 
-impl<'a> UserDeleteCall<'a> {
+impl<'a, S> UserDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4803,7 +4886,7 @@ impl<'a> UserDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> UserDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> UserDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -4813,7 +4896,7 @@ impl<'a> UserDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user(mut self, new_value: &str) -> UserDeleteCall<'a> {
+    pub fn user(mut self, new_value: &str) -> UserDeleteCall<'a, S> {
         self._user = new_value.to_string();
         self
     }
@@ -4823,7 +4906,7 @@ impl<'a> UserDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4844,7 +4927,7 @@ impl<'a> UserDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4864,9 +4947,9 @@ impl<'a> UserDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4898,7 +4981,7 @@ impl<'a> UserDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4906,10 +4989,10 @@ impl<'a> UserDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserGetCall<'a>
-    where  {
+pub struct UserGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _user: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4917,9 +5000,15 @@ pub struct UserGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserGetCall<'a, S> {}
 
-impl<'a> UserGetCall<'a> {
+impl<'a, S> UserGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5063,7 +5152,7 @@ impl<'a> UserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> UserGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> UserGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -5073,7 +5162,7 @@ impl<'a> UserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user(mut self, new_value: &str) -> UserGetCall<'a> {
+    pub fn user(mut self, new_value: &str) -> UserGetCall<'a, S> {
         self._user = new_value.to_string();
         self
     }
@@ -5083,7 +5172,7 @@ impl<'a> UserGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5104,7 +5193,7 @@ impl<'a> UserGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5124,9 +5213,9 @@ impl<'a> UserGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5159,7 +5248,7 @@ impl<'a> UserGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5172,10 +5261,10 @@ impl<'a> UserGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserInsertCall<'a>
-    where  {
+pub struct UserInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _request: User,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5183,9 +5272,15 @@ pub struct UserInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for UserInsertCall<'a, S> {}
 
-impl<'a> UserInsertCall<'a> {
+impl<'a, S> UserInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5341,7 +5436,7 @@ impl<'a> UserInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: User) -> UserInsertCall<'a> {
+    pub fn request(mut self, new_value: User) -> UserInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5351,7 +5446,7 @@ impl<'a> UserInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> UserInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> UserInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -5361,7 +5456,7 @@ impl<'a> UserInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5382,7 +5477,7 @@ impl<'a> UserInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> UserInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5402,9 +5497,9 @@ impl<'a> UserInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5436,7 +5531,7 @@ impl<'a> UserInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5448,10 +5543,10 @@ impl<'a> UserInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserListCall<'a>
-    where  {
+pub struct UserListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -5462,9 +5557,15 @@ pub struct UserListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserListCall<'a, S> {}
 
-impl<'a> UserListCall<'a> {
+impl<'a, S> UserListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5619,14 +5720,14 @@ impl<'a> UserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> UserListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> UserListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5637,14 +5738,14 @@ impl<'a> UserListCall<'a> {
     /// Currently, only sorting by name or creationTimestamp desc is supported.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> UserListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> UserListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> UserListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> UserListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -5659,7 +5760,7 @@ impl<'a> UserListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> UserListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> UserListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -5669,7 +5770,7 @@ impl<'a> UserListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5690,7 +5791,7 @@ impl<'a> UserListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5710,9 +5811,9 @@ impl<'a> UserListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5744,7 +5845,7 @@ impl<'a> UserListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudUserAccounts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5752,10 +5853,10 @@ impl<'a> UserListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserRemovePublicKeyCall<'a>
-    where  {
+pub struct UserRemovePublicKeyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudUserAccounts<>,
+    hub: &'a CloudUserAccounts<S>,
     _project: String,
     _user: String,
     _fingerprint: String,
@@ -5764,9 +5865,15 @@ pub struct UserRemovePublicKeyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserRemovePublicKeyCall<'a> {}
+impl<'a, S> client::CallBuilder for UserRemovePublicKeyCall<'a, S> {}
 
-impl<'a> UserRemovePublicKeyCall<'a> {
+impl<'a, S> UserRemovePublicKeyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5911,7 +6018,7 @@ impl<'a> UserRemovePublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> UserRemovePublicKeyCall<'a> {
+    pub fn project(mut self, new_value: &str) -> UserRemovePublicKeyCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -5921,7 +6028,7 @@ impl<'a> UserRemovePublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user(mut self, new_value: &str) -> UserRemovePublicKeyCall<'a> {
+    pub fn user(mut self, new_value: &str) -> UserRemovePublicKeyCall<'a, S> {
         self._user = new_value.to_string();
         self
     }
@@ -5931,7 +6038,7 @@ impl<'a> UserRemovePublicKeyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn fingerprint(mut self, new_value: &str) -> UserRemovePublicKeyCall<'a> {
+    pub fn fingerprint(mut self, new_value: &str) -> UserRemovePublicKeyCall<'a, S> {
         self._fingerprint = new_value.to_string();
         self
     }
@@ -5941,7 +6048,7 @@ impl<'a> UserRemovePublicKeyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserRemovePublicKeyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserRemovePublicKeyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5962,7 +6069,7 @@ impl<'a> UserRemovePublicKeyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> UserRemovePublicKeyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserRemovePublicKeyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5982,9 +6089,9 @@ impl<'a> UserRemovePublicKeyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserRemovePublicKeyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserRemovePublicKeyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

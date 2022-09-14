@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -105,64 +110,64 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AndroidPublisher<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AndroidPublisher<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AndroidPublisher<> {}
+impl<'a, S> client::Hub for AndroidPublisher<S> {}
 
-impl<'a, > AndroidPublisher<> {
+impl<'a, S> AndroidPublisher<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AndroidPublisher<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AndroidPublisher<S> {
         AndroidPublisher {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://androidpublisher.googleapis.com/".to_string(),
             _root_url: "https://androidpublisher.googleapis.com/".to_string(),
         }
     }
 
-    pub fn edits(&'a self) -> EditMethods<'a> {
+    pub fn edits(&'a self) -> EditMethods<'a, S> {
         EditMethods { hub: &self }
     }
-    pub fn generatedapks(&'a self) -> GeneratedapkMethods<'a> {
+    pub fn generatedapks(&'a self) -> GeneratedapkMethods<'a, S> {
         GeneratedapkMethods { hub: &self }
     }
-    pub fn grants(&'a self) -> GrantMethods<'a> {
+    pub fn grants(&'a self) -> GrantMethods<'a, S> {
         GrantMethods { hub: &self }
     }
-    pub fn inappproducts(&'a self) -> InappproductMethods<'a> {
+    pub fn inappproducts(&'a self) -> InappproductMethods<'a, S> {
         InappproductMethods { hub: &self }
     }
-    pub fn internalappsharingartifacts(&'a self) -> InternalappsharingartifactMethods<'a> {
+    pub fn internalappsharingartifacts(&'a self) -> InternalappsharingartifactMethods<'a, S> {
         InternalappsharingartifactMethods { hub: &self }
     }
-    pub fn monetization(&'a self) -> MonetizationMethods<'a> {
+    pub fn monetization(&'a self) -> MonetizationMethods<'a, S> {
         MonetizationMethods { hub: &self }
     }
-    pub fn orders(&'a self) -> OrderMethods<'a> {
+    pub fn orders(&'a self) -> OrderMethods<'a, S> {
         OrderMethods { hub: &self }
     }
-    pub fn purchases(&'a self) -> PurchaseMethods<'a> {
+    pub fn purchases(&'a self) -> PurchaseMethods<'a, S> {
         PurchaseMethods { hub: &self }
     }
-    pub fn reviews(&'a self) -> ReviewMethods<'a> {
+    pub fn reviews(&'a self) -> ReviewMethods<'a, S> {
         ReviewMethods { hub: &self }
     }
-    pub fn systemapks(&'a self) -> SystemapkMethods<'a> {
+    pub fn systemapks(&'a self) -> SystemapkMethods<'a, S> {
         SystemapkMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a> {
+    pub fn users(&'a self) -> UserMethods<'a, S> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2043,22 +2048,22 @@ impl client::ResponseResult for VoidedPurchasesListResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `apks_addexternallyhosted(...)`, `apks_list(...)`, `apks_upload(...)`, `bundles_list(...)`, `bundles_upload(...)`, `commit(...)`, `countryavailability_get(...)`, `delete(...)`, `deobfuscationfiles_upload(...)`, `details_get(...)`, `details_patch(...)`, `details_update(...)`, `expansionfiles_get(...)`, `expansionfiles_patch(...)`, `expansionfiles_update(...)`, `expansionfiles_upload(...)`, `get(...)`, `images_delete(...)`, `images_deleteall(...)`, `images_list(...)`, `images_upload(...)`, `insert(...)`, `listings_delete(...)`, `listings_deleteall(...)`, `listings_get(...)`, `listings_list(...)`, `listings_patch(...)`, `listings_update(...)`, `testers_get(...)`, `testers_patch(...)`, `testers_update(...)`, `tracks_get(...)`, `tracks_list(...)`, `tracks_patch(...)`, `tracks_update(...)` and `validate(...)`
 /// // to build up your call.
 /// let rb = hub.edits();
 /// # }
 /// ```
-pub struct EditMethods<'a>
-    where  {
+pub struct EditMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for EditMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EditMethods<'a, S> {}
 
-impl<'a> EditMethods<'a> {
+impl<'a, S> EditMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2069,7 +2074,7 @@ impl<'a> EditMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn apks_addexternallyhosted(&self, request: ApksAddExternallyHostedRequest, package_name: &str, edit_id: &str) -> EditApkAddexternallyhostedCall<'a> {
+    pub fn apks_addexternallyhosted(&self, request: ApksAddExternallyHostedRequest, package_name: &str, edit_id: &str) -> EditApkAddexternallyhostedCall<'a, S> {
         EditApkAddexternallyhostedCall {
             hub: self.hub,
             _request: request,
@@ -2089,7 +2094,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn apks_list(&self, package_name: &str, edit_id: &str) -> EditApkListCall<'a> {
+    pub fn apks_list(&self, package_name: &str, edit_id: &str) -> EditApkListCall<'a, S> {
         EditApkListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2108,7 +2113,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn apks_upload(&self, package_name: &str, edit_id: &str) -> EditApkUploadCall<'a> {
+    pub fn apks_upload(&self, package_name: &str, edit_id: &str) -> EditApkUploadCall<'a, S> {
         EditApkUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2127,7 +2132,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn bundles_list(&self, package_name: &str, edit_id: &str) -> EditBundleListCall<'a> {
+    pub fn bundles_list(&self, package_name: &str, edit_id: &str) -> EditBundleListCall<'a, S> {
         EditBundleListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2146,7 +2151,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn bundles_upload(&self, package_name: &str, edit_id: &str) -> EditBundleUploadCall<'a> {
+    pub fn bundles_upload(&self, package_name: &str, edit_id: &str) -> EditBundleUploadCall<'a, S> {
         EditBundleUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2167,7 +2172,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - The track to read from.
-    pub fn countryavailability_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditCountryavailabilityGetCall<'a> {
+    pub fn countryavailability_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditCountryavailabilityGetCall<'a, S> {
         EditCountryavailabilityGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2189,7 +2194,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Unique identifier for this edit.
     /// * `apkVersionCode` - The version code of the APK whose Deobfuscation File is being uploaded.
     /// * `deobfuscationFileType` - The type of the deobfuscation file.
-    pub fn deobfuscationfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, deobfuscation_file_type: &str) -> EditDeobfuscationfileUploadCall<'a> {
+    pub fn deobfuscationfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, deobfuscation_file_type: &str) -> EditDeobfuscationfileUploadCall<'a, S> {
         EditDeobfuscationfileUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2210,7 +2215,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn details_get(&self, package_name: &str, edit_id: &str) -> EditDetailGetCall<'a> {
+    pub fn details_get(&self, package_name: &str, edit_id: &str) -> EditDetailGetCall<'a, S> {
         EditDetailGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2230,7 +2235,7 @@ impl<'a> EditMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn details_patch(&self, request: AppDetails, package_name: &str, edit_id: &str) -> EditDetailPatchCall<'a> {
+    pub fn details_patch(&self, request: AppDetails, package_name: &str, edit_id: &str) -> EditDetailPatchCall<'a, S> {
         EditDetailPatchCall {
             hub: self.hub,
             _request: request,
@@ -2251,7 +2256,7 @@ impl<'a> EditMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn details_update(&self, request: AppDetails, package_name: &str, edit_id: &str) -> EditDetailUpdateCall<'a> {
+    pub fn details_update(&self, request: AppDetails, package_name: &str, edit_id: &str) -> EditDetailUpdateCall<'a, S> {
         EditDetailUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2273,7 +2278,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being read or modified.
     /// * `expansionFileType` - The file type of the file configuration which is being read or modified.
-    pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a> {
+    pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a, S> {
         EditExpansionfileGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2297,7 +2302,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being read or modified.
     /// * `expansionFileType` - The file type of the expansion file configuration which is being updated.
-    pub fn expansionfiles_patch(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a> {
+    pub fn expansionfiles_patch(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a, S> {
         EditExpansionfilePatchCall {
             hub: self.hub,
             _request: request,
@@ -2322,7 +2327,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being read or modified.
     /// * `expansionFileType` - The file type of the file configuration which is being read or modified.
-    pub fn expansionfiles_update(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a> {
+    pub fn expansionfiles_update(&self, request: ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a, S> {
         EditExpansionfileUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2346,7 +2351,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `apkVersionCode` - The version code of the APK whose expansion file configuration is being read or modified.
     /// * `expansionFileType` - The file type of the expansion file configuration which is being updated.
-    pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a> {
+    pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a, S> {
         EditExpansionfileUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2370,7 +2375,7 @@ impl<'a> EditMethods<'a> {
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German).
     /// * `imageType` - Type of the Image.
     /// * `imageId` - Unique identifier an image within the set of images attached to this edit.
-    pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a> {
+    pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a, S> {
         EditImageDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2394,7 +2399,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German). Providing a language that is not supported by the App is a no-op.
     /// * `imageType` - Type of the Image. Providing an image type that refers to no images is a no-op.
-    pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a> {
+    pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a, S> {
         EditImageDeleteallCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2417,7 +2422,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German). There must be a store listing for the specified language.
     /// * `imageType` - Type of the Image. Providing an image type that refers to no images will return an empty response.
-    pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a> {
+    pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a, S> {
         EditImageListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2440,7 +2445,7 @@ impl<'a> EditMethods<'a> {
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German). Providing a language that is not supported by the App is a no-op.
     /// * `imageType` - Type of the Image.
-    pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a> {
+    pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a, S> {
         EditImageUploadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2462,7 +2467,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German).
-    pub fn listings_delete(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingDeleteCall<'a> {
+    pub fn listings_delete(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingDeleteCall<'a, S> {
         EditListingDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2482,7 +2487,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn listings_deleteall(&self, package_name: &str, edit_id: &str) -> EditListingDeleteallCall<'a> {
+    pub fn listings_deleteall(&self, package_name: &str, edit_id: &str) -> EditListingDeleteallCall<'a, S> {
         EditListingDeleteallCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2502,7 +2507,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German).
-    pub fn listings_get(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingGetCall<'a> {
+    pub fn listings_get(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingGetCall<'a, S> {
         EditListingGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2522,7 +2527,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn listings_list(&self, package_name: &str, edit_id: &str) -> EditListingListCall<'a> {
+    pub fn listings_list(&self, package_name: &str, edit_id: &str) -> EditListingListCall<'a, S> {
         EditListingListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2543,7 +2548,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German).
-    pub fn listings_patch(&self, request: Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingPatchCall<'a> {
+    pub fn listings_patch(&self, request: Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingPatchCall<'a, S> {
         EditListingPatchCall {
             hub: self.hub,
             _request: request,
@@ -2566,7 +2571,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `language` - Language localization code (a BCP-47 language tag; for example, "de-AT" for Austrian German).
-    pub fn listings_update(&self, request: Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingUpdateCall<'a> {
+    pub fn listings_update(&self, request: Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingUpdateCall<'a, S> {
         EditListingUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2588,7 +2593,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - The track to read from.
-    pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a> {
+    pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a, S> {
         EditTesterGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2610,7 +2615,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - The track to update.
-    pub fn testers_patch(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a> {
+    pub fn testers_patch(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a, S> {
         EditTesterPatchCall {
             hub: self.hub,
             _request: request,
@@ -2633,7 +2638,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - The track to update.
-    pub fn testers_update(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a> {
+    pub fn testers_update(&self, request: Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a, S> {
         EditTesterUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2655,7 +2660,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - Identifier of the track.
-    pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a> {
+    pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a, S> {
         EditTrackGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2675,7 +2680,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn tracks_list(&self, package_name: &str, edit_id: &str) -> EditTrackListCall<'a> {
+    pub fn tracks_list(&self, package_name: &str, edit_id: &str) -> EditTrackListCall<'a, S> {
         EditTrackListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2696,7 +2701,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - Identifier of the track.
-    pub fn tracks_patch(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a> {
+    pub fn tracks_patch(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a, S> {
         EditTrackPatchCall {
             hub: self.hub,
             _request: request,
@@ -2719,7 +2724,7 @@ impl<'a> EditMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
     /// * `track` - Identifier of the track.
-    pub fn tracks_update(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a> {
+    pub fn tracks_update(&self, request: Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a, S> {
         EditTrackUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2740,7 +2745,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn commit(&self, package_name: &str, edit_id: &str) -> EditCommitCall<'a> {
+    pub fn commit(&self, package_name: &str, edit_id: &str) -> EditCommitCall<'a, S> {
         EditCommitCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2760,7 +2765,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn delete(&self, package_name: &str, edit_id: &str) -> EditDeleteCall<'a> {
+    pub fn delete(&self, package_name: &str, edit_id: &str) -> EditDeleteCall<'a, S> {
         EditDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2779,7 +2784,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn get(&self, package_name: &str, edit_id: &str) -> EditGetCall<'a> {
+    pub fn get(&self, package_name: &str, edit_id: &str) -> EditGetCall<'a, S> {
         EditGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2798,7 +2803,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
-    pub fn insert(&self, request: AppEdit, package_name: &str) -> EditInsertCall<'a> {
+    pub fn insert(&self, request: AppEdit, package_name: &str) -> EditInsertCall<'a, S> {
         EditInsertCall {
             hub: self.hub,
             _request: request,
@@ -2817,7 +2822,7 @@ impl<'a> EditMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `editId` - Identifier of the edit.
-    pub fn validate(&self, package_name: &str, edit_id: &str) -> EditValidateCall<'a> {
+    pub fn validate(&self, package_name: &str, edit_id: &str) -> EditValidateCall<'a, S> {
         EditValidateCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2852,22 +2857,22 @@ impl<'a> EditMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `download(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.generatedapks();
 /// # }
 /// ```
-pub struct GeneratedapkMethods<'a>
-    where  {
+pub struct GeneratedapkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for GeneratedapkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GeneratedapkMethods<'a, S> {}
 
-impl<'a> GeneratedapkMethods<'a> {
+impl<'a, S> GeneratedapkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2878,7 +2883,7 @@ impl<'a> GeneratedapkMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `versionCode` - Version code of the app bundle.
     /// * `downloadId` - Download ID, which uniquely identifies the APK to download. Can be obtained from the response of `generatedapks.list` method.
-    pub fn download(&self, package_name: &str, version_code: i32, download_id: &str) -> GeneratedapkDownloadCall<'a> {
+    pub fn download(&self, package_name: &str, version_code: i32, download_id: &str) -> GeneratedapkDownloadCall<'a, S> {
         GeneratedapkDownloadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2898,7 +2903,7 @@ impl<'a> GeneratedapkMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `versionCode` - Version code of the app bundle.
-    pub fn list(&self, package_name: &str, version_code: i32) -> GeneratedapkListCall<'a> {
+    pub fn list(&self, package_name: &str, version_code: i32) -> GeneratedapkListCall<'a, S> {
         GeneratedapkListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -2933,22 +2938,22 @@ impl<'a> GeneratedapkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)` and `patch(...)`
 /// // to build up your call.
 /// let rb = hub.grants();
 /// # }
 /// ```
-pub struct GrantMethods<'a>
-    where  {
+pub struct GrantMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for GrantMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GrantMethods<'a, S> {}
 
-impl<'a> GrantMethods<'a> {
+impl<'a, S> GrantMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2958,7 +2963,7 @@ impl<'a> GrantMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The user which needs permission. Format: developers/{developer}/users/{user}
-    pub fn create(&self, request: Grant, parent: &str) -> GrantCreateCall<'a> {
+    pub fn create(&self, request: Grant, parent: &str) -> GrantCreateCall<'a, S> {
         GrantCreateCall {
             hub: self.hub,
             _request: request,
@@ -2976,7 +2981,7 @@ impl<'a> GrantMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the grant to delete. Format: developers/{developer}/users/{email}/grants/{package_name}
-    pub fn delete(&self, name: &str) -> GrantDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> GrantDeleteCall<'a, S> {
         GrantDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2994,7 +2999,7 @@ impl<'a> GrantMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name for this grant, following the pattern "developers/{developer}/users/{email}/grants/{package_name}".
-    pub fn patch(&self, request: Grant, name: &str) -> GrantPatchCall<'a> {
+    pub fn patch(&self, request: Grant, name: &str) -> GrantPatchCall<'a, S> {
         GrantPatchCall {
             hub: self.hub,
             _request: request,
@@ -3030,22 +3035,22 @@ impl<'a> GrantMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.inappproducts();
 /// # }
 /// ```
-pub struct InappproductMethods<'a>
-    where  {
+pub struct InappproductMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for InappproductMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for InappproductMethods<'a, S> {}
 
-impl<'a> InappproductMethods<'a> {
+impl<'a, S> InappproductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3055,7 +3060,7 @@ impl<'a> InappproductMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn delete(&self, package_name: &str, sku: &str) -> InappproductDeleteCall<'a> {
+    pub fn delete(&self, package_name: &str, sku: &str) -> InappproductDeleteCall<'a, S> {
         InappproductDeleteCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3074,7 +3079,7 @@ impl<'a> InappproductMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn get(&self, package_name: &str, sku: &str) -> InappproductGetCall<'a> {
+    pub fn get(&self, package_name: &str, sku: &str) -> InappproductGetCall<'a, S> {
         InappproductGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3093,7 +3098,7 @@ impl<'a> InappproductMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
-    pub fn insert(&self, request: InAppProduct, package_name: &str) -> InappproductInsertCall<'a> {
+    pub fn insert(&self, request: InAppProduct, package_name: &str) -> InappproductInsertCall<'a, S> {
         InappproductInsertCall {
             hub: self.hub,
             _request: request,
@@ -3112,7 +3117,7 @@ impl<'a> InappproductMethods<'a> {
     /// # Arguments
     ///
     /// * `packageName` - Package name of the app.
-    pub fn list(&self, package_name: &str) -> InappproductListCall<'a> {
+    pub fn list(&self, package_name: &str) -> InappproductListCall<'a, S> {
         InappproductListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3134,7 +3139,7 @@ impl<'a> InappproductMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn patch(&self, request: InAppProduct, package_name: &str, sku: &str) -> InappproductPatchCall<'a> {
+    pub fn patch(&self, request: InAppProduct, package_name: &str, sku: &str) -> InappproductPatchCall<'a, S> {
         InappproductPatchCall {
             hub: self.hub,
             _request: request,
@@ -3156,7 +3161,7 @@ impl<'a> InappproductMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `sku` - Unique identifier for the in-app product.
-    pub fn update(&self, request: InAppProduct, package_name: &str, sku: &str) -> InappproductUpdateCall<'a> {
+    pub fn update(&self, request: InAppProduct, package_name: &str, sku: &str) -> InappproductUpdateCall<'a, S> {
         InappproductUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3194,22 +3199,22 @@ impl<'a> InappproductMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `uploadapk(...)` and `uploadbundle(...)`
 /// // to build up your call.
 /// let rb = hub.internalappsharingartifacts();
 /// # }
 /// ```
-pub struct InternalappsharingartifactMethods<'a>
-    where  {
+pub struct InternalappsharingartifactMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for InternalappsharingartifactMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for InternalappsharingartifactMethods<'a, S> {}
 
-impl<'a> InternalappsharingartifactMethods<'a> {
+impl<'a, S> InternalappsharingartifactMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3218,7 +3223,7 @@ impl<'a> InternalappsharingartifactMethods<'a> {
     /// # Arguments
     ///
     /// * `packageName` - Package name of the app.
-    pub fn uploadapk(&self, package_name: &str) -> InternalappsharingartifactUploadapkCall<'a> {
+    pub fn uploadapk(&self, package_name: &str) -> InternalappsharingartifactUploadapkCall<'a, S> {
         InternalappsharingartifactUploadapkCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3235,7 +3240,7 @@ impl<'a> InternalappsharingartifactMethods<'a> {
     /// # Arguments
     ///
     /// * `packageName` - Package name of the app.
-    pub fn uploadbundle(&self, package_name: &str) -> InternalappsharingartifactUploadbundleCall<'a> {
+    pub fn uploadbundle(&self, package_name: &str) -> InternalappsharingartifactUploadbundleCall<'a, S> {
         InternalappsharingartifactUploadbundleCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3269,22 +3274,22 @@ impl<'a> InternalappsharingartifactMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `convert_region_prices(...)`
 /// // to build up your call.
 /// let rb = hub.monetization();
 /// # }
 /// ```
-pub struct MonetizationMethods<'a>
-    where  {
+pub struct MonetizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for MonetizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MonetizationMethods<'a, S> {}
 
-impl<'a> MonetizationMethods<'a> {
+impl<'a, S> MonetizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3294,7 +3299,7 @@ impl<'a> MonetizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `packageName` - Required. The app package name.
-    pub fn convert_region_prices(&self, request: ConvertRegionPricesRequest, package_name: &str) -> MonetizationConvertRegionPriceCall<'a> {
+    pub fn convert_region_prices(&self, request: ConvertRegionPricesRequest, package_name: &str) -> MonetizationConvertRegionPriceCall<'a, S> {
         MonetizationConvertRegionPriceCall {
             hub: self.hub,
             _request: request,
@@ -3329,22 +3334,22 @@ impl<'a> MonetizationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `refund(...)`
 /// // to build up your call.
 /// let rb = hub.orders();
 /// # }
 /// ```
-pub struct OrderMethods<'a>
-    where  {
+pub struct OrderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderMethods<'a, S> {}
 
-impl<'a> OrderMethods<'a> {
+impl<'a, S> OrderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3354,7 +3359,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `packageName` - The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing').
     /// * `orderId` - The order ID provided to the user when the subscription or in-app order was purchased.
-    pub fn refund(&self, package_name: &str, order_id: &str) -> OrderRefundCall<'a> {
+    pub fn refund(&self, package_name: &str, order_id: &str) -> OrderRefundCall<'a, S> {
         OrderRefundCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3390,22 +3395,22 @@ impl<'a> OrderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `products_acknowledge(...)`, `products_get(...)`, `subscriptions_acknowledge(...)`, `subscriptions_cancel(...)`, `subscriptions_defer(...)`, `subscriptions_get(...)`, `subscriptions_refund(...)`, `subscriptions_revoke(...)` and `voidedpurchases_list(...)`
 /// // to build up your call.
 /// let rb = hub.purchases();
 /// # }
 /// ```
-pub struct PurchaseMethods<'a>
-    where  {
+pub struct PurchaseMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for PurchaseMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PurchaseMethods<'a, S> {}
 
-impl<'a> PurchaseMethods<'a> {
+impl<'a, S> PurchaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3417,7 +3422,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
     /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
     /// * `token` - The token provided to the user's device when the inapp product was purchased.
-    pub fn products_acknowledge(&self, request: ProductPurchasesAcknowledgeRequest, package_name: &str, product_id: &str, token: &str) -> PurchaseProductAcknowledgeCall<'a> {
+    pub fn products_acknowledge(&self, request: ProductPurchasesAcknowledgeRequest, package_name: &str, product_id: &str, token: &str) -> PurchaseProductAcknowledgeCall<'a, S> {
         PurchaseProductAcknowledgeCall {
             hub: self.hub,
             _request: request,
@@ -3439,7 +3444,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
     /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
     /// * `token` - The token provided to the user's device when the inapp product was purchased.
-    pub fn products_get(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductGetCall<'a> {
+    pub fn products_get(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductGetCall<'a, S> {
         PurchaseProductGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3461,7 +3466,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_acknowledge(&self, request: SubscriptionPurchasesAcknowledgeRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionAcknowledgeCall<'a> {
+    pub fn subscriptions_acknowledge(&self, request: SubscriptionPurchasesAcknowledgeRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionAcknowledgeCall<'a, S> {
         PurchaseSubscriptionAcknowledgeCall {
             hub: self.hub,
             _request: request,
@@ -3483,7 +3488,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_cancel(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionCancelCall<'a> {
+    pub fn subscriptions_cancel(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionCancelCall<'a, S> {
         PurchaseSubscriptionCancelCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3505,7 +3510,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_defer(&self, request: SubscriptionPurchasesDeferRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionDeferCall<'a> {
+    pub fn subscriptions_defer(&self, request: SubscriptionPurchasesDeferRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionDeferCall<'a, S> {
         PurchaseSubscriptionDeferCall {
             hub: self.hub,
             _request: request,
@@ -3527,7 +3532,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_get(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionGetCall<'a> {
+    pub fn subscriptions_get(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionGetCall<'a, S> {
         PurchaseSubscriptionGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3548,7 +3553,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - "The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_refund(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRefundCall<'a> {
+    pub fn subscriptions_refund(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRefundCall<'a, S> {
         PurchaseSubscriptionRefundCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3569,7 +3574,7 @@ impl<'a> PurchaseMethods<'a> {
     /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
     /// * `token` - The token provided to the user's device when the subscription was purchased.
-    pub fn subscriptions_revoke(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRevokeCall<'a> {
+    pub fn subscriptions_revoke(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRevokeCall<'a, S> {
         PurchaseSubscriptionRevokeCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3588,7 +3593,7 @@ impl<'a> PurchaseMethods<'a> {
     /// # Arguments
     ///
     /// * `packageName` - The package name of the application for which voided purchases need to be returned (for example, 'com.some.thing').
-    pub fn voidedpurchases_list(&self, package_name: &str) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn voidedpurchases_list(&self, package_name: &str) -> PurchaseVoidedpurchaseListCall<'a, S> {
         PurchaseVoidedpurchaseListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3628,22 +3633,22 @@ impl<'a> PurchaseMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `list(...)` and `reply(...)`
 /// // to build up your call.
 /// let rb = hub.reviews();
 /// # }
 /// ```
-pub struct ReviewMethods<'a>
-    where  {
+pub struct ReviewMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for ReviewMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ReviewMethods<'a, S> {}
 
-impl<'a> ReviewMethods<'a> {
+impl<'a, S> ReviewMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3653,7 +3658,7 @@ impl<'a> ReviewMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `reviewId` - Unique identifier for a review.
-    pub fn get(&self, package_name: &str, review_id: &str) -> ReviewGetCall<'a> {
+    pub fn get(&self, package_name: &str, review_id: &str) -> ReviewGetCall<'a, S> {
         ReviewGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3672,7 +3677,7 @@ impl<'a> ReviewMethods<'a> {
     /// # Arguments
     ///
     /// * `packageName` - Package name of the app.
-    pub fn list(&self, package_name: &str) -> ReviewListCall<'a> {
+    pub fn list(&self, package_name: &str) -> ReviewListCall<'a, S> {
         ReviewListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3695,7 +3700,7 @@ impl<'a> ReviewMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `reviewId` - Unique identifier for a review.
-    pub fn reply(&self, request: ReviewsReplyRequest, package_name: &str, review_id: &str) -> ReviewReplyCall<'a> {
+    pub fn reply(&self, request: ReviewsReplyRequest, package_name: &str, review_id: &str) -> ReviewReplyCall<'a, S> {
         ReviewReplyCall {
             hub: self.hub,
             _request: request,
@@ -3731,22 +3736,22 @@ impl<'a> ReviewMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `variants_create(...)`, `variants_download(...)`, `variants_get(...)` and `variants_list(...)`
 /// // to build up your call.
 /// let rb = hub.systemapks();
 /// # }
 /// ```
-pub struct SystemapkMethods<'a>
-    where  {
+pub struct SystemapkMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for SystemapkMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SystemapkMethods<'a, S> {}
 
-impl<'a> SystemapkMethods<'a> {
+impl<'a, S> SystemapkMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3757,7 +3762,7 @@ impl<'a> SystemapkMethods<'a> {
     /// * `request` - No description provided.
     /// * `packageName` - Package name of the app.
     /// * `versionCode` - The version code of the App Bundle.
-    pub fn variants_create(&self, request: Variant, package_name: &str, version_code: &str) -> SystemapkVariantCreateCall<'a> {
+    pub fn variants_create(&self, request: Variant, package_name: &str, version_code: &str) -> SystemapkVariantCreateCall<'a, S> {
         SystemapkVariantCreateCall {
             hub: self.hub,
             _request: request,
@@ -3778,7 +3783,7 @@ impl<'a> SystemapkMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `versionCode` - The version code of the App Bundle.
     /// * `variantId` - The ID of a previously created system APK variant.
-    pub fn variants_download(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantDownloadCall<'a> {
+    pub fn variants_download(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantDownloadCall<'a, S> {
         SystemapkVariantDownloadCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3799,7 +3804,7 @@ impl<'a> SystemapkMethods<'a> {
     /// * `packageName` - Package name of the app.
     /// * `versionCode` - The version code of the App Bundle.
     /// * `variantId` - The ID of a previously created system APK variant.
-    pub fn variants_get(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantGetCall<'a> {
+    pub fn variants_get(&self, package_name: &str, version_code: &str, variant_id: u32) -> SystemapkVariantGetCall<'a, S> {
         SystemapkVariantGetCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3819,7 +3824,7 @@ impl<'a> SystemapkMethods<'a> {
     ///
     /// * `packageName` - Package name of the app.
     /// * `versionCode` - The version code of the App Bundle.
-    pub fn variants_list(&self, package_name: &str, version_code: &str) -> SystemapkVariantListCall<'a> {
+    pub fn variants_list(&self, package_name: &str, version_code: &str) -> SystemapkVariantListCall<'a, S> {
         SystemapkVariantListCall {
             hub: self.hub,
             _package_name: package_name.to_string(),
@@ -3854,22 +3859,22 @@ impl<'a> SystemapkMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)`, `list(...)` and `patch(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a>
-    where  {
+pub struct UserMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
 }
 
-impl<'a> client::MethodsBuilder for UserMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UserMethods<'a, S> {}
 
-impl<'a> UserMethods<'a> {
+impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3879,7 +3884,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The developer account to add the user to. Format: developers/{developer}
-    pub fn create(&self, request: User, parent: &str) -> UserCreateCall<'a> {
+    pub fn create(&self, request: User, parent: &str) -> UserCreateCall<'a, S> {
         UserCreateCall {
             hub: self.hub,
             _request: request,
@@ -3897,7 +3902,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the user to delete. Format: developers/{developer}/users/{email}
-    pub fn delete(&self, name: &str) -> UserDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> UserDeleteCall<'a, S> {
         UserDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3914,7 +3919,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The developer account to fetch users from. Format: developers/{developer}
-    pub fn list(&self, parent: &str) -> UserListCall<'a> {
+    pub fn list(&self, parent: &str) -> UserListCall<'a, S> {
         UserListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3934,7 +3939,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name for this user, following the pattern "developers/{developer}/users/{email}".
-    pub fn patch(&self, request: User, name: &str) -> UserPatchCall<'a> {
+    pub fn patch(&self, request: User, name: &str) -> UserPatchCall<'a, S> {
         UserPatchCall {
             hub: self.hub,
             _request: request,
@@ -3978,7 +3983,7 @@ impl<'a> UserMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3991,10 +3996,10 @@ impl<'a> UserMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditApkAddexternallyhostedCall<'a>
-    where  {
+pub struct EditApkAddexternallyhostedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: ApksAddExternallyHostedRequest,
     _package_name: String,
     _edit_id: String,
@@ -4003,9 +4008,15 @@ pub struct EditApkAddexternallyhostedCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditApkAddexternallyhostedCall<'a> {}
+impl<'a, S> client::CallBuilder for EditApkAddexternallyhostedCall<'a, S> {}
 
-impl<'a> EditApkAddexternallyhostedCall<'a> {
+impl<'a, S> EditApkAddexternallyhostedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4162,7 +4173,7 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ApksAddExternallyHostedRequest) -> EditApkAddexternallyhostedCall<'a> {
+    pub fn request(mut self, new_value: ApksAddExternallyHostedRequest) -> EditApkAddexternallyhostedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4172,7 +4183,7 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -4182,7 +4193,7 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -4192,7 +4203,7 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditApkAddexternallyhostedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditApkAddexternallyhostedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4217,7 +4228,7 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditApkAddexternallyhostedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApkAddexternallyhostedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4237,9 +4248,9 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditApkAddexternallyhostedCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditApkAddexternallyhostedCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4271,7 +4282,7 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4279,10 +4290,10 @@ impl<'a> EditApkAddexternallyhostedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditApkListCall<'a>
-    where  {
+pub struct EditApkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4290,9 +4301,15 @@ pub struct EditApkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditApkListCall<'a> {}
+impl<'a, S> client::CallBuilder for EditApkListCall<'a, S> {}
 
-impl<'a> EditApkListCall<'a> {
+impl<'a, S> EditApkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4436,7 +4453,7 @@ impl<'a> EditApkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditApkListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditApkListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -4446,7 +4463,7 @@ impl<'a> EditApkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditApkListCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApkListCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -4456,7 +4473,7 @@ impl<'a> EditApkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditApkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditApkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4481,7 +4498,7 @@ impl<'a> EditApkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditApkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4501,9 +4518,9 @@ impl<'a> EditApkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditApkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditApkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4536,7 +4553,7 @@ impl<'a> EditApkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -4544,10 +4561,10 @@ impl<'a> EditApkListCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct EditApkUploadCall<'a>
-    where  {
+pub struct EditApkUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4555,9 +4572,15 @@ pub struct EditApkUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditApkUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for EditApkUploadCall<'a, S> {}
 
-impl<'a> EditApkUploadCall<'a> {
+impl<'a, S> EditApkUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4809,7 +4832,7 @@ impl<'a> EditApkUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditApkUploadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditApkUploadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -4819,7 +4842,7 @@ impl<'a> EditApkUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditApkUploadCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditApkUploadCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -4829,7 +4852,7 @@ impl<'a> EditApkUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditApkUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditApkUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4854,7 +4877,7 @@ impl<'a> EditApkUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditApkUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditApkUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4874,9 +4897,9 @@ impl<'a> EditApkUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditApkUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditApkUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4908,7 +4931,7 @@ impl<'a> EditApkUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4916,10 +4939,10 @@ impl<'a> EditApkUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditBundleListCall<'a>
-    where  {
+pub struct EditBundleListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4927,9 +4950,15 @@ pub struct EditBundleListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditBundleListCall<'a> {}
+impl<'a, S> client::CallBuilder for EditBundleListCall<'a, S> {}
 
-impl<'a> EditBundleListCall<'a> {
+impl<'a, S> EditBundleListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5073,7 +5102,7 @@ impl<'a> EditBundleListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditBundleListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditBundleListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5083,7 +5112,7 @@ impl<'a> EditBundleListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditBundleListCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditBundleListCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -5093,7 +5122,7 @@ impl<'a> EditBundleListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditBundleListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditBundleListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5118,7 +5147,7 @@ impl<'a> EditBundleListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditBundleListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditBundleListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5138,9 +5167,9 @@ impl<'a> EditBundleListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditBundleListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditBundleListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5173,7 +5202,7 @@ impl<'a> EditBundleListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -5182,10 +5211,10 @@ impl<'a> EditBundleListCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct EditBundleUploadCall<'a>
-    where  {
+pub struct EditBundleUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _ack_bundle_installation_warning: Option<bool>,
@@ -5194,9 +5223,15 @@ pub struct EditBundleUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditBundleUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for EditBundleUploadCall<'a, S> {}
 
-impl<'a> EditBundleUploadCall<'a> {
+impl<'a, S> EditBundleUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5451,7 +5486,7 @@ impl<'a> EditBundleUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditBundleUploadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditBundleUploadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5461,14 +5496,14 @@ impl<'a> EditBundleUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditBundleUploadCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditBundleUploadCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
     /// Must be set to true if the app bundle installation may trigger a warning on user devices (for example, if installation size may be over a threshold, typically 100 MB).
     ///
     /// Sets the *ack bundle installation warning* query property to the given value.
-    pub fn ack_bundle_installation_warning(mut self, new_value: bool) -> EditBundleUploadCall<'a> {
+    pub fn ack_bundle_installation_warning(mut self, new_value: bool) -> EditBundleUploadCall<'a, S> {
         self._ack_bundle_installation_warning = Some(new_value);
         self
     }
@@ -5478,7 +5513,7 @@ impl<'a> EditBundleUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditBundleUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditBundleUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5503,7 +5538,7 @@ impl<'a> EditBundleUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditBundleUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditBundleUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5523,9 +5558,9 @@ impl<'a> EditBundleUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditBundleUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditBundleUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5557,7 +5592,7 @@ impl<'a> EditBundleUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5565,10 +5600,10 @@ impl<'a> EditBundleUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditCountryavailabilityGetCall<'a>
-    where  {
+pub struct EditCountryavailabilityGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _track: String,
@@ -5577,9 +5612,15 @@ pub struct EditCountryavailabilityGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditCountryavailabilityGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditCountryavailabilityGetCall<'a, S> {}
 
-impl<'a> EditCountryavailabilityGetCall<'a> {
+impl<'a, S> EditCountryavailabilityGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5724,7 +5765,7 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditCountryavailabilityGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditCountryavailabilityGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -5734,7 +5775,7 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditCountryavailabilityGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditCountryavailabilityGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -5744,7 +5785,7 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditCountryavailabilityGetCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditCountryavailabilityGetCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -5754,7 +5795,7 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditCountryavailabilityGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditCountryavailabilityGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5779,7 +5820,7 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditCountryavailabilityGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditCountryavailabilityGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5799,9 +5840,9 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditCountryavailabilityGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditCountryavailabilityGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5834,7 +5875,7 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -5842,10 +5883,10 @@ impl<'a> EditCountryavailabilityGetCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct EditDeobfuscationfileUploadCall<'a>
-    where  {
+pub struct EditDeobfuscationfileUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -5855,9 +5896,15 @@ pub struct EditDeobfuscationfileUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditDeobfuscationfileUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for EditDeobfuscationfileUploadCall<'a, S> {}
 
-impl<'a> EditDeobfuscationfileUploadCall<'a> {
+impl<'a, S> EditDeobfuscationfileUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6111,7 +6158,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6121,7 +6168,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6131,7 +6178,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditDeobfuscationfileUploadCall<'a> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditDeobfuscationfileUploadCall<'a, S> {
         self._apk_version_code = new_value;
         self
     }
@@ -6141,7 +6188,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deobfuscation_file_type(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a> {
+    pub fn deobfuscation_file_type(mut self, new_value: &str) -> EditDeobfuscationfileUploadCall<'a, S> {
         self._deobfuscation_file_type = new_value.to_string();
         self
     }
@@ -6151,7 +6198,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDeobfuscationfileUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDeobfuscationfileUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6176,7 +6223,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditDeobfuscationfileUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDeobfuscationfileUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6196,9 +6243,9 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditDeobfuscationfileUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditDeobfuscationfileUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6230,7 +6277,7 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6238,10 +6285,10 @@ impl<'a> EditDeobfuscationfileUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditDetailGetCall<'a>
-    where  {
+pub struct EditDetailGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6249,9 +6296,15 @@ pub struct EditDetailGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditDetailGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditDetailGetCall<'a, S> {}
 
-impl<'a> EditDetailGetCall<'a> {
+impl<'a, S> EditDetailGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6395,7 +6448,7 @@ impl<'a> EditDetailGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditDetailGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditDetailGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6405,7 +6458,7 @@ impl<'a> EditDetailGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditDetailGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDetailGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6415,7 +6468,7 @@ impl<'a> EditDetailGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDetailGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDetailGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6440,7 +6493,7 @@ impl<'a> EditDetailGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditDetailGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDetailGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6460,9 +6513,9 @@ impl<'a> EditDetailGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditDetailGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditDetailGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6495,7 +6548,7 @@ impl<'a> EditDetailGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6508,10 +6561,10 @@ impl<'a> EditDetailGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditDetailPatchCall<'a>
-    where  {
+pub struct EditDetailPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: AppDetails,
     _package_name: String,
     _edit_id: String,
@@ -6520,9 +6573,15 @@ pub struct EditDetailPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditDetailPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EditDetailPatchCall<'a, S> {}
 
-impl<'a> EditDetailPatchCall<'a> {
+impl<'a, S> EditDetailPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6679,7 +6738,7 @@ impl<'a> EditDetailPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AppDetails) -> EditDetailPatchCall<'a> {
+    pub fn request(mut self, new_value: AppDetails) -> EditDetailPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6689,7 +6748,7 @@ impl<'a> EditDetailPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditDetailPatchCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditDetailPatchCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6699,7 +6758,7 @@ impl<'a> EditDetailPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditDetailPatchCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDetailPatchCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -6709,7 +6768,7 @@ impl<'a> EditDetailPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDetailPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDetailPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6734,7 +6793,7 @@ impl<'a> EditDetailPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditDetailPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDetailPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6754,9 +6813,9 @@ impl<'a> EditDetailPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditDetailPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditDetailPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6789,7 +6848,7 @@ impl<'a> EditDetailPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6802,10 +6861,10 @@ impl<'a> EditDetailPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditDetailUpdateCall<'a>
-    where  {
+pub struct EditDetailUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: AppDetails,
     _package_name: String,
     _edit_id: String,
@@ -6814,9 +6873,15 @@ pub struct EditDetailUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditDetailUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for EditDetailUpdateCall<'a, S> {}
 
-impl<'a> EditDetailUpdateCall<'a> {
+impl<'a, S> EditDetailUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6973,7 +7038,7 @@ impl<'a> EditDetailUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AppDetails) -> EditDetailUpdateCall<'a> {
+    pub fn request(mut self, new_value: AppDetails) -> EditDetailUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6983,7 +7048,7 @@ impl<'a> EditDetailUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditDetailUpdateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditDetailUpdateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -6993,7 +7058,7 @@ impl<'a> EditDetailUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditDetailUpdateCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDetailUpdateCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7003,7 +7068,7 @@ impl<'a> EditDetailUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDetailUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDetailUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7028,7 +7093,7 @@ impl<'a> EditDetailUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditDetailUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDetailUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7048,9 +7113,9 @@ impl<'a> EditDetailUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditDetailUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditDetailUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7082,7 +7147,7 @@ impl<'a> EditDetailUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7090,10 +7155,10 @@ impl<'a> EditDetailUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditExpansionfileGetCall<'a>
-    where  {
+pub struct EditExpansionfileGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -7103,9 +7168,15 @@ pub struct EditExpansionfileGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditExpansionfileGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditExpansionfileGetCall<'a, S> {}
 
-impl<'a> EditExpansionfileGetCall<'a> {
+impl<'a, S> EditExpansionfileGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7251,7 +7322,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7261,7 +7332,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7271,7 +7342,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileGetCall<'a> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileGetCall<'a, S> {
         self._apk_version_code = new_value;
         self
     }
@@ -7281,7 +7352,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileGetCall<'a> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, S> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -7291,7 +7362,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfileGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfileGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7316,7 +7387,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7336,9 +7407,9 @@ impl<'a> EditExpansionfileGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditExpansionfileGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditExpansionfileGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7371,7 +7442,7 @@ impl<'a> EditExpansionfileGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7384,10 +7455,10 @@ impl<'a> EditExpansionfileGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditExpansionfilePatchCall<'a>
-    where  {
+pub struct EditExpansionfilePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: ExpansionFile,
     _package_name: String,
     _edit_id: String,
@@ -7398,9 +7469,15 @@ pub struct EditExpansionfilePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditExpansionfilePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EditExpansionfilePatchCall<'a, S> {}
 
-impl<'a> EditExpansionfilePatchCall<'a> {
+impl<'a, S> EditExpansionfilePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7559,7 +7636,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExpansionFile) -> EditExpansionfilePatchCall<'a> {
+    pub fn request(mut self, new_value: ExpansionFile) -> EditExpansionfilePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7569,7 +7646,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7579,7 +7656,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7589,7 +7666,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfilePatchCall<'a> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfilePatchCall<'a, S> {
         self._apk_version_code = new_value;
         self
     }
@@ -7599,7 +7676,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, S> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -7609,7 +7686,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfilePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfilePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7634,7 +7711,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfilePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfilePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7654,9 +7731,9 @@ impl<'a> EditExpansionfilePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditExpansionfilePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditExpansionfilePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7689,7 +7766,7 @@ impl<'a> EditExpansionfilePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7702,10 +7779,10 @@ impl<'a> EditExpansionfilePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditExpansionfileUpdateCall<'a>
-    where  {
+pub struct EditExpansionfileUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: ExpansionFile,
     _package_name: String,
     _edit_id: String,
@@ -7716,9 +7793,15 @@ pub struct EditExpansionfileUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditExpansionfileUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for EditExpansionfileUpdateCall<'a, S> {}
 
-impl<'a> EditExpansionfileUpdateCall<'a> {
+impl<'a, S> EditExpansionfileUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7877,7 +7960,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExpansionFile) -> EditExpansionfileUpdateCall<'a> {
+    pub fn request(mut self, new_value: ExpansionFile) -> EditExpansionfileUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7887,7 +7970,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -7897,7 +7980,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -7907,7 +7990,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUpdateCall<'a> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUpdateCall<'a, S> {
         self._apk_version_code = new_value;
         self
     }
@@ -7917,7 +8000,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, S> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -7927,7 +8010,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfileUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfileUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7952,7 +8035,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7972,9 +8055,9 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditExpansionfileUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditExpansionfileUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8007,7 +8090,7 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -8015,10 +8098,10 @@ impl<'a> EditExpansionfileUpdateCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct EditExpansionfileUploadCall<'a>
-    where  {
+pub struct EditExpansionfileUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _apk_version_code: i32,
@@ -8028,9 +8111,15 @@ pub struct EditExpansionfileUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditExpansionfileUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for EditExpansionfileUploadCall<'a, S> {}
 
-impl<'a> EditExpansionfileUploadCall<'a> {
+impl<'a, S> EditExpansionfileUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8284,7 +8373,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -8294,7 +8383,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -8304,7 +8393,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUploadCall<'a> {
+    pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUploadCall<'a, S> {
         self._apk_version_code = new_value;
         self
     }
@@ -8314,7 +8403,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a> {
+    pub fn expansion_file_type(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, S> {
         self._expansion_file_type = new_value.to_string();
         self
     }
@@ -8324,7 +8413,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfileUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditExpansionfileUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8349,7 +8438,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditExpansionfileUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8369,9 +8458,9 @@ impl<'a> EditExpansionfileUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditExpansionfileUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditExpansionfileUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8403,7 +8492,7 @@ impl<'a> EditExpansionfileUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8411,10 +8500,10 @@ impl<'a> EditExpansionfileUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditImageDeleteCall<'a>
-    where  {
+pub struct EditImageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -8425,9 +8514,15 @@ pub struct EditImageDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditImageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for EditImageDeleteCall<'a, S> {}
 
-impl<'a> EditImageDeleteCall<'a> {
+impl<'a, S> EditImageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8563,7 +8658,7 @@ impl<'a> EditImageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -8573,7 +8668,7 @@ impl<'a> EditImageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -8583,7 +8678,7 @@ impl<'a> EditImageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditImageDeleteCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditImageDeleteCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -8593,7 +8688,7 @@ impl<'a> EditImageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteCall<'a> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteCall<'a, S> {
         self._image_type = new_value.to_string();
         self
     }
@@ -8603,7 +8698,7 @@ impl<'a> EditImageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_id(mut self, new_value: &str) -> EditImageDeleteCall<'a> {
+    pub fn image_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, S> {
         self._image_id = new_value.to_string();
         self
     }
@@ -8613,7 +8708,7 @@ impl<'a> EditImageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8638,7 +8733,7 @@ impl<'a> EditImageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8658,9 +8753,9 @@ impl<'a> EditImageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditImageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditImageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8692,7 +8787,7 @@ impl<'a> EditImageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8700,10 +8795,10 @@ impl<'a> EditImageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditImageDeleteallCall<'a>
-    where  {
+pub struct EditImageDeleteallCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -8713,9 +8808,15 @@ pub struct EditImageDeleteallCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditImageDeleteallCall<'a> {}
+impl<'a, S> client::CallBuilder for EditImageDeleteallCall<'a, S> {}
 
-impl<'a> EditImageDeleteallCall<'a> {
+impl<'a, S> EditImageDeleteallCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8861,7 +8962,7 @@ impl<'a> EditImageDeleteallCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteallCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageDeleteallCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -8871,7 +8972,7 @@ impl<'a> EditImageDeleteallCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteallCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteallCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -8881,7 +8982,7 @@ impl<'a> EditImageDeleteallCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditImageDeleteallCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditImageDeleteallCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -8891,7 +8992,7 @@ impl<'a> EditImageDeleteallCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteallCall<'a> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageDeleteallCall<'a, S> {
         self._image_type = new_value.to_string();
         self
     }
@@ -8901,7 +9002,7 @@ impl<'a> EditImageDeleteallCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageDeleteallCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageDeleteallCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8926,7 +9027,7 @@ impl<'a> EditImageDeleteallCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteallCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageDeleteallCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8946,9 +9047,9 @@ impl<'a> EditImageDeleteallCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditImageDeleteallCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditImageDeleteallCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8980,7 +9081,7 @@ impl<'a> EditImageDeleteallCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8988,10 +9089,10 @@ impl<'a> EditImageDeleteallCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditImageListCall<'a>
-    where  {
+pub struct EditImageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -9001,9 +9102,15 @@ pub struct EditImageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditImageListCall<'a> {}
+impl<'a, S> client::CallBuilder for EditImageListCall<'a, S> {}
 
-impl<'a> EditImageListCall<'a> {
+impl<'a, S> EditImageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9149,7 +9256,7 @@ impl<'a> EditImageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditImageListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9159,7 +9266,7 @@ impl<'a> EditImageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageListCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageListCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9169,7 +9276,7 @@ impl<'a> EditImageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditImageListCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditImageListCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -9179,7 +9286,7 @@ impl<'a> EditImageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageListCall<'a> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageListCall<'a, S> {
         self._image_type = new_value.to_string();
         self
     }
@@ -9189,7 +9296,7 @@ impl<'a> EditImageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9214,7 +9321,7 @@ impl<'a> EditImageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9234,9 +9341,9 @@ impl<'a> EditImageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditImageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditImageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9269,7 +9376,7 @@ impl<'a> EditImageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -9277,10 +9384,10 @@ impl<'a> EditImageListCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct EditImageUploadCall<'a>
-    where  {
+pub struct EditImageUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -9290,9 +9397,15 @@ pub struct EditImageUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditImageUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for EditImageUploadCall<'a, S> {}
 
-impl<'a> EditImageUploadCall<'a> {
+impl<'a, S> EditImageUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9546,7 +9659,7 @@ impl<'a> EditImageUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditImageUploadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditImageUploadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9556,7 +9669,7 @@ impl<'a> EditImageUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditImageUploadCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditImageUploadCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9566,7 +9679,7 @@ impl<'a> EditImageUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditImageUploadCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditImageUploadCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -9576,7 +9689,7 @@ impl<'a> EditImageUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> EditImageUploadCall<'a> {
+    pub fn image_type(mut self, new_value: &str) -> EditImageUploadCall<'a, S> {
         self._image_type = new_value.to_string();
         self
     }
@@ -9586,7 +9699,7 @@ impl<'a> EditImageUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditImageUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9611,7 +9724,7 @@ impl<'a> EditImageUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditImageUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditImageUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9631,9 +9744,9 @@ impl<'a> EditImageUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditImageUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditImageUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9665,7 +9778,7 @@ impl<'a> EditImageUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9673,10 +9786,10 @@ impl<'a> EditImageUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditListingDeleteCall<'a>
-    where  {
+pub struct EditListingDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -9685,9 +9798,15 @@ pub struct EditListingDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditListingDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for EditListingDeleteCall<'a, S> {}
 
-impl<'a> EditListingDeleteCall<'a> {
+impl<'a, S> EditListingDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9821,7 +9940,7 @@ impl<'a> EditListingDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -9831,7 +9950,7 @@ impl<'a> EditListingDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -9841,7 +9960,7 @@ impl<'a> EditListingDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditListingDeleteCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditListingDeleteCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -9851,7 +9970,7 @@ impl<'a> EditListingDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9876,7 +9995,7 @@ impl<'a> EditListingDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9896,9 +10015,9 @@ impl<'a> EditListingDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditListingDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditListingDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9930,7 +10049,7 @@ impl<'a> EditListingDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9938,10 +10057,10 @@ impl<'a> EditListingDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditListingDeleteallCall<'a>
-    where  {
+pub struct EditListingDeleteallCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9949,9 +10068,15 @@ pub struct EditListingDeleteallCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditListingDeleteallCall<'a> {}
+impl<'a, S> client::CallBuilder for EditListingDeleteallCall<'a, S> {}
 
-impl<'a> EditListingDeleteallCall<'a> {
+impl<'a, S> EditListingDeleteallCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10084,7 +10209,7 @@ impl<'a> EditListingDeleteallCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteallCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingDeleteallCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10094,7 +10219,7 @@ impl<'a> EditListingDeleteallCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteallCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteallCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -10104,7 +10229,7 @@ impl<'a> EditListingDeleteallCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingDeleteallCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingDeleteallCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10129,7 +10254,7 @@ impl<'a> EditListingDeleteallCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteallCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingDeleteallCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10149,9 +10274,9 @@ impl<'a> EditListingDeleteallCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditListingDeleteallCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditListingDeleteallCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10183,7 +10308,7 @@ impl<'a> EditListingDeleteallCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10191,10 +10316,10 @@ impl<'a> EditListingDeleteallCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditListingGetCall<'a>
-    where  {
+pub struct EditListingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _language: String,
@@ -10203,9 +10328,15 @@ pub struct EditListingGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditListingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditListingGetCall<'a, S> {}
 
-impl<'a> EditListingGetCall<'a> {
+impl<'a, S> EditListingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10350,7 +10481,7 @@ impl<'a> EditListingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditListingGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10360,7 +10491,7 @@ impl<'a> EditListingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -10370,7 +10501,7 @@ impl<'a> EditListingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditListingGetCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditListingGetCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -10380,7 +10511,7 @@ impl<'a> EditListingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10405,7 +10536,7 @@ impl<'a> EditListingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10425,9 +10556,9 @@ impl<'a> EditListingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditListingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditListingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10459,7 +10590,7 @@ impl<'a> EditListingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10467,10 +10598,10 @@ impl<'a> EditListingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditListingListCall<'a>
-    where  {
+pub struct EditListingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10478,9 +10609,15 @@ pub struct EditListingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditListingListCall<'a> {}
+impl<'a, S> client::CallBuilder for EditListingListCall<'a, S> {}
 
-impl<'a> EditListingListCall<'a> {
+impl<'a, S> EditListingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10624,7 +10761,7 @@ impl<'a> EditListingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditListingListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10634,7 +10771,7 @@ impl<'a> EditListingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingListCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingListCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -10644,7 +10781,7 @@ impl<'a> EditListingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10669,7 +10806,7 @@ impl<'a> EditListingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10689,9 +10826,9 @@ impl<'a> EditListingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditListingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditListingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10724,7 +10861,7 @@ impl<'a> EditListingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10737,10 +10874,10 @@ impl<'a> EditListingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditListingPatchCall<'a>
-    where  {
+pub struct EditListingPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Listing,
     _package_name: String,
     _edit_id: String,
@@ -10750,9 +10887,15 @@ pub struct EditListingPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditListingPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EditListingPatchCall<'a, S> {}
 
-impl<'a> EditListingPatchCall<'a> {
+impl<'a, S> EditListingPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10910,7 +11053,7 @@ impl<'a> EditListingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Listing) -> EditListingPatchCall<'a> {
+    pub fn request(mut self, new_value: Listing) -> EditListingPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10920,7 +11063,7 @@ impl<'a> EditListingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditListingPatchCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingPatchCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -10930,7 +11073,7 @@ impl<'a> EditListingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingPatchCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingPatchCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -10940,7 +11083,7 @@ impl<'a> EditListingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditListingPatchCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditListingPatchCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -10950,7 +11093,7 @@ impl<'a> EditListingPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10975,7 +11118,7 @@ impl<'a> EditListingPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10995,9 +11138,9 @@ impl<'a> EditListingPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditListingPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditListingPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11030,7 +11173,7 @@ impl<'a> EditListingPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11043,10 +11186,10 @@ impl<'a> EditListingPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditListingUpdateCall<'a>
-    where  {
+pub struct EditListingUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Listing,
     _package_name: String,
     _edit_id: String,
@@ -11056,9 +11199,15 @@ pub struct EditListingUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditListingUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for EditListingUpdateCall<'a, S> {}
 
-impl<'a> EditListingUpdateCall<'a> {
+impl<'a, S> EditListingUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11216,7 +11365,7 @@ impl<'a> EditListingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Listing) -> EditListingUpdateCall<'a> {
+    pub fn request(mut self, new_value: Listing) -> EditListingUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11226,7 +11375,7 @@ impl<'a> EditListingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditListingUpdateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditListingUpdateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11236,7 +11385,7 @@ impl<'a> EditListingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditListingUpdateCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditListingUpdateCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11246,7 +11395,7 @@ impl<'a> EditListingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditListingUpdateCall<'a> {
+    pub fn language(mut self, new_value: &str) -> EditListingUpdateCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -11256,7 +11405,7 @@ impl<'a> EditListingUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditListingUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11281,7 +11430,7 @@ impl<'a> EditListingUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditListingUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditListingUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11301,9 +11450,9 @@ impl<'a> EditListingUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditListingUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditListingUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11335,7 +11484,7 @@ impl<'a> EditListingUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11343,10 +11492,10 @@ impl<'a> EditListingUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTesterGetCall<'a>
-    where  {
+pub struct EditTesterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _track: String,
@@ -11355,9 +11504,15 @@ pub struct EditTesterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTesterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTesterGetCall<'a, S> {}
 
-impl<'a> EditTesterGetCall<'a> {
+impl<'a, S> EditTesterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11502,7 +11657,7 @@ impl<'a> EditTesterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTesterGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTesterGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11512,7 +11667,7 @@ impl<'a> EditTesterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTesterGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTesterGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11522,7 +11677,7 @@ impl<'a> EditTesterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditTesterGetCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditTesterGetCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -11532,7 +11687,7 @@ impl<'a> EditTesterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTesterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTesterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11557,7 +11712,7 @@ impl<'a> EditTesterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTesterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTesterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11577,9 +11732,9 @@ impl<'a> EditTesterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTesterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTesterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11612,7 +11767,7 @@ impl<'a> EditTesterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11625,10 +11780,10 @@ impl<'a> EditTesterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTesterPatchCall<'a>
-    where  {
+pub struct EditTesterPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Testers,
     _package_name: String,
     _edit_id: String,
@@ -11638,9 +11793,15 @@ pub struct EditTesterPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTesterPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTesterPatchCall<'a, S> {}
 
-impl<'a> EditTesterPatchCall<'a> {
+impl<'a, S> EditTesterPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11798,7 +11959,7 @@ impl<'a> EditTesterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Testers) -> EditTesterPatchCall<'a> {
+    pub fn request(mut self, new_value: Testers) -> EditTesterPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11808,7 +11969,7 @@ impl<'a> EditTesterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTesterPatchCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTesterPatchCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -11818,7 +11979,7 @@ impl<'a> EditTesterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTesterPatchCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTesterPatchCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -11828,7 +11989,7 @@ impl<'a> EditTesterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditTesterPatchCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditTesterPatchCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -11838,7 +11999,7 @@ impl<'a> EditTesterPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTesterPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTesterPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11863,7 +12024,7 @@ impl<'a> EditTesterPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTesterPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTesterPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11883,9 +12044,9 @@ impl<'a> EditTesterPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTesterPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTesterPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11918,7 +12079,7 @@ impl<'a> EditTesterPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11931,10 +12092,10 @@ impl<'a> EditTesterPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTesterUpdateCall<'a>
-    where  {
+pub struct EditTesterUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Testers,
     _package_name: String,
     _edit_id: String,
@@ -11944,9 +12105,15 @@ pub struct EditTesterUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTesterUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTesterUpdateCall<'a, S> {}
 
-impl<'a> EditTesterUpdateCall<'a> {
+impl<'a, S> EditTesterUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12104,7 +12271,7 @@ impl<'a> EditTesterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Testers) -> EditTesterUpdateCall<'a> {
+    pub fn request(mut self, new_value: Testers) -> EditTesterUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12114,7 +12281,7 @@ impl<'a> EditTesterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTesterUpdateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTesterUpdateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12124,7 +12291,7 @@ impl<'a> EditTesterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTesterUpdateCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTesterUpdateCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12134,7 +12301,7 @@ impl<'a> EditTesterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditTesterUpdateCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditTesterUpdateCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -12144,7 +12311,7 @@ impl<'a> EditTesterUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTesterUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTesterUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12169,7 +12336,7 @@ impl<'a> EditTesterUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTesterUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTesterUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12189,9 +12356,9 @@ impl<'a> EditTesterUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTesterUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTesterUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12223,7 +12390,7 @@ impl<'a> EditTesterUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12231,10 +12398,10 @@ impl<'a> EditTesterUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTrackGetCall<'a>
-    where  {
+pub struct EditTrackGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _track: String,
@@ -12243,9 +12410,15 @@ pub struct EditTrackGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTrackGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTrackGetCall<'a, S> {}
 
-impl<'a> EditTrackGetCall<'a> {
+impl<'a, S> EditTrackGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12390,7 +12563,7 @@ impl<'a> EditTrackGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTrackGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12400,7 +12573,7 @@ impl<'a> EditTrackGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12410,7 +12583,7 @@ impl<'a> EditTrackGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditTrackGetCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditTrackGetCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -12420,7 +12593,7 @@ impl<'a> EditTrackGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12445,7 +12618,7 @@ impl<'a> EditTrackGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12465,9 +12638,9 @@ impl<'a> EditTrackGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTrackGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTrackGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12499,7 +12672,7 @@ impl<'a> EditTrackGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12507,10 +12680,10 @@ impl<'a> EditTrackGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTrackListCall<'a>
-    where  {
+pub struct EditTrackListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12518,9 +12691,15 @@ pub struct EditTrackListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTrackListCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTrackListCall<'a, S> {}
 
-impl<'a> EditTrackListCall<'a> {
+impl<'a, S> EditTrackListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12664,7 +12843,7 @@ impl<'a> EditTrackListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTrackListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12674,7 +12853,7 @@ impl<'a> EditTrackListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackListCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackListCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12684,7 +12863,7 @@ impl<'a> EditTrackListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12709,7 +12888,7 @@ impl<'a> EditTrackListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12729,9 +12908,9 @@ impl<'a> EditTrackListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTrackListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTrackListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12764,7 +12943,7 @@ impl<'a> EditTrackListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12777,10 +12956,10 @@ impl<'a> EditTrackListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTrackPatchCall<'a>
-    where  {
+pub struct EditTrackPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Track,
     _package_name: String,
     _edit_id: String,
@@ -12790,9 +12969,15 @@ pub struct EditTrackPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTrackPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTrackPatchCall<'a, S> {}
 
-impl<'a> EditTrackPatchCall<'a> {
+impl<'a, S> EditTrackPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12950,7 +13135,7 @@ impl<'a> EditTrackPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Track) -> EditTrackPatchCall<'a> {
+    pub fn request(mut self, new_value: Track) -> EditTrackPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12960,7 +13145,7 @@ impl<'a> EditTrackPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTrackPatchCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackPatchCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -12970,7 +13155,7 @@ impl<'a> EditTrackPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackPatchCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackPatchCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -12980,7 +13165,7 @@ impl<'a> EditTrackPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditTrackPatchCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditTrackPatchCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -12990,7 +13175,7 @@ impl<'a> EditTrackPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13015,7 +13200,7 @@ impl<'a> EditTrackPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13035,9 +13220,9 @@ impl<'a> EditTrackPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTrackPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTrackPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13070,7 +13255,7 @@ impl<'a> EditTrackPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13083,10 +13268,10 @@ impl<'a> EditTrackPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditTrackUpdateCall<'a>
-    where  {
+pub struct EditTrackUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Track,
     _package_name: String,
     _edit_id: String,
@@ -13096,9 +13281,15 @@ pub struct EditTrackUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditTrackUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for EditTrackUpdateCall<'a, S> {}
 
-impl<'a> EditTrackUpdateCall<'a> {
+impl<'a, S> EditTrackUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13256,7 +13447,7 @@ impl<'a> EditTrackUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Track) -> EditTrackUpdateCall<'a> {
+    pub fn request(mut self, new_value: Track) -> EditTrackUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13266,7 +13457,7 @@ impl<'a> EditTrackUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditTrackUpdateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditTrackUpdateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13276,7 +13467,7 @@ impl<'a> EditTrackUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditTrackUpdateCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditTrackUpdateCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -13286,7 +13477,7 @@ impl<'a> EditTrackUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn track(mut self, new_value: &str) -> EditTrackUpdateCall<'a> {
+    pub fn track(mut self, new_value: &str) -> EditTrackUpdateCall<'a, S> {
         self._track = new_value.to_string();
         self
     }
@@ -13296,7 +13487,7 @@ impl<'a> EditTrackUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditTrackUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13321,7 +13512,7 @@ impl<'a> EditTrackUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditTrackUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditTrackUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13341,9 +13532,9 @@ impl<'a> EditTrackUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditTrackUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditTrackUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13375,7 +13566,7 @@ impl<'a> EditTrackUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13384,10 +13575,10 @@ impl<'a> EditTrackUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditCommitCall<'a>
-    where  {
+pub struct EditCommitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _changes_not_sent_for_review: Option<bool>,
@@ -13396,9 +13587,15 @@ pub struct EditCommitCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditCommitCall<'a> {}
+impl<'a, S> client::CallBuilder for EditCommitCall<'a, S> {}
 
-impl<'a> EditCommitCall<'a> {
+impl<'a, S> EditCommitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13545,7 +13742,7 @@ impl<'a> EditCommitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditCommitCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditCommitCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13555,14 +13752,14 @@ impl<'a> EditCommitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditCommitCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditCommitCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
     /// Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI. These changes will be added to any other changes that are not yet sent for review.
     ///
     /// Sets the *changes not sent for review* query property to the given value.
-    pub fn changes_not_sent_for_review(mut self, new_value: bool) -> EditCommitCall<'a> {
+    pub fn changes_not_sent_for_review(mut self, new_value: bool) -> EditCommitCall<'a, S> {
         self._changes_not_sent_for_review = Some(new_value);
         self
     }
@@ -13572,7 +13769,7 @@ impl<'a> EditCommitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditCommitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditCommitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13597,7 +13794,7 @@ impl<'a> EditCommitCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditCommitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditCommitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13617,9 +13814,9 @@ impl<'a> EditCommitCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditCommitCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditCommitCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13651,7 +13848,7 @@ impl<'a> EditCommitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13659,10 +13856,10 @@ impl<'a> EditCommitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditDeleteCall<'a>
-    where  {
+pub struct EditDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13670,9 +13867,15 @@ pub struct EditDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for EditDeleteCall<'a, S> {}
 
-impl<'a> EditDeleteCall<'a> {
+impl<'a, S> EditDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13805,7 +14008,7 @@ impl<'a> EditDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditDeleteCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditDeleteCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -13815,7 +14018,7 @@ impl<'a> EditDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditDeleteCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditDeleteCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -13825,7 +14028,7 @@ impl<'a> EditDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13850,7 +14053,7 @@ impl<'a> EditDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13870,9 +14073,9 @@ impl<'a> EditDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13904,7 +14107,7 @@ impl<'a> EditDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13912,10 +14115,10 @@ impl<'a> EditDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditGetCall<'a>
-    where  {
+pub struct EditGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13923,9 +14126,15 @@ pub struct EditGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EditGetCall<'a, S> {}
 
-impl<'a> EditGetCall<'a> {
+impl<'a, S> EditGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14069,7 +14278,7 @@ impl<'a> EditGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -14079,7 +14288,7 @@ impl<'a> EditGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditGetCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditGetCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -14089,7 +14298,7 @@ impl<'a> EditGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14114,7 +14323,7 @@ impl<'a> EditGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14134,9 +14343,9 @@ impl<'a> EditGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14169,7 +14378,7 @@ impl<'a> EditGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14182,10 +14391,10 @@ impl<'a> EditGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditInsertCall<'a>
-    where  {
+pub struct EditInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: AppEdit,
     _package_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14193,9 +14402,15 @@ pub struct EditInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for EditInsertCall<'a, S> {}
 
-impl<'a> EditInsertCall<'a> {
+impl<'a, S> EditInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14351,7 +14566,7 @@ impl<'a> EditInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AppEdit) -> EditInsertCall<'a> {
+    pub fn request(mut self, new_value: AppEdit) -> EditInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14361,7 +14576,7 @@ impl<'a> EditInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditInsertCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditInsertCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -14371,7 +14586,7 @@ impl<'a> EditInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14396,7 +14611,7 @@ impl<'a> EditInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14416,9 +14631,9 @@ impl<'a> EditInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14450,7 +14665,7 @@ impl<'a> EditInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14458,10 +14673,10 @@ impl<'a> EditInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EditValidateCall<'a>
-    where  {
+pub struct EditValidateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _edit_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14469,9 +14684,15 @@ pub struct EditValidateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EditValidateCall<'a> {}
+impl<'a, S> client::CallBuilder for EditValidateCall<'a, S> {}
 
-impl<'a> EditValidateCall<'a> {
+impl<'a, S> EditValidateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14615,7 +14836,7 @@ impl<'a> EditValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditValidateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> EditValidateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -14625,7 +14846,7 @@ impl<'a> EditValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditValidateCall<'a> {
+    pub fn edit_id(mut self, new_value: &str) -> EditValidateCall<'a, S> {
         self._edit_id = new_value.to_string();
         self
     }
@@ -14635,7 +14856,7 @@ impl<'a> EditValidateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditValidateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EditValidateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14660,7 +14881,7 @@ impl<'a> EditValidateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EditValidateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EditValidateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14680,9 +14901,9 @@ impl<'a> EditValidateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EditValidateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EditValidateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14717,7 +14938,7 @@ impl<'a> EditValidateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14725,10 +14946,10 @@ impl<'a> EditValidateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GeneratedapkDownloadCall<'a>
-    where  {
+pub struct GeneratedapkDownloadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _version_code: i32,
     _download_id: String,
@@ -14737,9 +14958,15 @@ pub struct GeneratedapkDownloadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GeneratedapkDownloadCall<'a> {}
+impl<'a, S> client::CallBuilder for GeneratedapkDownloadCall<'a, S> {}
 
-impl<'a> GeneratedapkDownloadCall<'a> {
+impl<'a, S> GeneratedapkDownloadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14873,7 +15100,7 @@ impl<'a> GeneratedapkDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> GeneratedapkDownloadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> GeneratedapkDownloadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -14883,7 +15110,7 @@ impl<'a> GeneratedapkDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version_code(mut self, new_value: i32) -> GeneratedapkDownloadCall<'a> {
+    pub fn version_code(mut self, new_value: i32) -> GeneratedapkDownloadCall<'a, S> {
         self._version_code = new_value;
         self
     }
@@ -14893,7 +15120,7 @@ impl<'a> GeneratedapkDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn download_id(mut self, new_value: &str) -> GeneratedapkDownloadCall<'a> {
+    pub fn download_id(mut self, new_value: &str) -> GeneratedapkDownloadCall<'a, S> {
         self._download_id = new_value.to_string();
         self
     }
@@ -14903,7 +15130,7 @@ impl<'a> GeneratedapkDownloadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GeneratedapkDownloadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GeneratedapkDownloadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14928,7 +15155,7 @@ impl<'a> GeneratedapkDownloadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GeneratedapkDownloadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GeneratedapkDownloadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14948,9 +15175,9 @@ impl<'a> GeneratedapkDownloadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GeneratedapkDownloadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GeneratedapkDownloadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14982,7 +15209,7 @@ impl<'a> GeneratedapkDownloadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14990,10 +15217,10 @@ impl<'a> GeneratedapkDownloadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GeneratedapkListCall<'a>
-    where  {
+pub struct GeneratedapkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _version_code: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15001,9 +15228,15 @@ pub struct GeneratedapkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GeneratedapkListCall<'a> {}
+impl<'a, S> client::CallBuilder for GeneratedapkListCall<'a, S> {}
 
-impl<'a> GeneratedapkListCall<'a> {
+impl<'a, S> GeneratedapkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15147,7 +15380,7 @@ impl<'a> GeneratedapkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> GeneratedapkListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> GeneratedapkListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -15157,7 +15390,7 @@ impl<'a> GeneratedapkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version_code(mut self, new_value: i32) -> GeneratedapkListCall<'a> {
+    pub fn version_code(mut self, new_value: i32) -> GeneratedapkListCall<'a, S> {
         self._version_code = new_value;
         self
     }
@@ -15167,7 +15400,7 @@ impl<'a> GeneratedapkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GeneratedapkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GeneratedapkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15192,7 +15425,7 @@ impl<'a> GeneratedapkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GeneratedapkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GeneratedapkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15212,9 +15445,9 @@ impl<'a> GeneratedapkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GeneratedapkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GeneratedapkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15247,7 +15480,7 @@ impl<'a> GeneratedapkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15260,10 +15493,10 @@ impl<'a> GeneratedapkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GrantCreateCall<'a>
-    where  {
+pub struct GrantCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Grant,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15271,9 +15504,15 @@ pub struct GrantCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GrantCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for GrantCreateCall<'a, S> {}
 
-impl<'a> GrantCreateCall<'a> {
+impl<'a, S> GrantCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15433,7 +15672,7 @@ impl<'a> GrantCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Grant) -> GrantCreateCall<'a> {
+    pub fn request(mut self, new_value: Grant) -> GrantCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15443,7 +15682,7 @@ impl<'a> GrantCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GrantCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> GrantCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -15453,7 +15692,7 @@ impl<'a> GrantCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GrantCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GrantCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15478,7 +15717,7 @@ impl<'a> GrantCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GrantCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GrantCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15498,9 +15737,9 @@ impl<'a> GrantCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GrantCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GrantCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15532,7 +15771,7 @@ impl<'a> GrantCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15540,19 +15779,25 @@ impl<'a> GrantCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GrantDeleteCall<'a>
-    where  {
+pub struct GrantDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GrantDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for GrantDeleteCall<'a, S> {}
 
-impl<'a> GrantDeleteCall<'a> {
+impl<'a, S> GrantDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15688,7 +15933,7 @@ impl<'a> GrantDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GrantDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> GrantDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15698,7 +15943,7 @@ impl<'a> GrantDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GrantDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GrantDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15723,7 +15968,7 @@ impl<'a> GrantDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GrantDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GrantDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15743,9 +15988,9 @@ impl<'a> GrantDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GrantDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GrantDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15778,7 +16023,7 @@ impl<'a> GrantDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15792,10 +16037,10 @@ impl<'a> GrantDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GrantPatchCall<'a>
-    where  {
+pub struct GrantPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Grant,
     _name: String,
     _update_mask: Option<String>,
@@ -15804,9 +16049,15 @@ pub struct GrantPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GrantPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for GrantPatchCall<'a, S> {}
 
-impl<'a> GrantPatchCall<'a> {
+impl<'a, S> GrantPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15969,7 +16220,7 @@ impl<'a> GrantPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Grant) -> GrantPatchCall<'a> {
+    pub fn request(mut self, new_value: Grant) -> GrantPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15979,14 +16230,14 @@ impl<'a> GrantPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GrantPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> GrantPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> GrantPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> GrantPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15996,7 +16247,7 @@ impl<'a> GrantPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GrantPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GrantPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16021,7 +16272,7 @@ impl<'a> GrantPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GrantPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GrantPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16041,9 +16292,9 @@ impl<'a> GrantPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GrantPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GrantPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16075,7 +16326,7 @@ impl<'a> GrantPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16083,10 +16334,10 @@ impl<'a> GrantPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InappproductDeleteCall<'a>
-    where  {
+pub struct InappproductDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _sku: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16094,9 +16345,15 @@ pub struct InappproductDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InappproductDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for InappproductDeleteCall<'a, S> {}
 
-impl<'a> InappproductDeleteCall<'a> {
+impl<'a, S> InappproductDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16229,7 +16486,7 @@ impl<'a> InappproductDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InappproductDeleteCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductDeleteCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -16239,7 +16496,7 @@ impl<'a> InappproductDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku(mut self, new_value: &str) -> InappproductDeleteCall<'a> {
+    pub fn sku(mut self, new_value: &str) -> InappproductDeleteCall<'a, S> {
         self._sku = new_value.to_string();
         self
     }
@@ -16249,7 +16506,7 @@ impl<'a> InappproductDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16274,7 +16531,7 @@ impl<'a> InappproductDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16294,9 +16551,9 @@ impl<'a> InappproductDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InappproductDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16328,7 +16585,7 @@ impl<'a> InappproductDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16336,10 +16593,10 @@ impl<'a> InappproductDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InappproductGetCall<'a>
-    where  {
+pub struct InappproductGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _sku: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16347,9 +16604,15 @@ pub struct InappproductGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InappproductGetCall<'a> {}
+impl<'a, S> client::CallBuilder for InappproductGetCall<'a, S> {}
 
-impl<'a> InappproductGetCall<'a> {
+impl<'a, S> InappproductGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16493,7 +16756,7 @@ impl<'a> InappproductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InappproductGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -16503,7 +16766,7 @@ impl<'a> InappproductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku(mut self, new_value: &str) -> InappproductGetCall<'a> {
+    pub fn sku(mut self, new_value: &str) -> InappproductGetCall<'a, S> {
         self._sku = new_value.to_string();
         self
     }
@@ -16513,7 +16776,7 @@ impl<'a> InappproductGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16538,7 +16801,7 @@ impl<'a> InappproductGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16558,9 +16821,9 @@ impl<'a> InappproductGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InappproductGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16593,7 +16856,7 @@ impl<'a> InappproductGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16607,10 +16870,10 @@ impl<'a> InappproductGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InappproductInsertCall<'a>
-    where  {
+pub struct InappproductInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: InAppProduct,
     _package_name: String,
     _auto_convert_missing_prices: Option<bool>,
@@ -16619,9 +16882,15 @@ pub struct InappproductInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InappproductInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for InappproductInsertCall<'a, S> {}
 
-impl<'a> InappproductInsertCall<'a> {
+impl<'a, S> InappproductInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16780,7 +17049,7 @@ impl<'a> InappproductInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InAppProduct) -> InappproductInsertCall<'a> {
+    pub fn request(mut self, new_value: InAppProduct) -> InappproductInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16790,14 +17059,14 @@ impl<'a> InappproductInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InappproductInsertCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductInsertCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
-    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a> {
+    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a, S> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
@@ -16807,7 +17076,7 @@ impl<'a> InappproductInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16832,7 +17101,7 @@ impl<'a> InappproductInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16852,9 +17121,9 @@ impl<'a> InappproductInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InappproductInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16886,7 +17155,7 @@ impl<'a> InappproductInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16897,10 +17166,10 @@ impl<'a> InappproductInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InappproductListCall<'a>
-    where  {
+pub struct InappproductListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _token: Option<String>,
     _start_index: Option<u32>,
@@ -16910,9 +17179,15 @@ pub struct InappproductListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InappproductListCall<'a> {}
+impl<'a, S> client::CallBuilder for InappproductListCall<'a, S> {}
 
-impl<'a> InappproductListCall<'a> {
+impl<'a, S> InappproductListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17064,28 +17339,28 @@ impl<'a> InappproductListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InappproductListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
     /// Pagination token. If empty, list starts at the first product.
     ///
     /// Sets the *token* query property to the given value.
-    pub fn token(mut self, new_value: &str) -> InappproductListCall<'a> {
+    pub fn token(mut self, new_value: &str) -> InappproductListCall<'a, S> {
         self._token = Some(new_value.to_string());
         self
     }
     /// Deprecated and ignored. Set the `token` parameter to rertieve the next page.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> InappproductListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// Deprecated and ignored. The page size is determined by the server.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> InappproductListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> InappproductListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -17095,7 +17370,7 @@ impl<'a> InappproductListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17120,7 +17395,7 @@ impl<'a> InappproductListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17140,9 +17415,9 @@ impl<'a> InappproductListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InappproductListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17175,7 +17450,7 @@ impl<'a> InappproductListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17189,10 +17464,10 @@ impl<'a> InappproductListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InappproductPatchCall<'a>
-    where  {
+pub struct InappproductPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: InAppProduct,
     _package_name: String,
     _sku: String,
@@ -17202,9 +17477,15 @@ pub struct InappproductPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InappproductPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for InappproductPatchCall<'a, S> {}
 
-impl<'a> InappproductPatchCall<'a> {
+impl<'a, S> InappproductPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17364,7 +17645,7 @@ impl<'a> InappproductPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InAppProduct) -> InappproductPatchCall<'a> {
+    pub fn request(mut self, new_value: InAppProduct) -> InappproductPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17374,7 +17655,7 @@ impl<'a> InappproductPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InappproductPatchCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductPatchCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -17384,14 +17665,14 @@ impl<'a> InappproductPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku(mut self, new_value: &str) -> InappproductPatchCall<'a> {
+    pub fn sku(mut self, new_value: &str) -> InappproductPatchCall<'a, S> {
         self._sku = new_value.to_string();
         self
     }
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
-    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a> {
+    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a, S> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
@@ -17401,7 +17682,7 @@ impl<'a> InappproductPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17426,7 +17707,7 @@ impl<'a> InappproductPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17446,9 +17727,9 @@ impl<'a> InappproductPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InappproductPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17481,7 +17762,7 @@ impl<'a> InappproductPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17496,10 +17777,10 @@ impl<'a> InappproductPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InappproductUpdateCall<'a>
-    where  {
+pub struct InappproductUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: InAppProduct,
     _package_name: String,
     _sku: String,
@@ -17510,9 +17791,15 @@ pub struct InappproductUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InappproductUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for InappproductUpdateCall<'a, S> {}
 
-impl<'a> InappproductUpdateCall<'a> {
+impl<'a, S> InappproductUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17675,7 +17962,7 @@ impl<'a> InappproductUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InAppProduct) -> InappproductUpdateCall<'a> {
+    pub fn request(mut self, new_value: InAppProduct) -> InappproductUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17685,7 +17972,7 @@ impl<'a> InappproductUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InappproductUpdateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InappproductUpdateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -17695,21 +17982,21 @@ impl<'a> InappproductUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a> {
+    pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a, S> {
         self._sku = new_value.to_string();
         self
     }
     /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     ///
     /// Sets the *auto convert missing prices* query property to the given value.
-    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a> {
+    pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a, S> {
         self._auto_convert_missing_prices = Some(new_value);
         self
     }
     /// If set to true, and the in-app product with the given package_name and sku doesn't exist, the in-app product will be created.
     ///
     /// Sets the *allow missing* query property to the given value.
-    pub fn allow_missing(mut self, new_value: bool) -> InappproductUpdateCall<'a> {
+    pub fn allow_missing(mut self, new_value: bool) -> InappproductUpdateCall<'a, S> {
         self._allow_missing = Some(new_value);
         self
     }
@@ -17719,7 +18006,7 @@ impl<'a> InappproductUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InappproductUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17744,7 +18031,7 @@ impl<'a> InappproductUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InappproductUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17764,9 +18051,9 @@ impl<'a> InappproductUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InappproductUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17799,7 +18086,7 @@ impl<'a> InappproductUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -17807,19 +18094,25 @@ impl<'a> InappproductUpdateCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct InternalappsharingartifactUploadapkCall<'a>
-    where  {
+pub struct InternalappsharingartifactUploadapkCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InternalappsharingartifactUploadapkCall<'a> {}
+impl<'a, S> client::CallBuilder for InternalappsharingartifactUploadapkCall<'a, S> {}
 
-impl<'a> InternalappsharingartifactUploadapkCall<'a> {
+impl<'a, S> InternalappsharingartifactUploadapkCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18070,7 +18363,7 @@ impl<'a> InternalappsharingartifactUploadapkCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InternalappsharingartifactUploadapkCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InternalappsharingartifactUploadapkCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -18080,7 +18373,7 @@ impl<'a> InternalappsharingartifactUploadapkCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InternalappsharingartifactUploadapkCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InternalappsharingartifactUploadapkCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18105,7 +18398,7 @@ impl<'a> InternalappsharingartifactUploadapkCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadapkCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadapkCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18125,9 +18418,9 @@ impl<'a> InternalappsharingartifactUploadapkCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InternalappsharingartifactUploadapkCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InternalappsharingartifactUploadapkCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18160,7 +18453,7 @@ impl<'a> InternalappsharingartifactUploadapkCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -18168,19 +18461,25 @@ impl<'a> InternalappsharingartifactUploadapkCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct InternalappsharingartifactUploadbundleCall<'a>
-    where  {
+pub struct InternalappsharingartifactUploadbundleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InternalappsharingartifactUploadbundleCall<'a> {}
+impl<'a, S> client::CallBuilder for InternalappsharingartifactUploadbundleCall<'a, S> {}
 
-impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
+impl<'a, S> InternalappsharingartifactUploadbundleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18431,7 +18730,7 @@ impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> InternalappsharingartifactUploadbundleCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> InternalappsharingartifactUploadbundleCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -18441,7 +18740,7 @@ impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InternalappsharingartifactUploadbundleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InternalappsharingartifactUploadbundleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18466,7 +18765,7 @@ impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadbundleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InternalappsharingartifactUploadbundleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18486,9 +18785,9 @@ impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InternalappsharingartifactUploadbundleCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InternalappsharingartifactUploadbundleCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18521,7 +18820,7 @@ impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18534,10 +18833,10 @@ impl<'a> InternalappsharingartifactUploadbundleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MonetizationConvertRegionPriceCall<'a>
-    where  {
+pub struct MonetizationConvertRegionPriceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: ConvertRegionPricesRequest,
     _package_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18545,9 +18844,15 @@ pub struct MonetizationConvertRegionPriceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MonetizationConvertRegionPriceCall<'a> {}
+impl<'a, S> client::CallBuilder for MonetizationConvertRegionPriceCall<'a, S> {}
 
-impl<'a> MonetizationConvertRegionPriceCall<'a> {
+impl<'a, S> MonetizationConvertRegionPriceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18703,7 +19008,7 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ConvertRegionPricesRequest) -> MonetizationConvertRegionPriceCall<'a> {
+    pub fn request(mut self, new_value: ConvertRegionPricesRequest) -> MonetizationConvertRegionPriceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18713,7 +19018,7 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> MonetizationConvertRegionPriceCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> MonetizationConvertRegionPriceCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -18723,7 +19028,7 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationConvertRegionPriceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonetizationConvertRegionPriceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18748,7 +19053,7 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MonetizationConvertRegionPriceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MonetizationConvertRegionPriceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18768,9 +19073,9 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MonetizationConvertRegionPriceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MonetizationConvertRegionPriceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18802,7 +19107,7 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18811,10 +19116,10 @@ impl<'a> MonetizationConvertRegionPriceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRefundCall<'a>
-    where  {
+pub struct OrderRefundCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _order_id: String,
     _revoke: Option<bool>,
@@ -18823,9 +19128,15 @@ pub struct OrderRefundCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderRefundCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderRefundCall<'a, S> {}
 
-impl<'a> OrderRefundCall<'a> {
+impl<'a, S> OrderRefundCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18961,7 +19272,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> OrderRefundCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> OrderRefundCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -18971,14 +19282,14 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
     /// Whether to revoke the purchased item. If set to true, access to the subscription or in-app item will be terminated immediately. If the item is a recurring subscription, all future payments will also be terminated. Consumed in-app items need to be handled by developer's app. (optional).
     ///
     /// Sets the *revoke* query property to the given value.
-    pub fn revoke(mut self, new_value: bool) -> OrderRefundCall<'a> {
+    pub fn revoke(mut self, new_value: bool) -> OrderRefundCall<'a, S> {
         self._revoke = Some(new_value);
         self
     }
@@ -18988,7 +19299,7 @@ impl<'a> OrderRefundCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19013,7 +19324,7 @@ impl<'a> OrderRefundCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19033,9 +19344,9 @@ impl<'a> OrderRefundCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRefundCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderRefundCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19068,7 +19379,7 @@ impl<'a> OrderRefundCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19081,10 +19392,10 @@ impl<'a> OrderRefundCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseProductAcknowledgeCall<'a>
-    where  {
+pub struct PurchaseProductAcknowledgeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: ProductPurchasesAcknowledgeRequest,
     _package_name: String,
     _product_id: String,
@@ -19094,9 +19405,15 @@ pub struct PurchaseProductAcknowledgeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseProductAcknowledgeCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseProductAcknowledgeCall<'a, S> {}
 
-impl<'a> PurchaseProductAcknowledgeCall<'a> {
+impl<'a, S> PurchaseProductAcknowledgeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19243,7 +19560,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ProductPurchasesAcknowledgeRequest) -> PurchaseProductAcknowledgeCall<'a> {
+    pub fn request(mut self, new_value: ProductPurchasesAcknowledgeRequest) -> PurchaseProductAcknowledgeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19253,7 +19570,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseProductAcknowledgeCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseProductAcknowledgeCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -19263,7 +19580,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> PurchaseProductAcknowledgeCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> PurchaseProductAcknowledgeCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -19273,7 +19590,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseProductAcknowledgeCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseProductAcknowledgeCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -19283,7 +19600,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseProductAcknowledgeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseProductAcknowledgeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19308,7 +19625,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductAcknowledgeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductAcknowledgeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19328,9 +19645,9 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseProductAcknowledgeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseProductAcknowledgeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19362,7 +19679,7 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19370,10 +19687,10 @@ impl<'a> PurchaseProductAcknowledgeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseProductGetCall<'a>
-    where  {
+pub struct PurchaseProductGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _product_id: String,
     _token: String,
@@ -19382,9 +19699,15 @@ pub struct PurchaseProductGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseProductGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseProductGetCall<'a, S> {}
 
-impl<'a> PurchaseProductGetCall<'a> {
+impl<'a, S> PurchaseProductGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19529,7 +19852,7 @@ impl<'a> PurchaseProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseProductGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseProductGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -19539,7 +19862,7 @@ impl<'a> PurchaseProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> PurchaseProductGetCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> PurchaseProductGetCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -19549,7 +19872,7 @@ impl<'a> PurchaseProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseProductGetCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseProductGetCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -19559,7 +19882,7 @@ impl<'a> PurchaseProductGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseProductGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseProductGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19584,7 +19907,7 @@ impl<'a> PurchaseProductGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseProductGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19604,9 +19927,9 @@ impl<'a> PurchaseProductGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseProductGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseProductGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19639,7 +19962,7 @@ impl<'a> PurchaseProductGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19652,10 +19975,10 @@ impl<'a> PurchaseProductGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseSubscriptionAcknowledgeCall<'a>
-    where  {
+pub struct PurchaseSubscriptionAcknowledgeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: SubscriptionPurchasesAcknowledgeRequest,
     _package_name: String,
     _subscription_id: String,
@@ -19665,9 +19988,15 @@ pub struct PurchaseSubscriptionAcknowledgeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseSubscriptionAcknowledgeCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionAcknowledgeCall<'a, S> {}
 
-impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
+impl<'a, S> PurchaseSubscriptionAcknowledgeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19814,7 +20143,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SubscriptionPurchasesAcknowledgeRequest) -> PurchaseSubscriptionAcknowledgeCall<'a> {
+    pub fn request(mut self, new_value: SubscriptionPurchasesAcknowledgeRequest) -> PurchaseSubscriptionAcknowledgeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19824,7 +20153,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionAcknowledgeCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionAcknowledgeCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -19834,7 +20163,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionAcknowledgeCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionAcknowledgeCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -19844,7 +20173,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionAcknowledgeCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionAcknowledgeCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -19854,7 +20183,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionAcknowledgeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionAcknowledgeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19879,7 +20208,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionAcknowledgeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionAcknowledgeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19899,9 +20228,9 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseSubscriptionAcknowledgeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseSubscriptionAcknowledgeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19933,7 +20262,7 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19941,10 +20270,10 @@ impl<'a> PurchaseSubscriptionAcknowledgeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseSubscriptionCancelCall<'a>
-    where  {
+pub struct PurchaseSubscriptionCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -19953,9 +20282,15 @@ pub struct PurchaseSubscriptionCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseSubscriptionCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionCancelCall<'a, S> {}
 
-impl<'a> PurchaseSubscriptionCancelCall<'a> {
+impl<'a, S> PurchaseSubscriptionCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20089,7 +20424,7 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -20099,7 +20434,7 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -20109,7 +20444,7 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -20119,7 +20454,7 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20144,7 +20479,7 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20164,9 +20499,9 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseSubscriptionCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseSubscriptionCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20199,7 +20534,7 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20212,10 +20547,10 @@ impl<'a> PurchaseSubscriptionCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseSubscriptionDeferCall<'a>
-    where  {
+pub struct PurchaseSubscriptionDeferCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: SubscriptionPurchasesDeferRequest,
     _package_name: String,
     _subscription_id: String,
@@ -20225,9 +20560,15 @@ pub struct PurchaseSubscriptionDeferCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseSubscriptionDeferCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionDeferCall<'a, S> {}
 
-impl<'a> PurchaseSubscriptionDeferCall<'a> {
+impl<'a, S> PurchaseSubscriptionDeferCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20385,7 +20726,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SubscriptionPurchasesDeferRequest) -> PurchaseSubscriptionDeferCall<'a> {
+    pub fn request(mut self, new_value: SubscriptionPurchasesDeferRequest) -> PurchaseSubscriptionDeferCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20395,7 +20736,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -20405,7 +20746,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -20415,7 +20756,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -20425,7 +20766,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionDeferCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionDeferCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20450,7 +20791,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionDeferCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionDeferCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20470,9 +20811,9 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseSubscriptionDeferCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseSubscriptionDeferCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20504,7 +20845,7 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20512,10 +20853,10 @@ impl<'a> PurchaseSubscriptionDeferCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseSubscriptionGetCall<'a>
-    where  {
+pub struct PurchaseSubscriptionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -20524,9 +20865,15 @@ pub struct PurchaseSubscriptionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseSubscriptionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionGetCall<'a, S> {}
 
-impl<'a> PurchaseSubscriptionGetCall<'a> {
+impl<'a, S> PurchaseSubscriptionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20671,7 +21018,7 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -20681,7 +21028,7 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -20691,7 +21038,7 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -20701,7 +21048,7 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20726,7 +21073,7 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20746,9 +21093,9 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseSubscriptionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseSubscriptionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20780,7 +21127,7 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20788,10 +21135,10 @@ impl<'a> PurchaseSubscriptionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseSubscriptionRefundCall<'a>
-    where  {
+pub struct PurchaseSubscriptionRefundCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -20800,9 +21147,15 @@ pub struct PurchaseSubscriptionRefundCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseSubscriptionRefundCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionRefundCall<'a, S> {}
 
-impl<'a> PurchaseSubscriptionRefundCall<'a> {
+impl<'a, S> PurchaseSubscriptionRefundCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20936,7 +21289,7 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -20946,7 +21299,7 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -20956,7 +21309,7 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -20966,7 +21319,7 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionRefundCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionRefundCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20991,7 +21344,7 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRefundCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRefundCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21011,9 +21364,9 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseSubscriptionRefundCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseSubscriptionRefundCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21045,7 +21398,7 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21053,10 +21406,10 @@ impl<'a> PurchaseSubscriptionRefundCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseSubscriptionRevokeCall<'a>
-    where  {
+pub struct PurchaseSubscriptionRevokeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _subscription_id: String,
     _token: String,
@@ -21065,9 +21418,15 @@ pub struct PurchaseSubscriptionRevokeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseSubscriptionRevokeCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseSubscriptionRevokeCall<'a, S> {}
 
-impl<'a> PurchaseSubscriptionRevokeCall<'a> {
+impl<'a, S> PurchaseSubscriptionRevokeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21201,7 +21560,7 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -21211,7 +21570,7 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -21221,7 +21580,7 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -21231,7 +21590,7 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionRevokeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseSubscriptionRevokeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21256,7 +21615,7 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRevokeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseSubscriptionRevokeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21276,9 +21635,9 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseSubscriptionRevokeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseSubscriptionRevokeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21310,7 +21669,7 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21324,10 +21683,10 @@ impl<'a> PurchaseSubscriptionRevokeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PurchaseVoidedpurchaseListCall<'a>
-    where  {
+pub struct PurchaseVoidedpurchaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _type_: Option<i32>,
     _token: Option<String>,
@@ -21340,9 +21699,15 @@ pub struct PurchaseVoidedpurchaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PurchaseVoidedpurchaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for PurchaseVoidedpurchaseListCall<'a, S> {}
 
-impl<'a> PurchaseVoidedpurchaseListCall<'a> {
+impl<'a, S> PurchaseVoidedpurchaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21503,49 +21868,49 @@ impl<'a> PurchaseVoidedpurchaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
     /// The type of voided purchases that you want to see in the response. Possible values are: 0. Only voided in-app product purchases will be returned in the response. This is the default value. 1. Both voided in-app purchases and voided subscription purchases will be returned in the response. Note: Before requesting to receive voided subscription purchases, you must switch to use orderId in the response which uniquely identifies one-time purchases and subscriptions. Otherwise, you will receive multiple subscription orders with the same PurchaseToken, because subscription renewal orders share the same PurchaseToken.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: i32) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn type_(mut self, new_value: i32) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._type_ = Some(new_value);
         self
     }
     /// Defines the token of the page to return, usually taken from TokenPagination. This can only be used if token paging is enabled.
     ///
     /// Sets the *token* query property to the given value.
-    pub fn token(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn token(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._token = Some(new_value.to_string());
         self
     }
     /// The time, in milliseconds since the Epoch, of the oldest voided purchase that you want to see in the response. The value of this parameter cannot be older than 30 days and is ignored if a pagination token is set. Default value is current time minus 30 days. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn start_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._start_time = Some(new_value.to_string());
         self
     }
     /// Defines the index of the first element to return. This can only be used if indexed paging is enabled.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// Defines how many results the list operation should return. The default number depends on the resource collection.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The time, in milliseconds since the Epoch, of the newest voided purchase that you want to see in the response. The value of this parameter cannot be greater than the current time and is ignored if a pagination token is set. Default value is current time. Note: This filter is applied on the time at which the record is seen as voided by our systems and not the actual voided time returned in the response.
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn end_time(mut self, new_value: &str) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -21555,7 +21920,7 @@ impl<'a> PurchaseVoidedpurchaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseVoidedpurchaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PurchaseVoidedpurchaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21580,7 +21945,7 @@ impl<'a> PurchaseVoidedpurchaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PurchaseVoidedpurchaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PurchaseVoidedpurchaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21600,9 +21965,9 @@ impl<'a> PurchaseVoidedpurchaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PurchaseVoidedpurchaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PurchaseVoidedpurchaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21634,7 +21999,7 @@ impl<'a> PurchaseVoidedpurchaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21643,10 +22008,10 @@ impl<'a> PurchaseVoidedpurchaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReviewGetCall<'a>
-    where  {
+pub struct ReviewGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _review_id: String,
     _translation_language: Option<String>,
@@ -21655,9 +22020,15 @@ pub struct ReviewGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReviewGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ReviewGetCall<'a, S> {}
 
-impl<'a> ReviewGetCall<'a> {
+impl<'a, S> ReviewGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21804,7 +22175,7 @@ impl<'a> ReviewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> ReviewGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> ReviewGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -21814,14 +22185,14 @@ impl<'a> ReviewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn review_id(mut self, new_value: &str) -> ReviewGetCall<'a> {
+    pub fn review_id(mut self, new_value: &str) -> ReviewGetCall<'a, S> {
         self._review_id = new_value.to_string();
         self
     }
     /// Language localization code.
     ///
     /// Sets the *translation language* query property to the given value.
-    pub fn translation_language(mut self, new_value: &str) -> ReviewGetCall<'a> {
+    pub fn translation_language(mut self, new_value: &str) -> ReviewGetCall<'a, S> {
         self._translation_language = Some(new_value.to_string());
         self
     }
@@ -21831,7 +22202,7 @@ impl<'a> ReviewGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReviewGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReviewGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21856,7 +22227,7 @@ impl<'a> ReviewGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ReviewGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReviewGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21876,9 +22247,9 @@ impl<'a> ReviewGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReviewGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReviewGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21910,7 +22281,7 @@ impl<'a> ReviewGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21922,10 +22293,10 @@ impl<'a> ReviewGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReviewListCall<'a>
-    where  {
+pub struct ReviewListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _translation_language: Option<String>,
     _token: Option<String>,
@@ -21936,9 +22307,15 @@ pub struct ReviewListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReviewListCall<'a> {}
+impl<'a, S> client::CallBuilder for ReviewListCall<'a, S> {}
 
-impl<'a> ReviewListCall<'a> {
+impl<'a, S> ReviewListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22093,35 +22470,35 @@ impl<'a> ReviewListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> ReviewListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> ReviewListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
     /// Language localization code.
     ///
     /// Sets the *translation language* query property to the given value.
-    pub fn translation_language(mut self, new_value: &str) -> ReviewListCall<'a> {
+    pub fn translation_language(mut self, new_value: &str) -> ReviewListCall<'a, S> {
         self._translation_language = Some(new_value.to_string());
         self
     }
     /// Pagination token. If empty, list starts at the first review.
     ///
     /// Sets the *token* query property to the given value.
-    pub fn token(mut self, new_value: &str) -> ReviewListCall<'a> {
+    pub fn token(mut self, new_value: &str) -> ReviewListCall<'a, S> {
         self._token = Some(new_value.to_string());
         self
     }
     /// The index of the first element to return.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> ReviewListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> ReviewListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// How many results the list operation should return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ReviewListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ReviewListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -22131,7 +22508,7 @@ impl<'a> ReviewListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReviewListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReviewListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22156,7 +22533,7 @@ impl<'a> ReviewListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ReviewListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReviewListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22176,9 +22553,9 @@ impl<'a> ReviewListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReviewListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReviewListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22211,7 +22588,7 @@ impl<'a> ReviewListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22224,10 +22601,10 @@ impl<'a> ReviewListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReviewReplyCall<'a>
-    where  {
+pub struct ReviewReplyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: ReviewsReplyRequest,
     _package_name: String,
     _review_id: String,
@@ -22236,9 +22613,15 @@ pub struct ReviewReplyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReviewReplyCall<'a> {}
+impl<'a, S> client::CallBuilder for ReviewReplyCall<'a, S> {}
 
-impl<'a> ReviewReplyCall<'a> {
+impl<'a, S> ReviewReplyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22395,7 +22778,7 @@ impl<'a> ReviewReplyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReviewsReplyRequest) -> ReviewReplyCall<'a> {
+    pub fn request(mut self, new_value: ReviewsReplyRequest) -> ReviewReplyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22405,7 +22788,7 @@ impl<'a> ReviewReplyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> ReviewReplyCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> ReviewReplyCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -22415,7 +22798,7 @@ impl<'a> ReviewReplyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn review_id(mut self, new_value: &str) -> ReviewReplyCall<'a> {
+    pub fn review_id(mut self, new_value: &str) -> ReviewReplyCall<'a, S> {
         self._review_id = new_value.to_string();
         self
     }
@@ -22425,7 +22808,7 @@ impl<'a> ReviewReplyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReviewReplyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReviewReplyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22450,7 +22833,7 @@ impl<'a> ReviewReplyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ReviewReplyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReviewReplyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22470,9 +22853,9 @@ impl<'a> ReviewReplyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReviewReplyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReviewReplyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22505,7 +22888,7 @@ impl<'a> ReviewReplyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22518,10 +22901,10 @@ impl<'a> ReviewReplyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SystemapkVariantCreateCall<'a>
-    where  {
+pub struct SystemapkVariantCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: Variant,
     _package_name: String,
     _version_code: String,
@@ -22530,9 +22913,15 @@ pub struct SystemapkVariantCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SystemapkVariantCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SystemapkVariantCreateCall<'a, S> {}
 
-impl<'a> SystemapkVariantCreateCall<'a> {
+impl<'a, S> SystemapkVariantCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22689,7 +23078,7 @@ impl<'a> SystemapkVariantCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Variant) -> SystemapkVariantCreateCall<'a> {
+    pub fn request(mut self, new_value: Variant) -> SystemapkVariantCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22699,7 +23088,7 @@ impl<'a> SystemapkVariantCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantCreateCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantCreateCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -22709,7 +23098,7 @@ impl<'a> SystemapkVariantCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantCreateCall<'a> {
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantCreateCall<'a, S> {
         self._version_code = new_value.to_string();
         self
     }
@@ -22719,7 +23108,7 @@ impl<'a> SystemapkVariantCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22744,7 +23133,7 @@ impl<'a> SystemapkVariantCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22764,9 +23153,9 @@ impl<'a> SystemapkVariantCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SystemapkVariantCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22801,7 +23190,7 @@ impl<'a> SystemapkVariantCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22809,10 +23198,10 @@ impl<'a> SystemapkVariantCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SystemapkVariantDownloadCall<'a>
-    where  {
+pub struct SystemapkVariantDownloadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _version_code: String,
     _variant_id: u32,
@@ -22821,9 +23210,15 @@ pub struct SystemapkVariantDownloadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SystemapkVariantDownloadCall<'a> {}
+impl<'a, S> client::CallBuilder for SystemapkVariantDownloadCall<'a, S> {}
 
-impl<'a> SystemapkVariantDownloadCall<'a> {
+impl<'a, S> SystemapkVariantDownloadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22957,7 +23352,7 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantDownloadCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantDownloadCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -22967,7 +23362,7 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantDownloadCall<'a> {
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantDownloadCall<'a, S> {
         self._version_code = new_value.to_string();
         self
     }
@@ -22977,7 +23372,7 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variant_id(mut self, new_value: u32) -> SystemapkVariantDownloadCall<'a> {
+    pub fn variant_id(mut self, new_value: u32) -> SystemapkVariantDownloadCall<'a, S> {
         self._variant_id = new_value;
         self
     }
@@ -22987,7 +23382,7 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantDownloadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantDownloadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23012,7 +23407,7 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantDownloadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantDownloadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23032,9 +23427,9 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantDownloadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SystemapkVariantDownloadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23066,7 +23461,7 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23074,10 +23469,10 @@ impl<'a> SystemapkVariantDownloadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SystemapkVariantGetCall<'a>
-    where  {
+pub struct SystemapkVariantGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _version_code: String,
     _variant_id: u32,
@@ -23086,9 +23481,15 @@ pub struct SystemapkVariantGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SystemapkVariantGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SystemapkVariantGetCall<'a, S> {}
 
-impl<'a> SystemapkVariantGetCall<'a> {
+impl<'a, S> SystemapkVariantGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23233,7 +23634,7 @@ impl<'a> SystemapkVariantGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantGetCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantGetCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -23243,7 +23644,7 @@ impl<'a> SystemapkVariantGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantGetCall<'a> {
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantGetCall<'a, S> {
         self._version_code = new_value.to_string();
         self
     }
@@ -23253,7 +23654,7 @@ impl<'a> SystemapkVariantGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variant_id(mut self, new_value: u32) -> SystemapkVariantGetCall<'a> {
+    pub fn variant_id(mut self, new_value: u32) -> SystemapkVariantGetCall<'a, S> {
         self._variant_id = new_value;
         self
     }
@@ -23263,7 +23664,7 @@ impl<'a> SystemapkVariantGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23288,7 +23689,7 @@ impl<'a> SystemapkVariantGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23308,9 +23709,9 @@ impl<'a> SystemapkVariantGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SystemapkVariantGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23342,7 +23743,7 @@ impl<'a> SystemapkVariantGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23350,10 +23751,10 @@ impl<'a> SystemapkVariantGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SystemapkVariantListCall<'a>
-    where  {
+pub struct SystemapkVariantListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _package_name: String,
     _version_code: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23361,9 +23762,15 @@ pub struct SystemapkVariantListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SystemapkVariantListCall<'a> {}
+impl<'a, S> client::CallBuilder for SystemapkVariantListCall<'a, S> {}
 
-impl<'a> SystemapkVariantListCall<'a> {
+impl<'a, S> SystemapkVariantListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23507,7 +23914,7 @@ impl<'a> SystemapkVariantListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantListCall<'a> {
+    pub fn package_name(mut self, new_value: &str) -> SystemapkVariantListCall<'a, S> {
         self._package_name = new_value.to_string();
         self
     }
@@ -23517,7 +23924,7 @@ impl<'a> SystemapkVariantListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantListCall<'a> {
+    pub fn version_code(mut self, new_value: &str) -> SystemapkVariantListCall<'a, S> {
         self._version_code = new_value.to_string();
         self
     }
@@ -23527,7 +23934,7 @@ impl<'a> SystemapkVariantListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SystemapkVariantListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23552,7 +23959,7 @@ impl<'a> SystemapkVariantListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SystemapkVariantListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23572,9 +23979,9 @@ impl<'a> SystemapkVariantListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SystemapkVariantListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SystemapkVariantListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23607,7 +24014,7 @@ impl<'a> SystemapkVariantListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23620,10 +24027,10 @@ impl<'a> SystemapkVariantListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserCreateCall<'a>
-    where  {
+pub struct UserCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: User,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23631,9 +24038,15 @@ pub struct UserCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserCreateCall<'a, S> {}
 
-impl<'a> UserCreateCall<'a> {
+impl<'a, S> UserCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23793,7 +24206,7 @@ impl<'a> UserCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: User) -> UserCreateCall<'a> {
+    pub fn request(mut self, new_value: User) -> UserCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23803,7 +24216,7 @@ impl<'a> UserCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> UserCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> UserCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -23813,7 +24226,7 @@ impl<'a> UserCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23838,7 +24251,7 @@ impl<'a> UserCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23858,9 +24271,9 @@ impl<'a> UserCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23892,7 +24305,7 @@ impl<'a> UserCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23900,19 +24313,25 @@ impl<'a> UserCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDeleteCall<'a>
-    where  {
+pub struct UserDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDeleteCall<'a, S> {}
 
-impl<'a> UserDeleteCall<'a> {
+impl<'a, S> UserDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24048,7 +24467,7 @@ impl<'a> UserDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> UserDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -24058,7 +24477,7 @@ impl<'a> UserDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24083,7 +24502,7 @@ impl<'a> UserDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24103,9 +24522,9 @@ impl<'a> UserDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24137,7 +24556,7 @@ impl<'a> UserDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24147,10 +24566,10 @@ impl<'a> UserDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserListCall<'a>
-    where  {
+pub struct UserListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -24159,9 +24578,15 @@ pub struct UserListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserListCall<'a, S> {}
 
-impl<'a> UserListCall<'a> {
+impl<'a, S> UserListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24314,21 +24739,21 @@ impl<'a> UserListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> UserListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> UserListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token received from a previous call to this method, in order to retrieve further results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. This must be set to -1 to disable pagination.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> UserListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> UserListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -24338,7 +24763,7 @@ impl<'a> UserListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24363,7 +24788,7 @@ impl<'a> UserListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24383,9 +24808,9 @@ impl<'a> UserListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24418,7 +24843,7 @@ impl<'a> UserListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24432,10 +24857,10 @@ impl<'a> UserListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserPatchCall<'a>
-    where  {
+pub struct UserPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AndroidPublisher<>,
+    hub: &'a AndroidPublisher<S>,
     _request: User,
     _name: String,
     _update_mask: Option<String>,
@@ -24444,9 +24869,15 @@ pub struct UserPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for UserPatchCall<'a, S> {}
 
-impl<'a> UserPatchCall<'a> {
+impl<'a, S> UserPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24609,7 +25040,7 @@ impl<'a> UserPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: User) -> UserPatchCall<'a> {
+    pub fn request(mut self, new_value: User) -> UserPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24619,14 +25050,14 @@ impl<'a> UserPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> UserPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> UserPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> UserPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -24636,7 +25067,7 @@ impl<'a> UserPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24661,7 +25092,7 @@ impl<'a> UserPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24681,9 +25112,9 @@ impl<'a> UserPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

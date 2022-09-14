@@ -1,15 +1,15 @@
 # DO NOT EDIT !
-# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
 # DO NOT EDIT !
 [package]
 
 name = "google-clouderrorreporting1_beta1"
-version = "3.1.0+20220302"
+version = "4.0.1+20220302"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Clouderrorreporting (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/clouderrorreporting1_beta1"
 homepage = "https://cloud.google.com/error-reporting/"
-documentation = "https://docs.rs/google-clouderrorreporting1_beta1/3.1.0+20220302"
+documentation = "https://docs.rs/google-clouderrorreporting1_beta1/4.0.1+20220302"
 license = "MIT"
 keywords = ["clouderrorreporting", "google", "protocol", "web", "api"]
 autobins = false
@@ -22,9 +22,12 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 6.6"
+yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
 hyper = "^ 0.14"
+http = "^0.2"
+tokio = "^1.0"
+tower-service = "^0.3.1"
 url = "= 1.7"
 
 

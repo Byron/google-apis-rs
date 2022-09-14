@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -82,34 +87,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PaymentsResellerSubscription<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PaymentsResellerSubscription<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PaymentsResellerSubscription<> {}
+impl<'a, S> client::Hub for PaymentsResellerSubscription<S> {}
 
-impl<'a, > PaymentsResellerSubscription<> {
+impl<'a, S> PaymentsResellerSubscription<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PaymentsResellerSubscription<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PaymentsResellerSubscription<S> {
         PaymentsResellerSubscription {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://paymentsresellersubscription.googleapis.com/".to_string(),
             _root_url: "https://paymentsresellersubscription.googleapis.com/".to_string(),
         }
     }
 
-    pub fn partners(&'a self) -> PartnerMethods<'a> {
+    pub fn partners(&'a self) -> PartnerMethods<'a, S> {
         PartnerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -599,22 +604,22 @@ impl client::Part for GoogleTypeLocalizedText {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `products_list(...)`, `promotions_list(...)`, `subscriptions_cancel(...)`, `subscriptions_create(...)`, `subscriptions_entitle(...)`, `subscriptions_extend(...)`, `subscriptions_get(...)`, `subscriptions_provision(...)` and `subscriptions_undo_cancel(...)`
 /// // to build up your call.
 /// let rb = hub.partners();
 /// # }
 /// ```
-pub struct PartnerMethods<'a>
-    where  {
+pub struct PartnerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
 }
 
-impl<'a> client::MethodsBuilder for PartnerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PartnerMethods<'a, S> {}
 
-impl<'a> PartnerMethods<'a> {
+impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -623,7 +628,7 @@ impl<'a> PartnerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent, the partner that can resell. Format: partners/{partner}
-    pub fn products_list(&self, parent: &str) -> PartnerProductListCall<'a> {
+    pub fn products_list(&self, parent: &str) -> PartnerProductListCall<'a, S> {
         PartnerProductListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -641,7 +646,7 @@ impl<'a> PartnerMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent, the partner that can resell. Format: partners/{partner}
-    pub fn promotions_list(&self, parent: &str) -> PartnerPromotionListCall<'a> {
+    pub fn promotions_list(&self, parent: &str) -> PartnerPromotionListCall<'a, S> {
         PartnerPromotionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -661,7 +666,7 @@ impl<'a> PartnerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the subscription resource to be cancelled. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}"
-    pub fn subscriptions_cancel(&self, request: GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest, name: &str) -> PartnerSubscriptionCancelCall<'a> {
+    pub fn subscriptions_cancel(&self, request: GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest, name: &str) -> PartnerSubscriptionCancelCall<'a, S> {
         PartnerSubscriptionCancelCall {
             hub: self.hub,
             _request: request,
@@ -679,7 +684,7 @@ impl<'a> PartnerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, which is the identifier of the partner. It will have the format of "partners/{partner_id}".
-    pub fn subscriptions_create(&self, request: GoogleCloudPaymentsResellerSubscriptionV1Subscription, parent: &str) -> PartnerSubscriptionCreateCall<'a> {
+    pub fn subscriptions_create(&self, request: GoogleCloudPaymentsResellerSubscriptionV1Subscription, parent: &str) -> PartnerSubscriptionCreateCall<'a, S> {
         PartnerSubscriptionCreateCall {
             hub: self.hub,
             _request: request,
@@ -698,7 +703,7 @@ impl<'a> PartnerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the subscription resource that is entitled to the current end user. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}"
-    pub fn subscriptions_entitle(&self, request: GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest, name: &str) -> PartnerSubscriptionEntitleCall<'a> {
+    pub fn subscriptions_entitle(&self, request: GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest, name: &str) -> PartnerSubscriptionEntitleCall<'a, S> {
         PartnerSubscriptionEntitleCall {
             hub: self.hub,
             _request: request,
@@ -716,7 +721,7 @@ impl<'a> PartnerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the subscription resource to be extended. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}".
-    pub fn subscriptions_extend(&self, request: GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest, name: &str) -> PartnerSubscriptionExtendCall<'a> {
+    pub fn subscriptions_extend(&self, request: GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest, name: &str) -> PartnerSubscriptionExtendCall<'a, S> {
         PartnerSubscriptionExtendCall {
             hub: self.hub,
             _request: request,
@@ -733,7 +738,7 @@ impl<'a> PartnerMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the subscription resource to retrieve. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}"
-    pub fn subscriptions_get(&self, name: &str) -> PartnerSubscriptionGetCall<'a> {
+    pub fn subscriptions_get(&self, name: &str) -> PartnerSubscriptionGetCall<'a, S> {
         PartnerSubscriptionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -750,7 +755,7 @@ impl<'a> PartnerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, which is the identifier of the partner. It will have the format of "partners/{partner_id}".
-    pub fn subscriptions_provision(&self, request: GoogleCloudPaymentsResellerSubscriptionV1Subscription, parent: &str) -> PartnerSubscriptionProvisionCall<'a> {
+    pub fn subscriptions_provision(&self, request: GoogleCloudPaymentsResellerSubscriptionV1Subscription, parent: &str) -> PartnerSubscriptionProvisionCall<'a, S> {
         PartnerSubscriptionProvisionCall {
             hub: self.hub,
             _request: request,
@@ -769,7 +774,7 @@ impl<'a> PartnerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the subscription resource whose pending cancellation needs to be undone. It will have the format of "partners/{partner_id}/subscriptions/{subscription_id}"
-    pub fn subscriptions_undo_cancel(&self, request: GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest, name: &str) -> PartnerSubscriptionUndoCancelCall<'a> {
+    pub fn subscriptions_undo_cancel(&self, request: GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest, name: &str) -> PartnerSubscriptionUndoCancelCall<'a, S> {
         PartnerSubscriptionUndoCancelCall {
             hub: self.hub,
             _request: request,
@@ -810,7 +815,7 @@ impl<'a> PartnerMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -820,10 +825,10 @@ impl<'a> PartnerMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerProductListCall<'a>
-    where  {
+pub struct PartnerProductListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -831,9 +836,15 @@ pub struct PartnerProductListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerProductListCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerProductListCall<'a, S> {}
 
-impl<'a> PartnerProductListCall<'a> {
+impl<'a, S> PartnerProductListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -980,21 +991,21 @@ impl<'a> PartnerProductListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerProductListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PartnerProductListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListProducts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProducts` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerProductListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerProductListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of products to return. The service may return fewer than this value. If unspecified, at most 50 products will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerProductListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerProductListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1004,7 +1015,7 @@ impl<'a> PartnerProductListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerProductListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerProductListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1029,7 +1040,7 @@ impl<'a> PartnerProductListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerProductListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerProductListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1060,7 +1071,7 @@ impl<'a> PartnerProductListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1071,10 +1082,10 @@ impl<'a> PartnerProductListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerPromotionListCall<'a>
-    where  {
+pub struct PartnerPromotionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1083,9 +1094,15 @@ pub struct PartnerPromotionListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerPromotionListCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerPromotionListCall<'a, S> {}
 
-impl<'a> PartnerPromotionListCall<'a> {
+impl<'a, S> PartnerPromotionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1235,28 +1252,28 @@ impl<'a> PartnerPromotionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerPromotionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PartnerPromotionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListPromotions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListPromotions` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerPromotionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerPromotionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of promotions to return. The service may return fewer than this value. If unspecified, at most 50 products will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerPromotionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerPromotionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the filters for the promotion results. The syntax defined in the EBNF grammar: https://google.aip.dev/assets/misc/ebnf-filtering.txt. Examples: - applicable_products: "sku1" - region_codes: "US" - applicable_products: "sku1" AND region_codes: "US"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PartnerPromotionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> PartnerPromotionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1266,7 +1283,7 @@ impl<'a> PartnerPromotionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerPromotionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerPromotionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1291,7 +1308,7 @@ impl<'a> PartnerPromotionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerPromotionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerPromotionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1323,7 +1340,7 @@ impl<'a> PartnerPromotionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1336,19 +1353,25 @@ impl<'a> PartnerPromotionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionCancelCall<'a>
-    where  {
+pub struct PartnerSubscriptionCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _request: GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionCancelCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionCancelCall<'a> {
+impl<'a, S> PartnerSubscriptionCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1502,7 +1525,7 @@ impl<'a> PartnerSubscriptionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest) -> PartnerSubscriptionCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest) -> PartnerSubscriptionCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1512,7 +1535,7 @@ impl<'a> PartnerSubscriptionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1522,7 +1545,7 @@ impl<'a> PartnerSubscriptionCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1547,7 +1570,7 @@ impl<'a> PartnerSubscriptionCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1579,7 +1602,7 @@ impl<'a> PartnerSubscriptionCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1593,10 +1616,10 @@ impl<'a> PartnerSubscriptionCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionCreateCall<'a>
-    where  {
+pub struct PartnerSubscriptionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _request: GoogleCloudPaymentsResellerSubscriptionV1Subscription,
     _parent: String,
     _subscription_id: Option<String>,
@@ -1604,9 +1627,15 @@ pub struct PartnerSubscriptionCreateCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionCreateCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionCreateCall<'a> {
+impl<'a, S> PartnerSubscriptionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1763,7 +1792,7 @@ impl<'a> PartnerSubscriptionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1Subscription) -> PartnerSubscriptionCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1Subscription) -> PartnerSubscriptionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1773,14 +1802,14 @@ impl<'a> PartnerSubscriptionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerSubscriptionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PartnerSubscriptionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Identifies the subscription resource on the Partner side. The value is restricted to 63 ASCII characters at the maximum. If a subscription was previously created with the same subscription_id, we will directly return that one.
     ///
     /// Sets the *subscription id* query property to the given value.
-    pub fn subscription_id(mut self, new_value: &str) -> PartnerSubscriptionCreateCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PartnerSubscriptionCreateCall<'a, S> {
         self._subscription_id = Some(new_value.to_string());
         self
     }
@@ -1790,7 +1819,7 @@ impl<'a> PartnerSubscriptionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1815,7 +1844,7 @@ impl<'a> PartnerSubscriptionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1847,7 +1876,7 @@ impl<'a> PartnerSubscriptionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1860,19 +1889,25 @@ impl<'a> PartnerSubscriptionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionEntitleCall<'a>
-    where  {
+pub struct PartnerSubscriptionEntitleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _request: GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionEntitleCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionEntitleCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionEntitleCall<'a> {
+impl<'a, S> PartnerSubscriptionEntitleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2026,7 +2061,7 @@ impl<'a> PartnerSubscriptionEntitleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest) -> PartnerSubscriptionEntitleCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest) -> PartnerSubscriptionEntitleCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2036,7 +2071,7 @@ impl<'a> PartnerSubscriptionEntitleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionEntitleCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionEntitleCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2046,7 +2081,7 @@ impl<'a> PartnerSubscriptionEntitleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionEntitleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionEntitleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2071,7 +2106,7 @@ impl<'a> PartnerSubscriptionEntitleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionEntitleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionEntitleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2103,7 +2138,7 @@ impl<'a> PartnerSubscriptionEntitleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2116,19 +2151,25 @@ impl<'a> PartnerSubscriptionEntitleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionExtendCall<'a>
-    where  {
+pub struct PartnerSubscriptionExtendCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _request: GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionExtendCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionExtendCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionExtendCall<'a> {
+impl<'a, S> PartnerSubscriptionExtendCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2282,7 +2323,7 @@ impl<'a> PartnerSubscriptionExtendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest) -> PartnerSubscriptionExtendCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest) -> PartnerSubscriptionExtendCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2292,7 +2333,7 @@ impl<'a> PartnerSubscriptionExtendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionExtendCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionExtendCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2302,7 +2343,7 @@ impl<'a> PartnerSubscriptionExtendCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionExtendCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionExtendCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2327,7 +2368,7 @@ impl<'a> PartnerSubscriptionExtendCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionExtendCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionExtendCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2358,7 +2399,7 @@ impl<'a> PartnerSubscriptionExtendCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2366,18 +2407,24 @@ impl<'a> PartnerSubscriptionExtendCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionGetCall<'a>
-    where  {
+pub struct PartnerSubscriptionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionGetCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionGetCall<'a> {
+impl<'a, S> PartnerSubscriptionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2518,7 +2565,7 @@ impl<'a> PartnerSubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2528,7 +2575,7 @@ impl<'a> PartnerSubscriptionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2553,7 +2600,7 @@ impl<'a> PartnerSubscriptionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2585,7 +2632,7 @@ impl<'a> PartnerSubscriptionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2599,10 +2646,10 @@ impl<'a> PartnerSubscriptionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionProvisionCall<'a>
-    where  {
+pub struct PartnerSubscriptionProvisionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _request: GoogleCloudPaymentsResellerSubscriptionV1Subscription,
     _parent: String,
     _subscription_id: Option<String>,
@@ -2610,9 +2657,15 @@ pub struct PartnerSubscriptionProvisionCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionProvisionCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionProvisionCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionProvisionCall<'a> {
+impl<'a, S> PartnerSubscriptionProvisionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2769,7 +2822,7 @@ impl<'a> PartnerSubscriptionProvisionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1Subscription) -> PartnerSubscriptionProvisionCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1Subscription) -> PartnerSubscriptionProvisionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2779,14 +2832,14 @@ impl<'a> PartnerSubscriptionProvisionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerSubscriptionProvisionCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PartnerSubscriptionProvisionCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Identifies the subscription resource on the Partner side. The value is restricted to 63 ASCII characters at the maximum. If a subscription was previously created with the same subscription_id, we will directly return that one.
     ///
     /// Sets the *subscription id* query property to the given value.
-    pub fn subscription_id(mut self, new_value: &str) -> PartnerSubscriptionProvisionCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> PartnerSubscriptionProvisionCall<'a, S> {
         self._subscription_id = Some(new_value.to_string());
         self
     }
@@ -2796,7 +2849,7 @@ impl<'a> PartnerSubscriptionProvisionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionProvisionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionProvisionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2821,7 +2874,7 @@ impl<'a> PartnerSubscriptionProvisionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionProvisionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionProvisionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2853,7 +2906,7 @@ impl<'a> PartnerSubscriptionProvisionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2866,19 +2919,25 @@ impl<'a> PartnerSubscriptionProvisionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerSubscriptionUndoCancelCall<'a>
-    where  {
+pub struct PartnerSubscriptionUndoCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PaymentsResellerSubscription<>,
+    hub: &'a PaymentsResellerSubscription<S>,
     _request: GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PartnerSubscriptionUndoCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for PartnerSubscriptionUndoCancelCall<'a, S> {}
 
-impl<'a> PartnerSubscriptionUndoCancelCall<'a> {
+impl<'a, S> PartnerSubscriptionUndoCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3032,7 +3091,7 @@ impl<'a> PartnerSubscriptionUndoCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest) -> PartnerSubscriptionUndoCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest) -> PartnerSubscriptionUndoCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3042,7 +3101,7 @@ impl<'a> PartnerSubscriptionUndoCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionUndoCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PartnerSubscriptionUndoCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3052,7 +3111,7 @@ impl<'a> PartnerSubscriptionUndoCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionUndoCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerSubscriptionUndoCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3077,7 +3136,7 @@ impl<'a> PartnerSubscriptionUndoCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionUndoCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerSubscriptionUndoCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

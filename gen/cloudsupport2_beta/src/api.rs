@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -100,43 +105,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudSupport<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudSupport<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudSupport<> {}
+impl<'a, S> client::Hub for CloudSupport<S> {}
 
-impl<'a, > CloudSupport<> {
+impl<'a, S> CloudSupport<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudSupport<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudSupport<S> {
         CloudSupport {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudsupport.googleapis.com/".to_string(),
             _root_url: "https://cloudsupport.googleapis.com/".to_string(),
         }
     }
 
-    pub fn attachments(&'a self) -> AttachmentMethods<'a> {
+    pub fn attachments(&'a self) -> AttachmentMethods<'a, S> {
         AttachmentMethods { hub: &self }
     }
-    pub fn case_classifications(&'a self) -> CaseClassificationMethods<'a> {
+    pub fn case_classifications(&'a self) -> CaseClassificationMethods<'a, S> {
         CaseClassificationMethods { hub: &self }
     }
-    pub fn cases(&'a self) -> CaseMethods<'a> {
+    pub fn cases(&'a self) -> CaseMethods<'a, S> {
         CaseMethods { hub: &self }
     }
-    pub fn media(&'a self) -> MediaMethods<'a> {
+    pub fn media(&'a self) -> MediaMethods<'a, S> {
         MediaMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -847,22 +852,22 @@ impl client::ResponseResult for SearchCasesResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`
 /// // to build up your call.
 /// let rb = hub.attachments();
 /// # }
 /// ```
-pub struct AttachmentMethods<'a>
-    where  {
+pub struct AttachmentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
 }
 
-impl<'a> client::MethodsBuilder for AttachmentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AttachmentMethods<'a, S> {}
 
-impl<'a> AttachmentMethods<'a> {
+impl<'a, S> AttachmentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -872,7 +877,7 @@ impl<'a> AttachmentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the case to which attachment should be attached.
-    pub fn create(&self, request: CreateAttachmentRequest, parent: &str) -> AttachmentCreateCall<'a> {
+    pub fn create(&self, request: CreateAttachmentRequest, parent: &str) -> AttachmentCreateCall<'a, S> {
         AttachmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -907,27 +912,27 @@ impl<'a> AttachmentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
 /// let rb = hub.case_classifications();
 /// # }
 /// ```
-pub struct CaseClassificationMethods<'a>
-    where  {
+pub struct CaseClassificationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
 }
 
-impl<'a> client::MethodsBuilder for CaseClassificationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CaseClassificationMethods<'a, S> {}
 
-impl<'a> CaseClassificationMethods<'a> {
+impl<'a, S> CaseClassificationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieve valid classifications to be used when creating a support case. The classications are hierarchical, with each classification containing all levels of the hierarchy, separated by " > ". For example "Technical Issue > Compute > Compute Engine".
-    pub fn search(&self) -> CaseClassificationSearchCall<'a> {
+    pub fn search(&self) -> CaseClassificationSearchCall<'a, S> {
         CaseClassificationSearchCall {
             hub: self.hub,
             _query: Default::default(),
@@ -963,22 +968,22 @@ impl<'a> CaseClassificationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `attachments_list(...)`, `close(...)`, `comments_create(...)`, `comments_list(...)`, `create(...)`, `escalate(...)`, `get(...)`, `list(...)`, `patch(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.cases();
 /// # }
 /// ```
-pub struct CaseMethods<'a>
-    where  {
+pub struct CaseMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
 }
 
-impl<'a> client::MethodsBuilder for CaseMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CaseMethods<'a, S> {}
 
-impl<'a> CaseMethods<'a> {
+impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -987,7 +992,7 @@ impl<'a> CaseMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of Case object for which attachments should be listed.
-    pub fn attachments_list(&self, parent: &str) -> CaseAttachmentListCall<'a> {
+    pub fn attachments_list(&self, parent: &str) -> CaseAttachmentListCall<'a, S> {
         CaseAttachmentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1007,7 +1012,7 @@ impl<'a> CaseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of Case to which this comment should be added.
-    pub fn comments_create(&self, request: Comment, parent: &str) -> CaseCommentCreateCall<'a> {
+    pub fn comments_create(&self, request: Comment, parent: &str) -> CaseCommentCreateCall<'a, S> {
         CaseCommentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1025,7 +1030,7 @@ impl<'a> CaseMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of Case object for which comments should be listed.
-    pub fn comments_list(&self, parent: &str) -> CaseCommentListCall<'a> {
+    pub fn comments_list(&self, parent: &str) -> CaseCommentListCall<'a, S> {
         CaseCommentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1045,7 +1050,7 @@ impl<'a> CaseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The fully qualified name of the case resource to be closed.
-    pub fn close(&self, request: CloseCaseRequest, name: &str) -> CaseCloseCall<'a> {
+    pub fn close(&self, request: CloseCaseRequest, name: &str) -> CaseCloseCall<'a, S> {
         CaseCloseCall {
             hub: self.hub,
             _request: request,
@@ -1064,7 +1069,7 @@ impl<'a> CaseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the Cloud resource under which the case should be created.
-    pub fn create(&self, request: Case, parent: &str) -> CaseCreateCall<'a> {
+    pub fn create(&self, request: Case, parent: &str) -> CaseCreateCall<'a, S> {
         CaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1083,7 +1088,7 @@ impl<'a> CaseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The fully qualified name of the Case resource to be escalated.
-    pub fn escalate(&self, request: EscalateCaseRequest, name: &str) -> CaseEscalateCall<'a> {
+    pub fn escalate(&self, request: EscalateCaseRequest, name: &str) -> CaseEscalateCall<'a, S> {
         CaseEscalateCall {
             hub: self.hub,
             _request: request,
@@ -1101,7 +1106,7 @@ impl<'a> CaseMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully qualified name of a case to be retrieved.
-    pub fn get(&self, name: &str) -> CaseGetCall<'a> {
+    pub fn get(&self, name: &str) -> CaseGetCall<'a, S> {
         CaseGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1118,7 +1123,7 @@ impl<'a> CaseMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The fully qualified name of parent resource to list cases under.
-    pub fn list(&self, parent: &str) -> CaseListCall<'a> {
+    pub fn list(&self, parent: &str) -> CaseListCall<'a, S> {
         CaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1139,7 +1144,7 @@ impl<'a> CaseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name for the case.
-    pub fn patch(&self, request: Case, name: &str) -> CasePatchCall<'a> {
+    pub fn patch(&self, request: Case, name: &str) -> CasePatchCall<'a, S> {
         CasePatchCall {
             hub: self.hub,
             _request: request,
@@ -1154,7 +1159,7 @@ impl<'a> CaseMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Search cases using the specified query.
-    pub fn search(&self) -> CaseSearchCall<'a> {
+    pub fn search(&self) -> CaseSearchCall<'a, S> {
         CaseSearchCall {
             hub: self.hub,
             _query: Default::default(),
@@ -1190,22 +1195,22 @@ impl<'a> CaseMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `download(...)` and `upload(...)`
 /// // to build up your call.
 /// let rb = hub.media();
 /// # }
 /// ```
-pub struct MediaMethods<'a>
-    where  {
+pub struct MediaMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
 }
 
-impl<'a> client::MethodsBuilder for MediaMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MediaMethods<'a, S> {}
 
-impl<'a> MediaMethods<'a> {
+impl<'a, S> MediaMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1214,7 +1219,7 @@ impl<'a> MediaMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the attachment to be downloaded.
-    pub fn download(&self, name: &str) -> MediaDownloadCall<'a> {
+    pub fn download(&self, name: &str) -> MediaDownloadCall<'a, S> {
         MediaDownloadCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1232,7 +1237,7 @@ impl<'a> MediaMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the case to which attachment should be attached.
-    pub fn upload(&self, request: CreateAttachmentRequest, parent: &str) -> MediaUploadCall<'a> {
+    pub fn upload(&self, request: CreateAttachmentRequest, parent: &str) -> MediaUploadCall<'a, S> {
         MediaUploadCall {
             hub: self.hub,
             _request: request,
@@ -1275,7 +1280,7 @@ impl<'a> MediaMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1288,10 +1293,10 @@ impl<'a> MediaMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AttachmentCreateCall<'a>
-    where  {
+pub struct AttachmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: CreateAttachmentRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1299,9 +1304,15 @@ pub struct AttachmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AttachmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AttachmentCreateCall<'a, S> {}
 
-impl<'a> AttachmentCreateCall<'a> {
+impl<'a, S> AttachmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1461,7 +1472,7 @@ impl<'a> AttachmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAttachmentRequest) -> AttachmentCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateAttachmentRequest) -> AttachmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1471,7 +1482,7 @@ impl<'a> AttachmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AttachmentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AttachmentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1481,7 +1492,7 @@ impl<'a> AttachmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AttachmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AttachmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1506,7 +1517,7 @@ impl<'a> AttachmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AttachmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AttachmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1526,9 +1537,9 @@ impl<'a> AttachmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AttachmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AttachmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1560,7 +1571,7 @@ impl<'a> AttachmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1571,10 +1582,10 @@ impl<'a> AttachmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseClassificationSearchCall<'a>
-    where  {
+pub struct CaseClassificationSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1583,9 +1594,15 @@ pub struct CaseClassificationSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseClassificationSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseClassificationSearchCall<'a, S> {}
 
-impl<'a> CaseClassificationSearchCall<'a> {
+impl<'a, S> CaseClassificationSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1712,21 +1729,21 @@ impl<'a> CaseClassificationSearchCall<'a> {
     /// An expression written in the Cloud filter language. If non-empty, then only cases whose fields match the filter are returned. If empty, then no messages are filtered out.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> CaseClassificationSearchCall<'a> {
+    pub fn query(mut self, new_value: &str) -> CaseClassificationSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CaseClassificationSearchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CaseClassificationSearchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of cases fetched with each request.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CaseClassificationSearchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CaseClassificationSearchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1736,7 +1753,7 @@ impl<'a> CaseClassificationSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseClassificationSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseClassificationSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1761,7 +1778,7 @@ impl<'a> CaseClassificationSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseClassificationSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseClassificationSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1781,9 +1798,9 @@ impl<'a> CaseClassificationSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseClassificationSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseClassificationSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1815,7 +1832,7 @@ impl<'a> CaseClassificationSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1825,10 +1842,10 @@ impl<'a> CaseClassificationSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseAttachmentListCall<'a>
-    where  {
+pub struct CaseAttachmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1837,9 +1854,15 @@ pub struct CaseAttachmentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseAttachmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseAttachmentListCall<'a, S> {}
 
-impl<'a> CaseAttachmentListCall<'a> {
+impl<'a, S> CaseAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1992,21 +2015,21 @@ impl<'a> CaseAttachmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CaseAttachmentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CaseAttachmentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CaseAttachmentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CaseAttachmentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of attachments fetched with each request. If not provided, the default is 10. The maximum page size that will be returned is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CaseAttachmentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CaseAttachmentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2016,7 +2039,7 @@ impl<'a> CaseAttachmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseAttachmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseAttachmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2041,7 +2064,7 @@ impl<'a> CaseAttachmentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseAttachmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseAttachmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2061,9 +2084,9 @@ impl<'a> CaseAttachmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseAttachmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseAttachmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2096,7 +2119,7 @@ impl<'a> CaseAttachmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2109,10 +2132,10 @@ impl<'a> CaseAttachmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseCommentCreateCall<'a>
-    where  {
+pub struct CaseCommentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: Comment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2120,9 +2143,15 @@ pub struct CaseCommentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseCommentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseCommentCreateCall<'a, S> {}
 
-impl<'a> CaseCommentCreateCall<'a> {
+impl<'a, S> CaseCommentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2282,7 +2311,7 @@ impl<'a> CaseCommentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CaseCommentCreateCall<'a> {
+    pub fn request(mut self, new_value: Comment) -> CaseCommentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2292,7 +2321,7 @@ impl<'a> CaseCommentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CaseCommentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CaseCommentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2302,7 +2331,7 @@ impl<'a> CaseCommentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCommentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCommentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2327,7 +2356,7 @@ impl<'a> CaseCommentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseCommentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseCommentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2347,9 +2376,9 @@ impl<'a> CaseCommentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseCommentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseCommentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2381,7 +2410,7 @@ impl<'a> CaseCommentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2391,10 +2420,10 @@ impl<'a> CaseCommentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseCommentListCall<'a>
-    where  {
+pub struct CaseCommentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2403,9 +2432,15 @@ pub struct CaseCommentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseCommentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseCommentListCall<'a, S> {}
 
-impl<'a> CaseCommentListCall<'a> {
+impl<'a, S> CaseCommentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2558,21 +2593,21 @@ impl<'a> CaseCommentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CaseCommentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CaseCommentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CaseCommentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CaseCommentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of comments fetched with each request. Defaults to 10.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CaseCommentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CaseCommentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2582,7 +2617,7 @@ impl<'a> CaseCommentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCommentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCommentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2607,7 +2642,7 @@ impl<'a> CaseCommentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseCommentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseCommentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2627,9 +2662,9 @@ impl<'a> CaseCommentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseCommentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseCommentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2662,7 +2697,7 @@ impl<'a> CaseCommentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2675,10 +2710,10 @@ impl<'a> CaseCommentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseCloseCall<'a>
-    where  {
+pub struct CaseCloseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: CloseCaseRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2686,9 +2721,15 @@ pub struct CaseCloseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseCloseCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseCloseCall<'a, S> {}
 
-impl<'a> CaseCloseCall<'a> {
+impl<'a, S> CaseCloseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2848,7 +2889,7 @@ impl<'a> CaseCloseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloseCaseRequest) -> CaseCloseCall<'a> {
+    pub fn request(mut self, new_value: CloseCaseRequest) -> CaseCloseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2858,7 +2899,7 @@ impl<'a> CaseCloseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CaseCloseCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CaseCloseCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2868,7 +2909,7 @@ impl<'a> CaseCloseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCloseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCloseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2893,7 +2934,7 @@ impl<'a> CaseCloseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseCloseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseCloseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2913,9 +2954,9 @@ impl<'a> CaseCloseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseCloseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseCloseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2948,7 +2989,7 @@ impl<'a> CaseCloseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2961,10 +3002,10 @@ impl<'a> CaseCloseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseCreateCall<'a>
-    where  {
+pub struct CaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: Case,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2972,9 +3013,15 @@ pub struct CaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseCreateCall<'a, S> {}
 
-impl<'a> CaseCreateCall<'a> {
+impl<'a, S> CaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3134,7 +3181,7 @@ impl<'a> CaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Case) -> CaseCreateCall<'a> {
+    pub fn request(mut self, new_value: Case) -> CaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3144,7 +3191,7 @@ impl<'a> CaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CaseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CaseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3154,7 +3201,7 @@ impl<'a> CaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3179,7 +3226,7 @@ impl<'a> CaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3199,9 +3246,9 @@ impl<'a> CaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3234,7 +3281,7 @@ impl<'a> CaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3247,10 +3294,10 @@ impl<'a> CaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseEscalateCall<'a>
-    where  {
+pub struct CaseEscalateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: EscalateCaseRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3258,9 +3305,15 @@ pub struct CaseEscalateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseEscalateCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseEscalateCall<'a, S> {}
 
-impl<'a> CaseEscalateCall<'a> {
+impl<'a, S> CaseEscalateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3420,7 +3473,7 @@ impl<'a> CaseEscalateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EscalateCaseRequest) -> CaseEscalateCall<'a> {
+    pub fn request(mut self, new_value: EscalateCaseRequest) -> CaseEscalateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3430,7 +3483,7 @@ impl<'a> CaseEscalateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CaseEscalateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CaseEscalateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3440,7 +3493,7 @@ impl<'a> CaseEscalateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseEscalateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseEscalateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3465,7 +3518,7 @@ impl<'a> CaseEscalateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseEscalateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseEscalateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3485,9 +3538,9 @@ impl<'a> CaseEscalateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseEscalateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseEscalateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3519,7 +3572,7 @@ impl<'a> CaseEscalateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3527,19 +3580,25 @@ impl<'a> CaseEscalateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseGetCall<'a>
-    where  {
+pub struct CaseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseGetCall<'a, S> {}
 
-impl<'a> CaseGetCall<'a> {
+impl<'a, S> CaseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3686,7 +3745,7 @@ impl<'a> CaseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CaseGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CaseGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3696,7 +3755,7 @@ impl<'a> CaseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3721,7 +3780,7 @@ impl<'a> CaseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3741,9 +3800,9 @@ impl<'a> CaseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3775,7 +3834,7 @@ impl<'a> CaseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3786,10 +3845,10 @@ impl<'a> CaseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseListCall<'a>
-    where  {
+pub struct CaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3799,9 +3858,15 @@ pub struct CaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseListCall<'a, S> {}
 
-impl<'a> CaseListCall<'a> {
+impl<'a, S> CaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3957,28 +4022,28 @@ impl<'a> CaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> CaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of cases fetched with each request. Defaults to 10.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An expression written in the Cloud filter language. If non-empty, then only cases whose fields match the filter are returned. If empty, then no messages are filtered out. Filter strings can use the following fields: - state (Accepted values: OPEN or CLOSED) - severity (Accepted values: S0, S1, S2, S3, or S4) - creator.email with the operators equals (=) and AND. Additionally, a global restriction (with no operator) can be used to search across displayName, description, and comments (e.g. "my search").
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CaseListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> CaseListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3988,7 +4053,7 @@ impl<'a> CaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4013,7 +4078,7 @@ impl<'a> CaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4033,9 +4098,9 @@ impl<'a> CaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4068,7 +4133,7 @@ impl<'a> CaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4082,10 +4147,10 @@ impl<'a> CaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CasePatchCall<'a>
-    where  {
+pub struct CasePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: Case,
     _name: String,
     _update_mask: Option<String>,
@@ -4094,9 +4159,15 @@ pub struct CasePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CasePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CasePatchCall<'a, S> {}
 
-impl<'a> CasePatchCall<'a> {
+impl<'a, S> CasePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4259,7 +4330,7 @@ impl<'a> CasePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Case) -> CasePatchCall<'a> {
+    pub fn request(mut self, new_value: Case) -> CasePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4269,14 +4340,14 @@ impl<'a> CasePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CasePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CasePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A field that represents attributes of a case object that should be updated as part of this request. Supported values are severity, display_name, and subscriber_email_addresses. If no fields are specified, all supported fields will be updated. WARNING: If you do not provide a field mask then you may accidentally clear some fields. For example, if you leave field mask empty and do not provide a value for subscriber_email_addresses then subscriber_email_addresses will be updated to empty.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CasePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CasePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4286,7 +4357,7 @@ impl<'a> CasePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CasePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CasePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4311,7 +4382,7 @@ impl<'a> CasePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CasePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CasePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4331,9 +4402,9 @@ impl<'a> CasePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CasePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CasePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4365,7 +4436,7 @@ impl<'a> CasePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4376,10 +4447,10 @@ impl<'a> CasePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaseSearchCall<'a>
-    where  {
+pub struct CaseSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4388,9 +4459,15 @@ pub struct CaseSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CaseSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for CaseSearchCall<'a, S> {}
 
-impl<'a> CaseSearchCall<'a> {
+impl<'a, S> CaseSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4517,21 +4594,21 @@ impl<'a> CaseSearchCall<'a> {
     /// An expression written in the Cloud filter language. Filter strings can use the following fields: - organization (A name of the form organizations/) - project (A name of the form projects/) - customer (A name of the form customers/) - state (Accepted values: OPEN or CLOSED) - severity (Accepted values: S0, S1, S2, S3, or S4) - creator.email with the operators equals (=) and AND. Additionally, a global restriction (with no key/operator) can be used to search across display_name, description, and comments (e.g. "my search"). One of organization, project, or customer field must be specified.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> CaseSearchCall<'a> {
+    pub fn query(mut self, new_value: &str) -> CaseSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CaseSearchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CaseSearchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of cases fetched with each request. The default page size is 10.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CaseSearchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CaseSearchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4541,7 +4618,7 @@ impl<'a> CaseSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaseSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4566,7 +4643,7 @@ impl<'a> CaseSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaseSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CaseSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4586,9 +4663,9 @@ impl<'a> CaseSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaseSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CaseSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4625,7 +4702,7 @@ impl<'a> CaseSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4633,19 +4710,25 @@ impl<'a> CaseSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaDownloadCall<'a>
-    where  {
+pub struct MediaDownloadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaDownloadCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaDownloadCall<'a, S> {}
 
-impl<'a> MediaDownloadCall<'a> {
+impl<'a, S> MediaDownloadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4808,7 +4891,7 @@ impl<'a> MediaDownloadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> MediaDownloadCall<'a> {
+    pub fn name(mut self, new_value: &str) -> MediaDownloadCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4818,7 +4901,7 @@ impl<'a> MediaDownloadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4843,7 +4926,7 @@ impl<'a> MediaDownloadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4863,9 +4946,9 @@ impl<'a> MediaDownloadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaDownloadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaDownloadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4899,7 +4982,7 @@ impl<'a> MediaDownloadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4912,10 +4995,10 @@ impl<'a> MediaDownloadCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct MediaUploadCall<'a>
-    where  {
+pub struct MediaUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudSupport<>,
+    hub: &'a CloudSupport<S>,
     _request: CreateAttachmentRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4923,9 +5006,15 @@ pub struct MediaUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaUploadCall<'a, S> {}
 
-impl<'a> MediaUploadCall<'a> {
+impl<'a, S> MediaUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5117,7 +5206,7 @@ impl<'a> MediaUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAttachmentRequest) -> MediaUploadCall<'a> {
+    pub fn request(mut self, new_value: CreateAttachmentRequest) -> MediaUploadCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5127,7 +5216,7 @@ impl<'a> MediaUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> MediaUploadCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> MediaUploadCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5137,7 +5226,7 @@ impl<'a> MediaUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5162,7 +5251,7 @@ impl<'a> MediaUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5182,9 +5271,9 @@ impl<'a> MediaUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

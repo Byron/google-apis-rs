@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -95,7 +100,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -128,55 +133,55 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Bigquery<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Bigquery<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Bigquery<> {}
+impl<'a, S> client::Hub for Bigquery<S> {}
 
-impl<'a, > Bigquery<> {
+impl<'a, S> Bigquery<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Bigquery<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Bigquery<S> {
         Bigquery {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://bigquery.googleapis.com/bigquery/v2/".to_string(),
             _root_url: "https://bigquery.googleapis.com/".to_string(),
         }
     }
 
-    pub fn datasets(&'a self) -> DatasetMethods<'a> {
+    pub fn datasets(&'a self) -> DatasetMethods<'a, S> {
         DatasetMethods { hub: &self }
     }
-    pub fn jobs(&'a self) -> JobMethods<'a> {
+    pub fn jobs(&'a self) -> JobMethods<'a, S> {
         JobMethods { hub: &self }
     }
-    pub fn models(&'a self) -> ModelMethods<'a> {
+    pub fn models(&'a self) -> ModelMethods<'a, S> {
         ModelMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn routines(&'a self) -> RoutineMethods<'a> {
+    pub fn routines(&'a self) -> RoutineMethods<'a, S> {
         RoutineMethods { hub: &self }
     }
-    pub fn row_access_policies(&'a self) -> RowAccessPolicyMethods<'a> {
+    pub fn row_access_policies(&'a self) -> RowAccessPolicyMethods<'a, S> {
         RowAccessPolicyMethods { hub: &self }
     }
-    pub fn tabledata(&'a self) -> TabledataMethods<'a> {
+    pub fn tabledata(&'a self) -> TabledataMethods<'a, S> {
         TabledataMethods { hub: &self }
     }
-    pub fn tables(&'a self) -> TableMethods<'a> {
+    pub fn tables(&'a self) -> TableMethods<'a, S> {
         TableMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3990,22 +3995,22 @@ impl client::Part for TableListTablesView {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.datasets();
 /// # }
 /// ```
-pub struct DatasetMethods<'a>
-    where  {
+pub struct DatasetMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for DatasetMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DatasetMethods<'a, S> {}
 
-impl<'a> DatasetMethods<'a> {
+impl<'a, S> DatasetMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4015,7 +4020,7 @@ impl<'a> DatasetMethods<'a> {
     ///
     /// * `projectId` - Project ID of the dataset being deleted
     /// * `datasetId` - Dataset ID of dataset being deleted
-    pub fn delete(&self, project_id: &str, dataset_id: &str) -> DatasetDeleteCall<'a> {
+    pub fn delete(&self, project_id: &str, dataset_id: &str) -> DatasetDeleteCall<'a, S> {
         DatasetDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4035,7 +4040,7 @@ impl<'a> DatasetMethods<'a> {
     ///
     /// * `projectId` - Project ID of the requested dataset
     /// * `datasetId` - Dataset ID of the requested dataset
-    pub fn get(&self, project_id: &str, dataset_id: &str) -> DatasetGetCall<'a> {
+    pub fn get(&self, project_id: &str, dataset_id: &str) -> DatasetGetCall<'a, S> {
         DatasetGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4054,7 +4059,7 @@ impl<'a> DatasetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Project ID of the new dataset
-    pub fn insert(&self, request: Dataset, project_id: &str) -> DatasetInsertCall<'a> {
+    pub fn insert(&self, request: Dataset, project_id: &str) -> DatasetInsertCall<'a, S> {
         DatasetInsertCall {
             hub: self.hub,
             _request: request,
@@ -4072,7 +4077,7 @@ impl<'a> DatasetMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the datasets to be listed
-    pub fn list(&self, project_id: &str) -> DatasetListCall<'a> {
+    pub fn list(&self, project_id: &str) -> DatasetListCall<'a, S> {
         DatasetListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4095,7 +4100,7 @@ impl<'a> DatasetMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Project ID of the dataset being updated
     /// * `datasetId` - Dataset ID of the dataset being updated
-    pub fn patch(&self, request: Dataset, project_id: &str, dataset_id: &str) -> DatasetPatchCall<'a> {
+    pub fn patch(&self, request: Dataset, project_id: &str, dataset_id: &str) -> DatasetPatchCall<'a, S> {
         DatasetPatchCall {
             hub: self.hub,
             _request: request,
@@ -4116,7 +4121,7 @@ impl<'a> DatasetMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Project ID of the dataset being updated
     /// * `datasetId` - Dataset ID of the dataset being updated
-    pub fn update(&self, request: Dataset, project_id: &str, dataset_id: &str) -> DatasetUpdateCall<'a> {
+    pub fn update(&self, request: Dataset, project_id: &str, dataset_id: &str) -> DatasetUpdateCall<'a, S> {
         DatasetUpdateCall {
             hub: self.hub,
             _request: request,
@@ -4152,22 +4157,22 @@ impl<'a> DatasetMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `delete(...)`, `get(...)`, `get_query_results(...)`, `insert(...)`, `list(...)` and `query(...)`
 /// // to build up your call.
 /// let rb = hub.jobs();
 /// # }
 /// ```
-pub struct JobMethods<'a>
-    where  {
+pub struct JobMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for JobMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for JobMethods<'a, S> {}
 
-impl<'a> JobMethods<'a> {
+impl<'a, S> JobMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4177,7 +4182,7 @@ impl<'a> JobMethods<'a> {
     ///
     /// * `projectId` - [Required] Project ID of the job to cancel
     /// * `jobId` - [Required] Job ID of the job to cancel
-    pub fn cancel(&self, project_id: &str, job_id: &str) -> JobCancelCall<'a> {
+    pub fn cancel(&self, project_id: &str, job_id: &str) -> JobCancelCall<'a, S> {
         JobCancelCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4197,7 +4202,7 @@ impl<'a> JobMethods<'a> {
     ///
     /// * `projectId` - Required. Project ID of the job for which metadata is to be deleted.
     /// * `jobId` - Required. Job ID of the job for which metadata is to be deleted. If this is a parent job which has child jobs, the metadata from all child jobs will be deleted as well. Direct deletion of the metadata of child jobs is not allowed.
-    pub fn delete(&self, project_id: &str, job_id: &str) -> JobDeleteCall<'a> {
+    pub fn delete(&self, project_id: &str, job_id: &str) -> JobDeleteCall<'a, S> {
         JobDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4217,7 +4222,7 @@ impl<'a> JobMethods<'a> {
     ///
     /// * `projectId` - [Required] Project ID of the requested job
     /// * `jobId` - [Required] Job ID of the requested job
-    pub fn get(&self, project_id: &str, job_id: &str) -> JobGetCall<'a> {
+    pub fn get(&self, project_id: &str, job_id: &str) -> JobGetCall<'a, S> {
         JobGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4237,7 +4242,7 @@ impl<'a> JobMethods<'a> {
     ///
     /// * `projectId` - [Required] Project ID of the query job
     /// * `jobId` - [Required] Job ID of the query job
-    pub fn get_query_results(&self, project_id: &str, job_id: &str) -> JobGetQueryResultCall<'a> {
+    pub fn get_query_results(&self, project_id: &str, job_id: &str) -> JobGetQueryResultCall<'a, S> {
         JobGetQueryResultCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4261,7 +4266,7 @@ impl<'a> JobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Project ID of the project that will be billed for the job
-    pub fn insert(&self, request: Job, project_id: &str) -> JobInsertCall<'a> {
+    pub fn insert(&self, request: Job, project_id: &str) -> JobInsertCall<'a, S> {
         JobInsertCall {
             hub: self.hub,
             _request: request,
@@ -4279,7 +4284,7 @@ impl<'a> JobMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the jobs to list
-    pub fn list(&self, project_id: &str) -> JobListCall<'a> {
+    pub fn list(&self, project_id: &str) -> JobListCall<'a, S> {
         JobListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4305,7 +4310,7 @@ impl<'a> JobMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Project ID of the project billed for the query
-    pub fn query(&self, request: QueryRequest, project_id: &str) -> JobQueryCall<'a> {
+    pub fn query(&self, request: QueryRequest, project_id: &str) -> JobQueryCall<'a, S> {
         JobQueryCall {
             hub: self.hub,
             _request: request,
@@ -4340,22 +4345,22 @@ impl<'a> JobMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `list(...)` and `patch(...)`
 /// // to build up your call.
 /// let rb = hub.models();
 /// # }
 /// ```
-pub struct ModelMethods<'a>
-    where  {
+pub struct ModelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for ModelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ModelMethods<'a, S> {}
 
-impl<'a> ModelMethods<'a> {
+impl<'a, S> ModelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4366,7 +4371,7 @@ impl<'a> ModelMethods<'a> {
     /// * `projectId` - Required. Project ID of the model to delete.
     /// * `datasetId` - Required. Dataset ID of the model to delete.
     /// * `modelId` - Required. Model ID of the model to delete.
-    pub fn delete(&self, project_id: &str, dataset_id: &str, model_id: &str) -> ModelDeleteCall<'a> {
+    pub fn delete(&self, project_id: &str, dataset_id: &str, model_id: &str) -> ModelDeleteCall<'a, S> {
         ModelDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4387,7 +4392,7 @@ impl<'a> ModelMethods<'a> {
     /// * `projectId` - Required. Project ID of the requested model.
     /// * `datasetId` - Required. Dataset ID of the requested model.
     /// * `modelId` - Required. Model ID of the requested model.
-    pub fn get(&self, project_id: &str, dataset_id: &str, model_id: &str) -> ModelGetCall<'a> {
+    pub fn get(&self, project_id: &str, dataset_id: &str, model_id: &str) -> ModelGetCall<'a, S> {
         ModelGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4407,7 +4412,7 @@ impl<'a> ModelMethods<'a> {
     ///
     /// * `projectId` - Required. Project ID of the models to list.
     /// * `datasetId` - Required. Dataset ID of the models to list.
-    pub fn list(&self, project_id: &str, dataset_id: &str) -> ModelListCall<'a> {
+    pub fn list(&self, project_id: &str, dataset_id: &str) -> ModelListCall<'a, S> {
         ModelListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4430,7 +4435,7 @@ impl<'a> ModelMethods<'a> {
     /// * `projectId` - Required. Project ID of the model to patch.
     /// * `datasetId` - Required. Dataset ID of the model to patch.
     /// * `modelId` - Required. Model ID of the model to patch.
-    pub fn patch(&self, request: Model, project_id: &str, dataset_id: &str, model_id: &str) -> ModelPatchCall<'a> {
+    pub fn patch(&self, request: Model, project_id: &str, dataset_id: &str, model_id: &str) -> ModelPatchCall<'a, S> {
         ModelPatchCall {
             hub: self.hub,
             _request: request,
@@ -4467,22 +4472,22 @@ impl<'a> ModelMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_service_account(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4491,7 +4496,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Project ID for which the service account is requested.
-    pub fn get_service_account(&self, project_id: &str) -> ProjectGetServiceAccountCall<'a> {
+    pub fn get_service_account(&self, project_id: &str) -> ProjectGetServiceAccountCall<'a, S> {
         ProjectGetServiceAccountCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4504,7 +4509,7 @@ impl<'a> ProjectMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all projects to which you have been granted any project role.
-    pub fn list(&self) -> ProjectListCall<'a> {
+    pub fn list(&self) -> ProjectListCall<'a, S> {
         ProjectListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -4539,22 +4544,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.routines();
 /// # }
 /// ```
-pub struct RoutineMethods<'a>
-    where  {
+pub struct RoutineMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for RoutineMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RoutineMethods<'a, S> {}
 
-impl<'a> RoutineMethods<'a> {
+impl<'a, S> RoutineMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4565,7 +4570,7 @@ impl<'a> RoutineMethods<'a> {
     /// * `projectId` - Required. Project ID of the routine to delete
     /// * `datasetId` - Required. Dataset ID of the routine to delete
     /// * `routineId` - Required. Routine ID of the routine to delete
-    pub fn delete(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineDeleteCall<'a> {
+    pub fn delete(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineDeleteCall<'a, S> {
         RoutineDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4586,7 +4591,7 @@ impl<'a> RoutineMethods<'a> {
     /// * `projectId` - Required. Project ID of the requested routine
     /// * `datasetId` - Required. Dataset ID of the requested routine
     /// * `routineId` - Required. Routine ID of the requested routine
-    pub fn get(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineGetCall<'a> {
+    pub fn get(&self, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineGetCall<'a, S> {
         RoutineGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4608,7 +4613,7 @@ impl<'a> RoutineMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Required. Project ID of the new routine
     /// * `datasetId` - Required. Dataset ID of the new routine
-    pub fn insert(&self, request: Routine, project_id: &str, dataset_id: &str) -> RoutineInsertCall<'a> {
+    pub fn insert(&self, request: Routine, project_id: &str, dataset_id: &str) -> RoutineInsertCall<'a, S> {
         RoutineInsertCall {
             hub: self.hub,
             _request: request,
@@ -4628,7 +4633,7 @@ impl<'a> RoutineMethods<'a> {
     ///
     /// * `projectId` - Required. Project ID of the routines to list
     /// * `datasetId` - Required. Dataset ID of the routines to list
-    pub fn list(&self, project_id: &str, dataset_id: &str) -> RoutineListCall<'a> {
+    pub fn list(&self, project_id: &str, dataset_id: &str) -> RoutineListCall<'a, S> {
         RoutineListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4653,7 +4658,7 @@ impl<'a> RoutineMethods<'a> {
     /// * `projectId` - Required. Project ID of the routine to update
     /// * `datasetId` - Required. Dataset ID of the routine to update
     /// * `routineId` - Required. Routine ID of the routine to update
-    pub fn update(&self, request: Routine, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineUpdateCall<'a> {
+    pub fn update(&self, request: Routine, project_id: &str, dataset_id: &str, routine_id: &str) -> RoutineUpdateCall<'a, S> {
         RoutineUpdateCall {
             hub: self.hub,
             _request: request,
@@ -4690,22 +4695,22 @@ impl<'a> RoutineMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)` and `test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.row_access_policies();
 /// # }
 /// ```
-pub struct RowAccessPolicyMethods<'a>
-    where  {
+pub struct RowAccessPolicyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for RowAccessPolicyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RowAccessPolicyMethods<'a, S> {}
 
-impl<'a> RowAccessPolicyMethods<'a> {
+impl<'a, S> RowAccessPolicyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4715,7 +4720,7 @@ impl<'a> RowAccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> RowAccessPolicyGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> RowAccessPolicyGetIamPolicyCall<'a, S> {
         RowAccessPolicyGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -4735,7 +4740,7 @@ impl<'a> RowAccessPolicyMethods<'a> {
     /// * `projectId` - Required. Project ID of the row access policies to list.
     /// * `datasetId` - Required. Dataset ID of row access policies to list.
     /// * `tableId` - Required. Table ID of the table to list row access policies.
-    pub fn list(&self, project_id: &str, dataset_id: &str, table_id: &str) -> RowAccessPolicyListCall<'a> {
+    pub fn list(&self, project_id: &str, dataset_id: &str, table_id: &str) -> RowAccessPolicyListCall<'a, S> {
         RowAccessPolicyListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4757,7 +4762,7 @@ impl<'a> RowAccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> RowAccessPolicySetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> RowAccessPolicySetIamPolicyCall<'a, S> {
         RowAccessPolicySetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -4776,7 +4781,7 @@ impl<'a> RowAccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> RowAccessPolicyTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> RowAccessPolicyTestIamPermissionCall<'a, S> {
         RowAccessPolicyTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -4811,22 +4816,22 @@ impl<'a> RowAccessPolicyMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert_all(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.tabledata();
 /// # }
 /// ```
-pub struct TabledataMethods<'a>
-    where  {
+pub struct TabledataMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for TabledataMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TabledataMethods<'a, S> {}
 
-impl<'a> TabledataMethods<'a> {
+impl<'a, S> TabledataMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4838,7 +4843,7 @@ impl<'a> TabledataMethods<'a> {
     /// * `projectId` - Project ID of the destination table.
     /// * `datasetId` - Dataset ID of the destination table.
     /// * `tableId` - Table ID of the destination table.
-    pub fn insert_all(&self, request: TableDataInsertAllRequest, project_id: &str, dataset_id: &str, table_id: &str) -> TabledataInsertAllCall<'a> {
+    pub fn insert_all(&self, request: TableDataInsertAllRequest, project_id: &str, dataset_id: &str, table_id: &str) -> TabledataInsertAllCall<'a, S> {
         TabledataInsertAllCall {
             hub: self.hub,
             _request: request,
@@ -4860,7 +4865,7 @@ impl<'a> TabledataMethods<'a> {
     /// * `projectId` - Project ID of the table to read
     /// * `datasetId` - Dataset ID of the table to read
     /// * `tableId` - Table ID of the table to read
-    pub fn list(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TabledataListCall<'a> {
+    pub fn list(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TabledataListCall<'a, S> {
         TabledataListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4900,22 +4905,22 @@ impl<'a> TabledataMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.tables();
 /// # }
 /// ```
-pub struct TableMethods<'a>
-    where  {
+pub struct TableMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
 }
 
-impl<'a> client::MethodsBuilder for TableMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TableMethods<'a, S> {}
 
-impl<'a> TableMethods<'a> {
+impl<'a, S> TableMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4926,7 +4931,7 @@ impl<'a> TableMethods<'a> {
     /// * `projectId` - Project ID of the table to delete
     /// * `datasetId` - Dataset ID of the table to delete
     /// * `tableId` - Table ID of the table to delete
-    pub fn delete(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TableDeleteCall<'a> {
+    pub fn delete(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TableDeleteCall<'a, S> {
         TableDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4947,7 +4952,7 @@ impl<'a> TableMethods<'a> {
     /// * `projectId` - Project ID of the requested table
     /// * `datasetId` - Dataset ID of the requested table
     /// * `tableId` - Table ID of the requested table
-    pub fn get(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TableGetCall<'a> {
+    pub fn get(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TableGetCall<'a, S> {
         TableGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -4968,7 +4973,7 @@ impl<'a> TableMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> TableGetIamPolicyCall<'a> {
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> TableGetIamPolicyCall<'a, S> {
         TableGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -4988,7 +4993,7 @@ impl<'a> TableMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Project ID of the new table
     /// * `datasetId` - Dataset ID of the new table
-    pub fn insert(&self, request: Table, project_id: &str, dataset_id: &str) -> TableInsertCall<'a> {
+    pub fn insert(&self, request: Table, project_id: &str, dataset_id: &str) -> TableInsertCall<'a, S> {
         TableInsertCall {
             hub: self.hub,
             _request: request,
@@ -5008,7 +5013,7 @@ impl<'a> TableMethods<'a> {
     ///
     /// * `projectId` - Project ID of the tables to list
     /// * `datasetId` - Dataset ID of the tables to list
-    pub fn list(&self, project_id: &str, dataset_id: &str) -> TableListCall<'a> {
+    pub fn list(&self, project_id: &str, dataset_id: &str) -> TableListCall<'a, S> {
         TableListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -5031,7 +5036,7 @@ impl<'a> TableMethods<'a> {
     /// * `projectId` - Project ID of the table to update
     /// * `datasetId` - Dataset ID of the table to update
     /// * `tableId` - Table ID of the table to update
-    pub fn patch(&self, request: Table, project_id: &str, dataset_id: &str, table_id: &str) -> TablePatchCall<'a> {
+    pub fn patch(&self, request: Table, project_id: &str, dataset_id: &str, table_id: &str) -> TablePatchCall<'a, S> {
         TablePatchCall {
             hub: self.hub,
             _request: request,
@@ -5053,7 +5058,7 @@ impl<'a> TableMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> TableSetIamPolicyCall<'a> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> TableSetIamPolicyCall<'a, S> {
         TableSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -5072,7 +5077,7 @@ impl<'a> TableMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> TableTestIamPermissionCall<'a> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> TableTestIamPermissionCall<'a, S> {
         TableTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -5093,7 +5098,7 @@ impl<'a> TableMethods<'a> {
     /// * `projectId` - Project ID of the table to update
     /// * `datasetId` - Dataset ID of the table to update
     /// * `tableId` - Table ID of the table to update
-    pub fn update(&self, request: Table, project_id: &str, dataset_id: &str, table_id: &str) -> TableUpdateCall<'a> {
+    pub fn update(&self, request: Table, project_id: &str, dataset_id: &str, table_id: &str) -> TableUpdateCall<'a, S> {
         TableUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5138,7 +5143,7 @@ impl<'a> TableMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5147,10 +5152,10 @@ impl<'a> TableMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatasetDeleteCall<'a>
-    where  {
+pub struct DatasetDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _delete_contents: Option<bool>,
@@ -5159,9 +5164,15 @@ pub struct DatasetDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatasetDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for DatasetDeleteCall<'a, S> {}
 
-impl<'a> DatasetDeleteCall<'a> {
+impl<'a, S> DatasetDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5297,7 +5308,7 @@ impl<'a> DatasetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5307,14 +5318,14 @@ impl<'a> DatasetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
     /// If True, delete all the tables in the dataset. If False and the dataset contains tables, the request will fail. Default is False
     ///
     /// Sets the *delete contents* query property to the given value.
-    pub fn delete_contents(mut self, new_value: bool) -> DatasetDeleteCall<'a> {
+    pub fn delete_contents(mut self, new_value: bool) -> DatasetDeleteCall<'a, S> {
         self._delete_contents = Some(new_value);
         self
     }
@@ -5324,7 +5335,7 @@ impl<'a> DatasetDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5345,7 +5356,7 @@ impl<'a> DatasetDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5365,9 +5376,9 @@ impl<'a> DatasetDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatasetDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5399,7 +5410,7 @@ impl<'a> DatasetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5407,10 +5418,10 @@ impl<'a> DatasetDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatasetGetCall<'a>
-    where  {
+pub struct DatasetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5418,9 +5429,15 @@ pub struct DatasetGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatasetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DatasetGetCall<'a, S> {}
 
-impl<'a> DatasetGetCall<'a> {
+impl<'a, S> DatasetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5564,7 +5581,7 @@ impl<'a> DatasetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> DatasetGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5574,7 +5591,7 @@ impl<'a> DatasetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -5584,7 +5601,7 @@ impl<'a> DatasetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5605,7 +5622,7 @@ impl<'a> DatasetGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5625,9 +5642,9 @@ impl<'a> DatasetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatasetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5660,7 +5677,7 @@ impl<'a> DatasetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5673,10 +5690,10 @@ impl<'a> DatasetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatasetInsertCall<'a>
-    where  {
+pub struct DatasetInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Dataset,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5684,9 +5701,15 @@ pub struct DatasetInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatasetInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for DatasetInsertCall<'a, S> {}
 
-impl<'a> DatasetInsertCall<'a> {
+impl<'a, S> DatasetInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5842,7 +5865,7 @@ impl<'a> DatasetInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> DatasetInsertCall<'a> {
+    pub fn request(mut self, new_value: Dataset) -> DatasetInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5852,7 +5875,7 @@ impl<'a> DatasetInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetInsertCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> DatasetInsertCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5862,7 +5885,7 @@ impl<'a> DatasetInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5883,7 +5906,7 @@ impl<'a> DatasetInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5903,9 +5926,9 @@ impl<'a> DatasetInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatasetInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5937,7 +5960,7 @@ impl<'a> DatasetInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5949,10 +5972,10 @@ impl<'a> DatasetInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatasetListCall<'a>
-    where  {
+pub struct DatasetListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -5963,9 +5986,15 @@ pub struct DatasetListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatasetListCall<'a> {}
+impl<'a, S> client::CallBuilder for DatasetListCall<'a, S> {}
 
-impl<'a> DatasetListCall<'a> {
+impl<'a, S> DatasetListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6120,35 +6149,35 @@ impl<'a> DatasetListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> DatasetListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> DatasetListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> DatasetListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// An expression for filtering the results of the request by label. The syntax is "labels.<name>[:<value>]". Multiple filters can be ANDed together by connecting with a space. Example: "labels.department:receiving labels.active". See Filtering datasets using labels for details.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> DatasetListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> DatasetListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Whether to list all datasets, including hidden ones
     ///
     /// Sets the *all* query property to the given value.
-    pub fn all(mut self, new_value: bool) -> DatasetListCall<'a> {
+    pub fn all(mut self, new_value: bool) -> DatasetListCall<'a, S> {
         self._all = Some(new_value);
         self
     }
@@ -6158,7 +6187,7 @@ impl<'a> DatasetListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6179,7 +6208,7 @@ impl<'a> DatasetListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6199,9 +6228,9 @@ impl<'a> DatasetListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatasetListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6234,7 +6263,7 @@ impl<'a> DatasetListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6247,10 +6276,10 @@ impl<'a> DatasetListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatasetPatchCall<'a>
-    where  {
+pub struct DatasetPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Dataset,
     _project_id: String,
     _dataset_id: String,
@@ -6259,9 +6288,15 @@ pub struct DatasetPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatasetPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for DatasetPatchCall<'a, S> {}
 
-impl<'a> DatasetPatchCall<'a> {
+impl<'a, S> DatasetPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6418,7 +6453,7 @@ impl<'a> DatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> DatasetPatchCall<'a> {
+    pub fn request(mut self, new_value: Dataset) -> DatasetPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6428,7 +6463,7 @@ impl<'a> DatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetPatchCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> DatasetPatchCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -6438,7 +6473,7 @@ impl<'a> DatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -6448,7 +6483,7 @@ impl<'a> DatasetPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6469,7 +6504,7 @@ impl<'a> DatasetPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6489,9 +6524,9 @@ impl<'a> DatasetPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatasetPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6524,7 +6559,7 @@ impl<'a> DatasetPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6537,10 +6572,10 @@ impl<'a> DatasetPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatasetUpdateCall<'a>
-    where  {
+pub struct DatasetUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Dataset,
     _project_id: String,
     _dataset_id: String,
@@ -6549,9 +6584,15 @@ pub struct DatasetUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatasetUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for DatasetUpdateCall<'a, S> {}
 
-impl<'a> DatasetUpdateCall<'a> {
+impl<'a, S> DatasetUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6708,7 +6749,7 @@ impl<'a> DatasetUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> DatasetUpdateCall<'a> {
+    pub fn request(mut self, new_value: Dataset) -> DatasetUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6718,7 +6759,7 @@ impl<'a> DatasetUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DatasetUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -6728,7 +6769,7 @@ impl<'a> DatasetUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -6738,7 +6779,7 @@ impl<'a> DatasetUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatasetUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6759,7 +6800,7 @@ impl<'a> DatasetUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DatasetUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatasetUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6779,9 +6820,9 @@ impl<'a> DatasetUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatasetUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatasetUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6813,7 +6854,7 @@ impl<'a> DatasetUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6822,10 +6863,10 @@ impl<'a> DatasetUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobCancelCall<'a>
-    where  {
+pub struct JobCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _job_id: String,
     _location: Option<String>,
@@ -6834,9 +6875,15 @@ pub struct JobCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for JobCancelCall<'a, S> {}
 
-impl<'a> JobCancelCall<'a> {
+impl<'a, S> JobCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6983,7 +7030,7 @@ impl<'a> JobCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobCancelCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobCancelCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -6993,14 +7040,14 @@ impl<'a> JobCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobCancelCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> JobCancelCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
     /// The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
     ///
     /// Sets the *location* query property to the given value.
-    pub fn location(mut self, new_value: &str) -> JobCancelCall<'a> {
+    pub fn location(mut self, new_value: &str) -> JobCancelCall<'a, S> {
         self._location = Some(new_value.to_string());
         self
     }
@@ -7010,7 +7057,7 @@ impl<'a> JobCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7031,7 +7078,7 @@ impl<'a> JobCancelCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7051,9 +7098,9 @@ impl<'a> JobCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7085,7 +7132,7 @@ impl<'a> JobCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7094,10 +7141,10 @@ impl<'a> JobCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobDeleteCall<'a>
-    where  {
+pub struct JobDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _job_id: String,
     _location: Option<String>,
@@ -7106,9 +7153,15 @@ pub struct JobDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for JobDeleteCall<'a, S> {}
 
-impl<'a> JobDeleteCall<'a> {
+impl<'a, S> JobDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7248,7 +7301,7 @@ impl<'a> JobDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -7258,14 +7311,14 @@ impl<'a> JobDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobDeleteCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> JobDeleteCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
     /// The geographic location of the job. Required. See details at: https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
     ///
     /// Sets the *location* query property to the given value.
-    pub fn location(mut self, new_value: &str) -> JobDeleteCall<'a> {
+    pub fn location(mut self, new_value: &str) -> JobDeleteCall<'a, S> {
         self._location = Some(new_value.to_string());
         self
     }
@@ -7275,7 +7328,7 @@ impl<'a> JobDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7296,7 +7349,7 @@ impl<'a> JobDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7316,9 +7369,9 @@ impl<'a> JobDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7350,7 +7403,7 @@ impl<'a> JobDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7359,10 +7412,10 @@ impl<'a> JobDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobGetCall<'a>
-    where  {
+pub struct JobGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _job_id: String,
     _location: Option<String>,
@@ -7371,9 +7424,15 @@ pub struct JobGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobGetCall<'a> {}
+impl<'a, S> client::CallBuilder for JobGetCall<'a, S> {}
 
-impl<'a> JobGetCall<'a> {
+impl<'a, S> JobGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7520,7 +7579,7 @@ impl<'a> JobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -7530,14 +7589,14 @@ impl<'a> JobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
     /// The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
     ///
     /// Sets the *location* query property to the given value.
-    pub fn location(mut self, new_value: &str) -> JobGetCall<'a> {
+    pub fn location(mut self, new_value: &str) -> JobGetCall<'a, S> {
         self._location = Some(new_value.to_string());
         self
     }
@@ -7547,7 +7606,7 @@ impl<'a> JobGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7568,7 +7627,7 @@ impl<'a> JobGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7588,9 +7647,9 @@ impl<'a> JobGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7622,7 +7681,7 @@ impl<'a> JobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7635,10 +7694,10 @@ impl<'a> JobGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobGetQueryResultCall<'a>
-    where  {
+pub struct JobGetQueryResultCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _job_id: String,
     _timeout_ms: Option<u32>,
@@ -7651,9 +7710,15 @@ pub struct JobGetQueryResultCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobGetQueryResultCall<'a> {}
+impl<'a, S> client::CallBuilder for JobGetQueryResultCall<'a, S> {}
 
-impl<'a> JobGetQueryResultCall<'a> {
+impl<'a, S> JobGetQueryResultCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7812,7 +7877,7 @@ impl<'a> JobGetQueryResultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -7822,42 +7887,42 @@ impl<'a> JobGetQueryResultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
     /// How long to wait for the query to complete, in milliseconds, before returning. Default is 10 seconds. If the timeout passes before the job completes, the 'jobComplete' field in the response will be false
     ///
     /// Sets the *timeout ms* query property to the given value.
-    pub fn timeout_ms(mut self, new_value: u32) -> JobGetQueryResultCall<'a> {
+    pub fn timeout_ms(mut self, new_value: u32) -> JobGetQueryResultCall<'a, S> {
         self._timeout_ms = Some(new_value);
         self
     }
     /// Zero-based index of the starting row
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: &str) -> JobGetQueryResultCall<'a> {
+    pub fn start_index(mut self, new_value: &str) -> JobGetQueryResultCall<'a, S> {
         self._start_index = Some(new_value.to_string());
         self
     }
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> JobGetQueryResultCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> JobGetQueryResultCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to read
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> JobGetQueryResultCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> JobGetQueryResultCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The geographic location where the job should run. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
     ///
     /// Sets the *location* query property to the given value.
-    pub fn location(mut self, new_value: &str) -> JobGetQueryResultCall<'a> {
+    pub fn location(mut self, new_value: &str) -> JobGetQueryResultCall<'a, S> {
         self._location = Some(new_value.to_string());
         self
     }
@@ -7867,7 +7932,7 @@ impl<'a> JobGetQueryResultCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetQueryResultCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetQueryResultCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7888,7 +7953,7 @@ impl<'a> JobGetQueryResultCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobGetQueryResultCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobGetQueryResultCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7908,9 +7973,9 @@ impl<'a> JobGetQueryResultCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobGetQueryResultCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobGetQueryResultCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7944,7 +8009,7 @@ impl<'a> JobGetQueryResultCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7957,10 +8022,10 @@ impl<'a> JobGetQueryResultCall<'a> {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct JobInsertCall<'a>
-    where  {
+pub struct JobInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Job,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7968,9 +8033,15 @@ pub struct JobInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for JobInsertCall<'a, S> {}
 
-impl<'a> JobInsertCall<'a> {
+impl<'a, S> JobInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
     /// Perform the operation you have build so far, but without uploading. This is used to e.g. renaming or updating the description for a file
     pub async fn doit_without_upload(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Job)> {
@@ -8383,7 +8454,7 @@ impl<'a> JobInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Job) -> JobInsertCall<'a> {
+    pub fn request(mut self, new_value: Job) -> JobInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8393,7 +8464,7 @@ impl<'a> JobInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobInsertCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobInsertCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -8403,7 +8474,7 @@ impl<'a> JobInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8424,7 +8495,7 @@ impl<'a> JobInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8444,9 +8515,9 @@ impl<'a> JobInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8478,7 +8549,7 @@ impl<'a> JobInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8494,10 +8565,10 @@ impl<'a> JobInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobListCall<'a>
-    where  {
+pub struct JobListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _state_filter: Vec<String>,
     _projection: Option<String>,
@@ -8512,9 +8583,15 @@ pub struct JobListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobListCall<'a> {}
+impl<'a, S> client::CallBuilder for JobListCall<'a, S> {}
 
-impl<'a> JobListCall<'a> {
+impl<'a, S> JobListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8683,7 +8760,7 @@ impl<'a> JobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -8691,56 +8768,56 @@ impl<'a> JobListCall<'a> {
     ///
     /// Append the given value to the *state filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_state_filter(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn add_state_filter(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._state_filter.push(new_value.to_string());
         self
     }
     /// Restrict information returned to a set of selected fields
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// If set, retrieves only jobs whose parent is this job. Otherwise, retrieves only jobs which have no parent
     ///
     /// Sets the *parent job id* query property to the given value.
-    pub fn parent_job_id(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn parent_job_id(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._parent_job_id = Some(new_value.to_string());
         self
     }
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Min value for job creation time, in milliseconds since the POSIX epoch. If set, only jobs created after or at this timestamp are returned
     ///
     /// Sets the *min creation time* query property to the given value.
-    pub fn min_creation_time(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn min_creation_time(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._min_creation_time = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> JobListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Max value for job creation time, in milliseconds since the POSIX epoch. If set, only jobs created before or at this timestamp are returned
     ///
     /// Sets the *max creation time* query property to the given value.
-    pub fn max_creation_time(mut self, new_value: &str) -> JobListCall<'a> {
+    pub fn max_creation_time(mut self, new_value: &str) -> JobListCall<'a, S> {
         self._max_creation_time = Some(new_value.to_string());
         self
     }
     /// Whether to display jobs owned by all users in the project. Default false
     ///
     /// Sets the *all users* query property to the given value.
-    pub fn all_users(mut self, new_value: bool) -> JobListCall<'a> {
+    pub fn all_users(mut self, new_value: bool) -> JobListCall<'a, S> {
         self._all_users = Some(new_value);
         self
     }
@@ -8750,7 +8827,7 @@ impl<'a> JobListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8771,7 +8848,7 @@ impl<'a> JobListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8791,9 +8868,9 @@ impl<'a> JobListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8826,7 +8903,7 @@ impl<'a> JobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8839,10 +8916,10 @@ impl<'a> JobListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobQueryCall<'a>
-    where  {
+pub struct JobQueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: QueryRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8850,9 +8927,15 @@ pub struct JobQueryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for JobQueryCall<'a> {}
+impl<'a, S> client::CallBuilder for JobQueryCall<'a, S> {}
 
-impl<'a> JobQueryCall<'a> {
+impl<'a, S> JobQueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9008,7 +9091,7 @@ impl<'a> JobQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: QueryRequest) -> JobQueryCall<'a> {
+    pub fn request(mut self, new_value: QueryRequest) -> JobQueryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9018,7 +9101,7 @@ impl<'a> JobQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> JobQueryCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> JobQueryCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -9028,7 +9111,7 @@ impl<'a> JobQueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobQueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobQueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9049,7 +9132,7 @@ impl<'a> JobQueryCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> JobQueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> JobQueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9069,9 +9152,9 @@ impl<'a> JobQueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobQueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> JobQueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9103,7 +9186,7 @@ impl<'a> JobQueryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9111,10 +9194,10 @@ impl<'a> JobQueryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ModelDeleteCall<'a>
-    where  {
+pub struct ModelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _model_id: String,
@@ -9123,9 +9206,15 @@ pub struct ModelDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ModelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ModelDeleteCall<'a, S> {}
 
-impl<'a> ModelDeleteCall<'a> {
+impl<'a, S> ModelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9263,7 +9352,7 @@ impl<'a> ModelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ModelDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ModelDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -9273,7 +9362,7 @@ impl<'a> ModelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> ModelDeleteCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> ModelDeleteCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -9283,7 +9372,7 @@ impl<'a> ModelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn model_id(mut self, new_value: &str) -> ModelDeleteCall<'a> {
+    pub fn model_id(mut self, new_value: &str) -> ModelDeleteCall<'a, S> {
         self._model_id = new_value.to_string();
         self
     }
@@ -9293,7 +9382,7 @@ impl<'a> ModelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9314,7 +9403,7 @@ impl<'a> ModelDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ModelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ModelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9334,9 +9423,9 @@ impl<'a> ModelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ModelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ModelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9368,7 +9457,7 @@ impl<'a> ModelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9376,10 +9465,10 @@ impl<'a> ModelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ModelGetCall<'a>
-    where  {
+pub struct ModelGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _model_id: String,
@@ -9388,9 +9477,15 @@ pub struct ModelGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ModelGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ModelGetCall<'a, S> {}
 
-impl<'a> ModelGetCall<'a> {
+impl<'a, S> ModelGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9539,7 +9634,7 @@ impl<'a> ModelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ModelGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ModelGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -9549,7 +9644,7 @@ impl<'a> ModelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> ModelGetCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> ModelGetCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -9559,7 +9654,7 @@ impl<'a> ModelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn model_id(mut self, new_value: &str) -> ModelGetCall<'a> {
+    pub fn model_id(mut self, new_value: &str) -> ModelGetCall<'a, S> {
         self._model_id = new_value.to_string();
         self
     }
@@ -9569,7 +9664,7 @@ impl<'a> ModelGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9590,7 +9685,7 @@ impl<'a> ModelGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ModelGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ModelGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9610,9 +9705,9 @@ impl<'a> ModelGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ModelGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ModelGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9644,7 +9739,7 @@ impl<'a> ModelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9654,10 +9749,10 @@ impl<'a> ModelGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ModelListCall<'a>
-    where  {
+pub struct ModelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _page_token: Option<String>,
@@ -9667,9 +9762,15 @@ pub struct ModelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ModelListCall<'a> {}
+impl<'a, S> client::CallBuilder for ModelListCall<'a, S> {}
 
-impl<'a> ModelListCall<'a> {
+impl<'a, S> ModelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9823,7 +9924,7 @@ impl<'a> ModelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ModelListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ModelListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -9833,21 +9934,21 @@ impl<'a> ModelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> ModelListCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> ModelListCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
     /// Page token, returned by a previous call to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ModelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ModelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return in a single response page. Leverage the page tokens to iterate through the entire collection.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ModelListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ModelListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -9857,7 +9958,7 @@ impl<'a> ModelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9878,7 +9979,7 @@ impl<'a> ModelListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ModelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ModelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9898,9 +9999,9 @@ impl<'a> ModelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ModelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ModelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9933,7 +10034,7 @@ impl<'a> ModelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9946,10 +10047,10 @@ impl<'a> ModelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ModelPatchCall<'a>
-    where  {
+pub struct ModelPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Model,
     _project_id: String,
     _dataset_id: String,
@@ -9959,9 +10060,15 @@ pub struct ModelPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ModelPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ModelPatchCall<'a, S> {}
 
-impl<'a> ModelPatchCall<'a> {
+impl<'a, S> ModelPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10123,7 +10230,7 @@ impl<'a> ModelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Model) -> ModelPatchCall<'a> {
+    pub fn request(mut self, new_value: Model) -> ModelPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10133,7 +10240,7 @@ impl<'a> ModelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ModelPatchCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ModelPatchCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -10143,7 +10250,7 @@ impl<'a> ModelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> ModelPatchCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> ModelPatchCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -10153,7 +10260,7 @@ impl<'a> ModelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn model_id(mut self, new_value: &str) -> ModelPatchCall<'a> {
+    pub fn model_id(mut self, new_value: &str) -> ModelPatchCall<'a, S> {
         self._model_id = new_value.to_string();
         self
     }
@@ -10163,7 +10270,7 @@ impl<'a> ModelPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ModelPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10184,7 +10291,7 @@ impl<'a> ModelPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ModelPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ModelPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10204,9 +10311,9 @@ impl<'a> ModelPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ModelPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ModelPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10238,7 +10345,7 @@ impl<'a> ModelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10246,19 +10353,25 @@ impl<'a> ModelPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetServiceAccountCall<'a>
-    where  {
+pub struct ProjectGetServiceAccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectGetServiceAccountCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectGetServiceAccountCall<'a, S> {}
 
-impl<'a> ProjectGetServiceAccountCall<'a> {
+impl<'a, S> ProjectGetServiceAccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10401,7 +10514,7 @@ impl<'a> ProjectGetServiceAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectGetServiceAccountCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectGetServiceAccountCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -10411,7 +10524,7 @@ impl<'a> ProjectGetServiceAccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetServiceAccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetServiceAccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10432,7 +10545,7 @@ impl<'a> ProjectGetServiceAccountCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetServiceAccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetServiceAccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10452,9 +10565,9 @@ impl<'a> ProjectGetServiceAccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetServiceAccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectGetServiceAccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10486,7 +10599,7 @@ impl<'a> ProjectGetServiceAccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10496,10 +10609,10 @@ impl<'a> ProjectGetServiceAccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectListCall<'a>
-    where  {
+pub struct ProjectListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10507,9 +10620,15 @@ pub struct ProjectListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectListCall<'a, S> {}
 
-impl<'a> ProjectListCall<'a> {
+impl<'a, S> ProjectListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10633,14 +10752,14 @@ impl<'a> ProjectListCall<'a> {
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ProjectListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ProjectListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -10650,7 +10769,7 @@ impl<'a> ProjectListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10671,7 +10790,7 @@ impl<'a> ProjectListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10691,9 +10810,9 @@ impl<'a> ProjectListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10725,7 +10844,7 @@ impl<'a> ProjectListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10733,10 +10852,10 @@ impl<'a> ProjectListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoutineDeleteCall<'a>
-    where  {
+pub struct RoutineDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _routine_id: String,
@@ -10745,9 +10864,15 @@ pub struct RoutineDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RoutineDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for RoutineDeleteCall<'a, S> {}
 
-impl<'a> RoutineDeleteCall<'a> {
+impl<'a, S> RoutineDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10885,7 +11010,7 @@ impl<'a> RoutineDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> RoutineDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> RoutineDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -10895,7 +11020,7 @@ impl<'a> RoutineDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> RoutineDeleteCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineDeleteCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -10905,7 +11030,7 @@ impl<'a> RoutineDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn routine_id(mut self, new_value: &str) -> RoutineDeleteCall<'a> {
+    pub fn routine_id(mut self, new_value: &str) -> RoutineDeleteCall<'a, S> {
         self._routine_id = new_value.to_string();
         self
     }
@@ -10915,7 +11040,7 @@ impl<'a> RoutineDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10936,7 +11061,7 @@ impl<'a> RoutineDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RoutineDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10956,9 +11081,9 @@ impl<'a> RoutineDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RoutineDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10990,7 +11115,7 @@ impl<'a> RoutineDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10999,10 +11124,10 @@ impl<'a> RoutineDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoutineGetCall<'a>
-    where  {
+pub struct RoutineGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _routine_id: String,
@@ -11012,9 +11137,15 @@ pub struct RoutineGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RoutineGetCall<'a> {}
+impl<'a, S> client::CallBuilder for RoutineGetCall<'a, S> {}
 
-impl<'a> RoutineGetCall<'a> {
+impl<'a, S> RoutineGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11166,7 +11297,7 @@ impl<'a> RoutineGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> RoutineGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> RoutineGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -11176,7 +11307,7 @@ impl<'a> RoutineGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> RoutineGetCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineGetCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -11186,14 +11317,14 @@ impl<'a> RoutineGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn routine_id(mut self, new_value: &str) -> RoutineGetCall<'a> {
+    pub fn routine_id(mut self, new_value: &str) -> RoutineGetCall<'a, S> {
         self._routine_id = new_value.to_string();
         self
     }
     /// If set, only the Routine fields in the field mask are returned in the response. If unset, all Routine fields are returned.
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> RoutineGetCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> RoutineGetCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
@@ -11203,7 +11334,7 @@ impl<'a> RoutineGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11224,7 +11355,7 @@ impl<'a> RoutineGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RoutineGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11244,9 +11375,9 @@ impl<'a> RoutineGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RoutineGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11279,7 +11410,7 @@ impl<'a> RoutineGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11292,10 +11423,10 @@ impl<'a> RoutineGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoutineInsertCall<'a>
-    where  {
+pub struct RoutineInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Routine,
     _project_id: String,
     _dataset_id: String,
@@ -11304,9 +11435,15 @@ pub struct RoutineInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RoutineInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for RoutineInsertCall<'a, S> {}
 
-impl<'a> RoutineInsertCall<'a> {
+impl<'a, S> RoutineInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11467,7 +11604,7 @@ impl<'a> RoutineInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Routine) -> RoutineInsertCall<'a> {
+    pub fn request(mut self, new_value: Routine) -> RoutineInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11477,7 +11614,7 @@ impl<'a> RoutineInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> RoutineInsertCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> RoutineInsertCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -11487,7 +11624,7 @@ impl<'a> RoutineInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> RoutineInsertCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineInsertCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -11497,7 +11634,7 @@ impl<'a> RoutineInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11518,7 +11655,7 @@ impl<'a> RoutineInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RoutineInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11538,9 +11675,9 @@ impl<'a> RoutineInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RoutineInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11572,7 +11709,7 @@ impl<'a> RoutineInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11584,10 +11721,10 @@ impl<'a> RoutineInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoutineListCall<'a>
-    where  {
+pub struct RoutineListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _read_mask: Option<String>,
@@ -11599,9 +11736,15 @@ pub struct RoutineListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RoutineListCall<'a> {}
+impl<'a, S> client::CallBuilder for RoutineListCall<'a, S> {}
 
-impl<'a> RoutineListCall<'a> {
+impl<'a, S> RoutineListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11761,7 +11904,7 @@ impl<'a> RoutineListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> RoutineListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> RoutineListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -11771,35 +11914,35 @@ impl<'a> RoutineListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> RoutineListCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineListCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
     /// If set, then only the Routine fields in the field mask, as well as project_id, dataset_id and routine_id, are returned in the response. If unset, then the following Routine fields are returned: etag, project_id, dataset_id, routine_id, routine_type, creation_time, last_modified_time, and language.
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> RoutineListCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> RoutineListCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RoutineListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> RoutineListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return in a single response page. Leverage the page tokens to iterate through the entire collection.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> RoutineListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> RoutineListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// If set, then only the Routines matching this filter are returned. The current supported form is either "routine_type:" or "routineType:", where is a RoutineType enum. Example: "routineType:SCALAR_FUNCTION".
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> RoutineListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> RoutineListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11809,7 +11952,7 @@ impl<'a> RoutineListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11830,7 +11973,7 @@ impl<'a> RoutineListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RoutineListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11850,9 +11993,9 @@ impl<'a> RoutineListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RoutineListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11885,7 +12028,7 @@ impl<'a> RoutineListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11898,10 +12041,10 @@ impl<'a> RoutineListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoutineUpdateCall<'a>
-    where  {
+pub struct RoutineUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Routine,
     _project_id: String,
     _dataset_id: String,
@@ -11911,9 +12054,15 @@ pub struct RoutineUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RoutineUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for RoutineUpdateCall<'a, S> {}
 
-impl<'a> RoutineUpdateCall<'a> {
+impl<'a, S> RoutineUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12075,7 +12224,7 @@ impl<'a> RoutineUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Routine) -> RoutineUpdateCall<'a> {
+    pub fn request(mut self, new_value: Routine) -> RoutineUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12085,7 +12234,7 @@ impl<'a> RoutineUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> RoutineUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> RoutineUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -12095,7 +12244,7 @@ impl<'a> RoutineUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> RoutineUpdateCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> RoutineUpdateCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -12105,7 +12254,7 @@ impl<'a> RoutineUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn routine_id(mut self, new_value: &str) -> RoutineUpdateCall<'a> {
+    pub fn routine_id(mut self, new_value: &str) -> RoutineUpdateCall<'a, S> {
         self._routine_id = new_value.to_string();
         self
     }
@@ -12115,7 +12264,7 @@ impl<'a> RoutineUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoutineUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12136,7 +12285,7 @@ impl<'a> RoutineUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RoutineUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12156,9 +12305,9 @@ impl<'a> RoutineUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RoutineUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RoutineUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12191,7 +12340,7 @@ impl<'a> RoutineUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12204,10 +12353,10 @@ impl<'a> RoutineUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RowAccessPolicyGetIamPolicyCall<'a>
-    where  {
+pub struct RowAccessPolicyGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12215,9 +12364,15 @@ pub struct RowAccessPolicyGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RowAccessPolicyGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for RowAccessPolicyGetIamPolicyCall<'a, S> {}
 
-impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
+impl<'a, S> RowAccessPolicyGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12377,7 +12532,7 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> RowAccessPolicyGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> RowAccessPolicyGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12387,7 +12542,7 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> RowAccessPolicyGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> RowAccessPolicyGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -12397,7 +12552,7 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicyGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicyGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12418,7 +12573,7 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12438,9 +12593,9 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RowAccessPolicyGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RowAccessPolicyGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12472,7 +12627,7 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12482,10 +12637,10 @@ impl<'a> RowAccessPolicyGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RowAccessPolicyListCall<'a>
-    where  {
+pub struct RowAccessPolicyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _table_id: String,
@@ -12496,9 +12651,15 @@ pub struct RowAccessPolicyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RowAccessPolicyListCall<'a> {}
+impl<'a, S> client::CallBuilder for RowAccessPolicyListCall<'a, S> {}
 
-impl<'a> RowAccessPolicyListCall<'a> {
+impl<'a, S> RowAccessPolicyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12653,7 +12814,7 @@ impl<'a> RowAccessPolicyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -12663,7 +12824,7 @@ impl<'a> RowAccessPolicyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyListCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyListCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -12673,21 +12834,21 @@ impl<'a> RowAccessPolicyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyListCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyListCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RowAccessPolicyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> RowAccessPolicyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return in a single response page. Leverage the page tokens to iterate through the entire collection.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> RowAccessPolicyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> RowAccessPolicyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -12697,7 +12858,7 @@ impl<'a> RowAccessPolicyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12718,7 +12879,7 @@ impl<'a> RowAccessPolicyListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12738,9 +12899,9 @@ impl<'a> RowAccessPolicyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RowAccessPolicyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RowAccessPolicyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12773,7 +12934,7 @@ impl<'a> RowAccessPolicyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12786,10 +12947,10 @@ impl<'a> RowAccessPolicyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RowAccessPolicySetIamPolicyCall<'a>
-    where  {
+pub struct RowAccessPolicySetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12797,9 +12958,15 @@ pub struct RowAccessPolicySetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RowAccessPolicySetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for RowAccessPolicySetIamPolicyCall<'a, S> {}
 
-impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
+impl<'a, S> RowAccessPolicySetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12959,7 +13126,7 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> RowAccessPolicySetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> RowAccessPolicySetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12969,7 +13136,7 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> RowAccessPolicySetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> RowAccessPolicySetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -12979,7 +13146,7 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicySetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicySetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13000,7 +13167,7 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicySetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicySetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13020,9 +13187,9 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RowAccessPolicySetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RowAccessPolicySetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13055,7 +13222,7 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13068,10 +13235,10 @@ impl<'a> RowAccessPolicySetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RowAccessPolicyTestIamPermissionCall<'a>
-    where  {
+pub struct RowAccessPolicyTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13079,9 +13246,15 @@ pub struct RowAccessPolicyTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RowAccessPolicyTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for RowAccessPolicyTestIamPermissionCall<'a, S> {}
 
-impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
+impl<'a, S> RowAccessPolicyTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13241,7 +13414,7 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> RowAccessPolicyTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> RowAccessPolicyTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13251,7 +13424,7 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> RowAccessPolicyTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> RowAccessPolicyTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -13261,7 +13434,7 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicyTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RowAccessPolicyTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13282,7 +13455,7 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13302,9 +13475,9 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RowAccessPolicyTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RowAccessPolicyTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13337,7 +13510,7 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13350,10 +13523,10 @@ impl<'a> RowAccessPolicyTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TabledataInsertAllCall<'a>
-    where  {
+pub struct TabledataInsertAllCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: TableDataInsertAllRequest,
     _project_id: String,
     _dataset_id: String,
@@ -13363,9 +13536,15 @@ pub struct TabledataInsertAllCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TabledataInsertAllCall<'a> {}
+impl<'a, S> client::CallBuilder for TabledataInsertAllCall<'a, S> {}
 
-impl<'a> TabledataInsertAllCall<'a> {
+impl<'a, S> TabledataInsertAllCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13523,7 +13702,7 @@ impl<'a> TabledataInsertAllCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TableDataInsertAllRequest) -> TabledataInsertAllCall<'a> {
+    pub fn request(mut self, new_value: TableDataInsertAllRequest) -> TabledataInsertAllCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13533,7 +13712,7 @@ impl<'a> TabledataInsertAllCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -13543,7 +13722,7 @@ impl<'a> TabledataInsertAllCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -13553,7 +13732,7 @@ impl<'a> TabledataInsertAllCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -13563,7 +13742,7 @@ impl<'a> TabledataInsertAllCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TabledataInsertAllCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TabledataInsertAllCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13584,7 +13763,7 @@ impl<'a> TabledataInsertAllCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TabledataInsertAllCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TabledataInsertAllCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13604,9 +13783,9 @@ impl<'a> TabledataInsertAllCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TabledataInsertAllCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TabledataInsertAllCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13638,7 +13817,7 @@ impl<'a> TabledataInsertAllCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13650,10 +13829,10 @@ impl<'a> TabledataInsertAllCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TabledataListCall<'a>
-    where  {
+pub struct TabledataListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _table_id: String,
@@ -13666,9 +13845,15 @@ pub struct TabledataListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TabledataListCall<'a> {}
+impl<'a, S> client::CallBuilder for TabledataListCall<'a, S> {}
 
-impl<'a> TabledataListCall<'a> {
+impl<'a, S> TabledataListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13825,7 +14010,7 @@ impl<'a> TabledataListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TabledataListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TabledataListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -13835,7 +14020,7 @@ impl<'a> TabledataListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TabledataListCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TabledataListCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -13845,35 +14030,35 @@ impl<'a> TabledataListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TabledataListCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TabledataListCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// Zero-based index of the starting row to read
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: &str) -> TabledataListCall<'a> {
+    pub fn start_index(mut self, new_value: &str) -> TabledataListCall<'a, S> {
         self._start_index = Some(new_value.to_string());
         self
     }
     /// List of fields to return (comma-separated). If unspecified, all fields are returned
     ///
     /// Sets the *selected fields* query property to the given value.
-    pub fn selected_fields(mut self, new_value: &str) -> TabledataListCall<'a> {
+    pub fn selected_fields(mut self, new_value: &str) -> TabledataListCall<'a, S> {
         self._selected_fields = Some(new_value.to_string());
         self
     }
     /// Page token, returned by a previous call, identifying the result set
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TabledataListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TabledataListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TabledataListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TabledataListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -13883,7 +14068,7 @@ impl<'a> TabledataListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TabledataListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TabledataListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13904,7 +14089,7 @@ impl<'a> TabledataListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TabledataListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TabledataListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13924,9 +14109,9 @@ impl<'a> TabledataListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TabledataListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TabledataListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13958,7 +14143,7 @@ impl<'a> TabledataListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13966,10 +14151,10 @@ impl<'a> TabledataListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableDeleteCall<'a>
-    where  {
+pub struct TableDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _table_id: String,
@@ -13978,9 +14163,15 @@ pub struct TableDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TableDeleteCall<'a, S> {}
 
-impl<'a> TableDeleteCall<'a> {
+impl<'a, S> TableDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14114,7 +14305,7 @@ impl<'a> TableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TableDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TableDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14124,7 +14315,7 @@ impl<'a> TableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TableDeleteCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TableDeleteCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -14134,7 +14325,7 @@ impl<'a> TableDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
@@ -14144,7 +14335,7 @@ impl<'a> TableDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14165,7 +14356,7 @@ impl<'a> TableDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14185,9 +14376,9 @@ impl<'a> TableDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14219,7 +14410,7 @@ impl<'a> TableDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14228,10 +14419,10 @@ impl<'a> TableDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableGetCall<'a>
-    where  {
+pub struct TableGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _table_id: String,
@@ -14241,9 +14432,15 @@ pub struct TableGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TableGetCall<'a, S> {}
 
-impl<'a> TableGetCall<'a> {
+impl<'a, S> TableGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14391,7 +14588,7 @@ impl<'a> TableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TableGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TableGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14401,7 +14598,7 @@ impl<'a> TableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TableGetCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TableGetCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -14411,14 +14608,14 @@ impl<'a> TableGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// List of fields to return (comma-separated). If unspecified, all fields are returned
     ///
     /// Sets the *selected fields* query property to the given value.
-    pub fn selected_fields(mut self, new_value: &str) -> TableGetCall<'a> {
+    pub fn selected_fields(mut self, new_value: &str) -> TableGetCall<'a, S> {
         self._selected_fields = Some(new_value.to_string());
         self
     }
@@ -14428,7 +14625,7 @@ impl<'a> TableGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14449,7 +14646,7 @@ impl<'a> TableGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14469,9 +14666,9 @@ impl<'a> TableGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14504,7 +14701,7 @@ impl<'a> TableGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14517,10 +14714,10 @@ impl<'a> TableGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableGetIamPolicyCall<'a>
-    where  {
+pub struct TableGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14528,9 +14725,15 @@ pub struct TableGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for TableGetIamPolicyCall<'a, S> {}
 
-impl<'a> TableGetIamPolicyCall<'a> {
+impl<'a, S> TableGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14690,7 +14893,7 @@ impl<'a> TableGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> TableGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> TableGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14700,7 +14903,7 @@ impl<'a> TableGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> TableGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> TableGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -14710,7 +14913,7 @@ impl<'a> TableGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14731,7 +14934,7 @@ impl<'a> TableGetIamPolicyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14751,9 +14954,9 @@ impl<'a> TableGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14786,7 +14989,7 @@ impl<'a> TableGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14799,10 +15002,10 @@ impl<'a> TableGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableInsertCall<'a>
-    where  {
+pub struct TableInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Table,
     _project_id: String,
     _dataset_id: String,
@@ -14811,9 +15014,15 @@ pub struct TableInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TableInsertCall<'a, S> {}
 
-impl<'a> TableInsertCall<'a> {
+impl<'a, S> TableInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14970,7 +15179,7 @@ impl<'a> TableInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Table) -> TableInsertCall<'a> {
+    pub fn request(mut self, new_value: Table) -> TableInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14980,7 +15189,7 @@ impl<'a> TableInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TableInsertCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TableInsertCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14990,7 +15199,7 @@ impl<'a> TableInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TableInsertCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TableInsertCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -15000,7 +15209,7 @@ impl<'a> TableInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15021,7 +15230,7 @@ impl<'a> TableInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15041,9 +15250,9 @@ impl<'a> TableInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15075,7 +15284,7 @@ impl<'a> TableInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15085,10 +15294,10 @@ impl<'a> TableInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableListCall<'a>
-    where  {
+pub struct TableListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _project_id: String,
     _dataset_id: String,
     _page_token: Option<String>,
@@ -15098,9 +15307,15 @@ pub struct TableListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableListCall<'a> {}
+impl<'a, S> client::CallBuilder for TableListCall<'a, S> {}
 
-impl<'a> TableListCall<'a> {
+impl<'a, S> TableListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15250,7 +15465,7 @@ impl<'a> TableListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TableListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TableListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15260,21 +15475,21 @@ impl<'a> TableListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TableListCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TableListCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
     /// Page token, returned by a previous call, to request the next page of results
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -15284,7 +15499,7 @@ impl<'a> TableListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15305,7 +15520,7 @@ impl<'a> TableListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15325,9 +15540,9 @@ impl<'a> TableListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15360,7 +15575,7 @@ impl<'a> TableListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15374,10 +15589,10 @@ impl<'a> TableListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TablePatchCall<'a>
-    where  {
+pub struct TablePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Table,
     _project_id: String,
     _dataset_id: String,
@@ -15388,9 +15603,15 @@ pub struct TablePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TablePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TablePatchCall<'a, S> {}
 
-impl<'a> TablePatchCall<'a> {
+impl<'a, S> TablePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15551,7 +15772,7 @@ impl<'a> TablePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Table) -> TablePatchCall<'a> {
+    pub fn request(mut self, new_value: Table) -> TablePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15561,7 +15782,7 @@ impl<'a> TablePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TablePatchCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TablePatchCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15571,7 +15792,7 @@ impl<'a> TablePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TablePatchCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TablePatchCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -15581,14 +15802,14 @@ impl<'a> TablePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// When true will autodetect schema, else will keep original schema
     ///
     /// Sets the *autodetect_schema* query property to the given value.
-    pub fn autodetect_schema(mut self, new_value: bool) -> TablePatchCall<'a> {
+    pub fn autodetect_schema(mut self, new_value: bool) -> TablePatchCall<'a, S> {
         self._autodetect_schema = Some(new_value);
         self
     }
@@ -15598,7 +15819,7 @@ impl<'a> TablePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TablePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TablePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15619,7 +15840,7 @@ impl<'a> TablePatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15639,9 +15860,9 @@ impl<'a> TablePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TablePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TablePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15674,7 +15895,7 @@ impl<'a> TablePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15687,10 +15908,10 @@ impl<'a> TablePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableSetIamPolicyCall<'a>
-    where  {
+pub struct TableSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15698,9 +15919,15 @@ pub struct TableSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for TableSetIamPolicyCall<'a, S> {}
 
-impl<'a> TableSetIamPolicyCall<'a> {
+impl<'a, S> TableSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15860,7 +16087,7 @@ impl<'a> TableSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> TableSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> TableSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15870,7 +16097,7 @@ impl<'a> TableSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> TableSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> TableSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -15880,7 +16107,7 @@ impl<'a> TableSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15901,7 +16128,7 @@ impl<'a> TableSetIamPolicyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15921,9 +16148,9 @@ impl<'a> TableSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15956,7 +16183,7 @@ impl<'a> TableSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15969,10 +16196,10 @@ impl<'a> TableSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableTestIamPermissionCall<'a>
-    where  {
+pub struct TableTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15980,9 +16207,15 @@ pub struct TableTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for TableTestIamPermissionCall<'a, S> {}
 
-impl<'a> TableTestIamPermissionCall<'a> {
+impl<'a, S> TableTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16142,7 +16375,7 @@ impl<'a> TableTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> TableTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> TableTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16152,7 +16385,7 @@ impl<'a> TableTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> TableTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> TableTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -16162,7 +16395,7 @@ impl<'a> TableTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16183,7 +16416,7 @@ impl<'a> TableTestIamPermissionCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16203,9 +16436,9 @@ impl<'a> TableTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16238,7 +16471,7 @@ impl<'a> TableTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Bigquery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16252,10 +16485,10 @@ impl<'a> TableTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableUpdateCall<'a>
-    where  {
+pub struct TableUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Bigquery<>,
+    hub: &'a Bigquery<S>,
     _request: Table,
     _project_id: String,
     _dataset_id: String,
@@ -16266,9 +16499,15 @@ pub struct TableUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TableUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TableUpdateCall<'a, S> {}
 
-impl<'a> TableUpdateCall<'a> {
+impl<'a, S> TableUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16429,7 +16668,7 @@ impl<'a> TableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Table) -> TableUpdateCall<'a> {
+    pub fn request(mut self, new_value: Table) -> TableUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16439,7 +16678,7 @@ impl<'a> TableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TableUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TableUpdateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16449,7 +16688,7 @@ impl<'a> TableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> TableUpdateCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> TableUpdateCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -16459,14 +16698,14 @@ impl<'a> TableUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a> {
+    pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, S> {
         self._table_id = new_value.to_string();
         self
     }
     /// When true will autodetect schema, else will keep original schema
     ///
     /// Sets the *autodetect_schema* query property to the given value.
-    pub fn autodetect_schema(mut self, new_value: bool) -> TableUpdateCall<'a> {
+    pub fn autodetect_schema(mut self, new_value: bool) -> TableUpdateCall<'a, S> {
         self._autodetect_schema = Some(new_value);
         self
     }
@@ -16476,7 +16715,7 @@ impl<'a> TableUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16497,7 +16736,7 @@ impl<'a> TableUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16517,9 +16756,9 @@ impl<'a> TableUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TableUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

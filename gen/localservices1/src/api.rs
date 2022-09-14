@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -106,37 +111,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Localservices<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Localservices<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Localservices<> {}
+impl<'a, S> client::Hub for Localservices<S> {}
 
-impl<'a, > Localservices<> {
+impl<'a, S> Localservices<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Localservices<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Localservices<S> {
         Localservices {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://localservices.googleapis.com/".to_string(),
             _root_url: "https://localservices.googleapis.com/".to_string(),
         }
     }
 
-    pub fn account_reports(&'a self) -> AccountReportMethods<'a> {
+    pub fn account_reports(&'a self) -> AccountReportMethods<'a, S> {
         AccountReportMethods { hub: &self }
     }
-    pub fn detailed_lead_reports(&'a self) -> DetailedLeadReportMethods<'a> {
+    pub fn detailed_lead_reports(&'a self) -> DetailedLeadReportMethods<'a, S> {
         DetailedLeadReportMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -451,27 +456,27 @@ impl client::Part for GoogleTypeTimeZone {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
 /// let rb = hub.account_reports();
 /// # }
 /// ```
-pub struct AccountReportMethods<'a>
-    where  {
+pub struct AccountReportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Localservices<>,
+    hub: &'a Localservices<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountReportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountReportMethods<'a, S> {}
 
-impl<'a> AccountReportMethods<'a> {
+impl<'a, S> AccountReportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Get account reports containing aggregate account data of all linked GLS accounts. Caller needs to provide their manager customer id and the associated auth credential that allows them read permissions on their linked accounts.
-    pub fn search(&self) -> AccountReportSearchCall<'a> {
+    pub fn search(&self) -> AccountReportSearchCall<'a, S> {
         AccountReportSearchCall {
             hub: self.hub,
             _start_date_year: Default::default(),
@@ -513,27 +518,27 @@ impl<'a> AccountReportMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
 /// let rb = hub.detailed_lead_reports();
 /// # }
 /// ```
-pub struct DetailedLeadReportMethods<'a>
-    where  {
+pub struct DetailedLeadReportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Localservices<>,
+    hub: &'a Localservices<S>,
 }
 
-impl<'a> client::MethodsBuilder for DetailedLeadReportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DetailedLeadReportMethods<'a, S> {}
 
-impl<'a> DetailedLeadReportMethods<'a> {
+impl<'a, S> DetailedLeadReportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Get detailed lead reports containing leads that have been received by all linked GLS accounts. Caller needs to provide their manager customer id and the associated auth credential that allows them read permissions on their linked accounts.
-    pub fn search(&self) -> DetailedLeadReportSearchCall<'a> {
+    pub fn search(&self) -> DetailedLeadReportSearchCall<'a, S> {
         DetailedLeadReportSearchCall {
             hub: self.hub,
             _start_date_year: Default::default(),
@@ -582,7 +587,7 @@ impl<'a> DetailedLeadReportMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -599,10 +604,10 @@ impl<'a> DetailedLeadReportMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountReportSearchCall<'a>
-    where  {
+pub struct AccountReportSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Localservices<>,
+    hub: &'a Localservices<S>,
     _start_date_year: Option<i32>,
     _start_date_month: Option<i32>,
     _start_date_day: Option<i32>,
@@ -617,9 +622,15 @@ pub struct AccountReportSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountReportSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountReportSearchCall<'a, S> {}
 
-impl<'a> AccountReportSearchCall<'a> {
+impl<'a, S> AccountReportSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -764,63 +775,63 @@ impl<'a> AccountReportSearchCall<'a> {
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
     ///
     /// Sets the *start date.year* query property to the given value.
-    pub fn start_date_year(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn start_date_year(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._start_date_year = Some(new_value);
         self
     }
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
     ///
     /// Sets the *start date.month* query property to the given value.
-    pub fn start_date_month(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn start_date_month(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._start_date_month = Some(new_value);
         self
     }
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
     ///
     /// Sets the *start date.day* query property to the given value.
-    pub fn start_date_day(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn start_date_day(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._start_date_day = Some(new_value);
         self
     }
     /// A query string for searching for account reports. Caller must provide a customer id of their MCC account with an associated Gaia Mint that allows read permission on their linked accounts. Search expressions are case insensitive. Example query: | Query | Description | |-------------------------|-----------------------------------------------| | manager_customer_id:123 | Get Account Report for Manager with id 123. | Required.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> AccountReportSearchCall<'a> {
+    pub fn query(mut self, new_value: &str) -> AccountReportSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The `next_page_token` value returned from a previous request to SearchAccountReports that indicates where listing should continue. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountReportSearchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountReportSearchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of accounts to return. If the page size is unset, page size will default to 1000. Maximum page_size is 10000. Optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
     ///
     /// Sets the *end date.year* query property to the given value.
-    pub fn end_date_year(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn end_date_year(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._end_date_year = Some(new_value);
         self
     }
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
     ///
     /// Sets the *end date.month* query property to the given value.
-    pub fn end_date_month(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn end_date_month(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._end_date_month = Some(new_value);
         self
     }
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
     ///
     /// Sets the *end date.day* query property to the given value.
-    pub fn end_date_day(mut self, new_value: i32) -> AccountReportSearchCall<'a> {
+    pub fn end_date_day(mut self, new_value: i32) -> AccountReportSearchCall<'a, S> {
         self._end_date_day = Some(new_value);
         self
     }
@@ -830,7 +841,7 @@ impl<'a> AccountReportSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountReportSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountReportSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -855,7 +866,7 @@ impl<'a> AccountReportSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountReportSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountReportSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -875,9 +886,9 @@ impl<'a> AccountReportSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountReportSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountReportSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -909,7 +920,7 @@ impl<'a> AccountReportSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Localservices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -926,10 +937,10 @@ impl<'a> AccountReportSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DetailedLeadReportSearchCall<'a>
-    where  {
+pub struct DetailedLeadReportSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Localservices<>,
+    hub: &'a Localservices<S>,
     _start_date_year: Option<i32>,
     _start_date_month: Option<i32>,
     _start_date_day: Option<i32>,
@@ -944,9 +955,15 @@ pub struct DetailedLeadReportSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DetailedLeadReportSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for DetailedLeadReportSearchCall<'a, S> {}
 
-impl<'a> DetailedLeadReportSearchCall<'a> {
+impl<'a, S> DetailedLeadReportSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1091,63 +1108,63 @@ impl<'a> DetailedLeadReportSearchCall<'a> {
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
     ///
     /// Sets the *start date.year* query property to the given value.
-    pub fn start_date_year(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn start_date_year(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._start_date_year = Some(new_value);
         self
     }
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
     ///
     /// Sets the *start date.month* query property to the given value.
-    pub fn start_date_month(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn start_date_month(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._start_date_month = Some(new_value);
         self
     }
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
     ///
     /// Sets the *start date.day* query property to the given value.
-    pub fn start_date_day(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn start_date_day(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._start_date_day = Some(new_value);
         self
     }
     /// A query string for searching for account reports. Caller must provide a customer id of their MCC account with an associated Gaia Mint that allows read permission on their linked accounts. Search expressions are case insensitive. Example query: | Query | Description | |-------------------------|-----------------------------------------------| | manager_customer_id:123 | Get Detailed Lead Report for Manager with id | | | 123. | Required.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> DetailedLeadReportSearchCall<'a> {
+    pub fn query(mut self, new_value: &str) -> DetailedLeadReportSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The `next_page_token` value returned from a previous request to SearchDetailedLeadReports that indicates where listing should continue. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DetailedLeadReportSearchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DetailedLeadReportSearchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of accounts to return. If the page size is unset, page size will default to 1000. Maximum page_size is 10000. Optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.
     ///
     /// Sets the *end date.year* query property to the given value.
-    pub fn end_date_year(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn end_date_year(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._end_date_year = Some(new_value);
         self
     }
     /// Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.
     ///
     /// Sets the *end date.month* query property to the given value.
-    pub fn end_date_month(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn end_date_month(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._end_date_month = Some(new_value);
         self
     }
     /// Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.
     ///
     /// Sets the *end date.day* query property to the given value.
-    pub fn end_date_day(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a> {
+    pub fn end_date_day(mut self, new_value: i32) -> DetailedLeadReportSearchCall<'a, S> {
         self._end_date_day = Some(new_value);
         self
     }
@@ -1157,7 +1174,7 @@ impl<'a> DetailedLeadReportSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DetailedLeadReportSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DetailedLeadReportSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1182,7 +1199,7 @@ impl<'a> DetailedLeadReportSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DetailedLeadReportSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DetailedLeadReportSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1202,9 +1219,9 @@ impl<'a> DetailedLeadReportSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DetailedLeadReportSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DetailedLeadReportSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

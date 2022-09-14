@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,37 +109,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AccessContextManager<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AccessContextManager<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AccessContextManager<> {}
+impl<'a, S> client::Hub for AccessContextManager<S> {}
 
-impl<'a, > AccessContextManager<> {
+impl<'a, S> AccessContextManager<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AccessContextManager<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AccessContextManager<S> {
         AccessContextManager {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://accesscontextmanager.googleapis.com/".to_string(),
             _root_url: "https://accesscontextmanager.googleapis.com/".to_string(),
         }
     }
 
-    pub fn access_policies(&'a self) -> AccessPolicyMethods<'a> {
+    pub fn access_policies(&'a self) -> AccessPolicyMethods<'a, S> {
         AccessPolicyMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -556,22 +561,22 @@ impl client::Part for VpcAccessibleServices {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `access_levels_create(...)`, `access_levels_delete(...)`, `access_levels_get(...)`, `access_levels_list(...)`, `access_levels_patch(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)`, `service_perimeters_create(...)`, `service_perimeters_delete(...)`, `service_perimeters_get(...)`, `service_perimeters_list(...)` and `service_perimeters_patch(...)`
 /// // to build up your call.
 /// let rb = hub.access_policies();
 /// # }
 /// ```
-pub struct AccessPolicyMethods<'a>
-    where  {
+pub struct AccessPolicyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccessPolicyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccessPolicyMethods<'a, S> {}
 
-impl<'a> AccessPolicyMethods<'a> {
+impl<'a, S> AccessPolicyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -581,7 +586,7 @@ impl<'a> AccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Resource name for the access policy which owns this Access Level. Format: `accessPolicies/{policy_id}`
-    pub fn access_levels_create(&self, request: AccessLevel, parent: &str) -> AccessPolicyAccessLevelCreateCall<'a> {
+    pub fn access_levels_create(&self, request: AccessLevel, parent: &str) -> AccessPolicyAccessLevelCreateCall<'a, S> {
         AccessPolicyAccessLevelCreateCall {
             hub: self.hub,
             _request: request,
@@ -599,7 +604,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name for the Access Level. Format: `accessPolicies/{policy_id}/accessLevels/{access_level_id}`
-    pub fn access_levels_delete(&self, name: &str) -> AccessPolicyAccessLevelDeleteCall<'a> {
+    pub fn access_levels_delete(&self, name: &str) -> AccessPolicyAccessLevelDeleteCall<'a, S> {
         AccessPolicyAccessLevelDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -616,7 +621,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name for the Access Level. Format: `accessPolicies/{policy_id}/accessLevels/{access_level_id}`
-    pub fn access_levels_get(&self, name: &str) -> AccessPolicyAccessLevelGetCall<'a> {
+    pub fn access_levels_get(&self, name: &str) -> AccessPolicyAccessLevelGetCall<'a, S> {
         AccessPolicyAccessLevelGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -634,7 +639,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Resource name for the access policy to list Access Levels from. Format: `accessPolicies/{policy_id}`
-    pub fn access_levels_list(&self, parent: &str) -> AccessPolicyAccessLevelListCall<'a> {
+    pub fn access_levels_list(&self, parent: &str) -> AccessPolicyAccessLevelListCall<'a, S> {
         AccessPolicyAccessLevelListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -655,7 +660,7 @@ impl<'a> AccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name for the Access Level. The `short_name` component must begin with a letter and only include alphanumeric and '_'. Format: `accessPolicies/{policy_id}/accessLevels/{short_name}`. The maximum length // of the `short_name` component is 50 characters.
-    pub fn access_levels_patch(&self, request: AccessLevel, name: &str) -> AccessPolicyAccessLevelPatchCall<'a> {
+    pub fn access_levels_patch(&self, request: AccessLevel, name: &str) -> AccessPolicyAccessLevelPatchCall<'a, S> {
         AccessPolicyAccessLevelPatchCall {
             hub: self.hub,
             _request: request,
@@ -675,7 +680,7 @@ impl<'a> AccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Resource name for the access policy which owns this Service Perimeter. Format: `accessPolicies/{policy_id}`
-    pub fn service_perimeters_create(&self, request: ServicePerimeter, parent: &str) -> AccessPolicyServicePerimeterCreateCall<'a> {
+    pub fn service_perimeters_create(&self, request: ServicePerimeter, parent: &str) -> AccessPolicyServicePerimeterCreateCall<'a, S> {
         AccessPolicyServicePerimeterCreateCall {
             hub: self.hub,
             _request: request,
@@ -693,7 +698,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name for the Service Perimeter. Format: `accessPolicies/{policy_id}/servicePerimeters/{service_perimeter_id}`
-    pub fn service_perimeters_delete(&self, name: &str) -> AccessPolicyServicePerimeterDeleteCall<'a> {
+    pub fn service_perimeters_delete(&self, name: &str) -> AccessPolicyServicePerimeterDeleteCall<'a, S> {
         AccessPolicyServicePerimeterDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -710,7 +715,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name for the Service Perimeter. Format: `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
-    pub fn service_perimeters_get(&self, name: &str) -> AccessPolicyServicePerimeterGetCall<'a> {
+    pub fn service_perimeters_get(&self, name: &str) -> AccessPolicyServicePerimeterGetCall<'a, S> {
         AccessPolicyServicePerimeterGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -727,7 +732,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Resource name for the access policy to list Service Perimeters from. Format: `accessPolicies/{policy_id}`
-    pub fn service_perimeters_list(&self, parent: &str) -> AccessPolicyServicePerimeterListCall<'a> {
+    pub fn service_perimeters_list(&self, parent: &str) -> AccessPolicyServicePerimeterListCall<'a, S> {
         AccessPolicyServicePerimeterListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -747,7 +752,7 @@ impl<'a> AccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name for the ServicePerimeter. The `short_name` component must begin with a letter and only include alphanumeric and '_'. Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
-    pub fn service_perimeters_patch(&self, request: ServicePerimeter, name: &str) -> AccessPolicyServicePerimeterPatchCall<'a> {
+    pub fn service_perimeters_patch(&self, request: ServicePerimeter, name: &str) -> AccessPolicyServicePerimeterPatchCall<'a, S> {
         AccessPolicyServicePerimeterPatchCall {
             hub: self.hub,
             _request: request,
@@ -766,7 +771,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: AccessPolicy) -> AccessPolicyCreateCall<'a> {
+    pub fn create(&self, request: AccessPolicy) -> AccessPolicyCreateCall<'a, S> {
         AccessPolicyCreateCall {
             hub: self.hub,
             _request: request,
@@ -783,7 +788,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name for the access policy to delete. Format `accessPolicies/{policy_id}`
-    pub fn delete(&self, name: &str) -> AccessPolicyDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> AccessPolicyDeleteCall<'a, S> {
         AccessPolicyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -800,7 +805,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name for the access policy to get. Format `accessPolicies/{policy_id}`
-    pub fn get(&self, name: &str) -> AccessPolicyGetCall<'a> {
+    pub fn get(&self, name: &str) -> AccessPolicyGetCall<'a, S> {
         AccessPolicyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -813,7 +818,7 @@ impl<'a> AccessPolicyMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all AccessPolicies under a container.
-    pub fn list(&self) -> AccessPolicyListCall<'a> {
+    pub fn list(&self) -> AccessPolicyListCall<'a, S> {
         AccessPolicyListCall {
             hub: self.hub,
             _parent: Default::default(),
@@ -833,7 +838,7 @@ impl<'a> AccessPolicyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of the `AccessPolicy`. Format: `accessPolicies/{policy_id}`
-    pub fn patch(&self, request: AccessPolicy, name: &str) -> AccessPolicyPatchCall<'a> {
+    pub fn patch(&self, request: AccessPolicy, name: &str) -> AccessPolicyPatchCall<'a, S> {
         AccessPolicyPatchCall {
             hub: self.hub,
             _request: request,
@@ -869,22 +874,22 @@ impl<'a> AccessPolicyMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -893,7 +898,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -935,7 +940,7 @@ impl<'a> OperationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -948,10 +953,10 @@ impl<'a> OperationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyAccessLevelCreateCall<'a>
-    where  {
+pub struct AccessPolicyAccessLevelCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _request: AccessLevel,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -959,9 +964,15 @@ pub struct AccessPolicyAccessLevelCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyAccessLevelCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyAccessLevelCreateCall<'a, S> {}
 
-impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
+impl<'a, S> AccessPolicyAccessLevelCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1121,7 +1132,7 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessLevel) -> AccessPolicyAccessLevelCreateCall<'a> {
+    pub fn request(mut self, new_value: AccessLevel) -> AccessPolicyAccessLevelCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1131,7 +1142,7 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccessPolicyAccessLevelCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccessPolicyAccessLevelCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1141,7 +1152,7 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1166,7 +1177,7 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1186,9 +1197,9 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyAccessLevelCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyAccessLevelCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1220,7 +1231,7 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1228,19 +1239,25 @@ impl<'a> AccessPolicyAccessLevelCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyAccessLevelDeleteCall<'a>
-    where  {
+pub struct AccessPolicyAccessLevelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyAccessLevelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyAccessLevelDeleteCall<'a, S> {}
 
-impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
+impl<'a, S> AccessPolicyAccessLevelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1387,7 +1404,7 @@ impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyAccessLevelDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyAccessLevelDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1397,7 +1414,7 @@ impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1422,7 +1439,7 @@ impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1442,9 +1459,9 @@ impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyAccessLevelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyAccessLevelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1476,7 +1493,7 @@ impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1485,10 +1502,10 @@ impl<'a> AccessPolicyAccessLevelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyAccessLevelGetCall<'a>
-    where  {
+pub struct AccessPolicyAccessLevelGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _access_level_format: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1496,9 +1513,15 @@ pub struct AccessPolicyAccessLevelGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyAccessLevelGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyAccessLevelGetCall<'a, S> {}
 
-impl<'a> AccessPolicyAccessLevelGetCall<'a> {
+impl<'a, S> AccessPolicyAccessLevelGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1648,14 +1671,14 @@ impl<'a> AccessPolicyAccessLevelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyAccessLevelGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyAccessLevelGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Whether to return `BasicLevels` in the Cloud Common Expression Language rather than as `BasicLevels`. Defaults to AS_DEFINED, where Access Levels are returned as `BasicLevels` or `CustomLevels` based on how they were created. If set to CEL, all Access Levels are returned as `CustomLevels`. In the CEL case, `BasicLevels` are translated to equivalent `CustomLevels`.
     ///
     /// Sets the *access level format* query property to the given value.
-    pub fn access_level_format(mut self, new_value: &str) -> AccessPolicyAccessLevelGetCall<'a> {
+    pub fn access_level_format(mut self, new_value: &str) -> AccessPolicyAccessLevelGetCall<'a, S> {
         self._access_level_format = Some(new_value.to_string());
         self
     }
@@ -1665,7 +1688,7 @@ impl<'a> AccessPolicyAccessLevelGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1690,7 +1713,7 @@ impl<'a> AccessPolicyAccessLevelGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1710,9 +1733,9 @@ impl<'a> AccessPolicyAccessLevelGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyAccessLevelGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyAccessLevelGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1744,7 +1767,7 @@ impl<'a> AccessPolicyAccessLevelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1755,10 +1778,10 @@ impl<'a> AccessPolicyAccessLevelGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyAccessLevelListCall<'a>
-    where  {
+pub struct AccessPolicyAccessLevelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1768,9 +1791,15 @@ pub struct AccessPolicyAccessLevelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyAccessLevelListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyAccessLevelListCall<'a, S> {}
 
-impl<'a> AccessPolicyAccessLevelListCall<'a> {
+impl<'a, S> AccessPolicyAccessLevelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1926,28 +1955,28 @@ impl<'a> AccessPolicyAccessLevelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Next page token for the next batch of Access Level instances. Defaults to the first page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Number of Access Levels to include in the list. Default 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccessPolicyAccessLevelListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccessPolicyAccessLevelListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Whether to return `BasicLevels` in the Cloud Common Expression language, as `CustomLevels`, rather than as `BasicLevels`. Defaults to returning `AccessLevels` in the format they were defined.
     ///
     /// Sets the *access level format* query property to the given value.
-    pub fn access_level_format(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a> {
+    pub fn access_level_format(mut self, new_value: &str) -> AccessPolicyAccessLevelListCall<'a, S> {
         self._access_level_format = Some(new_value.to_string());
         self
     }
@@ -1957,7 +1986,7 @@ impl<'a> AccessPolicyAccessLevelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1982,7 +2011,7 @@ impl<'a> AccessPolicyAccessLevelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2002,9 +2031,9 @@ impl<'a> AccessPolicyAccessLevelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyAccessLevelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyAccessLevelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2037,7 +2066,7 @@ impl<'a> AccessPolicyAccessLevelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2051,10 +2080,10 @@ impl<'a> AccessPolicyAccessLevelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyAccessLevelPatchCall<'a>
-    where  {
+pub struct AccessPolicyAccessLevelPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _request: AccessLevel,
     _name: String,
     _update_mask: Option<String>,
@@ -2063,9 +2092,15 @@ pub struct AccessPolicyAccessLevelPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyAccessLevelPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyAccessLevelPatchCall<'a, S> {}
 
-impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
+impl<'a, S> AccessPolicyAccessLevelPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2228,7 +2263,7 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessLevel) -> AccessPolicyAccessLevelPatchCall<'a> {
+    pub fn request(mut self, new_value: AccessLevel) -> AccessPolicyAccessLevelPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2238,14 +2273,14 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyAccessLevelPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyAccessLevelPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask to control which fields get updated. Must be non-empty.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyAccessLevelPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyAccessLevelPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2255,7 +2290,7 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyAccessLevelPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2280,7 +2315,7 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyAccessLevelPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2300,9 +2335,9 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyAccessLevelPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyAccessLevelPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2335,7 +2370,7 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2348,10 +2383,10 @@ impl<'a> AccessPolicyAccessLevelPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterCreateCall<'a>
-    where  {
+pub struct AccessPolicyServicePerimeterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _request: ServicePerimeter,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2359,9 +2394,15 @@ pub struct AccessPolicyServicePerimeterCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyServicePerimeterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyServicePerimeterCreateCall<'a, S> {}
 
-impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
+impl<'a, S> AccessPolicyServicePerimeterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2521,7 +2562,7 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ServicePerimeter) -> AccessPolicyServicePerimeterCreateCall<'a> {
+    pub fn request(mut self, new_value: ServicePerimeter) -> AccessPolicyServicePerimeterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2531,7 +2572,7 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccessPolicyServicePerimeterCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccessPolicyServicePerimeterCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2541,7 +2582,7 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2566,7 +2607,7 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2586,9 +2627,9 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyServicePerimeterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2620,7 +2661,7 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2628,19 +2669,25 @@ impl<'a> AccessPolicyServicePerimeterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterDeleteCall<'a>
-    where  {
+pub struct AccessPolicyServicePerimeterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyServicePerimeterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyServicePerimeterDeleteCall<'a, S> {}
 
-impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
+impl<'a, S> AccessPolicyServicePerimeterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2787,7 +2834,7 @@ impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2797,7 +2844,7 @@ impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2822,7 +2869,7 @@ impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2842,9 +2889,9 @@ impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyServicePerimeterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2876,7 +2923,7 @@ impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2884,19 +2931,25 @@ impl<'a> AccessPolicyServicePerimeterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterGetCall<'a>
-    where  {
+pub struct AccessPolicyServicePerimeterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyServicePerimeterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyServicePerimeterGetCall<'a, S> {}
 
-impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
+impl<'a, S> AccessPolicyServicePerimeterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3043,7 +3096,7 @@ impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3053,7 +3106,7 @@ impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3078,7 +3131,7 @@ impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3098,9 +3151,9 @@ impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyServicePerimeterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3132,7 +3185,7 @@ impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3142,10 +3195,10 @@ impl<'a> AccessPolicyServicePerimeterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterListCall<'a>
-    where  {
+pub struct AccessPolicyServicePerimeterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3154,9 +3207,15 @@ pub struct AccessPolicyServicePerimeterListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyServicePerimeterListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyServicePerimeterListCall<'a, S> {}
 
-impl<'a> AccessPolicyServicePerimeterListCall<'a> {
+impl<'a, S> AccessPolicyServicePerimeterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3309,21 +3368,21 @@ impl<'a> AccessPolicyServicePerimeterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccessPolicyServicePerimeterListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccessPolicyServicePerimeterListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Next page token for the next batch of Service Perimeter instances. Defaults to the first page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccessPolicyServicePerimeterListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccessPolicyServicePerimeterListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Number of Service Perimeters to include in the list. Default 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccessPolicyServicePerimeterListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccessPolicyServicePerimeterListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3333,7 +3392,7 @@ impl<'a> AccessPolicyServicePerimeterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3358,7 +3417,7 @@ impl<'a> AccessPolicyServicePerimeterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3378,9 +3437,9 @@ impl<'a> AccessPolicyServicePerimeterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyServicePerimeterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3413,7 +3472,7 @@ impl<'a> AccessPolicyServicePerimeterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3427,10 +3486,10 @@ impl<'a> AccessPolicyServicePerimeterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterPatchCall<'a>
-    where  {
+pub struct AccessPolicyServicePerimeterPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _request: ServicePerimeter,
     _name: String,
     _update_mask: Option<String>,
@@ -3439,9 +3498,15 @@ pub struct AccessPolicyServicePerimeterPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyServicePerimeterPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyServicePerimeterPatchCall<'a, S> {}
 
-impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
+impl<'a, S> AccessPolicyServicePerimeterPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3604,7 +3669,7 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ServicePerimeter) -> AccessPolicyServicePerimeterPatchCall<'a> {
+    pub fn request(mut self, new_value: ServicePerimeter) -> AccessPolicyServicePerimeterPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3614,14 +3679,14 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask to control which fields get updated. Must be non-empty.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3631,7 +3696,7 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyServicePerimeterPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3656,7 +3721,7 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3676,9 +3741,9 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyServicePerimeterPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3711,7 +3776,7 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3724,19 +3789,25 @@ impl<'a> AccessPolicyServicePerimeterPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyCreateCall<'a>
-    where  {
+pub struct AccessPolicyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _request: AccessPolicy,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyCreateCall<'a, S> {}
 
-impl<'a> AccessPolicyCreateCall<'a> {
+impl<'a, S> AccessPolicyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3870,7 +3941,7 @@ impl<'a> AccessPolicyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessPolicy) -> AccessPolicyCreateCall<'a> {
+    pub fn request(mut self, new_value: AccessPolicy) -> AccessPolicyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3880,7 +3951,7 @@ impl<'a> AccessPolicyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3905,7 +3976,7 @@ impl<'a> AccessPolicyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3925,9 +3996,9 @@ impl<'a> AccessPolicyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3959,7 +4030,7 @@ impl<'a> AccessPolicyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3967,19 +4038,25 @@ impl<'a> AccessPolicyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyDeleteCall<'a>
-    where  {
+pub struct AccessPolicyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyDeleteCall<'a, S> {}
 
-impl<'a> AccessPolicyDeleteCall<'a> {
+impl<'a, S> AccessPolicyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4126,7 +4203,7 @@ impl<'a> AccessPolicyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4136,7 +4213,7 @@ impl<'a> AccessPolicyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4161,7 +4238,7 @@ impl<'a> AccessPolicyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4181,9 +4258,9 @@ impl<'a> AccessPolicyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4215,7 +4292,7 @@ impl<'a> AccessPolicyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4223,19 +4300,25 @@ impl<'a> AccessPolicyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyGetCall<'a>
-    where  {
+pub struct AccessPolicyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyGetCall<'a, S> {}
 
-impl<'a> AccessPolicyGetCall<'a> {
+impl<'a, S> AccessPolicyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4382,7 +4465,7 @@ impl<'a> AccessPolicyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4392,7 +4475,7 @@ impl<'a> AccessPolicyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4417,7 +4500,7 @@ impl<'a> AccessPolicyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4437,9 +4520,9 @@ impl<'a> AccessPolicyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4471,7 +4554,7 @@ impl<'a> AccessPolicyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4482,10 +4565,10 @@ impl<'a> AccessPolicyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyListCall<'a>
-    where  {
+pub struct AccessPolicyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _parent: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4494,9 +4577,15 @@ pub struct AccessPolicyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyListCall<'a, S> {}
 
-impl<'a> AccessPolicyListCall<'a> {
+impl<'a, S> AccessPolicyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4623,21 +4712,21 @@ impl<'a> AccessPolicyListCall<'a> {
     /// Required. Resource name for the container to list AccessPolicy instances from. Format: `organizations/{org_id}`
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> AccessPolicyListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccessPolicyListCall<'a, S> {
         self._parent = Some(new_value.to_string());
         self
     }
     /// Next page token for the next batch of AccessPolicy instances. Defaults to the first page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccessPolicyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccessPolicyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Number of AccessPolicy instances to include in the list. Default 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccessPolicyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccessPolicyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4647,7 +4736,7 @@ impl<'a> AccessPolicyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4672,7 +4761,7 @@ impl<'a> AccessPolicyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4692,9 +4781,9 @@ impl<'a> AccessPolicyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4727,7 +4816,7 @@ impl<'a> AccessPolicyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4741,10 +4830,10 @@ impl<'a> AccessPolicyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccessPolicyPatchCall<'a>
-    where  {
+pub struct AccessPolicyPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _request: AccessPolicy,
     _name: String,
     _update_mask: Option<String>,
@@ -4753,9 +4842,15 @@ pub struct AccessPolicyPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccessPolicyPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccessPolicyPatchCall<'a, S> {}
 
-impl<'a> AccessPolicyPatchCall<'a> {
+impl<'a, S> AccessPolicyPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4918,7 +5013,7 @@ impl<'a> AccessPolicyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessPolicy) -> AccessPolicyPatchCall<'a> {
+    pub fn request(mut self, new_value: AccessPolicy) -> AccessPolicyPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4928,14 +5023,14 @@ impl<'a> AccessPolicyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask to control which fields get updated. Must be non-empty.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4945,7 +5040,7 @@ impl<'a> AccessPolicyPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccessPolicyPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4970,7 +5065,7 @@ impl<'a> AccessPolicyPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4990,9 +5085,9 @@ impl<'a> AccessPolicyPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccessPolicyPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5024,7 +5119,7 @@ impl<'a> AccessPolicyPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AccessContextManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5032,19 +5127,25 @@ impl<'a> AccessPolicyPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AccessContextManager<>,
+    hub: &'a AccessContextManager<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5191,7 +5292,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5201,7 +5302,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5226,7 +5327,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5246,9 +5347,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

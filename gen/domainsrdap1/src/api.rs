@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -75,49 +80,49 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct DomainsRDAP<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct DomainsRDAP<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for DomainsRDAP<> {}
+impl<'a, S> client::Hub for DomainsRDAP<S> {}
 
-impl<'a, > DomainsRDAP<> {
+impl<'a, S> DomainsRDAP<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DomainsRDAP<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DomainsRDAP<S> {
         DomainsRDAP {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://domainsrdap.googleapis.com/".to_string(),
             _root_url: "https://domainsrdap.googleapis.com/".to_string(),
         }
     }
 
-    pub fn autnum(&'a self) -> AutnumMethods<'a> {
+    pub fn autnum(&'a self) -> AutnumMethods<'a, S> {
         AutnumMethods { hub: &self }
     }
-    pub fn domain(&'a self) -> DomainMethods<'a> {
+    pub fn domain(&'a self) -> DomainMethods<'a, S> {
         DomainMethods { hub: &self }
     }
-    pub fn entity(&'a self) -> EntityMethods<'a> {
+    pub fn entity(&'a self) -> EntityMethods<'a, S> {
         EntityMethods { hub: &self }
     }
-    pub fn ip(&'a self) -> IpMethods<'a> {
+    pub fn ip(&'a self) -> IpMethods<'a, S> {
         IpMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a> {
+    pub fn methods(&'a self) -> MethodMethods<'a, S> {
         MethodMethods { hub: &self }
     }
-    pub fn nameserver(&'a self) -> NameserverMethods<'a> {
+    pub fn nameserver(&'a self) -> NameserverMethods<'a, S> {
         NameserverMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -281,22 +286,22 @@ impl client::ResponseResult for RdapResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.autnum();
 /// # }
 /// ```
-pub struct AutnumMethods<'a>
-    where  {
+pub struct AutnumMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for AutnumMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AutnumMethods<'a, S> {}
 
-impl<'a> AutnumMethods<'a> {
+impl<'a, S> AutnumMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -305,7 +310,7 @@ impl<'a> AutnumMethods<'a> {
     /// # Arguments
     ///
     /// * `autnumId` - No description provided.
-    pub fn get(&self, autnum_id: &str) -> AutnumGetCall<'a> {
+    pub fn get(&self, autnum_id: &str) -> AutnumGetCall<'a, S> {
         AutnumGetCall {
             hub: self.hub,
             _autnum_id: autnum_id.to_string(),
@@ -338,22 +343,22 @@ impl<'a> AutnumMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.domain();
 /// # }
 /// ```
-pub struct DomainMethods<'a>
-    where  {
+pub struct DomainMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for DomainMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DomainMethods<'a, S> {}
 
-impl<'a> DomainMethods<'a> {
+impl<'a, S> DomainMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -362,7 +367,7 @@ impl<'a> DomainMethods<'a> {
     /// # Arguments
     ///
     /// * `domainName` - Full domain name to look up. Example: "example.com"
-    pub fn get(&self, domain_name: &str) -> DomainGetCall<'a> {
+    pub fn get(&self, domain_name: &str) -> DomainGetCall<'a, S> {
         DomainGetCall {
             hub: self.hub,
             _domain_name: domain_name.to_string(),
@@ -395,22 +400,22 @@ impl<'a> DomainMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.entity();
 /// # }
 /// ```
-pub struct EntityMethods<'a>
-    where  {
+pub struct EntityMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for EntityMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EntityMethods<'a, S> {}
 
-impl<'a> EntityMethods<'a> {
+impl<'a, S> EntityMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -419,7 +424,7 @@ impl<'a> EntityMethods<'a> {
     /// # Arguments
     ///
     /// * `entityId` - No description provided.
-    pub fn get(&self, entity_id: &str) -> EntityGetCall<'a> {
+    pub fn get(&self, entity_id: &str) -> EntityGetCall<'a, S> {
         EntityGetCall {
             hub: self.hub,
             _entity_id: entity_id.to_string(),
@@ -452,22 +457,22 @@ impl<'a> EntityMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.ip();
 /// # }
 /// ```
-pub struct IpMethods<'a>
-    where  {
+pub struct IpMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for IpMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for IpMethods<'a, S> {}
 
-impl<'a> IpMethods<'a> {
+impl<'a, S> IpMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -477,7 +482,7 @@ impl<'a> IpMethods<'a> {
     ///
     /// * `ipId` - No description provided.
     /// * `ipId1` - No description provided.
-    pub fn get(&self, ip_id: &str, ip_id1: &str) -> IpGetCall<'a> {
+    pub fn get(&self, ip_id: &str, ip_id1: &str) -> IpGetCall<'a, S> {
         IpGetCall {
             hub: self.hub,
             _ip_id: ip_id.to_string(),
@@ -511,22 +516,22 @@ impl<'a> IpMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.nameserver();
 /// # }
 /// ```
-pub struct NameserverMethods<'a>
-    where  {
+pub struct NameserverMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for NameserverMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for NameserverMethods<'a, S> {}
 
-impl<'a> NameserverMethods<'a> {
+impl<'a, S> NameserverMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -535,7 +540,7 @@ impl<'a> NameserverMethods<'a> {
     /// # Arguments
     ///
     /// * `nameserverId` - No description provided.
-    pub fn get(&self, nameserver_id: &str) -> NameserverGetCall<'a> {
+    pub fn get(&self, nameserver_id: &str) -> NameserverGetCall<'a, S> {
         NameserverGetCall {
             hub: self.hub,
             _nameserver_id: nameserver_id.to_string(),
@@ -568,27 +573,27 @@ impl<'a> NameserverMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_domains(...)`, `get_entities(...)`, `get_help(...)`, `get_ip(...)` and `get_nameservers(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a>
-    where  {
+pub struct MethodMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
 }
 
-impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
 
-impl<'a> MethodMethods<'a> {
+impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_domains(&self) -> MethodGetDomainCall<'a> {
+    pub fn get_domains(&self) -> MethodGetDomainCall<'a, S> {
         MethodGetDomainCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -599,7 +604,7 @@ impl<'a> MethodMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_entities(&self) -> MethodGetEntityCall<'a> {
+    pub fn get_entities(&self) -> MethodGetEntityCall<'a, S> {
         MethodGetEntityCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -610,7 +615,7 @@ impl<'a> MethodMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get help information for the RDAP API, including links to documentation.
-    pub fn get_help(&self) -> MethodGetHelpCall<'a> {
+    pub fn get_help(&self) -> MethodGetHelpCall<'a, S> {
         MethodGetHelpCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -621,7 +626,7 @@ impl<'a> MethodMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_ip(&self) -> MethodGetIpCall<'a> {
+    pub fn get_ip(&self) -> MethodGetIpCall<'a, S> {
         MethodGetIpCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -632,7 +637,7 @@ impl<'a> MethodMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_nameservers(&self) -> MethodGetNameserverCall<'a> {
+    pub fn get_nameservers(&self) -> MethodGetNameserverCall<'a, S> {
         MethodGetNameserverCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -671,7 +676,7 @@ impl<'a> MethodMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -679,18 +684,24 @@ impl<'a> MethodMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutnumGetCall<'a>
-    where  {
+pub struct AutnumGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _autnum_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AutnumGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AutnumGetCall<'a, S> {}
 
-impl<'a> AutnumGetCall<'a> {
+impl<'a, S> AutnumGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -826,7 +837,7 @@ impl<'a> AutnumGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn autnum_id(mut self, new_value: &str) -> AutnumGetCall<'a> {
+    pub fn autnum_id(mut self, new_value: &str) -> AutnumGetCall<'a, S> {
         self._autnum_id = new_value.to_string();
         self
     }
@@ -836,7 +847,7 @@ impl<'a> AutnumGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutnumGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutnumGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -861,7 +872,7 @@ impl<'a> AutnumGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AutnumGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AutnumGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -892,7 +903,7 @@ impl<'a> AutnumGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -900,18 +911,24 @@ impl<'a> AutnumGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DomainGetCall<'a>
-    where  {
+pub struct DomainGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _domain_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for DomainGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DomainGetCall<'a, S> {}
 
-impl<'a> DomainGetCall<'a> {
+impl<'a, S> DomainGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1052,7 +1069,7 @@ impl<'a> DomainGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn domain_name(mut self, new_value: &str) -> DomainGetCall<'a> {
+    pub fn domain_name(mut self, new_value: &str) -> DomainGetCall<'a, S> {
         self._domain_name = new_value.to_string();
         self
     }
@@ -1062,7 +1079,7 @@ impl<'a> DomainGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1087,7 +1104,7 @@ impl<'a> DomainGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DomainGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DomainGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1118,7 +1135,7 @@ impl<'a> DomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1126,18 +1143,24 @@ impl<'a> DomainGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EntityGetCall<'a>
-    where  {
+pub struct EntityGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _entity_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for EntityGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EntityGetCall<'a, S> {}
 
-impl<'a> EntityGetCall<'a> {
+impl<'a, S> EntityGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1273,7 +1296,7 @@ impl<'a> EntityGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity_id(mut self, new_value: &str) -> EntityGetCall<'a> {
+    pub fn entity_id(mut self, new_value: &str) -> EntityGetCall<'a, S> {
         self._entity_id = new_value.to_string();
         self
     }
@@ -1283,7 +1306,7 @@ impl<'a> EntityGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntityGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntityGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1308,7 +1331,7 @@ impl<'a> EntityGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EntityGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EntityGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1339,7 +1362,7 @@ impl<'a> EntityGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1347,19 +1370,25 @@ impl<'a> EntityGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct IpGetCall<'a>
-    where  {
+pub struct IpGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _ip_id: String,
     _ip_id1: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for IpGetCall<'a> {}
+impl<'a, S> client::CallBuilder for IpGetCall<'a, S> {}
 
-impl<'a> IpGetCall<'a> {
+impl<'a, S> IpGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1496,7 +1525,7 @@ impl<'a> IpGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ip_id(mut self, new_value: &str) -> IpGetCall<'a> {
+    pub fn ip_id(mut self, new_value: &str) -> IpGetCall<'a, S> {
         self._ip_id = new_value.to_string();
         self
     }
@@ -1505,7 +1534,7 @@ impl<'a> IpGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ip_id1(mut self, new_value: &str) -> IpGetCall<'a> {
+    pub fn ip_id1(mut self, new_value: &str) -> IpGetCall<'a, S> {
         self._ip_id1 = new_value.to_string();
         self
     }
@@ -1515,7 +1544,7 @@ impl<'a> IpGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> IpGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> IpGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1540,7 +1569,7 @@ impl<'a> IpGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> IpGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> IpGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1571,7 +1600,7 @@ impl<'a> IpGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1579,18 +1608,24 @@ impl<'a> IpGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NameserverGetCall<'a>
-    where  {
+pub struct NameserverGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _nameserver_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for NameserverGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NameserverGetCall<'a, S> {}
 
-impl<'a> NameserverGetCall<'a> {
+impl<'a, S> NameserverGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1726,7 +1761,7 @@ impl<'a> NameserverGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn nameserver_id(mut self, new_value: &str) -> NameserverGetCall<'a> {
+    pub fn nameserver_id(mut self, new_value: &str) -> NameserverGetCall<'a, S> {
         self._nameserver_id = new_value.to_string();
         self
     }
@@ -1736,7 +1771,7 @@ impl<'a> NameserverGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NameserverGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NameserverGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1761,7 +1796,7 @@ impl<'a> NameserverGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NameserverGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NameserverGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1792,7 +1827,7 @@ impl<'a> NameserverGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1800,17 +1835,23 @@ impl<'a> NameserverGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetDomainCall<'a>
-    where  {
+pub struct MethodGetDomainCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for MethodGetDomainCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetDomainCall<'a, S> {}
 
-impl<'a> MethodGetDomainCall<'a> {
+impl<'a, S> MethodGetDomainCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1925,7 +1966,7 @@ impl<'a> MethodGetDomainCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetDomainCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetDomainCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1950,7 +1991,7 @@ impl<'a> MethodGetDomainCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetDomainCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetDomainCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1981,7 +2022,7 @@ impl<'a> MethodGetDomainCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1989,17 +2030,23 @@ impl<'a> MethodGetDomainCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetEntityCall<'a>
-    where  {
+pub struct MethodGetEntityCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for MethodGetEntityCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetEntityCall<'a, S> {}
 
-impl<'a> MethodGetEntityCall<'a> {
+impl<'a, S> MethodGetEntityCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2114,7 +2161,7 @@ impl<'a> MethodGetEntityCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEntityCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEntityCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2139,7 +2186,7 @@ impl<'a> MethodGetEntityCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEntityCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEntityCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2170,7 +2217,7 @@ impl<'a> MethodGetEntityCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2178,17 +2225,23 @@ impl<'a> MethodGetEntityCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetHelpCall<'a>
-    where  {
+pub struct MethodGetHelpCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for MethodGetHelpCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetHelpCall<'a, S> {}
 
-impl<'a> MethodGetHelpCall<'a> {
+impl<'a, S> MethodGetHelpCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2303,7 +2356,7 @@ impl<'a> MethodGetHelpCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetHelpCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetHelpCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2328,7 +2381,7 @@ impl<'a> MethodGetHelpCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetHelpCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetHelpCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2359,7 +2412,7 @@ impl<'a> MethodGetHelpCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2367,17 +2420,23 @@ impl<'a> MethodGetHelpCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetIpCall<'a>
-    where  {
+pub struct MethodGetIpCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for MethodGetIpCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetIpCall<'a, S> {}
 
-impl<'a> MethodGetIpCall<'a> {
+impl<'a, S> MethodGetIpCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2492,7 +2551,7 @@ impl<'a> MethodGetIpCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIpCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIpCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2517,7 +2576,7 @@ impl<'a> MethodGetIpCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIpCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIpCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2548,7 +2607,7 @@ impl<'a> MethodGetIpCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DomainsRDAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2556,17 +2615,23 @@ impl<'a> MethodGetIpCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetNameserverCall<'a>
-    where  {
+pub struct MethodGetNameserverCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DomainsRDAP<>,
+    hub: &'a DomainsRDAP<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for MethodGetNameserverCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetNameserverCall<'a, S> {}
 
-impl<'a> MethodGetNameserverCall<'a> {
+impl<'a, S> MethodGetNameserverCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2681,7 +2746,7 @@ impl<'a> MethodGetNameserverCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetNameserverCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetNameserverCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2706,7 +2771,7 @@ impl<'a> MethodGetNameserverCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetNameserverCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetNameserverCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

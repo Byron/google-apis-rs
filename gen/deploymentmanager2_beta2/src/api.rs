@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -83,7 +88,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -118,46 +123,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct DeploymentManager<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct DeploymentManager<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for DeploymentManager<> {}
+impl<'a, S> client::Hub for DeploymentManager<S> {}
 
-impl<'a, > DeploymentManager<> {
+impl<'a, S> DeploymentManager<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DeploymentManager<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> DeploymentManager<S> {
         DeploymentManager {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/deploymentmanager/v2beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn deployments(&'a self) -> DeploymentMethods<'a> {
+    pub fn deployments(&'a self) -> DeploymentMethods<'a, S> {
         DeploymentMethods { hub: &self }
     }
-    pub fn manifests(&'a self) -> ManifestMethods<'a> {
+    pub fn manifests(&'a self) -> ManifestMethods<'a, S> {
         ManifestMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
-    pub fn resources(&'a self) -> ResourceMethods<'a> {
+    pub fn resources(&'a self) -> ResourceMethods<'a, S> {
         ResourceMethods { hub: &self }
     }
-    pub fn types(&'a self) -> TypeMethods<'a> {
+    pub fn types(&'a self) -> TypeMethods<'a, S> {
         TypeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -691,22 +696,22 @@ impl client::Part for OperationWarningsData {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.deployments();
 /// # }
 /// ```
-pub struct DeploymentMethods<'a>
-    where  {
+pub struct DeploymentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for DeploymentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DeploymentMethods<'a, S> {}
 
-impl<'a> DeploymentMethods<'a> {
+impl<'a, S> DeploymentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -716,7 +721,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
-    pub fn delete(&self, project: &str, deployment: &str) -> DeploymentDeleteCall<'a> {
+    pub fn delete(&self, project: &str, deployment: &str) -> DeploymentDeleteCall<'a, S> {
         DeploymentDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -735,7 +740,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
-    pub fn get(&self, project: &str, deployment: &str) -> DeploymentGetCall<'a> {
+    pub fn get(&self, project: &str, deployment: &str) -> DeploymentGetCall<'a, S> {
         DeploymentGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -754,7 +759,7 @@ impl<'a> DeploymentMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project ID for this request.
-    pub fn insert(&self, request: Deployment, project: &str) -> DeploymentInsertCall<'a> {
+    pub fn insert(&self, request: Deployment, project: &str) -> DeploymentInsertCall<'a, S> {
         DeploymentInsertCall {
             hub: self.hub,
             _request: request,
@@ -772,7 +777,7 @@ impl<'a> DeploymentMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - The project ID for this request.
-    pub fn list(&self, project: &str) -> DeploymentListCall<'a> {
+    pub fn list(&self, project: &str) -> DeploymentListCall<'a, S> {
         DeploymentListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -794,7 +799,7 @@ impl<'a> DeploymentMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
-    pub fn patch(&self, request: Deployment, project: &str, deployment: &str) -> DeploymentPatchCall<'a> {
+    pub fn patch(&self, request: Deployment, project: &str, deployment: &str) -> DeploymentPatchCall<'a, S> {
         DeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -818,7 +823,7 @@ impl<'a> DeploymentMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
-    pub fn update(&self, request: Deployment, project: &str, deployment: &str) -> DeploymentUpdateCall<'a> {
+    pub fn update(&self, request: Deployment, project: &str, deployment: &str) -> DeploymentUpdateCall<'a, S> {
         DeploymentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -857,22 +862,22 @@ impl<'a> DeploymentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.manifests();
 /// # }
 /// ```
-pub struct ManifestMethods<'a>
-    where  {
+pub struct ManifestMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for ManifestMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ManifestMethods<'a, S> {}
 
-impl<'a> ManifestMethods<'a> {
+impl<'a, S> ManifestMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -883,7 +888,7 @@ impl<'a> ManifestMethods<'a> {
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
     /// * `manifest` - The name of the manifest for this request.
-    pub fn get(&self, project: &str, deployment: &str, manifest: &str) -> ManifestGetCall<'a> {
+    pub fn get(&self, project: &str, deployment: &str, manifest: &str) -> ManifestGetCall<'a, S> {
         ManifestGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -903,7 +908,7 @@ impl<'a> ManifestMethods<'a> {
     ///
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
-    pub fn list(&self, project: &str, deployment: &str) -> ManifestListCall<'a> {
+    pub fn list(&self, project: &str, deployment: &str) -> ManifestListCall<'a, S> {
         ManifestListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -941,22 +946,22 @@ impl<'a> ManifestMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -966,7 +971,7 @@ impl<'a> OperationMethods<'a> {
     ///
     /// * `project` - The project ID for this request.
     /// * `operation` - The name of the operation for this request.
-    pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -984,7 +989,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - The project ID for this request.
-    pub fn list(&self, project: &str) -> OperationListCall<'a> {
+    pub fn list(&self, project: &str) -> OperationListCall<'a, S> {
         OperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1021,22 +1026,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.resources();
 /// # }
 /// ```
-pub struct ResourceMethods<'a>
-    where  {
+pub struct ResourceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for ResourceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ResourceMethods<'a, S> {}
 
-impl<'a> ResourceMethods<'a> {
+impl<'a, S> ResourceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1047,7 +1052,7 @@ impl<'a> ResourceMethods<'a> {
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
     /// * `resource` - The name of the resource for this request.
-    pub fn get(&self, project: &str, deployment: &str, resource: &str) -> ResourceGetCall<'a> {
+    pub fn get(&self, project: &str, deployment: &str, resource: &str) -> ResourceGetCall<'a, S> {
         ResourceGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1067,7 +1072,7 @@ impl<'a> ResourceMethods<'a> {
     ///
     /// * `project` - The project ID for this request.
     /// * `deployment` - The name of the deployment for this request.
-    pub fn list(&self, project: &str, deployment: &str) -> ResourceListCall<'a> {
+    pub fn list(&self, project: &str, deployment: &str) -> ResourceListCall<'a, S> {
         ResourceListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1105,22 +1110,22 @@ impl<'a> ResourceMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.types();
 /// # }
 /// ```
-pub struct TypeMethods<'a>
-    where  {
+pub struct TypeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
 }
 
-impl<'a> client::MethodsBuilder for TypeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TypeMethods<'a, S> {}
 
-impl<'a> TypeMethods<'a> {
+impl<'a, S> TypeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1129,7 +1134,7 @@ impl<'a> TypeMethods<'a> {
     /// # Arguments
     ///
     /// * `project` - The project ID for this request.
-    pub fn list(&self, project: &str) -> TypeListCall<'a> {
+    pub fn list(&self, project: &str) -> TypeListCall<'a, S> {
         TypeListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -1173,7 +1178,7 @@ impl<'a> TypeMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1181,10 +1186,10 @@ impl<'a> TypeMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeleteCall<'a>
-    where  {
+pub struct DeploymentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _deployment: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1192,9 +1197,15 @@ pub struct DeploymentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentDeleteCall<'a, S> {}
 
-impl<'a> DeploymentDeleteCall<'a> {
+impl<'a, S> DeploymentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1338,7 +1349,7 @@ impl<'a> DeploymentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DeploymentDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> DeploymentDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1348,7 +1359,7 @@ impl<'a> DeploymentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> DeploymentDeleteCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> DeploymentDeleteCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
@@ -1358,7 +1369,7 @@ impl<'a> DeploymentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1379,7 +1390,7 @@ impl<'a> DeploymentDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1399,9 +1410,9 @@ impl<'a> DeploymentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1433,7 +1444,7 @@ impl<'a> DeploymentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1441,10 +1452,10 @@ impl<'a> DeploymentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentGetCall<'a>
-    where  {
+pub struct DeploymentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _deployment: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1452,9 +1463,15 @@ pub struct DeploymentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentGetCall<'a, S> {}
 
-impl<'a> DeploymentGetCall<'a> {
+impl<'a, S> DeploymentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1598,7 +1615,7 @@ impl<'a> DeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DeploymentGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> DeploymentGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1608,7 +1625,7 @@ impl<'a> DeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> DeploymentGetCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> DeploymentGetCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
@@ -1618,7 +1635,7 @@ impl<'a> DeploymentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1639,7 +1656,7 @@ impl<'a> DeploymentGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1659,9 +1676,9 @@ impl<'a> DeploymentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1694,7 +1711,7 @@ impl<'a> DeploymentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1707,10 +1724,10 @@ impl<'a> DeploymentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentInsertCall<'a>
-    where  {
+pub struct DeploymentInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _request: Deployment,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1718,9 +1735,15 @@ pub struct DeploymentInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentInsertCall<'a, S> {}
 
-impl<'a> DeploymentInsertCall<'a> {
+impl<'a, S> DeploymentInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1876,7 +1899,7 @@ impl<'a> DeploymentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Deployment) -> DeploymentInsertCall<'a> {
+    pub fn request(mut self, new_value: Deployment) -> DeploymentInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1886,7 +1909,7 @@ impl<'a> DeploymentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DeploymentInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> DeploymentInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1896,7 +1919,7 @@ impl<'a> DeploymentInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1917,7 +1940,7 @@ impl<'a> DeploymentInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1937,9 +1960,9 @@ impl<'a> DeploymentInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1971,7 +1994,7 @@ impl<'a> DeploymentInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1982,10 +2005,10 @@ impl<'a> DeploymentInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentListCall<'a>
-    where  {
+pub struct DeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -1995,9 +2018,15 @@ pub struct DeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentListCall<'a, S> {}
 
-impl<'a> DeploymentListCall<'a> {
+impl<'a, S> DeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2149,21 +2178,21 @@ impl<'a> DeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DeploymentListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> DeploymentListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> DeploymentListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> DeploymentListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -2178,7 +2207,7 @@ impl<'a> DeploymentListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> DeploymentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> DeploymentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2188,7 +2217,7 @@ impl<'a> DeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2209,7 +2238,7 @@ impl<'a> DeploymentListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2229,9 +2258,9 @@ impl<'a> DeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2264,7 +2293,7 @@ impl<'a> DeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2280,10 +2309,10 @@ impl<'a> DeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentPatchCall<'a>
-    where  {
+pub struct DeploymentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _request: Deployment,
     _project: String,
     _deployment: String,
@@ -2295,9 +2324,15 @@ pub struct DeploymentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentPatchCall<'a, S> {}
 
-impl<'a> DeploymentPatchCall<'a> {
+impl<'a, S> DeploymentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2463,7 +2498,7 @@ impl<'a> DeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Deployment) -> DeploymentPatchCall<'a> {
+    pub fn request(mut self, new_value: Deployment) -> DeploymentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2473,7 +2508,7 @@ impl<'a> DeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DeploymentPatchCall<'a> {
+    pub fn project(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2483,28 +2518,28 @@ impl<'a> DeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> DeploymentPatchCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
     /// Sets the policy to use for updating resources.
     ///
     /// Sets the *update policy* query property to the given value.
-    pub fn update_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a> {
+    pub fn update_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
         self._update_policy = Some(new_value.to_string());
         self
     }
     /// Sets the policy to use for deleting resources.
     ///
     /// Sets the *delete policy* query property to the given value.
-    pub fn delete_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a> {
+    pub fn delete_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
         self._delete_policy = Some(new_value.to_string());
         self
     }
     /// Sets the policy to use for creating new resources.
     ///
     /// Sets the *create policy* query property to the given value.
-    pub fn create_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a> {
+    pub fn create_policy(mut self, new_value: &str) -> DeploymentPatchCall<'a, S> {
         self._create_policy = Some(new_value.to_string());
         self
     }
@@ -2514,7 +2549,7 @@ impl<'a> DeploymentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2535,7 +2570,7 @@ impl<'a> DeploymentPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2555,9 +2590,9 @@ impl<'a> DeploymentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2590,7 +2625,7 @@ impl<'a> DeploymentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2606,10 +2641,10 @@ impl<'a> DeploymentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentUpdateCall<'a>
-    where  {
+pub struct DeploymentUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _request: Deployment,
     _project: String,
     _deployment: String,
@@ -2621,9 +2656,15 @@ pub struct DeploymentUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DeploymentUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for DeploymentUpdateCall<'a, S> {}
 
-impl<'a> DeploymentUpdateCall<'a> {
+impl<'a, S> DeploymentUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2789,7 +2830,7 @@ impl<'a> DeploymentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Deployment) -> DeploymentUpdateCall<'a> {
+    pub fn request(mut self, new_value: Deployment) -> DeploymentUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2799,7 +2840,7 @@ impl<'a> DeploymentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> DeploymentUpdateCall<'a> {
+    pub fn project(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2809,28 +2850,28 @@ impl<'a> DeploymentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> DeploymentUpdateCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
     /// Sets the policy to use for updating resources.
     ///
     /// Sets the *update policy* query property to the given value.
-    pub fn update_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a> {
+    pub fn update_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
         self._update_policy = Some(new_value.to_string());
         self
     }
     /// Sets the policy to use for deleting resources.
     ///
     /// Sets the *delete policy* query property to the given value.
-    pub fn delete_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a> {
+    pub fn delete_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
         self._delete_policy = Some(new_value.to_string());
         self
     }
     /// Sets the policy to use for creating new resources.
     ///
     /// Sets the *create policy* query property to the given value.
-    pub fn create_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a> {
+    pub fn create_policy(mut self, new_value: &str) -> DeploymentUpdateCall<'a, S> {
         self._create_policy = Some(new_value.to_string());
         self
     }
@@ -2840,7 +2881,7 @@ impl<'a> DeploymentUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2861,7 +2902,7 @@ impl<'a> DeploymentUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2881,9 +2922,9 @@ impl<'a> DeploymentUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DeploymentUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2915,7 +2956,7 @@ impl<'a> DeploymentUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2923,10 +2964,10 @@ impl<'a> DeploymentUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ManifestGetCall<'a>
-    where  {
+pub struct ManifestGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _deployment: String,
     _manifest: String,
@@ -2935,9 +2976,15 @@ pub struct ManifestGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ManifestGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ManifestGetCall<'a, S> {}
 
-impl<'a> ManifestGetCall<'a> {
+impl<'a, S> ManifestGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3082,7 +3129,7 @@ impl<'a> ManifestGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManifestGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ManifestGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3092,7 +3139,7 @@ impl<'a> ManifestGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> ManifestGetCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> ManifestGetCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
@@ -3102,7 +3149,7 @@ impl<'a> ManifestGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn manifest(mut self, new_value: &str) -> ManifestGetCall<'a> {
+    pub fn manifest(mut self, new_value: &str) -> ManifestGetCall<'a, S> {
         self._manifest = new_value.to_string();
         self
     }
@@ -3112,7 +3159,7 @@ impl<'a> ManifestGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManifestGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManifestGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3133,7 +3180,7 @@ impl<'a> ManifestGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ManifestGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ManifestGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3153,9 +3200,9 @@ impl<'a> ManifestGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManifestGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ManifestGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3187,7 +3234,7 @@ impl<'a> ManifestGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3198,10 +3245,10 @@ impl<'a> ManifestGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ManifestListCall<'a>
-    where  {
+pub struct ManifestListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _deployment: String,
     _page_token: Option<String>,
@@ -3212,9 +3259,15 @@ pub struct ManifestListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ManifestListCall<'a> {}
+impl<'a, S> client::CallBuilder for ManifestListCall<'a, S> {}
 
-impl<'a> ManifestListCall<'a> {
+impl<'a, S> ManifestListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3367,7 +3420,7 @@ impl<'a> ManifestListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ManifestListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ManifestListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3377,21 +3430,21 @@ impl<'a> ManifestListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> ManifestListCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> ManifestListCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ManifestListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ManifestListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ManifestListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ManifestListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -3406,7 +3459,7 @@ impl<'a> ManifestListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ManifestListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ManifestListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3416,7 +3469,7 @@ impl<'a> ManifestListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManifestListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManifestListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3437,7 +3490,7 @@ impl<'a> ManifestListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ManifestListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ManifestListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3457,9 +3510,9 @@ impl<'a> ManifestListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManifestListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ManifestListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3491,7 +3544,7 @@ impl<'a> ManifestListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3499,10 +3552,10 @@ impl<'a> ManifestListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _operation: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3510,9 +3563,15 @@ pub struct OperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3656,7 +3715,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3666,7 +3725,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._operation = new_value.to_string();
         self
     }
@@ -3676,7 +3735,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3697,7 +3756,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3717,9 +3776,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3751,7 +3810,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3762,10 +3821,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a>
-    where  {
+pub struct OperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -3775,9 +3834,15 @@ pub struct OperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationListCall<'a, S> {}
 
-impl<'a> OperationListCall<'a> {
+impl<'a, S> OperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3929,21 +3994,21 @@ impl<'a> OperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -3958,7 +4023,7 @@ impl<'a> OperationListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3968,7 +4033,7 @@ impl<'a> OperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3989,7 +4054,7 @@ impl<'a> OperationListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4009,9 +4074,9 @@ impl<'a> OperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4043,7 +4108,7 @@ impl<'a> OperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4051,10 +4116,10 @@ impl<'a> OperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ResourceGetCall<'a>
-    where  {
+pub struct ResourceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _deployment: String,
     _resource: String,
@@ -4063,9 +4128,15 @@ pub struct ResourceGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ResourceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ResourceGetCall<'a, S> {}
 
-impl<'a> ResourceGetCall<'a> {
+impl<'a, S> ResourceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4210,7 +4281,7 @@ impl<'a> ResourceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ResourceGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ResourceGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -4220,7 +4291,7 @@ impl<'a> ResourceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> ResourceGetCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> ResourceGetCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
@@ -4230,7 +4301,7 @@ impl<'a> ResourceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ResourceGetCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ResourceGetCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4240,7 +4311,7 @@ impl<'a> ResourceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResourceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResourceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4261,7 +4332,7 @@ impl<'a> ResourceGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ResourceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ResourceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4281,9 +4352,9 @@ impl<'a> ResourceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ResourceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ResourceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4315,7 +4386,7 @@ impl<'a> ResourceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4326,10 +4397,10 @@ impl<'a> ResourceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ResourceListCall<'a>
-    where  {
+pub struct ResourceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _deployment: String,
     _page_token: Option<String>,
@@ -4340,9 +4411,15 @@ pub struct ResourceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ResourceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ResourceListCall<'a, S> {}
 
-impl<'a> ResourceListCall<'a> {
+impl<'a, S> ResourceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4495,7 +4572,7 @@ impl<'a> ResourceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ResourceListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ResourceListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -4505,21 +4582,21 @@ impl<'a> ResourceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment(mut self, new_value: &str) -> ResourceListCall<'a> {
+    pub fn deployment(mut self, new_value: &str) -> ResourceListCall<'a, S> {
         self._deployment = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ResourceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ResourceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ResourceListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ResourceListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4534,7 +4611,7 @@ impl<'a> ResourceListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ResourceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ResourceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4544,7 +4621,7 @@ impl<'a> ResourceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResourceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResourceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4565,7 +4642,7 @@ impl<'a> ResourceListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ResourceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ResourceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4585,9 +4662,9 @@ impl<'a> ResourceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ResourceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ResourceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4619,7 +4696,7 @@ impl<'a> ResourceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = DeploymentManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4630,10 +4707,10 @@ impl<'a> ResourceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TypeListCall<'a>
-    where  {
+pub struct TypeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a DeploymentManager<>,
+    hub: &'a DeploymentManager<S>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -4643,9 +4720,15 @@ pub struct TypeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TypeListCall<'a> {}
+impl<'a, S> client::CallBuilder for TypeListCall<'a, S> {}
 
-impl<'a> TypeListCall<'a> {
+impl<'a, S> TypeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4797,21 +4880,21 @@ impl<'a> TypeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TypeListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TypeListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// Specifies a page token to use. Set pageToken to the nextPageToken returned by a previous list request to get the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TypeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TypeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TypeListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> TypeListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4826,7 +4909,7 @@ impl<'a> TypeListCall<'a> {
     /// The Beta API also supports filtering on multiple expressions by providing each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions meaning that resources must match all expressions to pass the filters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> TypeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> TypeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4836,7 +4919,7 @@ impl<'a> TypeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TypeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TypeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4857,7 +4940,7 @@ impl<'a> TypeListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TypeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TypeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4877,9 +4960,9 @@ impl<'a> TypeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TypeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TypeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

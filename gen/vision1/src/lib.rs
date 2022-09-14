@@ -1,5 +1,5 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/api/lib.rs.mako'
+// This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
 //! This documentation was generated from *Vision* crate version *4.0.1+20220225*, where *20220225* is the exact revision of the *vision:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
@@ -203,7 +203,7 @@
 #![allow(unused_imports, unused_mut, dead_code)]
 
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/api/lib.rs.mako'
+// This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
 #[macro_use]

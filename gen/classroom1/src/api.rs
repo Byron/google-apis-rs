@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -154,7 +159,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -186,43 +191,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Classroom<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Classroom<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Classroom<> {}
+impl<'a, S> client::Hub for Classroom<S> {}
 
-impl<'a, > Classroom<> {
+impl<'a, S> Classroom<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Classroom<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Classroom<S> {
         Classroom {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://classroom.googleapis.com/".to_string(),
             _root_url: "https://classroom.googleapis.com/".to_string(),
         }
     }
 
-    pub fn courses(&'a self) -> CourseMethods<'a> {
+    pub fn courses(&'a self) -> CourseMethods<'a, S> {
         CourseMethods { hub: &self }
     }
-    pub fn invitations(&'a self) -> InvitationMethods<'a> {
+    pub fn invitations(&'a self) -> InvitationMethods<'a, S> {
         InvitationMethods { hub: &self }
     }
-    pub fn registrations(&'a self) -> RegistrationMethods<'a> {
+    pub fn registrations(&'a self) -> RegistrationMethods<'a, S> {
         RegistrationMethods { hub: &self }
     }
-    pub fn user_profiles(&'a self) -> UserProfileMethods<'a> {
+    pub fn user_profiles(&'a self) -> UserProfileMethods<'a, S> {
         UserProfileMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1833,22 +1838,22 @@ impl client::Part for YouTubeVideo {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `aliases_create(...)`, `aliases_delete(...)`, `aliases_list(...)`, `announcements_create(...)`, `announcements_delete(...)`, `announcements_get(...)`, `announcements_list(...)`, `announcements_modify_assignees(...)`, `announcements_patch(...)`, `course_work_create(...)`, `course_work_delete(...)`, `course_work_get(...)`, `course_work_list(...)`, `course_work_materials_create(...)`, `course_work_materials_delete(...)`, `course_work_materials_get(...)`, `course_work_materials_list(...)`, `course_work_materials_patch(...)`, `course_work_modify_assignees(...)`, `course_work_patch(...)`, `course_work_student_submissions_get(...)`, `course_work_student_submissions_list(...)`, `course_work_student_submissions_modify_attachments(...)`, `course_work_student_submissions_patch(...)`, `course_work_student_submissions_reclaim(...)`, `course_work_student_submissions_return(...)`, `course_work_student_submissions_turn_in(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)`, `students_create(...)`, `students_delete(...)`, `students_get(...)`, `students_list(...)`, `teachers_create(...)`, `teachers_delete(...)`, `teachers_get(...)`, `teachers_list(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_list(...)`, `topics_patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.courses();
 /// # }
 /// ```
-pub struct CourseMethods<'a>
-    where  {
+pub struct CourseMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
 }
 
-impl<'a> client::MethodsBuilder for CourseMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CourseMethods<'a, S> {}
 
-impl<'a> CourseMethods<'a> {
+impl<'a, S> CourseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1858,7 +1863,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course to alias. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn aliases_create(&self, request: CourseAlias, course_id: &str) -> CourseAliaseCreateCall<'a> {
+    pub fn aliases_create(&self, request: CourseAlias, course_id: &str) -> CourseAliaseCreateCall<'a, S> {
         CourseAliaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1877,7 +1882,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course whose alias should be deleted. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `alias` - Alias to delete. This may not be the Classroom-assigned identifier.
-    pub fn aliases_delete(&self, course_id: &str, alias: &str) -> CourseAliaseDeleteCall<'a> {
+    pub fn aliases_delete(&self, course_id: &str, alias: &str) -> CourseAliaseDeleteCall<'a, S> {
         CourseAliaseDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -1895,7 +1900,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - The identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn aliases_list(&self, course_id: &str) -> CourseAliaseListCall<'a> {
+    pub fn aliases_list(&self, course_id: &str) -> CourseAliaseListCall<'a, S> {
         CourseAliaseListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -1915,7 +1920,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn announcements_create(&self, request: Announcement, course_id: &str) -> CourseAnnouncementCreateCall<'a> {
+    pub fn announcements_create(&self, request: Announcement, course_id: &str) -> CourseAnnouncementCreateCall<'a, S> {
         CourseAnnouncementCreateCall {
             hub: self.hub,
             _request: request,
@@ -1934,7 +1939,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the announcement to delete. This identifier is a Classroom-assigned identifier.
-    pub fn announcements_delete(&self, course_id: &str, id: &str) -> CourseAnnouncementDeleteCall<'a> {
+    pub fn announcements_delete(&self, course_id: &str, id: &str) -> CourseAnnouncementDeleteCall<'a, S> {
         CourseAnnouncementDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -1953,7 +1958,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the announcement.
-    pub fn announcements_get(&self, course_id: &str, id: &str) -> CourseAnnouncementGetCall<'a> {
+    pub fn announcements_get(&self, course_id: &str, id: &str) -> CourseAnnouncementGetCall<'a, S> {
         CourseAnnouncementGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -1971,7 +1976,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn announcements_list(&self, course_id: &str) -> CourseAnnouncementListCall<'a> {
+    pub fn announcements_list(&self, course_id: &str) -> CourseAnnouncementListCall<'a, S> {
         CourseAnnouncementListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -1994,7 +1999,7 @@ impl<'a> CourseMethods<'a> {
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the announcement.
-    pub fn announcements_modify_assignees(&self, request: ModifyAnnouncementAssigneesRequest, course_id: &str, id: &str) -> CourseAnnouncementModifyAssigneeCall<'a> {
+    pub fn announcements_modify_assignees(&self, request: ModifyAnnouncementAssigneesRequest, course_id: &str, id: &str) -> CourseAnnouncementModifyAssigneeCall<'a, S> {
         CourseAnnouncementModifyAssigneeCall {
             hub: self.hub,
             _request: request,
@@ -2015,7 +2020,7 @@ impl<'a> CourseMethods<'a> {
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the announcement.
-    pub fn announcements_patch(&self, request: Announcement, course_id: &str, id: &str) -> CourseAnnouncementPatchCall<'a> {
+    pub fn announcements_patch(&self, request: Announcement, course_id: &str, id: &str) -> CourseAnnouncementPatchCall<'a, S> {
         CourseAnnouncementPatchCall {
             hub: self.hub,
             _request: request,
@@ -2037,7 +2042,7 @@ impl<'a> CourseMethods<'a> {
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the course work.
     /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_get(&self, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a> {
+    pub fn course_work_student_submissions_get(&self, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a, S> {
         CourseCourseWorkStudentSubmissionGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2057,7 +2062,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the student work to request. This may be set to the string literal `"-"` to request student work for all course work in the specified course.
-    pub fn course_work_student_submissions_list(&self, course_id: &str, course_work_id: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn course_work_student_submissions_list(&self, course_id: &str, course_work_id: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         CourseCourseWorkStudentSubmissionListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2083,7 +2088,7 @@ impl<'a> CourseMethods<'a> {
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the course work.
     /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_modify_attachments(&self, request: ModifyAttachmentsRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+    pub fn course_work_student_submissions_modify_attachments(&self, request: ModifyAttachmentsRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {
         CourseCourseWorkStudentSubmissionModifyAttachmentCall {
             hub: self.hub,
             _request: request,
@@ -2106,7 +2111,7 @@ impl<'a> CourseMethods<'a> {
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the course work.
     /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_patch(&self, request: StudentSubmission, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn course_work_student_submissions_patch(&self, request: StudentSubmission, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         CourseCourseWorkStudentSubmissionPatchCall {
             hub: self.hub,
             _request: request,
@@ -2130,7 +2135,7 @@ impl<'a> CourseMethods<'a> {
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the course work.
     /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_reclaim(&self, request: ReclaimStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+    pub fn course_work_student_submissions_reclaim(&self, request: ReclaimStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {
         CourseCourseWorkStudentSubmissionReclaimCall {
             hub: self.hub,
             _request: request,
@@ -2153,7 +2158,7 @@ impl<'a> CourseMethods<'a> {
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the course work.
     /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_return(&self, request: ReturnStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+    pub fn course_work_student_submissions_return(&self, request: ReturnStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S> {
         CourseCourseWorkStudentSubmissionReturnCall {
             hub: self.hub,
             _request: request,
@@ -2176,7 +2181,7 @@ impl<'a> CourseMethods<'a> {
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `courseWorkId` - Identifier of the course work.
     /// * `id` - Identifier of the student submission.
-    pub fn course_work_student_submissions_turn_in(&self, request: TurnInStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+    pub fn course_work_student_submissions_turn_in(&self, request: TurnInStudentSubmissionRequest, course_id: &str, course_work_id: &str, id: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {
         CourseCourseWorkStudentSubmissionTurnInCall {
             hub: self.hub,
             _request: request,
@@ -2197,7 +2202,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn course_work_create(&self, request: CourseWork, course_id: &str) -> CourseCourseWorkCreateCall<'a> {
+    pub fn course_work_create(&self, request: CourseWork, course_id: &str) -> CourseCourseWorkCreateCall<'a, S> {
         CourseCourseWorkCreateCall {
             hub: self.hub,
             _request: request,
@@ -2216,7 +2221,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the course work to delete. This identifier is a Classroom-assigned identifier.
-    pub fn course_work_delete(&self, course_id: &str, id: &str) -> CourseCourseWorkDeleteCall<'a> {
+    pub fn course_work_delete(&self, course_id: &str, id: &str) -> CourseCourseWorkDeleteCall<'a, S> {
         CourseCourseWorkDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2235,7 +2240,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the course work.
-    pub fn course_work_get(&self, course_id: &str, id: &str) -> CourseCourseWorkGetCall<'a> {
+    pub fn course_work_get(&self, course_id: &str, id: &str) -> CourseCourseWorkGetCall<'a, S> {
         CourseCourseWorkGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2253,7 +2258,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn course_work_list(&self, course_id: &str) -> CourseCourseWorkListCall<'a> {
+    pub fn course_work_list(&self, course_id: &str) -> CourseCourseWorkListCall<'a, S> {
         CourseCourseWorkListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2276,7 +2281,7 @@ impl<'a> CourseMethods<'a> {
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the coursework.
-    pub fn course_work_modify_assignees(&self, request: ModifyCourseWorkAssigneesRequest, course_id: &str, id: &str) -> CourseCourseWorkModifyAssigneeCall<'a> {
+    pub fn course_work_modify_assignees(&self, request: ModifyCourseWorkAssigneesRequest, course_id: &str, id: &str) -> CourseCourseWorkModifyAssigneeCall<'a, S> {
         CourseCourseWorkModifyAssigneeCall {
             hub: self.hub,
             _request: request,
@@ -2297,7 +2302,7 @@ impl<'a> CourseMethods<'a> {
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the course work.
-    pub fn course_work_patch(&self, request: CourseWork, course_id: &str, id: &str) -> CourseCourseWorkPatchCall<'a> {
+    pub fn course_work_patch(&self, request: CourseWork, course_id: &str, id: &str) -> CourseCourseWorkPatchCall<'a, S> {
         CourseCourseWorkPatchCall {
             hub: self.hub,
             _request: request,
@@ -2318,7 +2323,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn course_work_materials_create(&self, request: CourseWorkMaterial, course_id: &str) -> CourseCourseWorkMaterialCreateCall<'a> {
+    pub fn course_work_materials_create(&self, request: CourseWorkMaterial, course_id: &str) -> CourseCourseWorkMaterialCreateCall<'a, S> {
         CourseCourseWorkMaterialCreateCall {
             hub: self.hub,
             _request: request,
@@ -2337,7 +2342,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the course work material to delete. This identifier is a Classroom-assigned identifier.
-    pub fn course_work_materials_delete(&self, course_id: &str, id: &str) -> CourseCourseWorkMaterialDeleteCall<'a> {
+    pub fn course_work_materials_delete(&self, course_id: &str, id: &str) -> CourseCourseWorkMaterialDeleteCall<'a, S> {
         CourseCourseWorkMaterialDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2356,7 +2361,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the course work material.
-    pub fn course_work_materials_get(&self, course_id: &str, id: &str) -> CourseCourseWorkMaterialGetCall<'a> {
+    pub fn course_work_materials_get(&self, course_id: &str, id: &str) -> CourseCourseWorkMaterialGetCall<'a, S> {
         CourseCourseWorkMaterialGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2374,7 +2379,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn course_work_materials_list(&self, course_id: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn course_work_materials_list(&self, course_id: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         CourseCourseWorkMaterialListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2399,7 +2404,7 @@ impl<'a> CourseMethods<'a> {
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the course work material.
-    pub fn course_work_materials_patch(&self, request: CourseWorkMaterial, course_id: &str, id: &str) -> CourseCourseWorkMaterialPatchCall<'a> {
+    pub fn course_work_materials_patch(&self, request: CourseWorkMaterial, course_id: &str, id: &str) -> CourseCourseWorkMaterialPatchCall<'a, S> {
         CourseCourseWorkMaterialPatchCall {
             hub: self.hub,
             _request: request,
@@ -2420,7 +2425,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course to create the student in. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn students_create(&self, request: Student, course_id: &str) -> CourseStudentCreateCall<'a> {
+    pub fn students_create(&self, request: Student, course_id: &str) -> CourseStudentCreateCall<'a, S> {
         CourseStudentCreateCall {
             hub: self.hub,
             _request: request,
@@ -2440,7 +2445,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `userId` - Identifier of the student to delete. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
-    pub fn students_delete(&self, course_id: &str, user_id: &str) -> CourseStudentDeleteCall<'a> {
+    pub fn students_delete(&self, course_id: &str, user_id: &str) -> CourseStudentDeleteCall<'a, S> {
         CourseStudentDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2459,7 +2464,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `userId` - Identifier of the student to return. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
-    pub fn students_get(&self, course_id: &str, user_id: &str) -> CourseStudentGetCall<'a> {
+    pub fn students_get(&self, course_id: &str, user_id: &str) -> CourseStudentGetCall<'a, S> {
         CourseStudentGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2477,7 +2482,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn students_list(&self, course_id: &str) -> CourseStudentListCall<'a> {
+    pub fn students_list(&self, course_id: &str) -> CourseStudentListCall<'a, S> {
         CourseStudentListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2497,7 +2502,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn teachers_create(&self, request: Teacher, course_id: &str) -> CourseTeacherCreateCall<'a> {
+    pub fn teachers_create(&self, request: Teacher, course_id: &str) -> CourseTeacherCreateCall<'a, S> {
         CourseTeacherCreateCall {
             hub: self.hub,
             _request: request,
@@ -2516,7 +2521,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `userId` - Identifier of the teacher to delete. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
-    pub fn teachers_delete(&self, course_id: &str, user_id: &str) -> CourseTeacherDeleteCall<'a> {
+    pub fn teachers_delete(&self, course_id: &str, user_id: &str) -> CourseTeacherDeleteCall<'a, S> {
         CourseTeacherDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2535,7 +2540,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `userId` - Identifier of the teacher to return. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
-    pub fn teachers_get(&self, course_id: &str, user_id: &str) -> CourseTeacherGetCall<'a> {
+    pub fn teachers_get(&self, course_id: &str, user_id: &str) -> CourseTeacherGetCall<'a, S> {
         CourseTeacherGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2553,7 +2558,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn teachers_list(&self, course_id: &str) -> CourseTeacherListCall<'a> {
+    pub fn teachers_list(&self, course_id: &str) -> CourseTeacherListCall<'a, S> {
         CourseTeacherListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2573,7 +2578,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn topics_create(&self, request: Topic, course_id: &str) -> CourseTopicCreateCall<'a> {
+    pub fn topics_create(&self, request: Topic, course_id: &str) -> CourseTopicCreateCall<'a, S> {
         CourseTopicCreateCall {
             hub: self.hub,
             _request: request,
@@ -2592,7 +2597,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the topic to delete.
-    pub fn topics_delete(&self, course_id: &str, id: &str) -> CourseTopicDeleteCall<'a> {
+    pub fn topics_delete(&self, course_id: &str, id: &str) -> CourseTopicDeleteCall<'a, S> {
         CourseTopicDeleteCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2611,7 +2616,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `courseId` - Identifier of the course.
     /// * `id` - Identifier of the topic.
-    pub fn topics_get(&self, course_id: &str, id: &str) -> CourseTopicGetCall<'a> {
+    pub fn topics_get(&self, course_id: &str, id: &str) -> CourseTopicGetCall<'a, S> {
         CourseTopicGetCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2629,7 +2634,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn topics_list(&self, course_id: &str) -> CourseTopicListCall<'a> {
+    pub fn topics_list(&self, course_id: &str) -> CourseTopicListCall<'a, S> {
         CourseTopicListCall {
             hub: self.hub,
             _course_id: course_id.to_string(),
@@ -2650,7 +2655,7 @@ impl<'a> CourseMethods<'a> {
     /// * `request` - No description provided.
     /// * `courseId` - Identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias.
     /// * `id` - Identifier of the topic.
-    pub fn topics_patch(&self, request: Topic, course_id: &str, id: &str) -> CourseTopicPatchCall<'a> {
+    pub fn topics_patch(&self, request: Topic, course_id: &str, id: &str) -> CourseTopicPatchCall<'a, S> {
         CourseTopicPatchCall {
             hub: self.hub,
             _request: request,
@@ -2670,7 +2675,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Course) -> CourseCreateCall<'a> {
+    pub fn create(&self, request: Course) -> CourseCreateCall<'a, S> {
         CourseCreateCall {
             hub: self.hub,
             _request: request,
@@ -2687,7 +2692,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Identifier of the course to delete. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn delete(&self, id: &str) -> CourseDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> CourseDeleteCall<'a, S> {
         CourseDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2704,7 +2709,7 @@ impl<'a> CourseMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Identifier of the course to return. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn get(&self, id: &str) -> CourseGetCall<'a> {
+    pub fn get(&self, id: &str) -> CourseGetCall<'a, S> {
         CourseGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2717,7 +2722,7 @@ impl<'a> CourseMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of courses that the requesting user is permitted to view, restricted to those that match the request. Returned courses are ordered by creation time, with the most recently created coming first. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the query argument is malformed. * `NOT_FOUND` if any users specified in the query arguments do not exist.
-    pub fn list(&self) -> CourseListCall<'a> {
+    pub fn list(&self) -> CourseListCall<'a, S> {
         CourseListCall {
             hub: self.hub,
             _teacher_id: Default::default(),
@@ -2739,7 +2744,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - Identifier of the course to update. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn patch(&self, request: Course, id: &str) -> CoursePatchCall<'a> {
+    pub fn patch(&self, request: Course, id: &str) -> CoursePatchCall<'a, S> {
         CoursePatchCall {
             hub: self.hub,
             _request: request,
@@ -2759,7 +2764,7 @@ impl<'a> CourseMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - Identifier of the course to update. This identifier can be either the Classroom-assigned identifier or an alias.
-    pub fn update(&self, request: Course, id: &str) -> CourseUpdateCall<'a> {
+    pub fn update(&self, request: Course, id: &str) -> CourseUpdateCall<'a, S> {
         CourseUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2794,22 +2799,22 @@ impl<'a> CourseMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `accept(...)`, `create(...)`, `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.invitations();
 /// # }
 /// ```
-pub struct InvitationMethods<'a>
-    where  {
+pub struct InvitationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
 }
 
-impl<'a> client::MethodsBuilder for InvitationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for InvitationMethods<'a, S> {}
 
-impl<'a> InvitationMethods<'a> {
+impl<'a, S> InvitationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2818,7 +2823,7 @@ impl<'a> InvitationMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Identifier of the invitation to accept.
-    pub fn accept(&self, id: &str) -> InvitationAcceptCall<'a> {
+    pub fn accept(&self, id: &str) -> InvitationAcceptCall<'a, S> {
         InvitationAcceptCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2835,7 +2840,7 @@ impl<'a> InvitationMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Invitation) -> InvitationCreateCall<'a> {
+    pub fn create(&self, request: Invitation) -> InvitationCreateCall<'a, S> {
         InvitationCreateCall {
             hub: self.hub,
             _request: request,
@@ -2852,7 +2857,7 @@ impl<'a> InvitationMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Identifier of the invitation to delete.
-    pub fn delete(&self, id: &str) -> InvitationDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> InvitationDeleteCall<'a, S> {
         InvitationDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2869,7 +2874,7 @@ impl<'a> InvitationMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - Identifier of the invitation to return.
-    pub fn get(&self, id: &str) -> InvitationGetCall<'a> {
+    pub fn get(&self, id: &str) -> InvitationGetCall<'a, S> {
         InvitationGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -2882,7 +2887,7 @@ impl<'a> InvitationMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of invitations that the requesting user is permitted to view, restricted to those that match the list request. *Note:* At least one of `user_id` or `course_id` must be supplied. Both fields can be supplied. This method returns the following error codes: * `PERMISSION_DENIED` for access errors.
-    pub fn list(&self) -> InvitationListCall<'a> {
+    pub fn list(&self) -> InvitationListCall<'a, S> {
         InvitationListCall {
             hub: self.hub,
             _user_id: Default::default(),
@@ -2919,22 +2924,22 @@ impl<'a> InvitationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)` and `delete(...)`
 /// // to build up your call.
 /// let rb = hub.registrations();
 /// # }
 /// ```
-pub struct RegistrationMethods<'a>
-    where  {
+pub struct RegistrationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
 }
 
-impl<'a> client::MethodsBuilder for RegistrationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RegistrationMethods<'a, S> {}
 
-impl<'a> RegistrationMethods<'a> {
+impl<'a, S> RegistrationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2943,7 +2948,7 @@ impl<'a> RegistrationMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Registration) -> RegistrationCreateCall<'a> {
+    pub fn create(&self, request: Registration) -> RegistrationCreateCall<'a, S> {
         RegistrationCreateCall {
             hub: self.hub,
             _request: request,
@@ -2960,7 +2965,7 @@ impl<'a> RegistrationMethods<'a> {
     /// # Arguments
     ///
     /// * `registrationId` - The `registration_id` of the `Registration` to be deleted.
-    pub fn delete(&self, registration_id: &str) -> RegistrationDeleteCall<'a> {
+    pub fn delete(&self, registration_id: &str) -> RegistrationDeleteCall<'a, S> {
         RegistrationDeleteCall {
             hub: self.hub,
             _registration_id: registration_id.to_string(),
@@ -2994,22 +2999,22 @@ impl<'a> RegistrationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `guardian_invitations_create(...)`, `guardian_invitations_get(...)`, `guardian_invitations_list(...)`, `guardian_invitations_patch(...)`, `guardians_delete(...)`, `guardians_get(...)` and `guardians_list(...)`
 /// // to build up your call.
 /// let rb = hub.user_profiles();
 /// # }
 /// ```
-pub struct UserProfileMethods<'a>
-    where  {
+pub struct UserProfileMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
 }
 
-impl<'a> client::MethodsBuilder for UserProfileMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UserProfileMethods<'a, S> {}
 
-impl<'a> UserProfileMethods<'a> {
+impl<'a, S> UserProfileMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3019,7 +3024,7 @@ impl<'a> UserProfileMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `studentId` - ID of the student (in standard format)
-    pub fn guardian_invitations_create(&self, request: GuardianInvitation, student_id: &str) -> UserProfileGuardianInvitationCreateCall<'a> {
+    pub fn guardian_invitations_create(&self, request: GuardianInvitation, student_id: &str) -> UserProfileGuardianInvitationCreateCall<'a, S> {
         UserProfileGuardianInvitationCreateCall {
             hub: self.hub,
             _request: request,
@@ -3038,7 +3043,7 @@ impl<'a> UserProfileMethods<'a> {
     ///
     /// * `studentId` - The ID of the student whose guardian invitation is being requested.
     /// * `invitationId` - The `id` field of the `GuardianInvitation` being requested.
-    pub fn guardian_invitations_get(&self, student_id: &str, invitation_id: &str) -> UserProfileGuardianInvitationGetCall<'a> {
+    pub fn guardian_invitations_get(&self, student_id: &str, invitation_id: &str) -> UserProfileGuardianInvitationGetCall<'a, S> {
         UserProfileGuardianInvitationGetCall {
             hub: self.hub,
             _student_id: student_id.to_string(),
@@ -3056,7 +3061,7 @@ impl<'a> UserProfileMethods<'a> {
     /// # Arguments
     ///
     /// * `studentId` - The ID of the student whose guardian invitations are to be returned. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user is permitted to view guardian invitations.
-    pub fn guardian_invitations_list(&self, student_id: &str) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn guardian_invitations_list(&self, student_id: &str) -> UserProfileGuardianInvitationListCall<'a, S> {
         UserProfileGuardianInvitationListCall {
             hub: self.hub,
             _student_id: student_id.to_string(),
@@ -3079,7 +3084,7 @@ impl<'a> UserProfileMethods<'a> {
     /// * `request` - No description provided.
     /// * `studentId` - The ID of the student whose guardian invitation is to be modified.
     /// * `invitationId` - The `id` field of the `GuardianInvitation` to be modified.
-    pub fn guardian_invitations_patch(&self, request: GuardianInvitation, student_id: &str, invitation_id: &str) -> UserProfileGuardianInvitationPatchCall<'a> {
+    pub fn guardian_invitations_patch(&self, request: GuardianInvitation, student_id: &str, invitation_id: &str) -> UserProfileGuardianInvitationPatchCall<'a, S> {
         UserProfileGuardianInvitationPatchCall {
             hub: self.hub,
             _request: request,
@@ -3100,7 +3105,7 @@ impl<'a> UserProfileMethods<'a> {
     ///
     /// * `studentId` - The student whose guardian is to be deleted. One of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     /// * `guardianId` - The `id` field from a `Guardian`.
-    pub fn guardians_delete(&self, student_id: &str, guardian_id: &str) -> UserProfileGuardianDeleteCall<'a> {
+    pub fn guardians_delete(&self, student_id: &str, guardian_id: &str) -> UserProfileGuardianDeleteCall<'a, S> {
         UserProfileGuardianDeleteCall {
             hub: self.hub,
             _student_id: student_id.to_string(),
@@ -3119,7 +3124,7 @@ impl<'a> UserProfileMethods<'a> {
     ///
     /// * `studentId` - The student whose guardian is being requested. One of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     /// * `guardianId` - The `id` field from a `Guardian`.
-    pub fn guardians_get(&self, student_id: &str, guardian_id: &str) -> UserProfileGuardianGetCall<'a> {
+    pub fn guardians_get(&self, student_id: &str, guardian_id: &str) -> UserProfileGuardianGetCall<'a, S> {
         UserProfileGuardianGetCall {
             hub: self.hub,
             _student_id: student_id.to_string(),
@@ -3137,7 +3142,7 @@ impl<'a> UserProfileMethods<'a> {
     /// # Arguments
     ///
     /// * `studentId` - Filter results by the student who the guardian is linked to. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user * the string literal `"-"`, indicating that results should be returned for all students that the requesting user has access to view.
-    pub fn guardians_list(&self, student_id: &str) -> UserProfileGuardianListCall<'a> {
+    pub fn guardians_list(&self, student_id: &str) -> UserProfileGuardianListCall<'a, S> {
         UserProfileGuardianListCall {
             hub: self.hub,
             _student_id: student_id.to_string(),
@@ -3157,7 +3162,7 @@ impl<'a> UserProfileMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - Identifier of the profile to return. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
-    pub fn get(&self, user_id: &str) -> UserProfileGetCall<'a> {
+    pub fn get(&self, user_id: &str) -> UserProfileGetCall<'a, S> {
         UserProfileGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -3199,7 +3204,7 @@ impl<'a> UserProfileMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3212,10 +3217,10 @@ impl<'a> UserProfileMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAliaseCreateCall<'a>
-    where  {
+pub struct CourseAliaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: CourseAlias,
     _course_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3223,9 +3228,15 @@ pub struct CourseAliaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAliaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAliaseCreateCall<'a, S> {}
 
-impl<'a> CourseAliaseCreateCall<'a> {
+impl<'a, S> CourseAliaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3381,7 +3392,7 @@ impl<'a> CourseAliaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CourseAlias) -> CourseAliaseCreateCall<'a> {
+    pub fn request(mut self, new_value: CourseAlias) -> CourseAliaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3391,7 +3402,7 @@ impl<'a> CourseAliaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAliaseCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAliaseCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -3401,7 +3412,7 @@ impl<'a> CourseAliaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAliaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAliaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3426,7 +3437,7 @@ impl<'a> CourseAliaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3446,9 +3457,9 @@ impl<'a> CourseAliaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAliaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAliaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3480,7 +3491,7 @@ impl<'a> CourseAliaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3488,10 +3499,10 @@ impl<'a> CourseAliaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAliaseDeleteCall<'a>
-    where  {
+pub struct CourseAliaseDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _alias: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3499,9 +3510,15 @@ pub struct CourseAliaseDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAliaseDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAliaseDeleteCall<'a, S> {}
 
-impl<'a> CourseAliaseDeleteCall<'a> {
+impl<'a, S> CourseAliaseDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3645,7 +3662,7 @@ impl<'a> CourseAliaseDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAliaseDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAliaseDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -3655,7 +3672,7 @@ impl<'a> CourseAliaseDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alias(mut self, new_value: &str) -> CourseAliaseDeleteCall<'a> {
+    pub fn alias(mut self, new_value: &str) -> CourseAliaseDeleteCall<'a, S> {
         self._alias = new_value.to_string();
         self
     }
@@ -3665,7 +3682,7 @@ impl<'a> CourseAliaseDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAliaseDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAliaseDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3690,7 +3707,7 @@ impl<'a> CourseAliaseDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3710,9 +3727,9 @@ impl<'a> CourseAliaseDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAliaseDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAliaseDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3744,7 +3761,7 @@ impl<'a> CourseAliaseDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3754,10 +3771,10 @@ impl<'a> CourseAliaseDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAliaseListCall<'a>
-    where  {
+pub struct CourseAliaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3766,9 +3783,15 @@ pub struct CourseAliaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAliaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAliaseListCall<'a, S> {}
 
-impl<'a> CourseAliaseListCall<'a> {
+impl<'a, S> CourseAliaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3917,21 +3940,21 @@ impl<'a> CourseAliaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAliaseListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAliaseListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseAliaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseAliaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseAliaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseAliaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3941,7 +3964,7 @@ impl<'a> CourseAliaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAliaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAliaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3966,7 +3989,7 @@ impl<'a> CourseAliaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3986,9 +4009,9 @@ impl<'a> CourseAliaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAliaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAliaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4021,7 +4044,7 @@ impl<'a> CourseAliaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4034,10 +4057,10 @@ impl<'a> CourseAliaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAnnouncementCreateCall<'a>
-    where  {
+pub struct CourseAnnouncementCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Announcement,
     _course_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4045,9 +4068,15 @@ pub struct CourseAnnouncementCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAnnouncementCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAnnouncementCreateCall<'a, S> {}
 
-impl<'a> CourseAnnouncementCreateCall<'a> {
+impl<'a, S> CourseAnnouncementCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4203,7 +4232,7 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Announcement) -> CourseAnnouncementCreateCall<'a> {
+    pub fn request(mut self, new_value: Announcement) -> CourseAnnouncementCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4213,7 +4242,7 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -4223,7 +4252,7 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4248,7 +4277,7 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4268,9 +4297,9 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAnnouncementCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4302,7 +4331,7 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4310,10 +4339,10 @@ impl<'a> CourseAnnouncementCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAnnouncementDeleteCall<'a>
-    where  {
+pub struct CourseAnnouncementDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4321,9 +4350,15 @@ pub struct CourseAnnouncementDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAnnouncementDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAnnouncementDeleteCall<'a, S> {}
 
-impl<'a> CourseAnnouncementDeleteCall<'a> {
+impl<'a, S> CourseAnnouncementDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4467,7 +4502,7 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -4477,7 +4512,7 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseAnnouncementDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseAnnouncementDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -4487,7 +4522,7 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4512,7 +4547,7 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4532,9 +4567,9 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAnnouncementDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4566,7 +4601,7 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4574,10 +4609,10 @@ impl<'a> CourseAnnouncementDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAnnouncementGetCall<'a>
-    where  {
+pub struct CourseAnnouncementGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4585,9 +4620,15 @@ pub struct CourseAnnouncementGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAnnouncementGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAnnouncementGetCall<'a, S> {}
 
-impl<'a> CourseAnnouncementGetCall<'a> {
+impl<'a, S> CourseAnnouncementGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4731,7 +4772,7 @@ impl<'a> CourseAnnouncementGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -4741,7 +4782,7 @@ impl<'a> CourseAnnouncementGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseAnnouncementGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseAnnouncementGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -4751,7 +4792,7 @@ impl<'a> CourseAnnouncementGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4776,7 +4817,7 @@ impl<'a> CourseAnnouncementGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4796,9 +4837,9 @@ impl<'a> CourseAnnouncementGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAnnouncementGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4830,7 +4871,7 @@ impl<'a> CourseAnnouncementGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4842,10 +4883,10 @@ impl<'a> CourseAnnouncementGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAnnouncementListCall<'a>
-    where  {
+pub struct CourseAnnouncementListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4856,9 +4897,15 @@ pub struct CourseAnnouncementListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAnnouncementListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAnnouncementListCall<'a, S> {}
 
-impl<'a> CourseAnnouncementListCall<'a> {
+impl<'a, S> CourseAnnouncementListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5015,28 +5062,28 @@ impl<'a> CourseAnnouncementListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseAnnouncementListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseAnnouncementListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseAnnouncementListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseAnnouncementListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional sort ordering for results. A comma-separated list of fields with an optional sort direction keyword. Supported field is `updateTime`. Supported direction keywords are `asc` and `desc`. If not specified, `updateTime desc` is the default behavior. Examples: `updateTime asc`, `updateTime`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CourseAnnouncementListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> CourseAnnouncementListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -5044,7 +5091,7 @@ impl<'a> CourseAnnouncementListCall<'a> {
     ///
     /// Append the given value to the *announcement states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_announcement_states(mut self, new_value: &str) -> CourseAnnouncementListCall<'a> {
+    pub fn add_announcement_states(mut self, new_value: &str) -> CourseAnnouncementListCall<'a, S> {
         self._announcement_states.push(new_value.to_string());
         self
     }
@@ -5054,7 +5101,7 @@ impl<'a> CourseAnnouncementListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5079,7 +5126,7 @@ impl<'a> CourseAnnouncementListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5099,9 +5146,9 @@ impl<'a> CourseAnnouncementListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAnnouncementListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5134,7 +5181,7 @@ impl<'a> CourseAnnouncementListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5147,10 +5194,10 @@ impl<'a> CourseAnnouncementListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAnnouncementModifyAssigneeCall<'a>
-    where  {
+pub struct CourseAnnouncementModifyAssigneeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: ModifyAnnouncementAssigneesRequest,
     _course_id: String,
     _id: String,
@@ -5159,9 +5206,15 @@ pub struct CourseAnnouncementModifyAssigneeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAnnouncementModifyAssigneeCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAnnouncementModifyAssigneeCall<'a, S> {}
 
-impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
+impl<'a, S> CourseAnnouncementModifyAssigneeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5318,7 +5371,7 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyAnnouncementAssigneesRequest) -> CourseAnnouncementModifyAssigneeCall<'a> {
+    pub fn request(mut self, new_value: ModifyAnnouncementAssigneesRequest) -> CourseAnnouncementModifyAssigneeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5328,7 +5381,7 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementModifyAssigneeCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementModifyAssigneeCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -5338,7 +5391,7 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseAnnouncementModifyAssigneeCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseAnnouncementModifyAssigneeCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -5348,7 +5401,7 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementModifyAssigneeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementModifyAssigneeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5373,7 +5426,7 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementModifyAssigneeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementModifyAssigneeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5393,9 +5446,9 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementModifyAssigneeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAnnouncementModifyAssigneeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5428,7 +5481,7 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5442,10 +5495,10 @@ impl<'a> CourseAnnouncementModifyAssigneeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseAnnouncementPatchCall<'a>
-    where  {
+pub struct CourseAnnouncementPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Announcement,
     _course_id: String,
     _id: String,
@@ -5455,9 +5508,15 @@ pub struct CourseAnnouncementPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseAnnouncementPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseAnnouncementPatchCall<'a, S> {}
 
-impl<'a> CourseAnnouncementPatchCall<'a> {
+impl<'a, S> CourseAnnouncementPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5617,7 +5676,7 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Announcement) -> CourseAnnouncementPatchCall<'a> {
+    pub fn request(mut self, new_value: Announcement) -> CourseAnnouncementPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5627,7 +5686,7 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementPatchCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementPatchCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -5637,14 +5696,14 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseAnnouncementPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseAnnouncementPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the announcement to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the Announcement object. If a field that does not support empty values is included in the update mask and not set in the Announcement object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `text` * `state` * `scheduled_time`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CourseAnnouncementPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CourseAnnouncementPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5654,7 +5713,7 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5679,7 +5738,7 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5699,9 +5758,9 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseAnnouncementPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseAnnouncementPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5733,7 +5792,7 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5741,10 +5800,10 @@ impl<'a> CourseAnnouncementPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionGetCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _course_work_id: String,
     _id: String,
@@ -5753,9 +5812,15 @@ pub struct CourseCourseWorkStudentSubmissionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionGetCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5900,7 +5965,7 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -5910,7 +5975,7 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
@@ -5920,7 +5985,7 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -5930,7 +5995,7 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5955,7 +6020,7 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5975,9 +6040,9 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6009,7 +6074,7 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6022,10 +6087,10 @@ impl<'a> CourseCourseWorkStudentSubmissionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionListCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _course_work_id: String,
     _user_id: Option<String>,
@@ -6038,9 +6103,15 @@ pub struct CourseCourseWorkStudentSubmissionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionListCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6201,7 +6272,7 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -6211,14 +6282,14 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
     /// Optional argument to restrict returned student work to those owned by the student with the specified identifier. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     ///
     /// Sets the *user id* query property to the given value.
-    pub fn user_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._user_id = Some(new_value.to_string());
         self
     }
@@ -6226,28 +6297,28 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_states(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn add_states(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._states.push(new_value.to_string());
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Requested lateness value. If specified, returned student submissions are restricted by the requested value. If unspecified, submissions are returned regardless of `late` value.
     ///
     /// Sets the *late* query property to the given value.
-    pub fn late(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn late(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._late = Some(new_value.to_string());
         self
     }
@@ -6257,7 +6328,7 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6282,7 +6353,7 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6302,9 +6373,9 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6337,7 +6408,7 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6350,10 +6421,10 @@ impl<'a> CourseCourseWorkStudentSubmissionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: ModifyAttachmentsRequest,
     _course_id: String,
     _course_work_id: String,
@@ -6363,9 +6434,15 @@ pub struct CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6523,7 +6600,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyAttachmentsRequest) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+    pub fn request(mut self, new_value: ModifyAttachmentsRequest) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6533,7 +6610,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -6543,7 +6620,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
@@ -6553,7 +6630,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -6563,7 +6640,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6588,7 +6665,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6608,9 +6685,9 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6643,7 +6720,7 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6657,10 +6734,10 @@ impl<'a> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionPatchCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: StudentSubmission,
     _course_id: String,
     _course_work_id: String,
@@ -6671,9 +6748,15 @@ pub struct CourseCourseWorkStudentSubmissionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionPatchCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6834,7 +6917,7 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StudentSubmission) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn request(mut self, new_value: StudentSubmission) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6844,7 +6927,7 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -6854,7 +6937,7 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
@@ -6864,14 +6947,14 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the student submission to update. This field is required to do an update. The update fails if invalid fields are specified. The following fields may be specified by teachers: * `draft_grade` * `assigned_grade`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6881,7 +6964,7 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6906,7 +6989,7 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6926,9 +7009,9 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6961,7 +7044,7 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6974,10 +7057,10 @@ impl<'a> CourseCourseWorkStudentSubmissionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionReclaimCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionReclaimCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: ReclaimStudentSubmissionRequest,
     _course_id: String,
     _course_work_id: String,
@@ -6987,9 +7070,15 @@ pub struct CourseCourseWorkStudentSubmissionReclaimCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionReclaimCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionReclaimCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7147,7 +7236,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReclaimStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+    pub fn request(mut self, new_value: ReclaimStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7157,7 +7246,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -7167,7 +7256,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
@@ -7177,7 +7266,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7187,7 +7276,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7212,7 +7301,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7232,9 +7321,9 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7267,7 +7356,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7280,10 +7369,10 @@ impl<'a> CourseCourseWorkStudentSubmissionReclaimCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionReturnCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionReturnCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: ReturnStudentSubmissionRequest,
     _course_id: String,
     _course_work_id: String,
@@ -7293,9 +7382,15 @@ pub struct CourseCourseWorkStudentSubmissionReturnCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionReturnCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionReturnCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionReturnCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7453,7 +7548,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReturnStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+    pub fn request(mut self, new_value: ReturnStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7463,7 +7558,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -7473,7 +7568,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
@@ -7483,7 +7578,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7493,7 +7588,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionReturnCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7518,7 +7613,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReturnCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7538,9 +7633,9 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionReturnCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionReturnCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7573,7 +7668,7 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7586,10 +7681,10 @@ impl<'a> CourseCourseWorkStudentSubmissionReturnCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkStudentSubmissionTurnInCall<'a>
-    where  {
+pub struct CourseCourseWorkStudentSubmissionTurnInCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: TurnInStudentSubmissionRequest,
     _course_id: String,
     _course_work_id: String,
@@ -7599,9 +7694,15 @@ pub struct CourseCourseWorkStudentSubmissionTurnInCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkStudentSubmissionTurnInCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {}
 
-impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+impl<'a, S> CourseCourseWorkStudentSubmissionTurnInCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7759,7 +7860,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TurnInStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+    pub fn request(mut self, new_value: TurnInStudentSubmissionRequest) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7769,7 +7870,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -7779,7 +7880,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+    pub fn course_work_id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {
         self._course_work_id = new_value.to_string();
         self
     }
@@ -7789,7 +7890,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -7799,7 +7900,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7824,7 +7925,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionTurnInCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7844,9 +7945,9 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionTurnInCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7879,7 +7980,7 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7892,10 +7993,10 @@ impl<'a> CourseCourseWorkStudentSubmissionTurnInCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkCreateCall<'a>
-    where  {
+pub struct CourseCourseWorkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: CourseWork,
     _course_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7903,9 +8004,15 @@ pub struct CourseCourseWorkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkCreateCall<'a, S> {}
 
-impl<'a> CourseCourseWorkCreateCall<'a> {
+impl<'a, S> CourseCourseWorkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8061,7 +8168,7 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CourseWork) -> CourseCourseWorkCreateCall<'a> {
+    pub fn request(mut self, new_value: CourseWork) -> CourseCourseWorkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8071,7 +8178,7 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -8081,7 +8188,7 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8106,7 +8213,7 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8126,9 +8233,9 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8160,7 +8267,7 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8168,10 +8275,10 @@ impl<'a> CourseCourseWorkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkDeleteCall<'a>
-    where  {
+pub struct CourseCourseWorkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8179,9 +8286,15 @@ pub struct CourseCourseWorkDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkDeleteCall<'a, S> {}
 
-impl<'a> CourseCourseWorkDeleteCall<'a> {
+impl<'a, S> CourseCourseWorkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8325,7 +8438,7 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -8335,7 +8448,7 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -8345,7 +8458,7 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8370,7 +8483,7 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8390,9 +8503,9 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8424,7 +8537,7 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8432,10 +8545,10 @@ impl<'a> CourseCourseWorkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkGetCall<'a>
-    where  {
+pub struct CourseCourseWorkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8443,9 +8556,15 @@ pub struct CourseCourseWorkGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkGetCall<'a, S> {}
 
-impl<'a> CourseCourseWorkGetCall<'a> {
+impl<'a, S> CourseCourseWorkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8589,7 +8708,7 @@ impl<'a> CourseCourseWorkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -8599,7 +8718,7 @@ impl<'a> CourseCourseWorkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -8609,7 +8728,7 @@ impl<'a> CourseCourseWorkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8634,7 +8753,7 @@ impl<'a> CourseCourseWorkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8654,9 +8773,9 @@ impl<'a> CourseCourseWorkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8688,7 +8807,7 @@ impl<'a> CourseCourseWorkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8700,10 +8819,10 @@ impl<'a> CourseCourseWorkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkListCall<'a>
-    where  {
+pub struct CourseCourseWorkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8714,9 +8833,15 @@ pub struct CourseCourseWorkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkListCall<'a, S> {}
 
-impl<'a> CourseCourseWorkListCall<'a> {
+impl<'a, S> CourseCourseWorkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8873,28 +8998,28 @@ impl<'a> CourseCourseWorkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional sort ordering for results. A comma-separated list of fields with an optional sort direction keyword. Supported fields are `updateTime` and `dueDate`. Supported direction keywords are `asc` and `desc`. If not specified, `updateTime desc` is the default behavior. Examples: `dueDate asc,updateTime desc`, `updateTime,dueDate desc`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CourseCourseWorkListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> CourseCourseWorkListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -8902,7 +9027,7 @@ impl<'a> CourseCourseWorkListCall<'a> {
     ///
     /// Append the given value to the *course work states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_course_work_states(mut self, new_value: &str) -> CourseCourseWorkListCall<'a> {
+    pub fn add_course_work_states(mut self, new_value: &str) -> CourseCourseWorkListCall<'a, S> {
         self._course_work_states.push(new_value.to_string());
         self
     }
@@ -8912,7 +9037,7 @@ impl<'a> CourseCourseWorkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8937,7 +9062,7 @@ impl<'a> CourseCourseWorkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8957,9 +9082,9 @@ impl<'a> CourseCourseWorkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8992,7 +9117,7 @@ impl<'a> CourseCourseWorkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9005,10 +9130,10 @@ impl<'a> CourseCourseWorkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkModifyAssigneeCall<'a>
-    where  {
+pub struct CourseCourseWorkModifyAssigneeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: ModifyCourseWorkAssigneesRequest,
     _course_id: String,
     _id: String,
@@ -9017,9 +9142,15 @@ pub struct CourseCourseWorkModifyAssigneeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkModifyAssigneeCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkModifyAssigneeCall<'a, S> {}
 
-impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
+impl<'a, S> CourseCourseWorkModifyAssigneeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9176,7 +9307,7 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyCourseWorkAssigneesRequest) -> CourseCourseWorkModifyAssigneeCall<'a> {
+    pub fn request(mut self, new_value: ModifyCourseWorkAssigneesRequest) -> CourseCourseWorkModifyAssigneeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9186,7 +9317,7 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkModifyAssigneeCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkModifyAssigneeCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -9196,7 +9327,7 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkModifyAssigneeCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkModifyAssigneeCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -9206,7 +9337,7 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkModifyAssigneeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkModifyAssigneeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9231,7 +9362,7 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkModifyAssigneeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkModifyAssigneeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9251,9 +9382,9 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkModifyAssigneeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkModifyAssigneeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9286,7 +9417,7 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9300,10 +9431,10 @@ impl<'a> CourseCourseWorkModifyAssigneeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkPatchCall<'a>
-    where  {
+pub struct CourseCourseWorkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: CourseWork,
     _course_id: String,
     _id: String,
@@ -9313,9 +9444,15 @@ pub struct CourseCourseWorkPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkPatchCall<'a, S> {}
 
-impl<'a> CourseCourseWorkPatchCall<'a> {
+impl<'a, S> CourseCourseWorkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9475,7 +9612,7 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CourseWork) -> CourseCourseWorkPatchCall<'a> {
+    pub fn request(mut self, new_value: CourseWork) -> CourseCourseWorkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9485,7 +9622,7 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -9495,14 +9632,14 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the CourseWork object. If a field that does not support empty values is included in the update mask and not set in the CourseWork object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9512,7 +9649,7 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9537,7 +9674,7 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9557,9 +9694,9 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9592,7 +9729,7 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9605,10 +9742,10 @@ impl<'a> CourseCourseWorkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkMaterialCreateCall<'a>
-    where  {
+pub struct CourseCourseWorkMaterialCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: CourseWorkMaterial,
     _course_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9616,9 +9753,15 @@ pub struct CourseCourseWorkMaterialCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkMaterialCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialCreateCall<'a, S> {}
 
-impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
+impl<'a, S> CourseCourseWorkMaterialCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9774,7 +9917,7 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CourseWorkMaterial) -> CourseCourseWorkMaterialCreateCall<'a> {
+    pub fn request(mut self, new_value: CourseWorkMaterial) -> CourseCourseWorkMaterialCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9784,7 +9927,7 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -9794,7 +9937,7 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9819,7 +9962,7 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9839,9 +9982,9 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkMaterialCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkMaterialCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9873,7 +10016,7 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9881,10 +10024,10 @@ impl<'a> CourseCourseWorkMaterialCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkMaterialDeleteCall<'a>
-    where  {
+pub struct CourseCourseWorkMaterialDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9892,9 +10035,15 @@ pub struct CourseCourseWorkMaterialDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkMaterialDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialDeleteCall<'a, S> {}
 
-impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
+impl<'a, S> CourseCourseWorkMaterialDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10038,7 +10187,7 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -10048,7 +10197,7 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkMaterialDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkMaterialDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -10058,7 +10207,7 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10083,7 +10232,7 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10103,9 +10252,9 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkMaterialDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkMaterialDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10137,7 +10286,7 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10145,10 +10294,10 @@ impl<'a> CourseCourseWorkMaterialDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkMaterialGetCall<'a>
-    where  {
+pub struct CourseCourseWorkMaterialGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10156,9 +10305,15 @@ pub struct CourseCourseWorkMaterialGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkMaterialGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialGetCall<'a, S> {}
 
-impl<'a> CourseCourseWorkMaterialGetCall<'a> {
+impl<'a, S> CourseCourseWorkMaterialGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10302,7 +10457,7 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -10312,7 +10467,7 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -10322,7 +10477,7 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10347,7 +10502,7 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10367,9 +10522,9 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkMaterialGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkMaterialGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10401,7 +10556,7 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10415,10 +10570,10 @@ impl<'a> CourseCourseWorkMaterialGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkMaterialListCall<'a>
-    where  {
+pub struct CourseCourseWorkMaterialListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10431,9 +10586,15 @@ pub struct CourseCourseWorkMaterialListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkMaterialListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialListCall<'a, S> {}
 
-impl<'a> CourseCourseWorkMaterialListCall<'a> {
+impl<'a, S> CourseCourseWorkMaterialListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10596,42 +10757,42 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional sort ordering for results. A comma-separated list of fields with an optional sort direction keyword. Supported field is `updateTime`. Supported direction keywords are `asc` and `desc`. If not specified, `updateTime desc` is the default behavior. Examples: `updateTime asc`, `updateTime`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional filtering for course work material with at least one link material whose URL partially matches the provided string.
     ///
     /// Sets the *material link* query property to the given value.
-    pub fn material_link(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn material_link(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._material_link = Some(new_value.to_string());
         self
     }
     /// Optional filtering for course work material with at least one Drive material whose ID matches the provided string. If `material_link` is also specified, course work material must have materials matching both filters.
     ///
     /// Sets the *material drive id* query property to the given value.
-    pub fn material_drive_id(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn material_drive_id(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._material_drive_id = Some(new_value.to_string());
         self
     }
@@ -10639,7 +10800,7 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
     ///
     /// Append the given value to the *course work material states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_course_work_material_states(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn add_course_work_material_states(mut self, new_value: &str) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._course_work_material_states.push(new_value.to_string());
         self
     }
@@ -10649,7 +10810,7 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10674,7 +10835,7 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10694,9 +10855,9 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkMaterialListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkMaterialListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10729,7 +10890,7 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10743,10 +10904,10 @@ impl<'a> CourseCourseWorkMaterialListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCourseWorkMaterialPatchCall<'a>
-    where  {
+pub struct CourseCourseWorkMaterialPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: CourseWorkMaterial,
     _course_id: String,
     _id: String,
@@ -10756,9 +10917,15 @@ pub struct CourseCourseWorkMaterialPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCourseWorkMaterialPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialPatchCall<'a, S> {}
 
-impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
+impl<'a, S> CourseCourseWorkMaterialPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10918,7 +11085,7 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CourseWorkMaterial) -> CourseCourseWorkMaterialPatchCall<'a> {
+    pub fn request(mut self, new_value: CourseWorkMaterial) -> CourseCourseWorkMaterialPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10928,7 +11095,7 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialPatchCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialPatchCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -10938,14 +11105,14 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseCourseWorkMaterialPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseCourseWorkMaterialPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the course work material to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the course work material object. If a field that does not support empty values is included in the update mask and not set in the course work material object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `scheduled_time` * `topic_id`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkMaterialPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CourseCourseWorkMaterialPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10955,7 +11122,7 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10980,7 +11147,7 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11000,9 +11167,9 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCourseWorkMaterialPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCourseWorkMaterialPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11035,7 +11202,7 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11049,10 +11216,10 @@ impl<'a> CourseCourseWorkMaterialPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseStudentCreateCall<'a>
-    where  {
+pub struct CourseStudentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Student,
     _course_id: String,
     _enrollment_code: Option<String>,
@@ -11061,9 +11228,15 @@ pub struct CourseStudentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseStudentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseStudentCreateCall<'a, S> {}
 
-impl<'a> CourseStudentCreateCall<'a> {
+impl<'a, S> CourseStudentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11222,7 +11395,7 @@ impl<'a> CourseStudentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Student) -> CourseStudentCreateCall<'a> {
+    pub fn request(mut self, new_value: Student) -> CourseStudentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11232,14 +11405,14 @@ impl<'a> CourseStudentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseStudentCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseStudentCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// Enrollment code of the course to create the student in. This code is required if userId corresponds to the requesting user; it may be omitted if the requesting user has administrative permissions to create students for any user.
     ///
     /// Sets the *enrollment code* query property to the given value.
-    pub fn enrollment_code(mut self, new_value: &str) -> CourseStudentCreateCall<'a> {
+    pub fn enrollment_code(mut self, new_value: &str) -> CourseStudentCreateCall<'a, S> {
         self._enrollment_code = Some(new_value.to_string());
         self
     }
@@ -11249,7 +11422,7 @@ impl<'a> CourseStudentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11274,7 +11447,7 @@ impl<'a> CourseStudentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11294,9 +11467,9 @@ impl<'a> CourseStudentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseStudentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11328,7 +11501,7 @@ impl<'a> CourseStudentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11336,10 +11509,10 @@ impl<'a> CourseStudentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseStudentDeleteCall<'a>
-    where  {
+pub struct CourseStudentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11347,9 +11520,15 @@ pub struct CourseStudentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseStudentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseStudentDeleteCall<'a, S> {}
 
-impl<'a> CourseStudentDeleteCall<'a> {
+impl<'a, S> CourseStudentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11493,7 +11672,7 @@ impl<'a> CourseStudentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -11503,7 +11682,7 @@ impl<'a> CourseStudentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> CourseStudentDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11513,7 +11692,7 @@ impl<'a> CourseStudentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11538,7 +11717,7 @@ impl<'a> CourseStudentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11558,9 +11737,9 @@ impl<'a> CourseStudentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseStudentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11592,7 +11771,7 @@ impl<'a> CourseStudentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11600,10 +11779,10 @@ impl<'a> CourseStudentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseStudentGetCall<'a>
-    where  {
+pub struct CourseStudentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11611,9 +11790,15 @@ pub struct CourseStudentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseStudentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseStudentGetCall<'a, S> {}
 
-impl<'a> CourseStudentGetCall<'a> {
+impl<'a, S> CourseStudentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11757,7 +11942,7 @@ impl<'a> CourseStudentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseStudentGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseStudentGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -11767,7 +11952,7 @@ impl<'a> CourseStudentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CourseStudentGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> CourseStudentGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11777,7 +11962,7 @@ impl<'a> CourseStudentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11802,7 +11987,7 @@ impl<'a> CourseStudentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11822,9 +12007,9 @@ impl<'a> CourseStudentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseStudentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11856,7 +12041,7 @@ impl<'a> CourseStudentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11866,10 +12051,10 @@ impl<'a> CourseStudentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseStudentListCall<'a>
-    where  {
+pub struct CourseStudentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11878,9 +12063,15 @@ pub struct CourseStudentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseStudentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseStudentListCall<'a, S> {}
 
-impl<'a> CourseStudentListCall<'a> {
+impl<'a, S> CourseStudentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12029,21 +12220,21 @@ impl<'a> CourseStudentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseStudentListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseStudentListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseStudentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseStudentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. The default is 30 if unspecified or `0`. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseStudentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseStudentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -12053,7 +12244,7 @@ impl<'a> CourseStudentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseStudentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12078,7 +12269,7 @@ impl<'a> CourseStudentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseStudentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12098,9 +12289,9 @@ impl<'a> CourseStudentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseStudentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseStudentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12133,7 +12324,7 @@ impl<'a> CourseStudentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12146,10 +12337,10 @@ impl<'a> CourseStudentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTeacherCreateCall<'a>
-    where  {
+pub struct CourseTeacherCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Teacher,
     _course_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12157,9 +12348,15 @@ pub struct CourseTeacherCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTeacherCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTeacherCreateCall<'a, S> {}
 
-impl<'a> CourseTeacherCreateCall<'a> {
+impl<'a, S> CourseTeacherCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12315,7 +12512,7 @@ impl<'a> CourseTeacherCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Teacher) -> CourseTeacherCreateCall<'a> {
+    pub fn request(mut self, new_value: Teacher) -> CourseTeacherCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12325,7 +12522,7 @@ impl<'a> CourseTeacherCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTeacherCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTeacherCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -12335,7 +12532,7 @@ impl<'a> CourseTeacherCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12360,7 +12557,7 @@ impl<'a> CourseTeacherCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12380,9 +12577,9 @@ impl<'a> CourseTeacherCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTeacherCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTeacherCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12414,7 +12611,7 @@ impl<'a> CourseTeacherCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12422,10 +12619,10 @@ impl<'a> CourseTeacherCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTeacherDeleteCall<'a>
-    where  {
+pub struct CourseTeacherDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12433,9 +12630,15 @@ pub struct CourseTeacherDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTeacherDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTeacherDeleteCall<'a, S> {}
 
-impl<'a> CourseTeacherDeleteCall<'a> {
+impl<'a, S> CourseTeacherDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12579,7 +12782,7 @@ impl<'a> CourseTeacherDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTeacherDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTeacherDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -12589,7 +12792,7 @@ impl<'a> CourseTeacherDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CourseTeacherDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> CourseTeacherDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -12599,7 +12802,7 @@ impl<'a> CourseTeacherDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12624,7 +12827,7 @@ impl<'a> CourseTeacherDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12644,9 +12847,9 @@ impl<'a> CourseTeacherDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTeacherDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTeacherDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12678,7 +12881,7 @@ impl<'a> CourseTeacherDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12686,10 +12889,10 @@ impl<'a> CourseTeacherDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTeacherGetCall<'a>
-    where  {
+pub struct CourseTeacherGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12697,9 +12900,15 @@ pub struct CourseTeacherGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTeacherGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTeacherGetCall<'a, S> {}
 
-impl<'a> CourseTeacherGetCall<'a> {
+impl<'a, S> CourseTeacherGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12843,7 +13052,7 @@ impl<'a> CourseTeacherGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTeacherGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTeacherGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -12853,7 +13062,7 @@ impl<'a> CourseTeacherGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> CourseTeacherGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> CourseTeacherGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -12863,7 +13072,7 @@ impl<'a> CourseTeacherGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12888,7 +13097,7 @@ impl<'a> CourseTeacherGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12908,9 +13117,9 @@ impl<'a> CourseTeacherGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTeacherGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTeacherGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12942,7 +13151,7 @@ impl<'a> CourseTeacherGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12952,10 +13161,10 @@ impl<'a> CourseTeacherGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTeacherListCall<'a>
-    where  {
+pub struct CourseTeacherListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12964,9 +13173,15 @@ pub struct CourseTeacherListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTeacherListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTeacherListCall<'a, S> {}
 
-impl<'a> CourseTeacherListCall<'a> {
+impl<'a, S> CourseTeacherListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13115,21 +13330,21 @@ impl<'a> CourseTeacherListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTeacherListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTeacherListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseTeacherListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseTeacherListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. The default is 30 if unspecified or `0`. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseTeacherListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseTeacherListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -13139,7 +13354,7 @@ impl<'a> CourseTeacherListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTeacherListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13164,7 +13379,7 @@ impl<'a> CourseTeacherListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13184,9 +13399,9 @@ impl<'a> CourseTeacherListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTeacherListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTeacherListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13219,7 +13434,7 @@ impl<'a> CourseTeacherListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13232,10 +13447,10 @@ impl<'a> CourseTeacherListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTopicCreateCall<'a>
-    where  {
+pub struct CourseTopicCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Topic,
     _course_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13243,9 +13458,15 @@ pub struct CourseTopicCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTopicCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTopicCreateCall<'a, S> {}
 
-impl<'a> CourseTopicCreateCall<'a> {
+impl<'a, S> CourseTopicCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13401,7 +13622,7 @@ impl<'a> CourseTopicCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Topic) -> CourseTopicCreateCall<'a> {
+    pub fn request(mut self, new_value: Topic) -> CourseTopicCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13411,7 +13632,7 @@ impl<'a> CourseTopicCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTopicCreateCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicCreateCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -13421,7 +13642,7 @@ impl<'a> CourseTopicCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13446,7 +13667,7 @@ impl<'a> CourseTopicCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13466,9 +13687,9 @@ impl<'a> CourseTopicCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTopicCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13500,7 +13721,7 @@ impl<'a> CourseTopicCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13508,10 +13729,10 @@ impl<'a> CourseTopicCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTopicDeleteCall<'a>
-    where  {
+pub struct CourseTopicDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13519,9 +13740,15 @@ pub struct CourseTopicDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTopicDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTopicDeleteCall<'a, S> {}
 
-impl<'a> CourseTopicDeleteCall<'a> {
+impl<'a, S> CourseTopicDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13665,7 +13892,7 @@ impl<'a> CourseTopicDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTopicDeleteCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicDeleteCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -13675,7 +13902,7 @@ impl<'a> CourseTopicDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseTopicDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseTopicDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -13685,7 +13912,7 @@ impl<'a> CourseTopicDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13710,7 +13937,7 @@ impl<'a> CourseTopicDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13730,9 +13957,9 @@ impl<'a> CourseTopicDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTopicDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13764,7 +13991,7 @@ impl<'a> CourseTopicDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13772,10 +13999,10 @@ impl<'a> CourseTopicDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTopicGetCall<'a>
-    where  {
+pub struct CourseTopicGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13783,9 +14010,15 @@ pub struct CourseTopicGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTopicGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTopicGetCall<'a, S> {}
 
-impl<'a> CourseTopicGetCall<'a> {
+impl<'a, S> CourseTopicGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13929,7 +14162,7 @@ impl<'a> CourseTopicGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTopicGetCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicGetCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -13939,7 +14172,7 @@ impl<'a> CourseTopicGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseTopicGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseTopicGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -13949,7 +14182,7 @@ impl<'a> CourseTopicGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13974,7 +14207,7 @@ impl<'a> CourseTopicGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13994,9 +14227,9 @@ impl<'a> CourseTopicGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTopicGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14028,7 +14261,7 @@ impl<'a> CourseTopicGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14038,10 +14271,10 @@ impl<'a> CourseTopicGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTopicListCall<'a>
-    where  {
+pub struct CourseTopicListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _course_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14050,9 +14283,15 @@ pub struct CourseTopicListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTopicListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTopicListCall<'a, S> {}
 
-impl<'a> CourseTopicListCall<'a> {
+impl<'a, S> CourseTopicListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14201,21 +14440,21 @@ impl<'a> CourseTopicListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTopicListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicListCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseTopicListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseTopicListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseTopicListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseTopicListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14225,7 +14464,7 @@ impl<'a> CourseTopicListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14250,7 +14489,7 @@ impl<'a> CourseTopicListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14270,9 +14509,9 @@ impl<'a> CourseTopicListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTopicListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14305,7 +14544,7 @@ impl<'a> CourseTopicListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14319,10 +14558,10 @@ impl<'a> CourseTopicListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseTopicPatchCall<'a>
-    where  {
+pub struct CourseTopicPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Topic,
     _course_id: String,
     _id: String,
@@ -14332,9 +14571,15 @@ pub struct CourseTopicPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseTopicPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseTopicPatchCall<'a, S> {}
 
-impl<'a> CourseTopicPatchCall<'a> {
+impl<'a, S> CourseTopicPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14494,7 +14739,7 @@ impl<'a> CourseTopicPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Topic) -> CourseTopicPatchCall<'a> {
+    pub fn request(mut self, new_value: Topic) -> CourseTopicPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14504,7 +14749,7 @@ impl<'a> CourseTopicPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn course_id(mut self, new_value: &str) -> CourseTopicPatchCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> CourseTopicPatchCall<'a, S> {
         self._course_id = new_value.to_string();
         self
     }
@@ -14514,14 +14759,14 @@ impl<'a> CourseTopicPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseTopicPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseTopicPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the topic to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the Topic object. If a field that does not support empty values is included in the update mask and not set in the Topic object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified: * `name`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CourseTopicPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CourseTopicPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -14531,7 +14776,7 @@ impl<'a> CourseTopicPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseTopicPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14556,7 +14801,7 @@ impl<'a> CourseTopicPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseTopicPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14576,9 +14821,9 @@ impl<'a> CourseTopicPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseTopicPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseTopicPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14611,7 +14856,7 @@ impl<'a> CourseTopicPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14624,19 +14869,25 @@ impl<'a> CourseTopicPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseCreateCall<'a>
-    where  {
+pub struct CourseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Course,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseCreateCall<'a, S> {}
 
-impl<'a> CourseCreateCall<'a> {
+impl<'a, S> CourseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14770,7 +15021,7 @@ impl<'a> CourseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Course) -> CourseCreateCall<'a> {
+    pub fn request(mut self, new_value: Course) -> CourseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14780,7 +15031,7 @@ impl<'a> CourseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14805,7 +15056,7 @@ impl<'a> CourseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14825,9 +15076,9 @@ impl<'a> CourseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14859,7 +15110,7 @@ impl<'a> CourseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14867,19 +15118,25 @@ impl<'a> CourseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseDeleteCall<'a>
-    where  {
+pub struct CourseDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseDeleteCall<'a, S> {}
 
-impl<'a> CourseDeleteCall<'a> {
+impl<'a, S> CourseDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15022,7 +15279,7 @@ impl<'a> CourseDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -15032,7 +15289,7 @@ impl<'a> CourseDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15057,7 +15314,7 @@ impl<'a> CourseDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15077,9 +15334,9 @@ impl<'a> CourseDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15111,7 +15368,7 @@ impl<'a> CourseDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15119,19 +15376,25 @@ impl<'a> CourseDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseGetCall<'a>
-    where  {
+pub struct CourseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseGetCall<'a, S> {}
 
-impl<'a> CourseGetCall<'a> {
+impl<'a, S> CourseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15274,7 +15537,7 @@ impl<'a> CourseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -15284,7 +15547,7 @@ impl<'a> CourseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15309,7 +15572,7 @@ impl<'a> CourseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15329,9 +15592,9 @@ impl<'a> CourseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15363,7 +15626,7 @@ impl<'a> CourseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15376,10 +15639,10 @@ impl<'a> CourseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseListCall<'a>
-    where  {
+pub struct CourseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _teacher_id: Option<String>,
     _student_id: Option<String>,
     _page_token: Option<String>,
@@ -15390,9 +15653,15 @@ pub struct CourseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseListCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseListCall<'a, S> {}
 
-impl<'a> CourseListCall<'a> {
+impl<'a, S> CourseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15527,28 +15796,28 @@ impl<'a> CourseListCall<'a> {
     /// Restricts returned courses to those having a teacher with the specified identifier. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     ///
     /// Sets the *teacher id* query property to the given value.
-    pub fn teacher_id(mut self, new_value: &str) -> CourseListCall<'a> {
+    pub fn teacher_id(mut self, new_value: &str) -> CourseListCall<'a, S> {
         self._teacher_id = Some(new_value.to_string());
         self
     }
     /// Restricts returned courses to those having a student with the specified identifier. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     ///
     /// Sets the *student id* query property to the given value.
-    pub fn student_id(mut self, new_value: &str) -> CourseListCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> CourseListCall<'a, S> {
         self._student_id = Some(new_value.to_string());
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CourseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CourseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CourseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CourseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -15556,7 +15825,7 @@ impl<'a> CourseListCall<'a> {
     ///
     /// Append the given value to the *course states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_course_states(mut self, new_value: &str) -> CourseListCall<'a> {
+    pub fn add_course_states(mut self, new_value: &str) -> CourseListCall<'a, S> {
         self._course_states.push(new_value.to_string());
         self
     }
@@ -15566,7 +15835,7 @@ impl<'a> CourseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15591,7 +15860,7 @@ impl<'a> CourseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15611,9 +15880,9 @@ impl<'a> CourseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15646,7 +15915,7 @@ impl<'a> CourseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15660,10 +15929,10 @@ impl<'a> CourseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CoursePatchCall<'a>
-    where  {
+pub struct CoursePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Course,
     _id: String,
     _update_mask: Option<String>,
@@ -15672,9 +15941,15 @@ pub struct CoursePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CoursePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CoursePatchCall<'a, S> {}
 
-impl<'a> CoursePatchCall<'a> {
+impl<'a, S> CoursePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15833,7 +16108,7 @@ impl<'a> CoursePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Course) -> CoursePatchCall<'a> {
+    pub fn request(mut self, new_value: Course) -> CoursePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15843,14 +16118,14 @@ impl<'a> CoursePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CoursePatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CoursePatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the course to update. This field is required to do an update. The update will fail if invalid fields are specified. The following fields are valid: * `name` * `section` * `descriptionHeading` * `description` * `room` * `courseState` * `ownerId` Note: patches to ownerId are treated as being effective immediately, but in practice it may take some time for the ownership transfer of all affected resources to complete. When set in a query parameter, this field should be specified as `updateMask=,,...`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CoursePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> CoursePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15860,7 +16135,7 @@ impl<'a> CoursePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15885,7 +16160,7 @@ impl<'a> CoursePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CoursePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15905,9 +16180,9 @@ impl<'a> CoursePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CoursePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CoursePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15940,7 +16215,7 @@ impl<'a> CoursePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15953,10 +16228,10 @@ impl<'a> CoursePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CourseUpdateCall<'a>
-    where  {
+pub struct CourseUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Course,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15964,9 +16239,15 @@ pub struct CourseUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CourseUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CourseUpdateCall<'a, S> {}
 
-impl<'a> CourseUpdateCall<'a> {
+impl<'a, S> CourseUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16122,7 +16403,7 @@ impl<'a> CourseUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Course) -> CourseUpdateCall<'a> {
+    pub fn request(mut self, new_value: Course) -> CourseUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16132,7 +16413,7 @@ impl<'a> CourseUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CourseUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> CourseUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -16142,7 +16423,7 @@ impl<'a> CourseUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16167,7 +16448,7 @@ impl<'a> CourseUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CourseUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CourseUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16187,9 +16468,9 @@ impl<'a> CourseUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CourseUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CourseUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16221,7 +16502,7 @@ impl<'a> CourseUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16229,19 +16510,25 @@ impl<'a> CourseUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InvitationAcceptCall<'a>
-    where  {
+pub struct InvitationAcceptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InvitationAcceptCall<'a> {}
+impl<'a, S> client::CallBuilder for InvitationAcceptCall<'a, S> {}
 
-impl<'a> InvitationAcceptCall<'a> {
+impl<'a, S> InvitationAcceptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16384,7 +16671,7 @@ impl<'a> InvitationAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> InvitationAcceptCall<'a> {
+    pub fn id(mut self, new_value: &str) -> InvitationAcceptCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -16394,7 +16681,7 @@ impl<'a> InvitationAcceptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationAcceptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationAcceptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16419,7 +16706,7 @@ impl<'a> InvitationAcceptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InvitationAcceptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InvitationAcceptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16439,9 +16726,9 @@ impl<'a> InvitationAcceptCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InvitationAcceptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InvitationAcceptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16474,7 +16761,7 @@ impl<'a> InvitationAcceptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16487,19 +16774,25 @@ impl<'a> InvitationAcceptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InvitationCreateCall<'a>
-    where  {
+pub struct InvitationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Invitation,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InvitationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for InvitationCreateCall<'a, S> {}
 
-impl<'a> InvitationCreateCall<'a> {
+impl<'a, S> InvitationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16633,7 +16926,7 @@ impl<'a> InvitationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Invitation) -> InvitationCreateCall<'a> {
+    pub fn request(mut self, new_value: Invitation) -> InvitationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16643,7 +16936,7 @@ impl<'a> InvitationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16668,7 +16961,7 @@ impl<'a> InvitationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InvitationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InvitationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16688,9 +16981,9 @@ impl<'a> InvitationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InvitationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InvitationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16722,7 +17015,7 @@ impl<'a> InvitationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16730,19 +17023,25 @@ impl<'a> InvitationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InvitationDeleteCall<'a>
-    where  {
+pub struct InvitationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InvitationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for InvitationDeleteCall<'a, S> {}
 
-impl<'a> InvitationDeleteCall<'a> {
+impl<'a, S> InvitationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16885,7 +17184,7 @@ impl<'a> InvitationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> InvitationDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> InvitationDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -16895,7 +17194,7 @@ impl<'a> InvitationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16920,7 +17219,7 @@ impl<'a> InvitationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InvitationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InvitationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16940,9 +17239,9 @@ impl<'a> InvitationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InvitationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InvitationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16974,7 +17273,7 @@ impl<'a> InvitationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16982,19 +17281,25 @@ impl<'a> InvitationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InvitationGetCall<'a>
-    where  {
+pub struct InvitationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InvitationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for InvitationGetCall<'a, S> {}
 
-impl<'a> InvitationGetCall<'a> {
+impl<'a, S> InvitationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17137,7 +17442,7 @@ impl<'a> InvitationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> InvitationGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> InvitationGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -17147,7 +17452,7 @@ impl<'a> InvitationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17172,7 +17477,7 @@ impl<'a> InvitationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InvitationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InvitationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17192,9 +17497,9 @@ impl<'a> InvitationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InvitationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InvitationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17226,7 +17531,7 @@ impl<'a> InvitationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17238,10 +17543,10 @@ impl<'a> InvitationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InvitationListCall<'a>
-    where  {
+pub struct InvitationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _user_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -17251,9 +17556,15 @@ pub struct InvitationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InvitationListCall<'a> {}
+impl<'a, S> client::CallBuilder for InvitationListCall<'a, S> {}
 
-impl<'a> InvitationListCall<'a> {
+impl<'a, S> InvitationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17383,28 +17694,28 @@ impl<'a> InvitationListCall<'a> {
     /// Restricts returned invitations to those for a specific user. The identifier can be one of the following: * the numeric identifier for the user * the email address of the user * the string literal `"me"`, indicating the requesting user
     ///
     /// Sets the *user id* query property to the given value.
-    pub fn user_id(mut self, new_value: &str) -> InvitationListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> InvitationListCall<'a, S> {
         self._user_id = Some(new_value.to_string());
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> InvitationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> InvitationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. The default is 500 if unspecified or `0`. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> InvitationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> InvitationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Restricts returned invitations to those for a course with the specified identifier.
     ///
     /// Sets the *course id* query property to the given value.
-    pub fn course_id(mut self, new_value: &str) -> InvitationListCall<'a> {
+    pub fn course_id(mut self, new_value: &str) -> InvitationListCall<'a, S> {
         self._course_id = Some(new_value.to_string());
         self
     }
@@ -17414,7 +17725,7 @@ impl<'a> InvitationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InvitationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17439,7 +17750,7 @@ impl<'a> InvitationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InvitationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InvitationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17459,9 +17770,9 @@ impl<'a> InvitationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InvitationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InvitationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17494,7 +17805,7 @@ impl<'a> InvitationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17507,19 +17818,25 @@ impl<'a> InvitationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RegistrationCreateCall<'a>
-    where  {
+pub struct RegistrationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: Registration,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RegistrationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for RegistrationCreateCall<'a, S> {}
 
-impl<'a> RegistrationCreateCall<'a> {
+impl<'a, S> RegistrationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17653,7 +17970,7 @@ impl<'a> RegistrationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Registration) -> RegistrationCreateCall<'a> {
+    pub fn request(mut self, new_value: Registration) -> RegistrationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17663,7 +17980,7 @@ impl<'a> RegistrationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RegistrationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RegistrationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17688,7 +18005,7 @@ impl<'a> RegistrationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RegistrationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RegistrationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17708,9 +18025,9 @@ impl<'a> RegistrationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RegistrationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RegistrationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17742,7 +18059,7 @@ impl<'a> RegistrationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17750,19 +18067,25 @@ impl<'a> RegistrationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RegistrationDeleteCall<'a>
-    where  {
+pub struct RegistrationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _registration_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for RegistrationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for RegistrationDeleteCall<'a, S> {}
 
-impl<'a> RegistrationDeleteCall<'a> {
+impl<'a, S> RegistrationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17905,7 +18228,7 @@ impl<'a> RegistrationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn registration_id(mut self, new_value: &str) -> RegistrationDeleteCall<'a> {
+    pub fn registration_id(mut self, new_value: &str) -> RegistrationDeleteCall<'a, S> {
         self._registration_id = new_value.to_string();
         self
     }
@@ -17915,7 +18238,7 @@ impl<'a> RegistrationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RegistrationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RegistrationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17940,7 +18263,7 @@ impl<'a> RegistrationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RegistrationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RegistrationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17960,9 +18283,9 @@ impl<'a> RegistrationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RegistrationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> RegistrationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17995,7 +18318,7 @@ impl<'a> RegistrationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18008,10 +18331,10 @@ impl<'a> RegistrationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianInvitationCreateCall<'a>
-    where  {
+pub struct UserProfileGuardianInvitationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: GuardianInvitation,
     _student_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18019,9 +18342,15 @@ pub struct UserProfileGuardianInvitationCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianInvitationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianInvitationCreateCall<'a, S> {}
 
-impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
+impl<'a, S> UserProfileGuardianInvitationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18177,7 +18506,7 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GuardianInvitation) -> UserProfileGuardianInvitationCreateCall<'a> {
+    pub fn request(mut self, new_value: GuardianInvitation) -> UserProfileGuardianInvitationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18187,7 +18516,7 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationCreateCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationCreateCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
@@ -18197,7 +18526,7 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18222,7 +18551,7 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18242,9 +18571,9 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianInvitationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18276,7 +18605,7 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18284,10 +18613,10 @@ impl<'a> UserProfileGuardianInvitationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianInvitationGetCall<'a>
-    where  {
+pub struct UserProfileGuardianInvitationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _student_id: String,
     _invitation_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18295,9 +18624,15 @@ pub struct UserProfileGuardianInvitationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianInvitationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianInvitationGetCall<'a, S> {}
 
-impl<'a> UserProfileGuardianInvitationGetCall<'a> {
+impl<'a, S> UserProfileGuardianInvitationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18441,7 +18776,7 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationGetCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationGetCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
@@ -18451,7 +18786,7 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn invitation_id(mut self, new_value: &str) -> UserProfileGuardianInvitationGetCall<'a> {
+    pub fn invitation_id(mut self, new_value: &str) -> UserProfileGuardianInvitationGetCall<'a, S> {
         self._invitation_id = new_value.to_string();
         self
     }
@@ -18461,7 +18796,7 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18486,7 +18821,7 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18506,9 +18841,9 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianInvitationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18540,7 +18875,7 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18552,10 +18887,10 @@ impl<'a> UserProfileGuardianInvitationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianInvitationListCall<'a>
-    where  {
+pub struct UserProfileGuardianInvitationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _student_id: String,
     _states: Vec<String>,
     _page_token: Option<String>,
@@ -18566,9 +18901,15 @@ pub struct UserProfileGuardianInvitationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianInvitationListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianInvitationListCall<'a, S> {}
 
-impl<'a> UserProfileGuardianInvitationListCall<'a> {
+impl<'a, S> UserProfileGuardianInvitationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18725,7 +19066,7 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
@@ -18733,28 +19074,28 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
     ///
     /// Append the given value to the *states* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_states(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn add_states(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, S> {
         self._states.push(new_value.to_string());
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> UserProfileGuardianInvitationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// If specified, only results with the specified `invited_email_address` are returned.
     ///
     /// Sets the *invited email address* query property to the given value.
-    pub fn invited_email_address(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn invited_email_address(mut self, new_value: &str) -> UserProfileGuardianInvitationListCall<'a, S> {
         self._invited_email_address = Some(new_value.to_string());
         self
     }
@@ -18764,7 +19105,7 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18789,7 +19130,7 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18809,9 +19150,9 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianInvitationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18844,7 +19185,7 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18858,10 +19199,10 @@ impl<'a> UserProfileGuardianInvitationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianInvitationPatchCall<'a>
-    where  {
+pub struct UserProfileGuardianInvitationPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _request: GuardianInvitation,
     _student_id: String,
     _invitation_id: String,
@@ -18871,9 +19212,15 @@ pub struct UserProfileGuardianInvitationPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianInvitationPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianInvitationPatchCall<'a, S> {}
 
-impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
+impl<'a, S> UserProfileGuardianInvitationPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19033,7 +19380,7 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GuardianInvitation) -> UserProfileGuardianInvitationPatchCall<'a> {
+    pub fn request(mut self, new_value: GuardianInvitation) -> UserProfileGuardianInvitationPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19043,7 +19390,7 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
@@ -19053,14 +19400,14 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn invitation_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a> {
+    pub fn invitation_id(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, S> {
         self._invitation_id = new_value.to_string();
         self
     }
     /// Mask that identifies which fields on the course to update. This field is required to do an update. The update fails if invalid fields are specified. The following fields are valid: * `state` When set in a query parameter, this field should be specified as `updateMask=,,...`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> UserProfileGuardianInvitationPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -19070,7 +19417,7 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianInvitationPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19095,7 +19442,7 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19115,9 +19462,9 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianInvitationPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19149,7 +19496,7 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19157,10 +19504,10 @@ impl<'a> UserProfileGuardianInvitationPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianDeleteCall<'a>
-    where  {
+pub struct UserProfileGuardianDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _student_id: String,
     _guardian_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19168,9 +19515,15 @@ pub struct UserProfileGuardianDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianDeleteCall<'a, S> {}
 
-impl<'a> UserProfileGuardianDeleteCall<'a> {
+impl<'a, S> UserProfileGuardianDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19314,7 +19667,7 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
@@ -19324,7 +19677,7 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn guardian_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a> {
+    pub fn guardian_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a, S> {
         self._guardian_id = new_value.to_string();
         self
     }
@@ -19334,7 +19687,7 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19359,7 +19712,7 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19379,9 +19732,9 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19413,7 +19766,7 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19421,10 +19774,10 @@ impl<'a> UserProfileGuardianDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianGetCall<'a>
-    where  {
+pub struct UserProfileGuardianGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _student_id: String,
     _guardian_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19432,9 +19785,15 @@ pub struct UserProfileGuardianGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianGetCall<'a, S> {}
 
-impl<'a> UserProfileGuardianGetCall<'a> {
+impl<'a, S> UserProfileGuardianGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19578,7 +19937,7 @@ impl<'a> UserProfileGuardianGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianGetCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianGetCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
@@ -19588,7 +19947,7 @@ impl<'a> UserProfileGuardianGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn guardian_id(mut self, new_value: &str) -> UserProfileGuardianGetCall<'a> {
+    pub fn guardian_id(mut self, new_value: &str) -> UserProfileGuardianGetCall<'a, S> {
         self._guardian_id = new_value.to_string();
         self
     }
@@ -19598,7 +19957,7 @@ impl<'a> UserProfileGuardianGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19623,7 +19982,7 @@ impl<'a> UserProfileGuardianGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19643,9 +20002,9 @@ impl<'a> UserProfileGuardianGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19677,7 +20036,7 @@ impl<'a> UserProfileGuardianGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19688,10 +20047,10 @@ impl<'a> UserProfileGuardianGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGuardianListCall<'a>
-    where  {
+pub struct UserProfileGuardianListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _student_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -19701,9 +20060,15 @@ pub struct UserProfileGuardianListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGuardianListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGuardianListCall<'a, S> {}
 
-impl<'a> UserProfileGuardianListCall<'a> {
+impl<'a, S> UserProfileGuardianListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19855,28 +20220,28 @@ impl<'a> UserProfileGuardianListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianListCall<'a> {
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianListCall<'a, S> {
         self._student_id = new_value.to_string();
         self
     }
     /// nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserProfileGuardianListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserProfileGuardianListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of items to return. Zero or unspecified indicates that the server may assign a maximum. The server may return fewer than the specified number of results.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> UserProfileGuardianListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> UserProfileGuardianListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Filter results by the email address that the original invitation was sent to, resulting in this guardian link. This filter can only be used by domain administrators.
     ///
     /// Sets the *invited email address* query property to the given value.
-    pub fn invited_email_address(mut self, new_value: &str) -> UserProfileGuardianListCall<'a> {
+    pub fn invited_email_address(mut self, new_value: &str) -> UserProfileGuardianListCall<'a, S> {
         self._invited_email_address = Some(new_value.to_string());
         self
     }
@@ -19886,7 +20251,7 @@ impl<'a> UserProfileGuardianListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGuardianListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19911,7 +20276,7 @@ impl<'a> UserProfileGuardianListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19931,9 +20296,9 @@ impl<'a> UserProfileGuardianListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGuardianListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19965,7 +20330,7 @@ impl<'a> UserProfileGuardianListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19973,19 +20338,25 @@ impl<'a> UserProfileGuardianListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProfileGetCall<'a>
-    where  {
+pub struct UserProfileGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Classroom<>,
+    hub: &'a Classroom<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserProfileGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserProfileGetCall<'a, S> {}
 
-impl<'a> UserProfileGetCall<'a> {
+impl<'a, S> UserProfileGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20128,7 +20499,7 @@ impl<'a> UserProfileGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserProfileGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserProfileGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -20138,7 +20509,7 @@ impl<'a> UserProfileGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProfileGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20163,7 +20534,7 @@ impl<'a> UserProfileGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20183,9 +20554,9 @@ impl<'a> UserProfileGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserProfileGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

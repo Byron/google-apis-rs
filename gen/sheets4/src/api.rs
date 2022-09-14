@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -87,7 +92,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -124,34 +129,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Sheets<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Sheets<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Sheets<> {}
+impl<'a, S> client::Hub for Sheets<S> {}
 
-impl<'a, > Sheets<> {
+impl<'a, S> Sheets<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Sheets<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Sheets<S> {
         Sheets {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://sheets.googleapis.com/".to_string(),
             _root_url: "https://sheets.googleapis.com/".to_string(),
         }
     }
 
-    pub fn spreadsheets(&'a self) -> SpreadsheetMethods<'a> {
+    pub fn spreadsheets(&'a self) -> SpreadsheetMethods<'a, S> {
         SpreadsheetMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5460,22 +5465,22 @@ impl client::Part for WaterfallChartSpec {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_update(...)`, `create(...)`, `developer_metadata_get(...)`, `developer_metadata_search(...)`, `get(...)`, `get_by_data_filter(...)`, `sheets_copy_to(...)`, `values_append(...)`, `values_batch_clear(...)`, `values_batch_clear_by_data_filter(...)`, `values_batch_get(...)`, `values_batch_get_by_data_filter(...)`, `values_batch_update(...)`, `values_batch_update_by_data_filter(...)`, `values_clear(...)`, `values_get(...)` and `values_update(...)`
 /// // to build up your call.
 /// let rb = hub.spreadsheets();
 /// # }
 /// ```
-pub struct SpreadsheetMethods<'a>
-    where  {
+pub struct SpreadsheetMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
 }
 
-impl<'a> client::MethodsBuilder for SpreadsheetMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SpreadsheetMethods<'a, S> {}
 
-impl<'a> SpreadsheetMethods<'a> {
+impl<'a, S> SpreadsheetMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5485,7 +5490,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve metadata from.
     /// * `metadataId` - The ID of the developer metadata to retrieve.
-    pub fn developer_metadata_get(&self, spreadsheet_id: &str, metadata_id: i32) -> SpreadsheetDeveloperMetadataGetCall<'a> {
+    pub fn developer_metadata_get(&self, spreadsheet_id: &str, metadata_id: i32) -> SpreadsheetDeveloperMetadataGetCall<'a, S> {
         SpreadsheetDeveloperMetadataGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5504,7 +5509,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve metadata from.
-    pub fn developer_metadata_search(&self, request: SearchDeveloperMetadataRequest, spreadsheet_id: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
+    pub fn developer_metadata_search(&self, request: SearchDeveloperMetadataRequest, spreadsheet_id: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a, S> {
         SpreadsheetDeveloperMetadataSearchCall {
             hub: self.hub,
             _request: request,
@@ -5524,7 +5529,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet containing the sheet to copy.
     /// * `sheetId` - The ID of the sheet to copy.
-    pub fn sheets_copy_to(&self, request: CopySheetToAnotherSpreadsheetRequest, spreadsheet_id: &str, sheet_id: i32) -> SpreadsheetSheetCopyToCall<'a> {
+    pub fn sheets_copy_to(&self, request: CopySheetToAnotherSpreadsheetRequest, spreadsheet_id: &str, sheet_id: i32) -> SpreadsheetSheetCopyToCall<'a, S> {
         SpreadsheetSheetCopyToCall {
             hub: self.hub,
             _request: request,
@@ -5545,7 +5550,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
     /// * `range` - The A1 notation of a range to search for a logical table of data. Values are appended after the last row of the table.
-    pub fn values_append(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn values_append(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueAppendCall<'a, S> {
         SpreadsheetValueAppendCall {
             hub: self.hub,
             _request: request,
@@ -5570,7 +5575,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_clear(&self, request: BatchClearValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearCall<'a> {
+    pub fn values_batch_clear(&self, request: BatchClearValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearCall<'a, S> {
         SpreadsheetValueBatchClearCall {
             hub: self.hub,
             _request: request,
@@ -5589,7 +5594,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_clear_by_data_filter(&self, request: BatchClearValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
+    pub fn values_batch_clear_by_data_filter(&self, request: BatchClearValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a, S> {
         SpreadsheetValueBatchClearByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5607,7 +5612,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// # Arguments
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
-    pub fn values_batch_get(&self, spreadsheet_id: &str) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn values_batch_get(&self, spreadsheet_id: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
         SpreadsheetValueBatchGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5629,7 +5634,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
-    pub fn values_batch_get_by_data_filter(&self, request: BatchGetValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
+    pub fn values_batch_get_by_data_filter(&self, request: BatchGetValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a, S> {
         SpreadsheetValueBatchGetByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5648,7 +5653,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_update(&self, request: BatchUpdateValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateCall<'a> {
+    pub fn values_batch_update(&self, request: BatchUpdateValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateCall<'a, S> {
         SpreadsheetValueBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5667,7 +5672,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_update_by_data_filter(&self, request: BatchUpdateValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
+    pub fn values_batch_update_by_data_filter(&self, request: BatchUpdateValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S> {
         SpreadsheetValueBatchUpdateByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5687,7 +5692,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
     /// * `range` - The A1 notation or R1C1 notation of the values to clear.
-    pub fn values_clear(&self, request: ClearValuesRequest, spreadsheet_id: &str, range: &str) -> SpreadsheetValueClearCall<'a> {
+    pub fn values_clear(&self, request: ClearValuesRequest, spreadsheet_id: &str, range: &str) -> SpreadsheetValueClearCall<'a, S> {
         SpreadsheetValueClearCall {
             hub: self.hub,
             _request: request,
@@ -5707,7 +5712,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
     /// * `range` - The A1 notation or R1C1 notation of the range to retrieve values from.
-    pub fn values_get(&self, spreadsheet_id: &str, range: &str) -> SpreadsheetValueGetCall<'a> {
+    pub fn values_get(&self, spreadsheet_id: &str, range: &str) -> SpreadsheetValueGetCall<'a, S> {
         SpreadsheetValueGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5730,7 +5735,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
     /// * `range` - The A1 notation of the values to update.
-    pub fn values_update(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn values_update(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         SpreadsheetValueUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5754,7 +5759,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The spreadsheet to apply the updates to.
-    pub fn batch_update(&self, request: BatchUpdateSpreadsheetRequest, spreadsheet_id: &str) -> SpreadsheetBatchUpdateCall<'a> {
+    pub fn batch_update(&self, request: BatchUpdateSpreadsheetRequest, spreadsheet_id: &str) -> SpreadsheetBatchUpdateCall<'a, S> {
         SpreadsheetBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5772,7 +5777,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Spreadsheet) -> SpreadsheetCreateCall<'a> {
+    pub fn create(&self, request: Spreadsheet) -> SpreadsheetCreateCall<'a, S> {
         SpreadsheetCreateCall {
             hub: self.hub,
             _request: request,
@@ -5789,7 +5794,7 @@ impl<'a> SpreadsheetMethods<'a> {
     /// # Arguments
     ///
     /// * `spreadsheetId` - The spreadsheet to request.
-    pub fn get(&self, spreadsheet_id: &str) -> SpreadsheetGetCall<'a> {
+    pub fn get(&self, spreadsheet_id: &str) -> SpreadsheetGetCall<'a, S> {
         SpreadsheetGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5809,7 +5814,7 @@ impl<'a> SpreadsheetMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The spreadsheet to request.
-    pub fn get_by_data_filter(&self, request: GetSpreadsheetByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetGetByDataFilterCall<'a> {
+    pub fn get_by_data_filter(&self, request: GetSpreadsheetByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetGetByDataFilterCall<'a, S> {
         SpreadsheetGetByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5851,7 +5856,7 @@ impl<'a> SpreadsheetMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5859,10 +5864,10 @@ impl<'a> SpreadsheetMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetDeveloperMetadataGetCall<'a>
-    where  {
+pub struct SpreadsheetDeveloperMetadataGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _spreadsheet_id: String,
     _metadata_id: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5870,9 +5875,15 @@ pub struct SpreadsheetDeveloperMetadataGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetDeveloperMetadataGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetDeveloperMetadataGetCall<'a, S> {}
 
-impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
+impl<'a, S> SpreadsheetDeveloperMetadataGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6016,7 +6027,7 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataGetCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataGetCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6026,7 +6037,7 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metadata_id(mut self, new_value: i32) -> SpreadsheetDeveloperMetadataGetCall<'a> {
+    pub fn metadata_id(mut self, new_value: i32) -> SpreadsheetDeveloperMetadataGetCall<'a, S> {
         self._metadata_id = new_value;
         self
     }
@@ -6036,7 +6047,7 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6061,7 +6072,7 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6081,9 +6092,9 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetDeveloperMetadataGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetDeveloperMetadataGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6116,7 +6127,7 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6129,10 +6140,10 @@ impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetDeveloperMetadataSearchCall<'a>
-    where  {
+pub struct SpreadsheetDeveloperMetadataSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: SearchDeveloperMetadataRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6140,9 +6151,15 @@ pub struct SpreadsheetDeveloperMetadataSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetDeveloperMetadataSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetDeveloperMetadataSearchCall<'a, S> {}
 
-impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
+impl<'a, S> SpreadsheetDeveloperMetadataSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6298,7 +6315,7 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchDeveloperMetadataRequest) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
+    pub fn request(mut self, new_value: SearchDeveloperMetadataRequest) -> SpreadsheetDeveloperMetadataSearchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6308,7 +6325,7 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6318,7 +6335,7 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6343,7 +6360,7 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6363,9 +6380,9 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetDeveloperMetadataSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetDeveloperMetadataSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6398,7 +6415,7 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6411,10 +6428,10 @@ impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetSheetCopyToCall<'a>
-    where  {
+pub struct SpreadsheetSheetCopyToCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: CopySheetToAnotherSpreadsheetRequest,
     _spreadsheet_id: String,
     _sheet_id: i32,
@@ -6423,9 +6440,15 @@ pub struct SpreadsheetSheetCopyToCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetSheetCopyToCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetSheetCopyToCall<'a, S> {}
 
-impl<'a> SpreadsheetSheetCopyToCall<'a> {
+impl<'a, S> SpreadsheetSheetCopyToCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6582,7 +6605,7 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CopySheetToAnotherSpreadsheetRequest) -> SpreadsheetSheetCopyToCall<'a> {
+    pub fn request(mut self, new_value: CopySheetToAnotherSpreadsheetRequest) -> SpreadsheetSheetCopyToCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6592,7 +6615,7 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetSheetCopyToCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetSheetCopyToCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6602,7 +6625,7 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sheet_id(mut self, new_value: i32) -> SpreadsheetSheetCopyToCall<'a> {
+    pub fn sheet_id(mut self, new_value: i32) -> SpreadsheetSheetCopyToCall<'a, S> {
         self._sheet_id = new_value;
         self
     }
@@ -6612,7 +6635,7 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetSheetCopyToCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetSheetCopyToCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6637,7 +6660,7 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetSheetCopyToCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetSheetCopyToCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6657,9 +6680,9 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetSheetCopyToCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetSheetCopyToCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6692,7 +6715,7 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6710,10 +6733,10 @@ impl<'a> SpreadsheetSheetCopyToCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueAppendCall<'a>
-    where  {
+pub struct SpreadsheetValueAppendCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: ValueRange,
     _spreadsheet_id: String,
     _range: String,
@@ -6727,9 +6750,15 @@ pub struct SpreadsheetValueAppendCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueAppendCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueAppendCall<'a, S> {}
 
-impl<'a> SpreadsheetValueAppendCall<'a> {
+impl<'a, S> SpreadsheetValueAppendCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6901,7 +6930,7 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueAppendCall<'a> {
+    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueAppendCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6911,7 +6940,7 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6921,42 +6950,42 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
         self._range = new_value.to_string();
         self
     }
     /// How the input data should be interpreted.
     ///
     /// Sets the *value input option* query property to the given value.
-    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
         self._value_input_option = Some(new_value.to_string());
         self
     }
     /// Determines how values in the response should be rendered. The default render option is FORMATTED_VALUE.
     ///
     /// Sets the *response value render option* query property to the given value.
-    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
         self._response_value_render_option = Some(new_value.to_string());
         self
     }
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *response date time render option* query property to the given value.
-    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
         self._response_date_time_render_option = Some(new_value.to_string());
         self
     }
     /// How the input data should be inserted.
     ///
     /// Sets the *insert data option* query property to the given value.
-    pub fn insert_data_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
+    pub fn insert_data_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, S> {
         self._insert_data_option = Some(new_value.to_string());
         self
     }
     /// Determines if the update response should include the values of the cells that were appended. By default, responses do not include the updated values.
     ///
     /// Sets the *include values in response* query property to the given value.
-    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueAppendCall<'a> {
+    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueAppendCall<'a, S> {
         self._include_values_in_response = Some(new_value);
         self
     }
@@ -6966,7 +6995,7 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueAppendCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueAppendCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6991,7 +7020,7 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueAppendCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueAppendCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7011,9 +7040,9 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueAppendCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueAppendCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7046,7 +7075,7 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7059,10 +7088,10 @@ impl<'a> SpreadsheetValueAppendCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchClearCall<'a>
-    where  {
+pub struct SpreadsheetValueBatchClearCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: BatchClearValuesRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7070,9 +7099,15 @@ pub struct SpreadsheetValueBatchClearCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueBatchClearCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueBatchClearCall<'a, S> {}
 
-impl<'a> SpreadsheetValueBatchClearCall<'a> {
+impl<'a, S> SpreadsheetValueBatchClearCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7228,7 +7263,7 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchClearValuesRequest) -> SpreadsheetValueBatchClearCall<'a> {
+    pub fn request(mut self, new_value: BatchClearValuesRequest) -> SpreadsheetValueBatchClearCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7238,7 +7273,7 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -7248,7 +7283,7 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7273,7 +7308,7 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7293,9 +7328,9 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchClearCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueBatchClearCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7328,7 +7363,7 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7341,10 +7376,10 @@ impl<'a> SpreadsheetValueBatchClearCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchClearByDataFilterCall<'a>
-    where  {
+pub struct SpreadsheetValueBatchClearByDataFilterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: BatchClearValuesByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7352,9 +7387,15 @@ pub struct SpreadsheetValueBatchClearByDataFilterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueBatchClearByDataFilterCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueBatchClearByDataFilterCall<'a, S> {}
 
-impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
+impl<'a, S> SpreadsheetValueBatchClearByDataFilterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7510,7 +7551,7 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchClearValuesByDataFilterRequest) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
+    pub fn request(mut self, new_value: BatchClearValuesByDataFilterRequest) -> SpreadsheetValueBatchClearByDataFilterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7520,7 +7561,7 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -7530,7 +7571,7 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearByDataFilterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7555,7 +7596,7 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7575,9 +7616,9 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7609,7 +7650,7 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7621,10 +7662,10 @@ impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchGetCall<'a>
-    where  {
+pub struct SpreadsheetValueBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _spreadsheet_id: String,
     _value_render_option: Option<String>,
     _ranges: Vec<String>,
@@ -7635,9 +7676,15 @@ pub struct SpreadsheetValueBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueBatchGetCall<'a, S> {}
 
-impl<'a> SpreadsheetValueBatchGetCall<'a> {
+impl<'a, S> SpreadsheetValueBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7794,14 +7841,14 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
     /// How values should be represented in the output. The default render option is ValueRenderOption.FORMATTED_VALUE.
     ///
     /// Sets the *value render option* query property to the given value.
-    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
         self._value_render_option = Some(new_value.to_string());
         self
     }
@@ -7809,21 +7856,21 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
     ///
     /// Append the given value to the *ranges* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
         self._ranges.push(new_value.to_string());
         self
     }
     /// The major dimension that results should use. For example, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=A1:B2,majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas requesting `range=A1:B2,majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     ///
     /// Sets the *major dimension* query property to the given value.
-    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
         self._major_dimension = Some(new_value.to_string());
         self
     }
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *date time render option* query property to the given value.
-    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, S> {
         self._date_time_render_option = Some(new_value.to_string());
         self
     }
@@ -7833,7 +7880,7 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7858,7 +7905,7 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7878,9 +7925,9 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7913,7 +7960,7 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7926,10 +7973,10 @@ impl<'a> SpreadsheetValueBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchGetByDataFilterCall<'a>
-    where  {
+pub struct SpreadsheetValueBatchGetByDataFilterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: BatchGetValuesByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7937,9 +7984,15 @@ pub struct SpreadsheetValueBatchGetByDataFilterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueBatchGetByDataFilterCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueBatchGetByDataFilterCall<'a, S> {}
 
-impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
+impl<'a, S> SpreadsheetValueBatchGetByDataFilterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8095,7 +8148,7 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchGetValuesByDataFilterRequest) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
+    pub fn request(mut self, new_value: BatchGetValuesByDataFilterRequest) -> SpreadsheetValueBatchGetByDataFilterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8105,7 +8158,7 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8115,7 +8168,7 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetByDataFilterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8140,7 +8193,7 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8160,9 +8213,9 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8195,7 +8248,7 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8208,10 +8261,10 @@ impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchUpdateCall<'a>
-    where  {
+pub struct SpreadsheetValueBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: BatchUpdateValuesRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8219,9 +8272,15 @@ pub struct SpreadsheetValueBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueBatchUpdateCall<'a, S> {}
 
-impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
+impl<'a, S> SpreadsheetValueBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8377,7 +8436,7 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateValuesRequest) -> SpreadsheetValueBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: BatchUpdateValuesRequest) -> SpreadsheetValueBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8387,7 +8446,7 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8397,7 +8456,7 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8422,7 +8481,7 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8442,9 +8501,9 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8477,7 +8536,7 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8490,10 +8549,10 @@ impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a>
-    where  {
+pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: BatchUpdateValuesByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8501,9 +8560,15 @@ pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueBatchUpdateByDataFilterCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueBatchUpdateByDataFilterCall<'a, S> {}
 
-impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
+impl<'a, S> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8659,7 +8724,7 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateValuesByDataFilterRequest) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
+    pub fn request(mut self, new_value: BatchUpdateValuesByDataFilterRequest) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8669,7 +8734,7 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8679,7 +8744,7 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8704,7 +8769,7 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8724,9 +8789,9 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8759,7 +8824,7 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8772,10 +8837,10 @@ impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueClearCall<'a>
-    where  {
+pub struct SpreadsheetValueClearCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: ClearValuesRequest,
     _spreadsheet_id: String,
     _range: String,
@@ -8784,9 +8849,15 @@ pub struct SpreadsheetValueClearCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueClearCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueClearCall<'a, S> {}
 
-impl<'a> SpreadsheetValueClearCall<'a> {
+impl<'a, S> SpreadsheetValueClearCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8943,7 +9014,7 @@ impl<'a> SpreadsheetValueClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClearValuesRequest) -> SpreadsheetValueClearCall<'a> {
+    pub fn request(mut self, new_value: ClearValuesRequest) -> SpreadsheetValueClearCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8953,7 +9024,7 @@ impl<'a> SpreadsheetValueClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8963,7 +9034,7 @@ impl<'a> SpreadsheetValueClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a, S> {
         self._range = new_value.to_string();
         self
     }
@@ -8973,7 +9044,7 @@ impl<'a> SpreadsheetValueClearCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueClearCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueClearCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8998,7 +9069,7 @@ impl<'a> SpreadsheetValueClearCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueClearCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueClearCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9018,9 +9089,9 @@ impl<'a> SpreadsheetValueClearCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueClearCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueClearCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9052,7 +9123,7 @@ impl<'a> SpreadsheetValueClearCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9063,10 +9134,10 @@ impl<'a> SpreadsheetValueClearCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueGetCall<'a>
-    where  {
+pub struct SpreadsheetValueGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _spreadsheet_id: String,
     _range: String,
     _value_render_option: Option<String>,
@@ -9077,9 +9148,15 @@ pub struct SpreadsheetValueGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueGetCall<'a, S> {}
 
-impl<'a> SpreadsheetValueGetCall<'a> {
+impl<'a, S> SpreadsheetValueGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9232,7 +9309,7 @@ impl<'a> SpreadsheetValueGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9242,28 +9319,28 @@ impl<'a> SpreadsheetValueGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
         self._range = new_value.to_string();
         self
     }
     /// How values should be represented in the output. The default render option is FORMATTED_VALUE.
     ///
     /// Sets the *value render option* query property to the given value.
-    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
+    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
         self._value_render_option = Some(new_value.to_string());
         self
     }
     /// The major dimension that results should use. For example, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=A1:B2,majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas requesting `range=A1:B2,majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     ///
     /// Sets the *major dimension* query property to the given value.
-    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
+    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
         self._major_dimension = Some(new_value.to_string());
         self
     }
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *date time render option* query property to the given value.
-    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
+    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, S> {
         self._date_time_render_option = Some(new_value.to_string());
         self
     }
@@ -9273,7 +9350,7 @@ impl<'a> SpreadsheetValueGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9298,7 +9375,7 @@ impl<'a> SpreadsheetValueGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9318,9 +9395,9 @@ impl<'a> SpreadsheetValueGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9353,7 +9430,7 @@ impl<'a> SpreadsheetValueGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9370,10 +9447,10 @@ impl<'a> SpreadsheetValueGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueUpdateCall<'a>
-    where  {
+pub struct SpreadsheetValueUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: ValueRange,
     _spreadsheet_id: String,
     _range: String,
@@ -9386,9 +9463,15 @@ pub struct SpreadsheetValueUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetValueUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetValueUpdateCall<'a, S> {}
 
-impl<'a> SpreadsheetValueUpdateCall<'a> {
+impl<'a, S> SpreadsheetValueUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9557,7 +9640,7 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9567,7 +9650,7 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9577,35 +9660,35 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         self._range = new_value.to_string();
         self
     }
     /// How the input data should be interpreted.
     ///
     /// Sets the *value input option* query property to the given value.
-    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         self._value_input_option = Some(new_value.to_string());
         self
     }
     /// Determines how values in the response should be rendered. The default render option is FORMATTED_VALUE.
     ///
     /// Sets the *response value render option* query property to the given value.
-    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         self._response_value_render_option = Some(new_value.to_string());
         self
     }
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is SERIAL_NUMBER.
     ///
     /// Sets the *response date time render option* query property to the given value.
-    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, S> {
         self._response_date_time_render_option = Some(new_value.to_string());
         self
     }
     /// Determines if the update response should include the values of the cells that were updated. By default, responses do not include the updated values. If the range to write was larger than the range actually written, the response includes all values in the requested range (excluding trailing empty rows and columns).
     ///
     /// Sets the *include values in response* query property to the given value.
-    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueUpdateCall<'a, S> {
         self._include_values_in_response = Some(new_value);
         self
     }
@@ -9615,7 +9698,7 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9640,7 +9723,7 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9660,9 +9743,9 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetValueUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9695,7 +9778,7 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9708,10 +9791,10 @@ impl<'a> SpreadsheetValueUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetBatchUpdateCall<'a>
-    where  {
+pub struct SpreadsheetBatchUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: BatchUpdateSpreadsheetRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9719,9 +9802,15 @@ pub struct SpreadsheetBatchUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetBatchUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetBatchUpdateCall<'a, S> {}
 
-impl<'a> SpreadsheetBatchUpdateCall<'a> {
+impl<'a, S> SpreadsheetBatchUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9877,7 +9966,7 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateSpreadsheetRequest) -> SpreadsheetBatchUpdateCall<'a> {
+    pub fn request(mut self, new_value: BatchUpdateSpreadsheetRequest) -> SpreadsheetBatchUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9887,7 +9976,7 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetBatchUpdateCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetBatchUpdateCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9897,7 +9986,7 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetBatchUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetBatchUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9922,7 +10011,7 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetBatchUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetBatchUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9942,9 +10031,9 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetBatchUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetBatchUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9977,7 +10066,7 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9990,19 +10079,25 @@ impl<'a> SpreadsheetBatchUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetCreateCall<'a>
-    where  {
+pub struct SpreadsheetCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: Spreadsheet,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetCreateCall<'a, S> {}
 
-impl<'a> SpreadsheetCreateCall<'a> {
+impl<'a, S> SpreadsheetCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10136,7 +10231,7 @@ impl<'a> SpreadsheetCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Spreadsheet) -> SpreadsheetCreateCall<'a> {
+    pub fn request(mut self, new_value: Spreadsheet) -> SpreadsheetCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10146,7 +10241,7 @@ impl<'a> SpreadsheetCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10171,7 +10266,7 @@ impl<'a> SpreadsheetCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10191,9 +10286,9 @@ impl<'a> SpreadsheetCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10225,7 +10320,7 @@ impl<'a> SpreadsheetCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10235,10 +10330,10 @@ impl<'a> SpreadsheetCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetGetCall<'a>
-    where  {
+pub struct SpreadsheetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _spreadsheet_id: String,
     _ranges: Vec<String>,
     _include_grid_data: Option<bool>,
@@ -10247,9 +10342,15 @@ pub struct SpreadsheetGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetGetCall<'a, S> {}
 
-impl<'a> SpreadsheetGetCall<'a> {
+impl<'a, S> SpreadsheetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10400,7 +10501,7 @@ impl<'a> SpreadsheetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -10408,14 +10509,14 @@ impl<'a> SpreadsheetGetCall<'a> {
     ///
     /// Append the given value to the *ranges* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetGetCall<'a> {
+    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetGetCall<'a, S> {
         self._ranges.push(new_value.to_string());
         self
     }
     /// True if grid data should be returned. This parameter is ignored if a field mask was set in the request.
     ///
     /// Sets the *include grid data* query property to the given value.
-    pub fn include_grid_data(mut self, new_value: bool) -> SpreadsheetGetCall<'a> {
+    pub fn include_grid_data(mut self, new_value: bool) -> SpreadsheetGetCall<'a, S> {
         self._include_grid_data = Some(new_value);
         self
     }
@@ -10425,7 +10526,7 @@ impl<'a> SpreadsheetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10450,7 +10551,7 @@ impl<'a> SpreadsheetGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10470,9 +10571,9 @@ impl<'a> SpreadsheetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10505,7 +10606,7 @@ impl<'a> SpreadsheetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Sheets::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10518,10 +10619,10 @@ impl<'a> SpreadsheetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetGetByDataFilterCall<'a>
-    where  {
+pub struct SpreadsheetGetByDataFilterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Sheets<>,
+    hub: &'a Sheets<S>,
     _request: GetSpreadsheetByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10529,9 +10630,15 @@ pub struct SpreadsheetGetByDataFilterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SpreadsheetGetByDataFilterCall<'a> {}
+impl<'a, S> client::CallBuilder for SpreadsheetGetByDataFilterCall<'a, S> {}
 
-impl<'a> SpreadsheetGetByDataFilterCall<'a> {
+impl<'a, S> SpreadsheetGetByDataFilterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10687,7 +10794,7 @@ impl<'a> SpreadsheetGetByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetSpreadsheetByDataFilterRequest) -> SpreadsheetGetByDataFilterCall<'a> {
+    pub fn request(mut self, new_value: GetSpreadsheetByDataFilterRequest) -> SpreadsheetGetByDataFilterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10697,7 +10804,7 @@ impl<'a> SpreadsheetGetByDataFilterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetByDataFilterCall<'a> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetByDataFilterCall<'a, S> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -10707,7 +10814,7 @@ impl<'a> SpreadsheetGetByDataFilterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetByDataFilterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetByDataFilterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10732,7 +10839,7 @@ impl<'a> SpreadsheetGetByDataFilterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetByDataFilterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetByDataFilterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10752,9 +10859,9 @@ impl<'a> SpreadsheetGetByDataFilterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetGetByDataFilterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SpreadsheetGetByDataFilterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

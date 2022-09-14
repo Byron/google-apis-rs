@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -82,34 +87,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct MyBusinessNotificationSettings<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct MyBusinessNotificationSettings<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for MyBusinessNotificationSettings<> {}
+impl<'a, S> client::Hub for MyBusinessNotificationSettings<S> {}
 
-impl<'a, > MyBusinessNotificationSettings<> {
+impl<'a, S> MyBusinessNotificationSettings<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusinessNotificationSettings<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusinessNotificationSettings<S> {
         MyBusinessNotificationSettings {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://mybusinessnotifications.googleapis.com/".to_string(),
             _root_url: "https://mybusinessnotifications.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -189,22 +194,22 @@ impl client::ResponseResult for NotificationSetting {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_notification_setting(...)` and `update_notification_setting(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessNotificationSettings<>,
+    hub: &'a MyBusinessNotificationSettings<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -213,7 +218,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the notification setting we are trying to fetch.
-    pub fn get_notification_setting(&self, name: &str) -> AccountGetNotificationSettingCall<'a> {
+    pub fn get_notification_setting(&self, name: &str) -> AccountGetNotificationSettingCall<'a, S> {
         AccountGetNotificationSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -230,7 +235,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name this setting is for. This is of the form `accounts/{account_id}/notificationSetting`.
-    pub fn update_notification_setting(&self, request: NotificationSetting, name: &str) -> AccountUpdateNotificationSettingCall<'a> {
+    pub fn update_notification_setting(&self, request: NotificationSetting, name: &str) -> AccountUpdateNotificationSettingCall<'a, S> {
         AccountUpdateNotificationSettingCall {
             hub: self.hub,
             _request: request,
@@ -272,7 +277,7 @@ impl<'a> AccountMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -280,18 +285,24 @@ impl<'a> AccountMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetNotificationSettingCall<'a>
-    where  {
+pub struct AccountGetNotificationSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessNotificationSettings<>,
+    hub: &'a MyBusinessNotificationSettings<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountGetNotificationSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetNotificationSettingCall<'a, S> {}
 
-impl<'a> AccountGetNotificationSettingCall<'a> {
+impl<'a, S> AccountGetNotificationSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -432,7 +443,7 @@ impl<'a> AccountGetNotificationSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetNotificationSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountGetNotificationSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -442,7 +453,7 @@ impl<'a> AccountGetNotificationSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetNotificationSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetNotificationSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -467,7 +478,7 @@ impl<'a> AccountGetNotificationSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetNotificationSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetNotificationSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -499,7 +510,7 @@ impl<'a> AccountGetNotificationSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessNotificationSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -513,10 +524,10 @@ impl<'a> AccountGetNotificationSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUpdateNotificationSettingCall<'a>
-    where  {
+pub struct AccountUpdateNotificationSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessNotificationSettings<>,
+    hub: &'a MyBusinessNotificationSettings<S>,
     _request: NotificationSetting,
     _name: String,
     _update_mask: Option<String>,
@@ -524,9 +535,15 @@ pub struct AccountUpdateNotificationSettingCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountUpdateNotificationSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUpdateNotificationSettingCall<'a, S> {}
 
-impl<'a> AccountUpdateNotificationSettingCall<'a> {
+impl<'a, S> AccountUpdateNotificationSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -683,7 +700,7 @@ impl<'a> AccountUpdateNotificationSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: NotificationSetting) -> AccountUpdateNotificationSettingCall<'a> {
+    pub fn request(mut self, new_value: NotificationSetting) -> AccountUpdateNotificationSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -693,14 +710,14 @@ impl<'a> AccountUpdateNotificationSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUpdateNotificationSettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountUpdateNotificationSettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields that should be updated. The only editable field is notification_setting.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountUpdateNotificationSettingCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountUpdateNotificationSettingCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -710,7 +727,7 @@ impl<'a> AccountUpdateNotificationSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateNotificationSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateNotificationSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -735,7 +752,7 @@ impl<'a> AccountUpdateNotificationSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateNotificationSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateNotificationSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

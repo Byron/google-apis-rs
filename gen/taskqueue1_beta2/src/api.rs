@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -103,37 +108,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Taskqueue<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Taskqueue<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Taskqueue<> {}
+impl<'a, S> client::Hub for Taskqueue<S> {}
 
-impl<'a, > Taskqueue<> {
+impl<'a, S> Taskqueue<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Taskqueue<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Taskqueue<S> {
         Taskqueue {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/taskqueue/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn taskqueues(&'a self) -> TaskqueueMethods<'a> {
+    pub fn taskqueues(&'a self) -> TaskqueueMethods<'a, S> {
         TaskqueueMethods { hub: &self }
     }
-    pub fn tasks(&'a self) -> TaskMethods<'a> {
+    pub fn tasks(&'a self) -> TaskMethods<'a, S> {
         TaskMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -344,22 +349,22 @@ impl client::Part for TaskQueueStats {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.taskqueues();
 /// # }
 /// ```
-pub struct TaskqueueMethods<'a>
-    where  {
+pub struct TaskqueueMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
 }
 
-impl<'a> client::MethodsBuilder for TaskqueueMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TaskqueueMethods<'a, S> {}
 
-impl<'a> TaskqueueMethods<'a> {
+impl<'a, S> TaskqueueMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -369,7 +374,7 @@ impl<'a> TaskqueueMethods<'a> {
     ///
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The id of the taskqueue to get the properties of.
-    pub fn get(&self, project: &str, taskqueue: &str) -> TaskqueueGetCall<'a> {
+    pub fn get(&self, project: &str, taskqueue: &str) -> TaskqueueGetCall<'a, S> {
         TaskqueueGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -405,22 +410,22 @@ impl<'a> TaskqueueMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `lease(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.tasks();
 /// # }
 /// ```
-pub struct TaskMethods<'a>
-    where  {
+pub struct TaskMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
 }
 
-impl<'a> client::MethodsBuilder for TaskMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TaskMethods<'a, S> {}
 
-impl<'a> TaskMethods<'a> {
+impl<'a, S> TaskMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -431,7 +436,7 @@ impl<'a> TaskMethods<'a> {
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The taskqueue to delete a task from.
     /// * `task` - The id of the task to delete.
-    pub fn delete(&self, project: &str, taskqueue: &str, task: &str) -> TaskDeleteCall<'a> {
+    pub fn delete(&self, project: &str, taskqueue: &str, task: &str) -> TaskDeleteCall<'a, S> {
         TaskDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -452,7 +457,7 @@ impl<'a> TaskMethods<'a> {
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The taskqueue in which the task belongs.
     /// * `task` - The task to get properties of.
-    pub fn get(&self, project: &str, taskqueue: &str, task: &str) -> TaskGetCall<'a> {
+    pub fn get(&self, project: &str, taskqueue: &str, task: &str) -> TaskGetCall<'a, S> {
         TaskGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -473,7 +478,7 @@ impl<'a> TaskMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - The project under which the queue lies
     /// * `taskqueue` - The taskqueue to insert the task into
-    pub fn insert(&self, request: Task, project: &str, taskqueue: &str) -> TaskInsertCall<'a> {
+    pub fn insert(&self, request: Task, project: &str, taskqueue: &str) -> TaskInsertCall<'a, S> {
         TaskInsertCall {
             hub: self.hub,
             _request: request,
@@ -495,7 +500,7 @@ impl<'a> TaskMethods<'a> {
     /// * `taskqueue` - The taskqueue to lease a task from.
     /// * `numTasks` - The number of tasks to lease.
     /// * `leaseSecs` - The lease in seconds.
-    pub fn lease(&self, project: &str, taskqueue: &str, num_tasks: i32, lease_secs: i32) -> TaskLeaseCall<'a> {
+    pub fn lease(&self, project: &str, taskqueue: &str, num_tasks: i32, lease_secs: i32) -> TaskLeaseCall<'a, S> {
         TaskLeaseCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -518,7 +523,7 @@ impl<'a> TaskMethods<'a> {
     ///
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The id of the taskqueue to list tasks from.
-    pub fn list(&self, project: &str, taskqueue: &str) -> TaskListCall<'a> {
+    pub fn list(&self, project: &str, taskqueue: &str) -> TaskListCall<'a, S> {
         TaskListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -540,7 +545,7 @@ impl<'a> TaskMethods<'a> {
     /// * `taskqueue` - No description provided.
     /// * `task` - No description provided.
     /// * `newLeaseSeconds` - The new lease in seconds.
-    pub fn patch(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskPatchCall<'a> {
+    pub fn patch(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskPatchCall<'a, S> {
         TaskPatchCall {
             hub: self.hub,
             _request: request,
@@ -565,7 +570,7 @@ impl<'a> TaskMethods<'a> {
     /// * `taskqueue` - No description provided.
     /// * `task` - No description provided.
     /// * `newLeaseSeconds` - The new lease in seconds.
-    pub fn update(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskUpdateCall<'a> {
+    pub fn update(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskUpdateCall<'a, S> {
         TaskUpdateCall {
             hub: self.hub,
             _request: request,
@@ -610,7 +615,7 @@ impl<'a> TaskMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -619,10 +624,10 @@ impl<'a> TaskMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskqueueGetCall<'a>
-    where  {
+pub struct TaskqueueGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _project: String,
     _taskqueue: String,
     _get_stats: Option<bool>,
@@ -631,9 +636,15 @@ pub struct TaskqueueGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskqueueGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskqueueGetCall<'a, S> {}
 
-impl<'a> TaskqueueGetCall<'a> {
+impl<'a, S> TaskqueueGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -780,7 +791,7 @@ impl<'a> TaskqueueGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskqueueGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskqueueGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -790,14 +801,14 @@ impl<'a> TaskqueueGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskqueueGetCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskqueueGetCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
     /// Whether to get stats. Optional.
     ///
     /// Sets the *get stats* query property to the given value.
-    pub fn get_stats(mut self, new_value: bool) -> TaskqueueGetCall<'a> {
+    pub fn get_stats(mut self, new_value: bool) -> TaskqueueGetCall<'a, S> {
         self._get_stats = Some(new_value);
         self
     }
@@ -807,7 +818,7 @@ impl<'a> TaskqueueGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskqueueGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskqueueGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -828,7 +839,7 @@ impl<'a> TaskqueueGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskqueueGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskqueueGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -848,9 +859,9 @@ impl<'a> TaskqueueGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskqueueGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskqueueGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -882,7 +893,7 @@ impl<'a> TaskqueueGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -890,10 +901,10 @@ impl<'a> TaskqueueGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a>
-    where  {
+pub struct TaskDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _project: String,
     _taskqueue: String,
     _task: String,
@@ -902,9 +913,15 @@ pub struct TaskDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskDeleteCall<'a, S> {}
 
-impl<'a> TaskDeleteCall<'a> {
+impl<'a, S> TaskDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1038,7 +1055,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1048,7 +1065,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1058,7 +1075,7 @@ impl<'a> TaskDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -1068,7 +1085,7 @@ impl<'a> TaskDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1089,7 +1106,7 @@ impl<'a> TaskDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1109,9 +1126,9 @@ impl<'a> TaskDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1143,7 +1160,7 @@ impl<'a> TaskDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1151,10 +1168,10 @@ impl<'a> TaskDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskGetCall<'a>
-    where  {
+pub struct TaskGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _project: String,
     _taskqueue: String,
     _task: String,
@@ -1163,9 +1180,15 @@ pub struct TaskGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskGetCall<'a, S> {}
 
-impl<'a> TaskGetCall<'a> {
+impl<'a, S> TaskGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1310,7 +1333,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1320,7 +1343,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1330,7 +1353,7 @@ impl<'a> TaskGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -1340,7 +1363,7 @@ impl<'a> TaskGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1361,7 +1384,7 @@ impl<'a> TaskGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1381,9 +1404,9 @@ impl<'a> TaskGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1416,7 +1439,7 @@ impl<'a> TaskGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1429,10 +1452,10 @@ impl<'a> TaskGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskInsertCall<'a>
-    where  {
+pub struct TaskInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _request: Task,
     _project: String,
     _taskqueue: String,
@@ -1441,9 +1464,15 @@ pub struct TaskInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskInsertCall<'a, S> {}
 
-impl<'a> TaskInsertCall<'a> {
+impl<'a, S> TaskInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1600,7 +1629,7 @@ impl<'a> TaskInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a> {
+    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1610,7 +1639,7 @@ impl<'a> TaskInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1620,7 +1649,7 @@ impl<'a> TaskInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskInsertCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskInsertCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1630,7 +1659,7 @@ impl<'a> TaskInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1651,7 +1680,7 @@ impl<'a> TaskInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1671,9 +1700,9 @@ impl<'a> TaskInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1705,7 +1734,7 @@ impl<'a> TaskInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1715,10 +1744,10 @@ impl<'a> TaskInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskLeaseCall<'a>
-    where  {
+pub struct TaskLeaseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _project: String,
     _taskqueue: String,
     _num_tasks: i32,
@@ -1730,9 +1759,15 @@ pub struct TaskLeaseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskLeaseCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskLeaseCall<'a, S> {}
 
-impl<'a> TaskLeaseCall<'a> {
+impl<'a, S> TaskLeaseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1884,7 +1919,7 @@ impl<'a> TaskLeaseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskLeaseCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskLeaseCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1894,7 +1929,7 @@ impl<'a> TaskLeaseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskLeaseCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskLeaseCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1904,7 +1939,7 @@ impl<'a> TaskLeaseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn num_tasks(mut self, new_value: i32) -> TaskLeaseCall<'a> {
+    pub fn num_tasks(mut self, new_value: i32) -> TaskLeaseCall<'a, S> {
         self._num_tasks = new_value;
         self
     }
@@ -1914,21 +1949,21 @@ impl<'a> TaskLeaseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn lease_secs(mut self, new_value: i32) -> TaskLeaseCall<'a> {
+    pub fn lease_secs(mut self, new_value: i32) -> TaskLeaseCall<'a, S> {
         self._lease_secs = new_value;
         self
     }
     /// The tag allowed for tasks in the response. Must only be specified if group_by_tag is true. If group_by_tag is true and tag is not specified the tag will be that of the oldest task by eta, i.e. the first available tag
     ///
     /// Sets the *tag* query property to the given value.
-    pub fn tag(mut self, new_value: &str) -> TaskLeaseCall<'a> {
+    pub fn tag(mut self, new_value: &str) -> TaskLeaseCall<'a, S> {
         self._tag = Some(new_value.to_string());
         self
     }
     /// When true, all returned tasks will have the same tag
     ///
     /// Sets the *group by tag* query property to the given value.
-    pub fn group_by_tag(mut self, new_value: bool) -> TaskLeaseCall<'a> {
+    pub fn group_by_tag(mut self, new_value: bool) -> TaskLeaseCall<'a, S> {
         self._group_by_tag = Some(new_value);
         self
     }
@@ -1938,7 +1973,7 @@ impl<'a> TaskLeaseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskLeaseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskLeaseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1959,7 +1994,7 @@ impl<'a> TaskLeaseCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskLeaseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskLeaseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1979,9 +2014,9 @@ impl<'a> TaskLeaseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskLeaseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskLeaseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2013,7 +2048,7 @@ impl<'a> TaskLeaseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2021,10 +2056,10 @@ impl<'a> TaskLeaseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskListCall<'a>
-    where  {
+pub struct TaskListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _project: String,
     _taskqueue: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2032,9 +2067,15 @@ pub struct TaskListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskListCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskListCall<'a, S> {}
 
-impl<'a> TaskListCall<'a> {
+impl<'a, S> TaskListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2178,7 +2219,7 @@ impl<'a> TaskListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2188,7 +2229,7 @@ impl<'a> TaskListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskListCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskListCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -2198,7 +2239,7 @@ impl<'a> TaskListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2219,7 +2260,7 @@ impl<'a> TaskListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2239,9 +2280,9 @@ impl<'a> TaskListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2274,7 +2315,7 @@ impl<'a> TaskListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2287,10 +2328,10 @@ impl<'a> TaskListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskPatchCall<'a>
-    where  {
+pub struct TaskPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _request: Task,
     _project: String,
     _taskqueue: String,
@@ -2301,9 +2342,15 @@ pub struct TaskPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskPatchCall<'a, S> {}
 
-impl<'a> TaskPatchCall<'a> {
+impl<'a, S> TaskPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2462,7 +2509,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a> {
+    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2472,7 +2519,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskPatchCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskPatchCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2481,7 +2528,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskPatchCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskPatchCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -2490,7 +2537,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -2500,7 +2547,7 @@ impl<'a> TaskPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskPatchCall<'a> {
+    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskPatchCall<'a, S> {
         self._new_lease_seconds = new_value;
         self
     }
@@ -2510,7 +2557,7 @@ impl<'a> TaskPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2531,7 +2578,7 @@ impl<'a> TaskPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2551,9 +2598,9 @@ impl<'a> TaskPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2586,7 +2633,7 @@ impl<'a> TaskPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Taskqueue::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2599,10 +2646,10 @@ impl<'a> TaskPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskUpdateCall<'a>
-    where  {
+pub struct TaskUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Taskqueue<>,
+    hub: &'a Taskqueue<S>,
     _request: Task,
     _project: String,
     _taskqueue: String,
@@ -2613,9 +2660,15 @@ pub struct TaskUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TaskUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for TaskUpdateCall<'a, S> {}
 
-impl<'a> TaskUpdateCall<'a> {
+impl<'a, S> TaskUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2774,7 +2827,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a> {
+    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2784,7 +2837,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskUpdateCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TaskUpdateCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2793,7 +2846,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskUpdateCall<'a> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskUpdateCall<'a, S> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -2802,7 +2855,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a> {
+    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, S> {
         self._task = new_value.to_string();
         self
     }
@@ -2812,7 +2865,7 @@ impl<'a> TaskUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskUpdateCall<'a> {
+    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskUpdateCall<'a, S> {
         self._new_lease_seconds = new_value;
         self
     }
@@ -2822,7 +2875,7 @@ impl<'a> TaskUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2843,7 +2896,7 @@ impl<'a> TaskUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2863,9 +2916,9 @@ impl<'a> TaskUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TaskUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

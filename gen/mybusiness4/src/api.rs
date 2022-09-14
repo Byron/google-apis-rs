@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -80,49 +85,49 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct MyBusiness<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct MyBusiness<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for MyBusiness<> {}
+impl<'a, S> client::Hub for MyBusiness<S> {}
 
-impl<'a, > MyBusiness<> {
+impl<'a, S> MyBusiness<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusiness<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusiness<S> {
         MyBusiness {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://mybusiness.googleapis.com/".to_string(),
             _root_url: "https://mybusiness.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn attributes(&'a self) -> AttributeMethods<'a> {
+    pub fn attributes(&'a self) -> AttributeMethods<'a, S> {
         AttributeMethods { hub: &self }
     }
-    pub fn categories(&'a self) -> CategoryMethods<'a> {
+    pub fn categories(&'a self) -> CategoryMethods<'a, S> {
         CategoryMethods { hub: &self }
     }
-    pub fn chains(&'a self) -> ChainMethods<'a> {
+    pub fn chains(&'a self) -> ChainMethods<'a, S> {
         ChainMethods { hub: &self }
     }
-    pub fn google_locations(&'a self) -> GoogleLocationMethods<'a> {
+    pub fn google_locations(&'a self) -> GoogleLocationMethods<'a, S> {
         GoogleLocationMethods { hub: &self }
     }
-    pub fn verification_tokens(&'a self) -> VerificationTokenMethods<'a> {
+    pub fn verification_tokens(&'a self) -> VerificationTokenMethods<'a, S> {
         VerificationTokenMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3609,22 +3614,22 @@ impl client::Part for VettedPartnerInput {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `admins_create(...)`, `admins_delete(...)`, `admins_list(...)`, `admins_patch(...)`, `create(...)`, `delete_notifications(...)`, `generate_account_number(...)`, `get(...)`, `get_notifications(...)`, `invitations_accept(...)`, `invitations_decline(...)`, `invitations_list(...)`, `list(...)`, `list_recommend_google_locations(...)`, `locations_admins_create(...)`, `locations_admins_delete(...)`, `locations_admins_list(...)`, `locations_admins_patch(...)`, `locations_associate(...)`, `locations_batch_get(...)`, `locations_batch_get_reviews(...)`, `locations_clear_association(...)`, `locations_create(...)`, `locations_delete(...)`, `locations_fetch_verification_options(...)`, `locations_find_matches(...)`, `locations_followers_get_metadata(...)`, `locations_get(...)`, `locations_get_google_updated(...)`, `locations_list(...)`, `locations_local_posts_create(...)`, `locations_local_posts_delete(...)`, `locations_local_posts_get(...)`, `locations_local_posts_list(...)`, `locations_local_posts_patch(...)`, `locations_local_posts_report_insights(...)`, `locations_media_create(...)`, `locations_media_customers_get(...)`, `locations_media_customers_list(...)`, `locations_media_delete(...)`, `locations_media_get(...)`, `locations_media_list(...)`, `locations_media_patch(...)`, `locations_media_start_upload(...)`, `locations_patch(...)`, `locations_questions_answers_delete(...)`, `locations_questions_answers_list(...)`, `locations_questions_answers_upsert(...)`, `locations_questions_create(...)`, `locations_questions_delete(...)`, `locations_questions_list(...)`, `locations_questions_patch(...)`, `locations_report_insights(...)`, `locations_reviews_delete_reply(...)`, `locations_reviews_get(...)`, `locations_reviews_list(...)`, `locations_reviews_update_reply(...)`, `locations_transfer(...)`, `locations_verifications_complete(...)`, `locations_verifications_list(...)`, `locations_verify(...)`, `update(...)` and `update_notifications(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3637,7 +3642,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the account this admin is created for.
-    pub fn admins_create(&self, request: Admin, parent: &str) -> AccountAdminCreateCall<'a> {
+    pub fn admins_create(&self, request: Admin, parent: &str) -> AccountAdminCreateCall<'a, S> {
         AccountAdminCreateCall {
             hub: self.hub,
             _request: request,
@@ -3654,7 +3659,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the admin to remove from the account.
-    pub fn admins_delete(&self, name: &str) -> AccountAdminDeleteCall<'a> {
+    pub fn admins_delete(&self, name: &str) -> AccountAdminDeleteCall<'a, S> {
         AccountAdminDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3670,7 +3675,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the account from which to retrieve a list of admins.
-    pub fn admins_list(&self, parent: &str) -> AccountAdminListCall<'a> {
+    pub fn admins_list(&self, parent: &str) -> AccountAdminListCall<'a, S> {
         AccountAdminListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3688,7 +3693,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the admin to update.
-    pub fn admins_patch(&self, request: Admin, name: &str) -> AccountAdminPatchCall<'a> {
+    pub fn admins_patch(&self, request: Admin, name: &str) -> AccountAdminPatchCall<'a, S> {
         AccountAdminPatchCall {
             hub: self.hub,
             _request: request,
@@ -3706,7 +3711,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the invitation that is being accepted.
-    pub fn invitations_accept(&self, request: AcceptInvitationRequest, name: &str) -> AccountInvitationAcceptCall<'a> {
+    pub fn invitations_accept(&self, request: AcceptInvitationRequest, name: &str) -> AccountInvitationAcceptCall<'a, S> {
         AccountInvitationAcceptCall {
             hub: self.hub,
             _request: request,
@@ -3724,7 +3729,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the account invitation that is being declined.
-    pub fn invitations_decline(&self, request: DeclineInvitationRequest, name: &str) -> AccountInvitationDeclineCall<'a> {
+    pub fn invitations_decline(&self, request: DeclineInvitationRequest, name: &str) -> AccountInvitationDeclineCall<'a, S> {
         AccountInvitationDeclineCall {
             hub: self.hub,
             _request: request,
@@ -3742,7 +3747,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `parent` - The name of the account from which the list of invitations is being
     ///              retrieved.
-    pub fn invitations_list(&self, parent: &str) -> AccountInvitationListCall<'a> {
+    pub fn invitations_list(&self, parent: &str) -> AccountInvitationListCall<'a, S> {
         AccountInvitationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3763,7 +3768,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the location this admin is created for.
-    pub fn locations_admins_create(&self, request: Admin, parent: &str) -> AccountLocationAdminCreateCall<'a> {
+    pub fn locations_admins_create(&self, request: Admin, parent: &str) -> AccountLocationAdminCreateCall<'a, S> {
         AccountLocationAdminCreateCall {
             hub: self.hub,
             _request: request,
@@ -3780,7 +3785,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the admin to remove from the location.
-    pub fn locations_admins_delete(&self, name: &str) -> AccountLocationAdminDeleteCall<'a> {
+    pub fn locations_admins_delete(&self, name: &str) -> AccountLocationAdminDeleteCall<'a, S> {
         AccountLocationAdminDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3796,7 +3801,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the location to list admins of.
-    pub fn locations_admins_list(&self, parent: &str) -> AccountLocationAdminListCall<'a> {
+    pub fn locations_admins_list(&self, parent: &str) -> AccountLocationAdminListCall<'a, S> {
         AccountLocationAdminListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3814,7 +3819,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the admin to update.
-    pub fn locations_admins_patch(&self, request: Admin, name: &str) -> AccountLocationAdminPatchCall<'a> {
+    pub fn locations_admins_patch(&self, request: Admin, name: &str) -> AccountLocationAdminPatchCall<'a, S> {
         AccountLocationAdminPatchCall {
             hub: self.hub,
             _request: request,
@@ -3836,7 +3841,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `name` - The resource name of the location's followers metadata.
     ///            accounts/{account_id}/locations/{location_id}/followers/metadata
-    pub fn locations_followers_get_metadata(&self, name: &str) -> AccountLocationFollowerGetMetadataCall<'a> {
+    pub fn locations_followers_get_metadata(&self, name: &str) -> AccountLocationFollowerGetMetadataCall<'a, S> {
         AccountLocationFollowerGetMetadataCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3854,7 +3859,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the location in which to create this local post.
-    pub fn locations_local_posts_create(&self, request: LocalPost, parent: &str) -> AccountLocationLocalPostCreateCall<'a> {
+    pub fn locations_local_posts_create(&self, request: LocalPost, parent: &str) -> AccountLocationLocalPostCreateCall<'a, S> {
         AccountLocationLocalPostCreateCall {
             hub: self.hub,
             _request: request,
@@ -3872,7 +3877,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the local post to delete.
-    pub fn locations_local_posts_delete(&self, name: &str) -> AccountLocationLocalPostDeleteCall<'a> {
+    pub fn locations_local_posts_delete(&self, name: &str) -> AccountLocationLocalPostDeleteCall<'a, S> {
         AccountLocationLocalPostDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3889,7 +3894,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the local post to fetch.
-    pub fn locations_local_posts_get(&self, name: &str) -> AccountLocationLocalPostGetCall<'a> {
+    pub fn locations_local_posts_get(&self, name: &str) -> AccountLocationLocalPostGetCall<'a, S> {
         AccountLocationLocalPostGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3905,7 +3910,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the location whose local posts will be listed.
-    pub fn locations_local_posts_list(&self, parent: &str) -> AccountLocationLocalPostListCall<'a> {
+    pub fn locations_local_posts_list(&self, parent: &str) -> AccountLocationLocalPostListCall<'a, S> {
         AccountLocationLocalPostListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3924,7 +3929,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the local post to update.
-    pub fn locations_local_posts_patch(&self, request: LocalPost, name: &str) -> AccountLocationLocalPostPatchCall<'a> {
+    pub fn locations_local_posts_patch(&self, request: LocalPost, name: &str) -> AccountLocationLocalPostPatchCall<'a, S> {
         AccountLocationLocalPostPatchCall {
             hub: self.hub,
             _request: request,
@@ -3947,7 +3952,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the location for which to fetch insights.
-    pub fn locations_local_posts_report_insights(&self, request: ReportLocalPostInsightsRequest, name: &str) -> AccountLocationLocalPostReportInsightCall<'a> {
+    pub fn locations_local_posts_report_insights(&self, request: ReportLocalPostInsightsRequest, name: &str) -> AccountLocationLocalPostReportInsightCall<'a, S> {
         AccountLocationLocalPostReportInsightCall {
             hub: self.hub,
             _request: request,
@@ -3964,7 +3969,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the requested customer media item.
-    pub fn locations_media_customers_get(&self, name: &str) -> AccountLocationMediaCustomerGetCall<'a> {
+    pub fn locations_media_customers_get(&self, name: &str) -> AccountLocationMediaCustomerGetCall<'a, S> {
         AccountLocationMediaCustomerGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3981,7 +3986,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the location whose customer media items will be listed.
-    pub fn locations_media_customers_list(&self, parent: &str) -> AccountLocationMediaCustomerListCall<'a> {
+    pub fn locations_media_customers_list(&self, parent: &str) -> AccountLocationMediaCustomerListCall<'a, S> {
         AccountLocationMediaCustomerListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4000,7 +4005,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the location where this media item will be created.
-    pub fn locations_media_create(&self, request: MediaItem, parent: &str) -> AccountLocationMediaCreateCall<'a> {
+    pub fn locations_media_create(&self, request: MediaItem, parent: &str) -> AccountLocationMediaCreateCall<'a, S> {
         AccountLocationMediaCreateCall {
             hub: self.hub,
             _request: request,
@@ -4017,7 +4022,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the media item to be deleted.
-    pub fn locations_media_delete(&self, name: &str) -> AccountLocationMediaDeleteCall<'a> {
+    pub fn locations_media_delete(&self, name: &str) -> AccountLocationMediaDeleteCall<'a, S> {
         AccountLocationMediaDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4033,7 +4038,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the requested media item.
-    pub fn locations_media_get(&self, name: &str) -> AccountLocationMediaGetCall<'a> {
+    pub fn locations_media_get(&self, name: &str) -> AccountLocationMediaGetCall<'a, S> {
         AccountLocationMediaGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4049,7 +4054,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the location whose media items will be listed.
-    pub fn locations_media_list(&self, parent: &str) -> AccountLocationMediaListCall<'a> {
+    pub fn locations_media_list(&self, parent: &str) -> AccountLocationMediaListCall<'a, S> {
         AccountLocationMediaListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4070,7 +4075,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the media item to be updated.
-    pub fn locations_media_patch(&self, request: MediaItem, name: &str) -> AccountLocationMediaPatchCall<'a> {
+    pub fn locations_media_patch(&self, request: MediaItem, name: &str) -> AccountLocationMediaPatchCall<'a, S> {
         AccountLocationMediaPatchCall {
             hub: self.hub,
             _request: request,
@@ -4089,7 +4094,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The resource name of the location this media item is to be added to.
-    pub fn locations_media_start_upload(&self, request: StartUploadMediaItemDataRequest, parent: &str) -> AccountLocationMediaStartUploadCall<'a> {
+    pub fn locations_media_start_upload(&self, request: StartUploadMediaItemDataRequest, parent: &str) -> AccountLocationMediaStartUploadCall<'a, S> {
         AccountLocationMediaStartUploadCall {
             hub: self.hub,
             _request: request,
@@ -4106,7 +4111,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the question to delete an answer for.
-    pub fn locations_questions_answers_delete(&self, parent: &str) -> AccountLocationQuestionAnswerDeleteCall<'a> {
+    pub fn locations_questions_answers_delete(&self, parent: &str) -> AccountLocationQuestionAnswerDeleteCall<'a, S> {
         AccountLocationQuestionAnswerDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4122,7 +4127,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the question to fetch answers for.
-    pub fn locations_questions_answers_list(&self, parent: &str) -> AccountLocationQuestionAnswerListCall<'a> {
+    pub fn locations_questions_answers_list(&self, parent: &str) -> AccountLocationQuestionAnswerListCall<'a, S> {
         AccountLocationQuestionAnswerListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4143,7 +4148,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the question to write an answer for.
-    pub fn locations_questions_answers_upsert(&self, request: UpsertAnswerRequest, parent: &str) -> AccountLocationQuestionAnswerUpsertCall<'a> {
+    pub fn locations_questions_answers_upsert(&self, request: UpsertAnswerRequest, parent: &str) -> AccountLocationQuestionAnswerUpsertCall<'a, S> {
         AccountLocationQuestionAnswerUpsertCall {
             hub: self.hub,
             _request: request,
@@ -4161,7 +4166,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the location to write a question for.
-    pub fn locations_questions_create(&self, request: Question, parent: &str) -> AccountLocationQuestionCreateCall<'a> {
+    pub fn locations_questions_create(&self, request: Question, parent: &str) -> AccountLocationQuestionCreateCall<'a, S> {
         AccountLocationQuestionCreateCall {
             hub: self.hub,
             _request: request,
@@ -4178,7 +4183,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the question to delete.
-    pub fn locations_questions_delete(&self, name: &str) -> AccountLocationQuestionDeleteCall<'a> {
+    pub fn locations_questions_delete(&self, name: &str) -> AccountLocationQuestionDeleteCall<'a, S> {
         AccountLocationQuestionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4195,7 +4200,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the location to fetch questions for.
-    pub fn locations_questions_list(&self, parent: &str) -> AccountLocationQuestionListCall<'a> {
+    pub fn locations_questions_list(&self, parent: &str) -> AccountLocationQuestionListCall<'a, S> {
         AccountLocationQuestionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4217,7 +4222,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the question to update.
-    pub fn locations_questions_patch(&self, request: Question, name: &str) -> AccountLocationQuestionPatchCall<'a> {
+    pub fn locations_questions_patch(&self, request: Question, name: &str) -> AccountLocationQuestionPatchCall<'a, S> {
         AccountLocationQuestionPatchCall {
             hub: self.hub,
             _request: request,
@@ -4235,7 +4240,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the review reply to delete.
-    pub fn locations_reviews_delete_reply(&self, name: &str) -> AccountLocationReviewDeleteReplyCall<'a> {
+    pub fn locations_reviews_delete_reply(&self, name: &str) -> AccountLocationReviewDeleteReplyCall<'a, S> {
         AccountLocationReviewDeleteReplyCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4253,7 +4258,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the review to fetch.
-    pub fn locations_reviews_get(&self, name: &str) -> AccountLocationReviewGetCall<'a> {
+    pub fn locations_reviews_get(&self, name: &str) -> AccountLocationReviewGetCall<'a, S> {
         AccountLocationReviewGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4270,7 +4275,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - The name of the location to fetch reviews for.
-    pub fn locations_reviews_list(&self, parent: &str) -> AccountLocationReviewListCall<'a> {
+    pub fn locations_reviews_list(&self, parent: &str) -> AccountLocationReviewListCall<'a, S> {
         AccountLocationReviewListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4292,7 +4297,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the review to respond to.
-    pub fn locations_reviews_update_reply(&self, request: ReviewReply, name: &str) -> AccountLocationReviewUpdateReplyCall<'a> {
+    pub fn locations_reviews_update_reply(&self, request: ReviewReply, name: &str) -> AccountLocationReviewUpdateReplyCall<'a, S> {
         AccountLocationReviewUpdateReplyCall {
             hub: self.hub,
             _request: request,
@@ -4313,7 +4318,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the verification to complete.
-    pub fn locations_verifications_complete(&self, request: CompleteVerificationRequest, name: &str) -> AccountLocationVerificationCompleteCall<'a> {
+    pub fn locations_verifications_complete(&self, request: CompleteVerificationRequest, name: &str) -> AccountLocationVerificationCompleteCall<'a, S> {
         AccountLocationVerificationCompleteCall {
             hub: self.hub,
             _request: request,
@@ -4330,7 +4335,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Resource name of the location that verification requests belong to.
-    pub fn locations_verifications_list(&self, parent: &str) -> AccountLocationVerificationListCall<'a> {
+    pub fn locations_verifications_list(&self, parent: &str) -> AccountLocationVerificationListCall<'a, S> {
         AccountLocationVerificationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4352,7 +4357,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the location to associate.
-    pub fn locations_associate(&self, request: AssociateLocationRequest, name: &str) -> AccountLocationAssociateCall<'a> {
+    pub fn locations_associate(&self, request: AssociateLocationRequest, name: &str) -> AccountLocationAssociateCall<'a, S> {
         AccountLocationAssociateCall {
             hub: self.hub,
             _request: request,
@@ -4370,7 +4375,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the account from which to fetch locations.
-    pub fn locations_batch_get(&self, request: BatchGetLocationsRequest, name: &str) -> AccountLocationBatchGetCall<'a> {
+    pub fn locations_batch_get(&self, request: BatchGetLocationsRequest, name: &str) -> AccountLocationBatchGetCall<'a, S> {
         AccountLocationBatchGetCall {
             hub: self.hub,
             _request: request,
@@ -4392,7 +4397,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `name` - The name of the account from which to retrieve a list of reviews across
     ///            multiple locations.
-    pub fn locations_batch_get_reviews(&self, request: BatchGetReviewsRequest, name: &str) -> AccountLocationBatchGetReviewCall<'a> {
+    pub fn locations_batch_get_reviews(&self, request: BatchGetReviewsRequest, name: &str) -> AccountLocationBatchGetReviewCall<'a, S> {
         AccountLocationBatchGetReviewCall {
             hub: self.hub,
             _request: request,
@@ -4411,7 +4416,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the location to disassociate.
-    pub fn locations_clear_association(&self, request: ClearLocationAssociationRequest, name: &str) -> AccountLocationClearAssociationCall<'a> {
+    pub fn locations_clear_association(&self, request: ClearLocationAssociationRequest, name: &str) -> AccountLocationClearAssociationCall<'a, S> {
         AccountLocationClearAssociationCall {
             hub: self.hub,
             _request: request,
@@ -4430,7 +4435,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The name of the account in which to create this location.
-    pub fn locations_create(&self, request: Location, parent: &str) -> AccountLocationCreateCall<'a> {
+    pub fn locations_create(&self, request: Location, parent: &str) -> AccountLocationCreateCall<'a, S> {
         AccountLocationCreateCall {
             hub: self.hub,
             _request: request,
@@ -4456,7 +4461,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the location to delete.
-    pub fn locations_delete(&self, name: &str) -> AccountLocationDeleteCall<'a> {
+    pub fn locations_delete(&self, name: &str) -> AccountLocationDeleteCall<'a, S> {
         AccountLocationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4474,7 +4479,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the location to verify.
-    pub fn locations_fetch_verification_options(&self, request: FetchVerificationOptionsRequest, name: &str) -> AccountLocationFetchVerificationOptionCall<'a> {
+    pub fn locations_fetch_verification_options(&self, request: FetchVerificationOptionsRequest, name: &str) -> AccountLocationFetchVerificationOptionCall<'a, S> {
         AccountLocationFetchVerificationOptionCall {
             hub: self.hub,
             _request: request,
@@ -4493,7 +4498,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the location to find matches for.
-    pub fn locations_find_matches(&self, request: FindMatchingLocationsRequest, name: &str) -> AccountLocationFindMatcheCall<'a> {
+    pub fn locations_find_matches(&self, request: FindMatchingLocationsRequest, name: &str) -> AccountLocationFindMatcheCall<'a, S> {
         AccountLocationFindMatcheCall {
             hub: self.hub,
             _request: request,
@@ -4511,7 +4516,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the location to fetch.
-    pub fn locations_get(&self, name: &str) -> AccountLocationGetCall<'a> {
+    pub fn locations_get(&self, name: &str) -> AccountLocationGetCall<'a, S> {
         AccountLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4528,7 +4533,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the location to fetch.
-    pub fn locations_get_google_updated(&self, name: &str) -> AccountLocationGetGoogleUpdatedCall<'a> {
+    pub fn locations_get_google_updated(&self, name: &str) -> AccountLocationGetGoogleUpdatedCall<'a, S> {
         AccountLocationGetGoogleUpdatedCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4546,7 +4551,7 @@ impl<'a> AccountMethods<'a> {
     /// * `parent` - The name of the account to fetch locations from. If the Account is of AccountType PERSONAL, only Locations that are
     ///              directly owned by the Account are returned, otherwise it will return all
     ///              accessible locations from the Account, either directly or indirectly.
-    pub fn locations_list(&self, parent: &str) -> AccountLocationListCall<'a> {
+    pub fn locations_list(&self, parent: &str) -> AccountLocationListCall<'a, S> {
         AccountLocationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4572,7 +4577,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the location to update.
-    pub fn locations_patch(&self, request: Location, name: &str) -> AccountLocationPatchCall<'a> {
+    pub fn locations_patch(&self, request: Location, name: &str) -> AccountLocationPatchCall<'a, S> {
         AccountLocationPatchCall {
             hub: self.hub,
             _request: request,
@@ -4596,7 +4601,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The account resource name.
-    pub fn locations_report_insights(&self, request: ReportLocationInsightsRequest, name: &str) -> AccountLocationReportInsightCall<'a> {
+    pub fn locations_report_insights(&self, request: ReportLocationInsightsRequest, name: &str) -> AccountLocationReportInsightCall<'a, S> {
         AccountLocationReportInsightCall {
             hub: self.hub,
             _request: request,
@@ -4618,7 +4623,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the location to transfer.
-    pub fn locations_transfer(&self, request: TransferLocationRequest, name: &str) -> AccountLocationTransferCall<'a> {
+    pub fn locations_transfer(&self, request: TransferLocationRequest, name: &str) -> AccountLocationTransferCall<'a, S> {
         AccountLocationTransferCall {
             hub: self.hub,
             _request: request,
@@ -4636,7 +4641,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the location to verify.
-    pub fn locations_verify(&self, request: VerifyLocationRequest, name: &str) -> AccountLocationVerifyCall<'a> {
+    pub fn locations_verify(&self, request: VerifyLocationRequest, name: &str) -> AccountLocationVerifyCall<'a, S> {
         AccountLocationVerifyCall {
             hub: self.hub,
             _request: request,
@@ -4661,7 +4666,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Account) -> AccountCreateCall<'a> {
+    pub fn create(&self, request: Account) -> AccountCreateCall<'a, S> {
         AccountCreateCall {
             hub: self.hub,
             _request: request,
@@ -4678,7 +4683,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource name for the notification settings to be cleared.
-    pub fn delete_notifications(&self, name: &str) -> AccountDeleteNotificationCall<'a> {
+    pub fn delete_notifications(&self, name: &str) -> AccountDeleteNotificationCall<'a, S> {
         AccountDeleteNotificationCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4697,7 +4702,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the account to generate an account number for.
-    pub fn generate_account_number(&self, request: GenerateAccountNumberRequest, name: &str) -> AccountGenerateAccountNumberCall<'a> {
+    pub fn generate_account_number(&self, request: GenerateAccountNumberRequest, name: &str) -> AccountGenerateAccountNumberCall<'a, S> {
         AccountGenerateAccountNumberCall {
             hub: self.hub,
             _request: request,
@@ -4715,7 +4720,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the account to fetch.
-    pub fn get(&self, name: &str) -> AccountGetCall<'a> {
+    pub fn get(&self, name: &str) -> AccountGetCall<'a, S> {
         AccountGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4731,7 +4736,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The notification settings resource name.
-    pub fn get_notifications(&self, name: &str) -> AccountGetNotificationCall<'a> {
+    pub fn get_notifications(&self, name: &str) -> AccountGetNotificationCall<'a, S> {
         AccountGetNotificationCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4745,7 +4750,7 @@ impl<'a> AccountMethods<'a> {
     /// Lists all of the accounts for the authenticated user. This includes all
     /// accounts that the user owns, as well as any accounts for which the user
     /// has management rights.
-    pub fn list(&self) -> AccountListCall<'a> {
+    pub fn list(&self) -> AccountListCall<'a, S> {
         AccountListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -4774,7 +4779,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Name of the account resource to fetch recommended Google locations for.
-    pub fn list_recommend_google_locations(&self, name: &str) -> AccountListRecommendGoogleLocationCall<'a> {
+    pub fn list_recommend_google_locations(&self, name: &str) -> AccountListRecommendGoogleLocationCall<'a, S> {
         AccountListRecommendGoogleLocationCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4798,7 +4803,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the account to update.
-    pub fn update(&self, request: Account, name: &str) -> AccountUpdateCall<'a> {
+    pub fn update(&self, request: Account, name: &str) -> AccountUpdateCall<'a, S> {
         AccountUpdateCall {
             hub: self.hub,
             _request: request,
@@ -4825,7 +4830,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The notification settings resource name.
-    pub fn update_notifications(&self, request: Notifications, name: &str) -> AccountUpdateNotificationCall<'a> {
+    pub fn update_notifications(&self, request: Notifications, name: &str) -> AccountUpdateNotificationCall<'a, S> {
         AccountUpdateNotificationCall {
             hub: self.hub,
             _request: request,
@@ -4859,28 +4864,28 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.attributes();
 /// # }
 /// ```
-pub struct AttributeMethods<'a>
-    where  {
+pub struct AttributeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
 }
 
-impl<'a> client::MethodsBuilder for AttributeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AttributeMethods<'a, S> {}
 
-impl<'a> AttributeMethods<'a> {
+impl<'a, S> AttributeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the list of available attributes that would be available for a
     /// location with the given primary category and country.
-    pub fn list(&self) -> AttributeListCall<'a> {
+    pub fn list(&self) -> AttributeListCall<'a, S> {
         AttributeListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -4918,22 +4923,22 @@ impl<'a> AttributeMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.categories();
 /// # }
 /// ```
-pub struct CategoryMethods<'a>
-    where  {
+pub struct CategoryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
 }
 
-impl<'a> client::MethodsBuilder for CategoryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CategoryMethods<'a, S> {}
 
-impl<'a> CategoryMethods<'a> {
+impl<'a, S> CategoryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4943,7 +4948,7 @@ impl<'a> CategoryMethods<'a> {
     /// <aside class="note"><b>Note:</b> Search only matches the front of
     /// a category name (that is, 'food' may return 'Food Court' but not 'Fast Food
     /// Restaurant').</aside>
-    pub fn list(&self) -> CategoryListCall<'a> {
+    pub fn list(&self) -> CategoryListCall<'a, S> {
         CategoryListCall {
             hub: self.hub,
             _search_term: Default::default(),
@@ -4980,22 +4985,22 @@ impl<'a> CategoryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.chains();
 /// # }
 /// ```
-pub struct ChainMethods<'a>
-    where  {
+pub struct ChainMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChainMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChainMethods<'a, S> {}
 
-impl<'a> ChainMethods<'a> {
+impl<'a, S> ChainMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5005,7 +5010,7 @@ impl<'a> ChainMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The chain's resource name, in the format `chains/{chain_place_id}`.
-    pub fn get(&self, name: &str) -> ChainGetCall<'a> {
+    pub fn get(&self, name: &str) -> ChainGetCall<'a, S> {
         ChainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5017,7 +5022,7 @@ impl<'a> ChainMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Searches the chain based on chain name.
-    pub fn search(&self) -> ChainSearchCall<'a> {
+    pub fn search(&self) -> ChainSearchCall<'a, S> {
         ChainSearchCall {
             hub: self.hub,
             _result_count: Default::default(),
@@ -5051,22 +5056,22 @@ impl<'a> ChainMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `report(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.google_locations();
 /// # }
 /// ```
-pub struct GoogleLocationMethods<'a>
-    where  {
+pub struct GoogleLocationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
 }
 
-impl<'a> client::MethodsBuilder for GoogleLocationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GoogleLocationMethods<'a, S> {}
 
-impl<'a> GoogleLocationMethods<'a> {
+impl<'a, S> GoogleLocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5077,7 +5082,7 @@ impl<'a> GoogleLocationMethods<'a> {
     /// * `request` - No description provided.
     /// * `name` - Resource name of a [GoogleLocation], in the format
     ///            `googleLocations/{googleLocationId}`.
-    pub fn report(&self, request: ReportGoogleLocationRequest, name: &str) -> GoogleLocationReportCall<'a> {
+    pub fn report(&self, request: ReportGoogleLocationRequest, name: &str) -> GoogleLocationReportCall<'a, S> {
         GoogleLocationReportCall {
             hub: self.hub,
             _request: request,
@@ -5095,7 +5100,7 @@ impl<'a> GoogleLocationMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: SearchGoogleLocationsRequest) -> GoogleLocationSearchCall<'a> {
+    pub fn search(&self, request: SearchGoogleLocationsRequest) -> GoogleLocationSearchCall<'a, S> {
         GoogleLocationSearchCall {
             hub: self.hub,
             _request: request,
@@ -5128,22 +5133,22 @@ impl<'a> GoogleLocationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `generate(...)`
 /// // to build up your call.
 /// let rb = hub.verification_tokens();
 /// # }
 /// ```
-pub struct VerificationTokenMethods<'a>
-    where  {
+pub struct VerificationTokenMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
 }
 
-impl<'a> client::MethodsBuilder for VerificationTokenMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VerificationTokenMethods<'a, S> {}
 
-impl<'a> VerificationTokenMethods<'a> {
+impl<'a, S> VerificationTokenMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5155,7 +5160,7 @@ impl<'a> VerificationTokenMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn generate(&self, request: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a> {
+    pub fn generate(&self, request: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a, S> {
         VerificationTokenGenerateCall {
             hub: self.hub,
             _request: request,
@@ -5199,7 +5204,7 @@ impl<'a> VerificationTokenMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5212,19 +5217,25 @@ impl<'a> VerificationTokenMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminCreateCall<'a>
-    where  {
+pub struct AccountAdminCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Admin,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountAdminCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdminCreateCall<'a, S> {}
 
-impl<'a> AccountAdminCreateCall<'a> {
+impl<'a, S> AccountAdminCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5378,7 +5389,7 @@ impl<'a> AccountAdminCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> AccountAdminCreateCall<'a> {
+    pub fn request(mut self, new_value: Admin) -> AccountAdminCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5388,7 +5399,7 @@ impl<'a> AccountAdminCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountAdminCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountAdminCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5398,7 +5409,7 @@ impl<'a> AccountAdminCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5423,7 +5434,7 @@ impl<'a> AccountAdminCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5454,7 +5465,7 @@ impl<'a> AccountAdminCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5462,18 +5473,24 @@ impl<'a> AccountAdminCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminDeleteCall<'a>
-    where  {
+pub struct AccountAdminDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountAdminDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdminDeleteCall<'a, S> {}
 
-impl<'a> AccountAdminDeleteCall<'a> {
+impl<'a, S> AccountAdminDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5614,7 +5631,7 @@ impl<'a> AccountAdminDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountAdminDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountAdminDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5624,7 +5641,7 @@ impl<'a> AccountAdminDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5649,7 +5666,7 @@ impl<'a> AccountAdminDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5680,7 +5697,7 @@ impl<'a> AccountAdminDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5688,18 +5705,24 @@ impl<'a> AccountAdminDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminListCall<'a>
-    where  {
+pub struct AccountAdminListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountAdminListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdminListCall<'a, S> {}
 
-impl<'a> AccountAdminListCall<'a> {
+impl<'a, S> AccountAdminListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5840,7 +5863,7 @@ impl<'a> AccountAdminListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountAdminListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountAdminListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5850,7 +5873,7 @@ impl<'a> AccountAdminListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5875,7 +5898,7 @@ impl<'a> AccountAdminListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5908,7 +5931,7 @@ impl<'a> AccountAdminListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5921,19 +5944,25 @@ impl<'a> AccountAdminListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminPatchCall<'a>
-    where  {
+pub struct AccountAdminPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Admin,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountAdminPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdminPatchCall<'a, S> {}
 
-impl<'a> AccountAdminPatchCall<'a> {
+impl<'a, S> AccountAdminPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6087,7 +6116,7 @@ impl<'a> AccountAdminPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> AccountAdminPatchCall<'a> {
+    pub fn request(mut self, new_value: Admin) -> AccountAdminPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6097,7 +6126,7 @@ impl<'a> AccountAdminPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountAdminPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountAdminPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6107,7 +6136,7 @@ impl<'a> AccountAdminPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6132,7 +6161,7 @@ impl<'a> AccountAdminPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6164,7 +6193,7 @@ impl<'a> AccountAdminPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6177,19 +6206,25 @@ impl<'a> AccountAdminPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInvitationAcceptCall<'a>
-    where  {
+pub struct AccountInvitationAcceptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: AcceptInvitationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountInvitationAcceptCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountInvitationAcceptCall<'a, S> {}
 
-impl<'a> AccountInvitationAcceptCall<'a> {
+impl<'a, S> AccountInvitationAcceptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6343,7 +6378,7 @@ impl<'a> AccountInvitationAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AcceptInvitationRequest) -> AccountInvitationAcceptCall<'a> {
+    pub fn request(mut self, new_value: AcceptInvitationRequest) -> AccountInvitationAcceptCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6353,7 +6388,7 @@ impl<'a> AccountInvitationAcceptCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountInvitationAcceptCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountInvitationAcceptCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6363,7 +6398,7 @@ impl<'a> AccountInvitationAcceptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationAcceptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationAcceptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6388,7 +6423,7 @@ impl<'a> AccountInvitationAcceptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationAcceptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationAcceptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6420,7 +6455,7 @@ impl<'a> AccountInvitationAcceptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6433,19 +6468,25 @@ impl<'a> AccountInvitationAcceptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInvitationDeclineCall<'a>
-    where  {
+pub struct AccountInvitationDeclineCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: DeclineInvitationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountInvitationDeclineCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountInvitationDeclineCall<'a, S> {}
 
-impl<'a> AccountInvitationDeclineCall<'a> {
+impl<'a, S> AccountInvitationDeclineCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6599,7 +6640,7 @@ impl<'a> AccountInvitationDeclineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeclineInvitationRequest) -> AccountInvitationDeclineCall<'a> {
+    pub fn request(mut self, new_value: DeclineInvitationRequest) -> AccountInvitationDeclineCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6609,7 +6650,7 @@ impl<'a> AccountInvitationDeclineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountInvitationDeclineCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountInvitationDeclineCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6619,7 +6660,7 @@ impl<'a> AccountInvitationDeclineCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationDeclineCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationDeclineCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6644,7 +6685,7 @@ impl<'a> AccountInvitationDeclineCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationDeclineCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationDeclineCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6675,7 +6716,7 @@ impl<'a> AccountInvitationDeclineCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6684,19 +6725,25 @@ impl<'a> AccountInvitationDeclineCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInvitationListCall<'a>
-    where  {
+pub struct AccountInvitationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _target_type: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountInvitationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountInvitationListCall<'a, S> {}
 
-impl<'a> AccountInvitationListCall<'a> {
+impl<'a, S> AccountInvitationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6841,14 +6888,14 @@ impl<'a> AccountInvitationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountInvitationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountInvitationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Specifies which target types should appear in the response.
     ///
     /// Sets the *target type* query property to the given value.
-    pub fn target_type(mut self, new_value: &str) -> AccountInvitationListCall<'a> {
+    pub fn target_type(mut self, new_value: &str) -> AccountInvitationListCall<'a, S> {
         self._target_type = Some(new_value.to_string());
         self
     }
@@ -6858,7 +6905,7 @@ impl<'a> AccountInvitationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6883,7 +6930,7 @@ impl<'a> AccountInvitationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6918,7 +6965,7 @@ impl<'a> AccountInvitationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6931,19 +6978,25 @@ impl<'a> AccountInvitationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationAdminCreateCall<'a>
-    where  {
+pub struct AccountLocationAdminCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Admin,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationAdminCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationAdminCreateCall<'a, S> {}
 
-impl<'a> AccountLocationAdminCreateCall<'a> {
+impl<'a, S> AccountLocationAdminCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7097,7 +7150,7 @@ impl<'a> AccountLocationAdminCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> AccountLocationAdminCreateCall<'a> {
+    pub fn request(mut self, new_value: Admin) -> AccountLocationAdminCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7107,7 +7160,7 @@ impl<'a> AccountLocationAdminCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationAdminCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationAdminCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -7117,7 +7170,7 @@ impl<'a> AccountLocationAdminCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7142,7 +7195,7 @@ impl<'a> AccountLocationAdminCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7173,7 +7226,7 @@ impl<'a> AccountLocationAdminCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7181,18 +7234,24 @@ impl<'a> AccountLocationAdminCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationAdminDeleteCall<'a>
-    where  {
+pub struct AccountLocationAdminDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationAdminDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationAdminDeleteCall<'a, S> {}
 
-impl<'a> AccountLocationAdminDeleteCall<'a> {
+impl<'a, S> AccountLocationAdminDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7333,7 +7392,7 @@ impl<'a> AccountLocationAdminDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationAdminDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationAdminDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7343,7 +7402,7 @@ impl<'a> AccountLocationAdminDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7368,7 +7427,7 @@ impl<'a> AccountLocationAdminDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7399,7 +7458,7 @@ impl<'a> AccountLocationAdminDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7407,18 +7466,24 @@ impl<'a> AccountLocationAdminDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationAdminListCall<'a>
-    where  {
+pub struct AccountLocationAdminListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationAdminListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationAdminListCall<'a, S> {}
 
-impl<'a> AccountLocationAdminListCall<'a> {
+impl<'a, S> AccountLocationAdminListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7559,7 +7624,7 @@ impl<'a> AccountLocationAdminListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationAdminListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationAdminListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -7569,7 +7634,7 @@ impl<'a> AccountLocationAdminListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7594,7 +7659,7 @@ impl<'a> AccountLocationAdminListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7627,7 +7692,7 @@ impl<'a> AccountLocationAdminListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7640,19 +7705,25 @@ impl<'a> AccountLocationAdminListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationAdminPatchCall<'a>
-    where  {
+pub struct AccountLocationAdminPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Admin,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationAdminPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationAdminPatchCall<'a, S> {}
 
-impl<'a> AccountLocationAdminPatchCall<'a> {
+impl<'a, S> AccountLocationAdminPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7806,7 +7877,7 @@ impl<'a> AccountLocationAdminPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> AccountLocationAdminPatchCall<'a> {
+    pub fn request(mut self, new_value: Admin) -> AccountLocationAdminPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7816,7 +7887,7 @@ impl<'a> AccountLocationAdminPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationAdminPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationAdminPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7826,7 +7897,7 @@ impl<'a> AccountLocationAdminPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAdminPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7851,7 +7922,7 @@ impl<'a> AccountLocationAdminPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAdminPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7886,7 +7957,7 @@ impl<'a> AccountLocationAdminPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7894,18 +7965,24 @@ impl<'a> AccountLocationAdminPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationFollowerGetMetadataCall<'a>
-    where  {
+pub struct AccountLocationFollowerGetMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationFollowerGetMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationFollowerGetMetadataCall<'a, S> {}
 
-impl<'a> AccountLocationFollowerGetMetadataCall<'a> {
+impl<'a, S> AccountLocationFollowerGetMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8047,7 +8124,7 @@ impl<'a> AccountLocationFollowerGetMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationFollowerGetMetadataCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationFollowerGetMetadataCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8057,7 +8134,7 @@ impl<'a> AccountLocationFollowerGetMetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationFollowerGetMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationFollowerGetMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8082,7 +8159,7 @@ impl<'a> AccountLocationFollowerGetMetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationFollowerGetMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationFollowerGetMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8115,7 +8192,7 @@ impl<'a> AccountLocationFollowerGetMetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8128,19 +8205,25 @@ impl<'a> AccountLocationFollowerGetMetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationLocalPostCreateCall<'a>
-    where  {
+pub struct AccountLocationLocalPostCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: LocalPost,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationLocalPostCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationLocalPostCreateCall<'a, S> {}
 
-impl<'a> AccountLocationLocalPostCreateCall<'a> {
+impl<'a, S> AccountLocationLocalPostCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8294,7 +8377,7 @@ impl<'a> AccountLocationLocalPostCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LocalPost) -> AccountLocationLocalPostCreateCall<'a> {
+    pub fn request(mut self, new_value: LocalPost) -> AccountLocationLocalPostCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8304,7 +8387,7 @@ impl<'a> AccountLocationLocalPostCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationLocalPostCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationLocalPostCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8314,7 +8397,7 @@ impl<'a> AccountLocationLocalPostCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8339,7 +8422,7 @@ impl<'a> AccountLocationLocalPostCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8371,7 +8454,7 @@ impl<'a> AccountLocationLocalPostCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8379,18 +8462,24 @@ impl<'a> AccountLocationLocalPostCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationLocalPostDeleteCall<'a>
-    where  {
+pub struct AccountLocationLocalPostDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationLocalPostDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationLocalPostDeleteCall<'a, S> {}
 
-impl<'a> AccountLocationLocalPostDeleteCall<'a> {
+impl<'a, S> AccountLocationLocalPostDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8531,7 +8620,7 @@ impl<'a> AccountLocationLocalPostDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8541,7 +8630,7 @@ impl<'a> AccountLocationLocalPostDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8566,7 +8655,7 @@ impl<'a> AccountLocationLocalPostDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8598,7 +8687,7 @@ impl<'a> AccountLocationLocalPostDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8606,18 +8695,24 @@ impl<'a> AccountLocationLocalPostDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationLocalPostGetCall<'a>
-    where  {
+pub struct AccountLocationLocalPostGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationLocalPostGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationLocalPostGetCall<'a, S> {}
 
-impl<'a> AccountLocationLocalPostGetCall<'a> {
+impl<'a, S> AccountLocationLocalPostGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8758,7 +8853,7 @@ impl<'a> AccountLocationLocalPostGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8768,7 +8863,7 @@ impl<'a> AccountLocationLocalPostGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8793,7 +8888,7 @@ impl<'a> AccountLocationLocalPostGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8824,7 +8919,7 @@ impl<'a> AccountLocationLocalPostGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8834,10 +8929,10 @@ impl<'a> AccountLocationLocalPostGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationLocalPostListCall<'a>
-    where  {
+pub struct AccountLocationLocalPostListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8845,9 +8940,15 @@ pub struct AccountLocationLocalPostListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationLocalPostListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationLocalPostListCall<'a, S> {}
 
-impl<'a> AccountLocationLocalPostListCall<'a> {
+impl<'a, S> AccountLocationLocalPostListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8994,14 +9095,14 @@ impl<'a> AccountLocationLocalPostListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationLocalPostListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationLocalPostListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, returns the next page of local posts.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationLocalPostListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationLocalPostListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -9009,7 +9110,7 @@ impl<'a> AccountLocationLocalPostListCall<'a> {
     /// and maximum page size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationLocalPostListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationLocalPostListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -9019,7 +9120,7 @@ impl<'a> AccountLocationLocalPostListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9044,7 +9145,7 @@ impl<'a> AccountLocationLocalPostListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9076,7 +9177,7 @@ impl<'a> AccountLocationLocalPostListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9090,10 +9191,10 @@ impl<'a> AccountLocationLocalPostListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationLocalPostPatchCall<'a>
-    where  {
+pub struct AccountLocationLocalPostPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: LocalPost,
     _name: String,
     _update_mask: Option<String>,
@@ -9101,9 +9202,15 @@ pub struct AccountLocationLocalPostPatchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationLocalPostPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationLocalPostPatchCall<'a, S> {}
 
-impl<'a> AccountLocationLocalPostPatchCall<'a> {
+impl<'a, S> AccountLocationLocalPostPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9260,7 +9367,7 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LocalPost) -> AccountLocationLocalPostPatchCall<'a> {
+    pub fn request(mut self, new_value: LocalPost) -> AccountLocationLocalPostPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9270,7 +9377,7 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9278,7 +9385,7 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
     /// updated in the mask.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountLocationLocalPostPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountLocationLocalPostPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9288,7 +9395,7 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9313,7 +9420,7 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9349,7 +9456,7 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9362,19 +9469,25 @@ impl<'a> AccountLocationLocalPostPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationLocalPostReportInsightCall<'a>
-    where  {
+pub struct AccountLocationLocalPostReportInsightCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: ReportLocalPostInsightsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationLocalPostReportInsightCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationLocalPostReportInsightCall<'a, S> {}
 
-impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
+impl<'a, S> AccountLocationLocalPostReportInsightCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9528,7 +9641,7 @@ impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReportLocalPostInsightsRequest) -> AccountLocationLocalPostReportInsightCall<'a> {
+    pub fn request(mut self, new_value: ReportLocalPostInsightsRequest) -> AccountLocationLocalPostReportInsightCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9538,7 +9651,7 @@ impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostReportInsightCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationLocalPostReportInsightCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9548,7 +9661,7 @@ impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostReportInsightCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationLocalPostReportInsightCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9573,7 +9686,7 @@ impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostReportInsightCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationLocalPostReportInsightCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9604,7 +9717,7 @@ impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9612,18 +9725,24 @@ impl<'a> AccountLocationLocalPostReportInsightCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaCustomerGetCall<'a>
-    where  {
+pub struct AccountLocationMediaCustomerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaCustomerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaCustomerGetCall<'a, S> {}
 
-impl<'a> AccountLocationMediaCustomerGetCall<'a> {
+impl<'a, S> AccountLocationMediaCustomerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9764,7 +9883,7 @@ impl<'a> AccountLocationMediaCustomerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationMediaCustomerGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationMediaCustomerGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9774,7 +9893,7 @@ impl<'a> AccountLocationMediaCustomerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaCustomerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaCustomerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9799,7 +9918,7 @@ impl<'a> AccountLocationMediaCustomerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaCustomerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaCustomerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9831,7 +9950,7 @@ impl<'a> AccountLocationMediaCustomerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9841,10 +9960,10 @@ impl<'a> AccountLocationMediaCustomerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaCustomerListCall<'a>
-    where  {
+pub struct AccountLocationMediaCustomerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9852,9 +9971,15 @@ pub struct AccountLocationMediaCustomerListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaCustomerListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaCustomerListCall<'a, S> {}
 
-impl<'a> AccountLocationMediaCustomerListCall<'a> {
+impl<'a, S> AccountLocationMediaCustomerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10001,14 +10126,14 @@ impl<'a> AccountLocationMediaCustomerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaCustomerListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaCustomerListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, returns the next page of media items.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationMediaCustomerListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationMediaCustomerListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10016,7 +10141,7 @@ impl<'a> AccountLocationMediaCustomerListCall<'a> {
     /// maximum supported page size is 200.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationMediaCustomerListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationMediaCustomerListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -10026,7 +10151,7 @@ impl<'a> AccountLocationMediaCustomerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaCustomerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaCustomerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10051,7 +10176,7 @@ impl<'a> AccountLocationMediaCustomerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaCustomerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaCustomerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10083,7 +10208,7 @@ impl<'a> AccountLocationMediaCustomerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10096,19 +10221,25 @@ impl<'a> AccountLocationMediaCustomerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaCreateCall<'a>
-    where  {
+pub struct AccountLocationMediaCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: MediaItem,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaCreateCall<'a, S> {}
 
-impl<'a> AccountLocationMediaCreateCall<'a> {
+impl<'a, S> AccountLocationMediaCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10262,7 +10393,7 @@ impl<'a> AccountLocationMediaCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MediaItem) -> AccountLocationMediaCreateCall<'a> {
+    pub fn request(mut self, new_value: MediaItem) -> AccountLocationMediaCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10272,7 +10403,7 @@ impl<'a> AccountLocationMediaCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -10282,7 +10413,7 @@ impl<'a> AccountLocationMediaCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10307,7 +10438,7 @@ impl<'a> AccountLocationMediaCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10338,7 +10469,7 @@ impl<'a> AccountLocationMediaCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10346,18 +10477,24 @@ impl<'a> AccountLocationMediaCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaDeleteCall<'a>
-    where  {
+pub struct AccountLocationMediaDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaDeleteCall<'a, S> {}
 
-impl<'a> AccountLocationMediaDeleteCall<'a> {
+impl<'a, S> AccountLocationMediaDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10498,7 +10635,7 @@ impl<'a> AccountLocationMediaDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationMediaDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationMediaDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10508,7 +10645,7 @@ impl<'a> AccountLocationMediaDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10533,7 +10670,7 @@ impl<'a> AccountLocationMediaDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10564,7 +10701,7 @@ impl<'a> AccountLocationMediaDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10572,18 +10709,24 @@ impl<'a> AccountLocationMediaDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaGetCall<'a>
-    where  {
+pub struct AccountLocationMediaGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaGetCall<'a, S> {}
 
-impl<'a> AccountLocationMediaGetCall<'a> {
+impl<'a, S> AccountLocationMediaGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10724,7 +10867,7 @@ impl<'a> AccountLocationMediaGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationMediaGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationMediaGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10734,7 +10877,7 @@ impl<'a> AccountLocationMediaGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10759,7 +10902,7 @@ impl<'a> AccountLocationMediaGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10790,7 +10933,7 @@ impl<'a> AccountLocationMediaGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10800,10 +10943,10 @@ impl<'a> AccountLocationMediaGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaListCall<'a>
-    where  {
+pub struct AccountLocationMediaListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10811,9 +10954,15 @@ pub struct AccountLocationMediaListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaListCall<'a, S> {}
 
-impl<'a> AccountLocationMediaListCall<'a> {
+impl<'a, S> AccountLocationMediaListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10960,14 +11109,14 @@ impl<'a> AccountLocationMediaListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, returns the next page of media items.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationMediaListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationMediaListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -10976,7 +11125,7 @@ impl<'a> AccountLocationMediaListCall<'a> {
     /// location with the My Business API. Maximum page size is 2500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationMediaListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationMediaListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -10986,7 +11135,7 @@ impl<'a> AccountLocationMediaListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11011,7 +11160,7 @@ impl<'a> AccountLocationMediaListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11045,7 +11194,7 @@ impl<'a> AccountLocationMediaListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11059,10 +11208,10 @@ impl<'a> AccountLocationMediaListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaPatchCall<'a>
-    where  {
+pub struct AccountLocationMediaPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: MediaItem,
     _name: String,
     _update_mask: Option<String>,
@@ -11070,9 +11219,15 @@ pub struct AccountLocationMediaPatchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaPatchCall<'a, S> {}
 
-impl<'a> AccountLocationMediaPatchCall<'a> {
+impl<'a, S> AccountLocationMediaPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11229,7 +11384,7 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MediaItem) -> AccountLocationMediaPatchCall<'a> {
+    pub fn request(mut self, new_value: MediaItem) -> AccountLocationMediaPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11239,7 +11394,7 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationMediaPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationMediaPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11248,7 +11403,7 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
     /// passed in.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountLocationMediaPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountLocationMediaPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11258,7 +11413,7 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11283,7 +11438,7 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11315,7 +11470,7 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11328,19 +11483,25 @@ impl<'a> AccountLocationMediaPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationMediaStartUploadCall<'a>
-    where  {
+pub struct AccountLocationMediaStartUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: StartUploadMediaItemDataRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationMediaStartUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationMediaStartUploadCall<'a, S> {}
 
-impl<'a> AccountLocationMediaStartUploadCall<'a> {
+impl<'a, S> AccountLocationMediaStartUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11494,7 +11655,7 @@ impl<'a> AccountLocationMediaStartUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StartUploadMediaItemDataRequest) -> AccountLocationMediaStartUploadCall<'a> {
+    pub fn request(mut self, new_value: StartUploadMediaItemDataRequest) -> AccountLocationMediaStartUploadCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11504,7 +11665,7 @@ impl<'a> AccountLocationMediaStartUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaStartUploadCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationMediaStartUploadCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -11514,7 +11675,7 @@ impl<'a> AccountLocationMediaStartUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaStartUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationMediaStartUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11539,7 +11700,7 @@ impl<'a> AccountLocationMediaStartUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaStartUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationMediaStartUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11570,7 +11731,7 @@ impl<'a> AccountLocationMediaStartUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11578,18 +11739,24 @@ impl<'a> AccountLocationMediaStartUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionAnswerDeleteCall<'a>
-    where  {
+pub struct AccountLocationQuestionAnswerDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionAnswerDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionAnswerDeleteCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionAnswerDeleteCall<'a> {
+impl<'a, S> AccountLocationQuestionAnswerDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11730,7 +11897,7 @@ impl<'a> AccountLocationQuestionAnswerDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionAnswerDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionAnswerDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -11740,7 +11907,7 @@ impl<'a> AccountLocationQuestionAnswerDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionAnswerDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionAnswerDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11765,7 +11932,7 @@ impl<'a> AccountLocationQuestionAnswerDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionAnswerDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionAnswerDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11796,7 +11963,7 @@ impl<'a> AccountLocationQuestionAnswerDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11807,10 +11974,10 @@ impl<'a> AccountLocationQuestionAnswerDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionAnswerListCall<'a>
-    where  {
+pub struct AccountLocationQuestionAnswerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11819,9 +11986,15 @@ pub struct AccountLocationQuestionAnswerListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionAnswerListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionAnswerListCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionAnswerListCall<'a> {
+impl<'a, S> AccountLocationQuestionAnswerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11971,14 +12144,14 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionAnswerListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionAnswerListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, the next page of answers is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationQuestionAnswerListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationQuestionAnswerListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -11986,7 +12159,7 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
     /// values are 10.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationQuestionAnswerListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationQuestionAnswerListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -11996,7 +12169,7 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
     /// desc'.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AccountLocationQuestionAnswerListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> AccountLocationQuestionAnswerListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -12006,7 +12179,7 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionAnswerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionAnswerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12031,7 +12204,7 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionAnswerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionAnswerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12064,7 +12237,7 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12077,19 +12250,25 @@ impl<'a> AccountLocationQuestionAnswerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionAnswerUpsertCall<'a>
-    where  {
+pub struct AccountLocationQuestionAnswerUpsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: UpsertAnswerRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionAnswerUpsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionAnswerUpsertCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
+impl<'a, S> AccountLocationQuestionAnswerUpsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12243,7 +12422,7 @@ impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpsertAnswerRequest) -> AccountLocationQuestionAnswerUpsertCall<'a> {
+    pub fn request(mut self, new_value: UpsertAnswerRequest) -> AccountLocationQuestionAnswerUpsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12253,7 +12432,7 @@ impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionAnswerUpsertCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionAnswerUpsertCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12263,7 +12442,7 @@ impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionAnswerUpsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionAnswerUpsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12288,7 +12467,7 @@ impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionAnswerUpsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionAnswerUpsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12320,7 +12499,7 @@ impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12333,19 +12512,25 @@ impl<'a> AccountLocationQuestionAnswerUpsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionCreateCall<'a>
-    where  {
+pub struct AccountLocationQuestionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Question,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionCreateCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionCreateCall<'a> {
+impl<'a, S> AccountLocationQuestionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12499,7 +12684,7 @@ impl<'a> AccountLocationQuestionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Question) -> AccountLocationQuestionCreateCall<'a> {
+    pub fn request(mut self, new_value: Question) -> AccountLocationQuestionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12509,7 +12694,7 @@ impl<'a> AccountLocationQuestionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12519,7 +12704,7 @@ impl<'a> AccountLocationQuestionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12544,7 +12729,7 @@ impl<'a> AccountLocationQuestionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12575,7 +12760,7 @@ impl<'a> AccountLocationQuestionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12583,18 +12768,24 @@ impl<'a> AccountLocationQuestionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionDeleteCall<'a>
-    where  {
+pub struct AccountLocationQuestionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionDeleteCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionDeleteCall<'a> {
+impl<'a, S> AccountLocationQuestionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12735,7 +12926,7 @@ impl<'a> AccountLocationQuestionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationQuestionDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationQuestionDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12745,7 +12936,7 @@ impl<'a> AccountLocationQuestionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12770,7 +12961,7 @@ impl<'a> AccountLocationQuestionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12802,7 +12993,7 @@ impl<'a> AccountLocationQuestionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12815,10 +13006,10 @@ impl<'a> AccountLocationQuestionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionListCall<'a>
-    where  {
+pub struct AccountLocationQuestionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12829,9 +13020,15 @@ pub struct AccountLocationQuestionListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionListCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionListCall<'a> {
+impl<'a, S> AccountLocationQuestionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12987,14 +13184,14 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, the next page of questions is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -13002,7 +13199,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     /// values are 10.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationQuestionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationQuestionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -13012,7 +13209,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     /// desc'.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -13020,7 +13217,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     /// supported is "ignore_answered=true"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountLocationQuestionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -13028,7 +13225,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     /// `answers_per_question` values are 10.
     ///
     /// Sets the *answers per question* query property to the given value.
-    pub fn answers_per_question(mut self, new_value: i32) -> AccountLocationQuestionListCall<'a> {
+    pub fn answers_per_question(mut self, new_value: i32) -> AccountLocationQuestionListCall<'a, S> {
         self._answers_per_question = Some(new_value);
         self
     }
@@ -13038,7 +13235,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13063,7 +13260,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13095,7 +13292,7 @@ impl<'a> AccountLocationQuestionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13108,19 +13305,25 @@ impl<'a> AccountLocationQuestionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationQuestionPatchCall<'a>
-    where  {
+pub struct AccountLocationQuestionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Question,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationQuestionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationQuestionPatchCall<'a, S> {}
 
-impl<'a> AccountLocationQuestionPatchCall<'a> {
+impl<'a, S> AccountLocationQuestionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13274,7 +13477,7 @@ impl<'a> AccountLocationQuestionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Question) -> AccountLocationQuestionPatchCall<'a> {
+    pub fn request(mut self, new_value: Question) -> AccountLocationQuestionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13284,7 +13487,7 @@ impl<'a> AccountLocationQuestionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationQuestionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationQuestionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13294,7 +13497,7 @@ impl<'a> AccountLocationQuestionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationQuestionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13319,7 +13522,7 @@ impl<'a> AccountLocationQuestionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationQuestionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13351,7 +13554,7 @@ impl<'a> AccountLocationQuestionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13359,18 +13562,24 @@ impl<'a> AccountLocationQuestionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationReviewDeleteReplyCall<'a>
-    where  {
+pub struct AccountLocationReviewDeleteReplyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationReviewDeleteReplyCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationReviewDeleteReplyCall<'a, S> {}
 
-impl<'a> AccountLocationReviewDeleteReplyCall<'a> {
+impl<'a, S> AccountLocationReviewDeleteReplyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13511,7 +13720,7 @@ impl<'a> AccountLocationReviewDeleteReplyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationReviewDeleteReplyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationReviewDeleteReplyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13521,7 +13730,7 @@ impl<'a> AccountLocationReviewDeleteReplyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewDeleteReplyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewDeleteReplyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13546,7 +13755,7 @@ impl<'a> AccountLocationReviewDeleteReplyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewDeleteReplyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewDeleteReplyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13579,7 +13788,7 @@ impl<'a> AccountLocationReviewDeleteReplyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13587,18 +13796,24 @@ impl<'a> AccountLocationReviewDeleteReplyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationReviewGetCall<'a>
-    where  {
+pub struct AccountLocationReviewGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationReviewGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationReviewGetCall<'a, S> {}
 
-impl<'a> AccountLocationReviewGetCall<'a> {
+impl<'a, S> AccountLocationReviewGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13739,7 +13954,7 @@ impl<'a> AccountLocationReviewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationReviewGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationReviewGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13749,7 +13964,7 @@ impl<'a> AccountLocationReviewGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13774,7 +13989,7 @@ impl<'a> AccountLocationReviewGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13806,7 +14021,7 @@ impl<'a> AccountLocationReviewGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13817,10 +14032,10 @@ impl<'a> AccountLocationReviewGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationReviewListCall<'a>
-    where  {
+pub struct AccountLocationReviewListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13829,9 +14044,15 @@ pub struct AccountLocationReviewListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationReviewListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationReviewListCall<'a, S> {}
 
-impl<'a> AccountLocationReviewListCall<'a> {
+impl<'a, S> AccountLocationReviewListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13981,14 +14202,14 @@ impl<'a> AccountLocationReviewListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationReviewListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationReviewListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, it fetches the next page of reviews.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationReviewListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationReviewListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -13996,7 +14217,7 @@ impl<'a> AccountLocationReviewListCall<'a> {
     /// 200.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationReviewListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationReviewListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14007,7 +14228,7 @@ impl<'a> AccountLocationReviewListCall<'a> {
     /// `update_time desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AccountLocationReviewListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> AccountLocationReviewListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -14017,7 +14238,7 @@ impl<'a> AccountLocationReviewListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14042,7 +14263,7 @@ impl<'a> AccountLocationReviewListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14076,7 +14297,7 @@ impl<'a> AccountLocationReviewListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14089,19 +14310,25 @@ impl<'a> AccountLocationReviewListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationReviewUpdateReplyCall<'a>
-    where  {
+pub struct AccountLocationReviewUpdateReplyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: ReviewReply,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationReviewUpdateReplyCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationReviewUpdateReplyCall<'a, S> {}
 
-impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
+impl<'a, S> AccountLocationReviewUpdateReplyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14255,7 +14482,7 @@ impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReviewReply) -> AccountLocationReviewUpdateReplyCall<'a> {
+    pub fn request(mut self, new_value: ReviewReply) -> AccountLocationReviewUpdateReplyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14265,7 +14492,7 @@ impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationReviewUpdateReplyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationReviewUpdateReplyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14275,7 +14502,7 @@ impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewUpdateReplyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReviewUpdateReplyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14300,7 +14527,7 @@ impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewUpdateReplyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReviewUpdateReplyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14335,7 +14562,7 @@ impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14348,19 +14575,25 @@ impl<'a> AccountLocationReviewUpdateReplyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationVerificationCompleteCall<'a>
-    where  {
+pub struct AccountLocationVerificationCompleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: CompleteVerificationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationVerificationCompleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationVerificationCompleteCall<'a, S> {}
 
-impl<'a> AccountLocationVerificationCompleteCall<'a> {
+impl<'a, S> AccountLocationVerificationCompleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14514,7 +14747,7 @@ impl<'a> AccountLocationVerificationCompleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompleteVerificationRequest) -> AccountLocationVerificationCompleteCall<'a> {
+    pub fn request(mut self, new_value: CompleteVerificationRequest) -> AccountLocationVerificationCompleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14524,7 +14757,7 @@ impl<'a> AccountLocationVerificationCompleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationVerificationCompleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationVerificationCompleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -14534,7 +14767,7 @@ impl<'a> AccountLocationVerificationCompleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationVerificationCompleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationVerificationCompleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14559,7 +14792,7 @@ impl<'a> AccountLocationVerificationCompleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationVerificationCompleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationVerificationCompleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14590,7 +14823,7 @@ impl<'a> AccountLocationVerificationCompleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14600,10 +14833,10 @@ impl<'a> AccountLocationVerificationCompleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationVerificationListCall<'a>
-    where  {
+pub struct AccountLocationVerificationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14611,9 +14844,15 @@ pub struct AccountLocationVerificationListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationVerificationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationVerificationListCall<'a, S> {}
 
-impl<'a> AccountLocationVerificationListCall<'a> {
+impl<'a, S> AccountLocationVerificationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14760,21 +14999,21 @@ impl<'a> AccountLocationVerificationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationVerificationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationVerificationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, returns the next page of verifications.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationVerificationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationVerificationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// How many verification to include per page. If not set, return all.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationVerificationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationVerificationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14784,7 +15023,7 @@ impl<'a> AccountLocationVerificationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationVerificationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationVerificationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14809,7 +15048,7 @@ impl<'a> AccountLocationVerificationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationVerificationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationVerificationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14844,7 +15083,7 @@ impl<'a> AccountLocationVerificationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14857,19 +15096,25 @@ impl<'a> AccountLocationVerificationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationAssociateCall<'a>
-    where  {
+pub struct AccountLocationAssociateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: AssociateLocationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationAssociateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationAssociateCall<'a, S> {}
 
-impl<'a> AccountLocationAssociateCall<'a> {
+impl<'a, S> AccountLocationAssociateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15023,7 +15268,7 @@ impl<'a> AccountLocationAssociateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssociateLocationRequest) -> AccountLocationAssociateCall<'a> {
+    pub fn request(mut self, new_value: AssociateLocationRequest) -> AccountLocationAssociateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15033,7 +15278,7 @@ impl<'a> AccountLocationAssociateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationAssociateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationAssociateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15043,7 +15288,7 @@ impl<'a> AccountLocationAssociateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAssociateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationAssociateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15068,7 +15313,7 @@ impl<'a> AccountLocationAssociateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAssociateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationAssociateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15100,7 +15345,7 @@ impl<'a> AccountLocationAssociateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15113,19 +15358,25 @@ impl<'a> AccountLocationAssociateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationBatchGetCall<'a>
-    where  {
+pub struct AccountLocationBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: BatchGetLocationsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationBatchGetCall<'a, S> {}
 
-impl<'a> AccountLocationBatchGetCall<'a> {
+impl<'a, S> AccountLocationBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15279,7 +15530,7 @@ impl<'a> AccountLocationBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchGetLocationsRequest) -> AccountLocationBatchGetCall<'a> {
+    pub fn request(mut self, new_value: BatchGetLocationsRequest) -> AccountLocationBatchGetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15289,7 +15540,7 @@ impl<'a> AccountLocationBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationBatchGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationBatchGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15299,7 +15550,7 @@ impl<'a> AccountLocationBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15324,7 +15575,7 @@ impl<'a> AccountLocationBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15359,7 +15610,7 @@ impl<'a> AccountLocationBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15372,19 +15623,25 @@ impl<'a> AccountLocationBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationBatchGetReviewCall<'a>
-    where  {
+pub struct AccountLocationBatchGetReviewCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: BatchGetReviewsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationBatchGetReviewCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationBatchGetReviewCall<'a, S> {}
 
-impl<'a> AccountLocationBatchGetReviewCall<'a> {
+impl<'a, S> AccountLocationBatchGetReviewCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15538,7 +15795,7 @@ impl<'a> AccountLocationBatchGetReviewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchGetReviewsRequest) -> AccountLocationBatchGetReviewCall<'a> {
+    pub fn request(mut self, new_value: BatchGetReviewsRequest) -> AccountLocationBatchGetReviewCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15549,7 +15806,7 @@ impl<'a> AccountLocationBatchGetReviewCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationBatchGetReviewCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationBatchGetReviewCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15559,7 +15816,7 @@ impl<'a> AccountLocationBatchGetReviewCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationBatchGetReviewCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationBatchGetReviewCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15584,7 +15841,7 @@ impl<'a> AccountLocationBatchGetReviewCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationBatchGetReviewCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationBatchGetReviewCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15617,7 +15874,7 @@ impl<'a> AccountLocationBatchGetReviewCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15630,19 +15887,25 @@ impl<'a> AccountLocationBatchGetReviewCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationClearAssociationCall<'a>
-    where  {
+pub struct AccountLocationClearAssociationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: ClearLocationAssociationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationClearAssociationCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationClearAssociationCall<'a, S> {}
 
-impl<'a> AccountLocationClearAssociationCall<'a> {
+impl<'a, S> AccountLocationClearAssociationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15796,7 +16059,7 @@ impl<'a> AccountLocationClearAssociationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClearLocationAssociationRequest) -> AccountLocationClearAssociationCall<'a> {
+    pub fn request(mut self, new_value: ClearLocationAssociationRequest) -> AccountLocationClearAssociationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15806,7 +16069,7 @@ impl<'a> AccountLocationClearAssociationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationClearAssociationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationClearAssociationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -15816,7 +16079,7 @@ impl<'a> AccountLocationClearAssociationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationClearAssociationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationClearAssociationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15841,7 +16104,7 @@ impl<'a> AccountLocationClearAssociationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationClearAssociationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationClearAssociationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15874,7 +16137,7 @@ impl<'a> AccountLocationClearAssociationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15889,10 +16152,10 @@ impl<'a> AccountLocationClearAssociationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationCreateCall<'a>
-    where  {
+pub struct AccountLocationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Location,
     _parent: String,
     _validate_only: Option<bool>,
@@ -15901,9 +16164,15 @@ pub struct AccountLocationCreateCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationCreateCall<'a, S> {}
 
-impl<'a> AccountLocationCreateCall<'a> {
+impl<'a, S> AccountLocationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16063,7 +16332,7 @@ impl<'a> AccountLocationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Location) -> AccountLocationCreateCall<'a> {
+    pub fn request(mut self, new_value: Location) -> AccountLocationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16073,14 +16342,14 @@ impl<'a> AccountLocationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If true, the request is validated without actually creating the location.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> AccountLocationCreateCall<'a> {
+    pub fn validate_only(mut self, new_value: bool) -> AccountLocationCreateCall<'a, S> {
         self._validate_only = Some(new_value);
         self
     }
@@ -16088,7 +16357,7 @@ impl<'a> AccountLocationCreateCall<'a> {
     /// We recommend using UUIDs. Max length is 50 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> AccountLocationCreateCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> AccountLocationCreateCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
@@ -16098,7 +16367,7 @@ impl<'a> AccountLocationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16123,7 +16392,7 @@ impl<'a> AccountLocationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16161,7 +16430,7 @@ impl<'a> AccountLocationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16169,18 +16438,24 @@ impl<'a> AccountLocationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationDeleteCall<'a>
-    where  {
+pub struct AccountLocationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationDeleteCall<'a, S> {}
 
-impl<'a> AccountLocationDeleteCall<'a> {
+impl<'a, S> AccountLocationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16321,7 +16596,7 @@ impl<'a> AccountLocationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16331,7 +16606,7 @@ impl<'a> AccountLocationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16356,7 +16631,7 @@ impl<'a> AccountLocationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16389,7 +16664,7 @@ impl<'a> AccountLocationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16402,19 +16677,25 @@ impl<'a> AccountLocationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationFetchVerificationOptionCall<'a>
-    where  {
+pub struct AccountLocationFetchVerificationOptionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: FetchVerificationOptionsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationFetchVerificationOptionCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationFetchVerificationOptionCall<'a, S> {}
 
-impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
+impl<'a, S> AccountLocationFetchVerificationOptionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16568,7 +16849,7 @@ impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FetchVerificationOptionsRequest) -> AccountLocationFetchVerificationOptionCall<'a> {
+    pub fn request(mut self, new_value: FetchVerificationOptionsRequest) -> AccountLocationFetchVerificationOptionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16578,7 +16859,7 @@ impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationFetchVerificationOptionCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationFetchVerificationOptionCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16588,7 +16869,7 @@ impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationFetchVerificationOptionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationFetchVerificationOptionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16613,7 +16894,7 @@ impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationFetchVerificationOptionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationFetchVerificationOptionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16646,7 +16927,7 @@ impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16659,19 +16940,25 @@ impl<'a> AccountLocationFetchVerificationOptionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationFindMatcheCall<'a>
-    where  {
+pub struct AccountLocationFindMatcheCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: FindMatchingLocationsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationFindMatcheCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationFindMatcheCall<'a, S> {}
 
-impl<'a> AccountLocationFindMatcheCall<'a> {
+impl<'a, S> AccountLocationFindMatcheCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16825,7 +17112,7 @@ impl<'a> AccountLocationFindMatcheCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FindMatchingLocationsRequest) -> AccountLocationFindMatcheCall<'a> {
+    pub fn request(mut self, new_value: FindMatchingLocationsRequest) -> AccountLocationFindMatcheCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16835,7 +17122,7 @@ impl<'a> AccountLocationFindMatcheCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationFindMatcheCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationFindMatcheCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -16845,7 +17132,7 @@ impl<'a> AccountLocationFindMatcheCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationFindMatcheCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationFindMatcheCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16870,7 +17157,7 @@ impl<'a> AccountLocationFindMatcheCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationFindMatcheCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationFindMatcheCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16902,7 +17189,7 @@ impl<'a> AccountLocationFindMatcheCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16910,18 +17197,24 @@ impl<'a> AccountLocationFindMatcheCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationGetCall<'a>
-    where  {
+pub struct AccountLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationGetCall<'a, S> {}
 
-impl<'a> AccountLocationGetCall<'a> {
+impl<'a, S> AccountLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17062,7 +17355,7 @@ impl<'a> AccountLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17072,7 +17365,7 @@ impl<'a> AccountLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17097,7 +17390,7 @@ impl<'a> AccountLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17129,7 +17422,7 @@ impl<'a> AccountLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17137,18 +17430,24 @@ impl<'a> AccountLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationGetGoogleUpdatedCall<'a>
-    where  {
+pub struct AccountLocationGetGoogleUpdatedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationGetGoogleUpdatedCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationGetGoogleUpdatedCall<'a, S> {}
 
-impl<'a> AccountLocationGetGoogleUpdatedCall<'a> {
+impl<'a, S> AccountLocationGetGoogleUpdatedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17289,7 +17588,7 @@ impl<'a> AccountLocationGetGoogleUpdatedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationGetGoogleUpdatedCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationGetGoogleUpdatedCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -17299,7 +17598,7 @@ impl<'a> AccountLocationGetGoogleUpdatedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationGetGoogleUpdatedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationGetGoogleUpdatedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17324,7 +17623,7 @@ impl<'a> AccountLocationGetGoogleUpdatedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationGetGoogleUpdatedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationGetGoogleUpdatedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17355,7 +17654,7 @@ impl<'a> AccountLocationGetGoogleUpdatedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17368,10 +17667,10 @@ impl<'a> AccountLocationGetGoogleUpdatedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationListCall<'a>
-    where  {
+pub struct AccountLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -17382,9 +17681,15 @@ pub struct AccountLocationListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationListCall<'a, S> {}
 
-impl<'a> AccountLocationListCall<'a> {
+impl<'a, S> AccountLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17542,7 +17847,7 @@ impl<'a> AccountLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountLocationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountLocationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -17551,7 +17856,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// locations than could fit in the requested page size.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -17559,7 +17864,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// minimum is 1, and maximum page size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -17571,7 +17876,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// "location_name, store_code desc" or "location_name" or "store_code desc"
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AccountLocationListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> AccountLocationListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -17580,7 +17885,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// location. If neither is available, they will be provided in English.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> AccountLocationListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> AccountLocationListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -17594,7 +17899,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// Guide](https://developers.google.com/my-business/content/location-data#filter_results_when_you_list_locations).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -17604,7 +17909,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17629,7 +17934,7 @@ impl<'a> AccountLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17665,7 +17970,7 @@ impl<'a> AccountLocationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17681,10 +17986,10 @@ impl<'a> AccountLocationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationPatchCall<'a>
-    where  {
+pub struct AccountLocationPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Location,
     _name: String,
     _validate_only: Option<bool>,
@@ -17694,9 +17999,15 @@ pub struct AccountLocationPatchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationPatchCall<'a, S> {}
 
-impl<'a> AccountLocationPatchCall<'a> {
+impl<'a, S> AccountLocationPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17859,7 +18170,7 @@ impl<'a> AccountLocationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Location) -> AccountLocationPatchCall<'a> {
+    pub fn request(mut self, new_value: Location) -> AccountLocationPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17869,14 +18180,14 @@ impl<'a> AccountLocationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If true, the request is validated without actually updating the location.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> AccountLocationPatchCall<'a> {
+    pub fn validate_only(mut self, new_value: bool) -> AccountLocationPatchCall<'a, S> {
         self._validate_only = Some(new_value);
         self
     }
@@ -17885,7 +18196,7 @@ impl<'a> AccountLocationPatchCall<'a> {
     /// in, which may include unsetting empty fields in the request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountLocationPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountLocationPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -17897,7 +18208,7 @@ impl<'a> AccountLocationPatchCall<'a> {
     /// one of the fields to update.
     ///
     /// Sets the *attribute mask* query property to the given value.
-    pub fn attribute_mask(mut self, new_value: &str) -> AccountLocationPatchCall<'a> {
+    pub fn attribute_mask(mut self, new_value: &str) -> AccountLocationPatchCall<'a, S> {
         self._attribute_mask = Some(new_value.to_string());
         self
     }
@@ -17907,7 +18218,7 @@ impl<'a> AccountLocationPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17932,7 +18243,7 @@ impl<'a> AccountLocationPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17967,7 +18278,7 @@ impl<'a> AccountLocationPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17980,19 +18291,25 @@ impl<'a> AccountLocationPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationReportInsightCall<'a>
-    where  {
+pub struct AccountLocationReportInsightCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: ReportLocationInsightsRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationReportInsightCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationReportInsightCall<'a, S> {}
 
-impl<'a> AccountLocationReportInsightCall<'a> {
+impl<'a, S> AccountLocationReportInsightCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18146,7 +18463,7 @@ impl<'a> AccountLocationReportInsightCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReportLocationInsightsRequest) -> AccountLocationReportInsightCall<'a> {
+    pub fn request(mut self, new_value: ReportLocationInsightsRequest) -> AccountLocationReportInsightCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18156,7 +18473,7 @@ impl<'a> AccountLocationReportInsightCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationReportInsightCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationReportInsightCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18166,7 +18483,7 @@ impl<'a> AccountLocationReportInsightCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReportInsightCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationReportInsightCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18191,7 +18508,7 @@ impl<'a> AccountLocationReportInsightCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReportInsightCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationReportInsightCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18227,7 +18544,7 @@ impl<'a> AccountLocationReportInsightCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18240,19 +18557,25 @@ impl<'a> AccountLocationReportInsightCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationTransferCall<'a>
-    where  {
+pub struct AccountLocationTransferCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: TransferLocationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationTransferCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationTransferCall<'a, S> {}
 
-impl<'a> AccountLocationTransferCall<'a> {
+impl<'a, S> AccountLocationTransferCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18406,7 +18729,7 @@ impl<'a> AccountLocationTransferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TransferLocationRequest) -> AccountLocationTransferCall<'a> {
+    pub fn request(mut self, new_value: TransferLocationRequest) -> AccountLocationTransferCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18416,7 +18739,7 @@ impl<'a> AccountLocationTransferCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationTransferCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationTransferCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18426,7 +18749,7 @@ impl<'a> AccountLocationTransferCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationTransferCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationTransferCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18451,7 +18774,7 @@ impl<'a> AccountLocationTransferCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationTransferCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationTransferCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18483,7 +18806,7 @@ impl<'a> AccountLocationTransferCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18496,19 +18819,25 @@ impl<'a> AccountLocationTransferCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLocationVerifyCall<'a>
-    where  {
+pub struct AccountLocationVerifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: VerifyLocationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountLocationVerifyCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLocationVerifyCall<'a, S> {}
 
-impl<'a> AccountLocationVerifyCall<'a> {
+impl<'a, S> AccountLocationVerifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18662,7 +18991,7 @@ impl<'a> AccountLocationVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: VerifyLocationRequest) -> AccountLocationVerifyCall<'a> {
+    pub fn request(mut self, new_value: VerifyLocationRequest) -> AccountLocationVerifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18672,7 +19001,7 @@ impl<'a> AccountLocationVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountLocationVerifyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountLocationVerifyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18682,7 +19011,7 @@ impl<'a> AccountLocationVerifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationVerifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLocationVerifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18707,7 +19036,7 @@ impl<'a> AccountLocationVerifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationVerifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLocationVerifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18747,7 +19076,7 @@ impl<'a> AccountLocationVerifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18761,19 +19090,25 @@ impl<'a> AccountLocationVerifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreateCall<'a>
-    where  {
+pub struct AccountCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Account,
     _primary_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCreateCall<'a, S> {}
 
-impl<'a> AccountCreateCall<'a> {
+impl<'a, S> AccountCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18904,7 +19239,7 @@ impl<'a> AccountCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountCreateCall<'a> {
+    pub fn request(mut self, new_value: Account) -> AccountCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18912,7 +19247,7 @@ impl<'a> AccountCreateCall<'a> {
     /// account being created. It should be of the form `accounts/{account_id}/`.
     ///
     /// Sets the *primary owner* query property to the given value.
-    pub fn primary_owner(mut self, new_value: &str) -> AccountCreateCall<'a> {
+    pub fn primary_owner(mut self, new_value: &str) -> AccountCreateCall<'a, S> {
         self._primary_owner = Some(new_value.to_string());
         self
     }
@@ -18922,7 +19257,7 @@ impl<'a> AccountCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18947,7 +19282,7 @@ impl<'a> AccountCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18978,7 +19313,7 @@ impl<'a> AccountCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18986,18 +19321,24 @@ impl<'a> AccountCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountDeleteNotificationCall<'a>
-    where  {
+pub struct AccountDeleteNotificationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountDeleteNotificationCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountDeleteNotificationCall<'a, S> {}
 
-impl<'a> AccountDeleteNotificationCall<'a> {
+impl<'a, S> AccountDeleteNotificationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19138,7 +19479,7 @@ impl<'a> AccountDeleteNotificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountDeleteNotificationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountDeleteNotificationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19148,7 +19489,7 @@ impl<'a> AccountDeleteNotificationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteNotificationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteNotificationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19173,7 +19514,7 @@ impl<'a> AccountDeleteNotificationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteNotificationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteNotificationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19207,7 +19548,7 @@ impl<'a> AccountDeleteNotificationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19220,19 +19561,25 @@ impl<'a> AccountDeleteNotificationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGenerateAccountNumberCall<'a>
-    where  {
+pub struct AccountGenerateAccountNumberCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: GenerateAccountNumberRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountGenerateAccountNumberCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGenerateAccountNumberCall<'a, S> {}
 
-impl<'a> AccountGenerateAccountNumberCall<'a> {
+impl<'a, S> AccountGenerateAccountNumberCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19386,7 +19733,7 @@ impl<'a> AccountGenerateAccountNumberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateAccountNumberRequest) -> AccountGenerateAccountNumberCall<'a> {
+    pub fn request(mut self, new_value: GenerateAccountNumberRequest) -> AccountGenerateAccountNumberCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19396,7 +19743,7 @@ impl<'a> AccountGenerateAccountNumberCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGenerateAccountNumberCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountGenerateAccountNumberCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19406,7 +19753,7 @@ impl<'a> AccountGenerateAccountNumberCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGenerateAccountNumberCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGenerateAccountNumberCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19431,7 +19778,7 @@ impl<'a> AccountGenerateAccountNumberCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGenerateAccountNumberCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGenerateAccountNumberCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19463,7 +19810,7 @@ impl<'a> AccountGenerateAccountNumberCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19471,18 +19818,24 @@ impl<'a> AccountGenerateAccountNumberCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a>
-    where  {
+pub struct AccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetCall<'a, S> {}
 
-impl<'a> AccountGetCall<'a> {
+impl<'a, S> AccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19623,7 +19976,7 @@ impl<'a> AccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19633,7 +19986,7 @@ impl<'a> AccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19658,7 +20011,7 @@ impl<'a> AccountGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19689,7 +20042,7 @@ impl<'a> AccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19697,18 +20050,24 @@ impl<'a> AccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetNotificationCall<'a>
-    where  {
+pub struct AccountGetNotificationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountGetNotificationCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetNotificationCall<'a, S> {}
 
-impl<'a> AccountGetNotificationCall<'a> {
+impl<'a, S> AccountGetNotificationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19849,7 +20208,7 @@ impl<'a> AccountGetNotificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetNotificationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountGetNotificationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19859,7 +20218,7 @@ impl<'a> AccountGetNotificationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetNotificationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetNotificationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19884,7 +20243,7 @@ impl<'a> AccountGetNotificationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetNotificationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetNotificationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19917,7 +20276,7 @@ impl<'a> AccountGetNotificationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19929,10 +20288,10 @@ impl<'a> AccountGetNotificationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a>
-    where  {
+pub struct AccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
@@ -19941,9 +20300,15 @@ pub struct AccountListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListCall<'a, S> {}
 
-impl<'a> AccountListCall<'a> {
+impl<'a, S> AccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20069,7 +20434,7 @@ impl<'a> AccountListCall<'a> {
     /// into the requested page size.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -20077,7 +20442,7 @@ impl<'a> AccountListCall<'a> {
     /// minimum is 2, and maximum page size is 20.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -20087,7 +20452,7 @@ impl<'a> AccountListCall<'a> {
     /// user.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -20100,7 +20465,7 @@ impl<'a> AccountListCall<'a> {
     /// user groups.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -20110,7 +20475,7 @@ impl<'a> AccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20135,7 +20500,7 @@ impl<'a> AccountListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20176,7 +20541,7 @@ impl<'a> AccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20186,10 +20551,10 @@ impl<'a> AccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListRecommendGoogleLocationCall<'a>
-    where  {
+pub struct AccountListRecommendGoogleLocationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20197,9 +20562,15 @@ pub struct AccountListRecommendGoogleLocationCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountListRecommendGoogleLocationCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListRecommendGoogleLocationCall<'a, S> {}
 
-impl<'a> AccountListRecommendGoogleLocationCall<'a> {
+impl<'a, S> AccountListRecommendGoogleLocationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20346,14 +20717,14 @@ impl<'a> AccountListRecommendGoogleLocationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If specified, the next page of locations is retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListRecommendGoogleLocationCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -20361,7 +20732,7 @@ impl<'a> AccountListRecommendGoogleLocationCall<'a> {
     /// maximum page size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListRecommendGoogleLocationCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListRecommendGoogleLocationCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -20371,7 +20742,7 @@ impl<'a> AccountListRecommendGoogleLocationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListRecommendGoogleLocationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListRecommendGoogleLocationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20396,7 +20767,7 @@ impl<'a> AccountListRecommendGoogleLocationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListRecommendGoogleLocationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListRecommendGoogleLocationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20433,7 +20804,7 @@ impl<'a> AccountListRecommendGoogleLocationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20447,10 +20818,10 @@ impl<'a> AccountListRecommendGoogleLocationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUpdateCall<'a>
-    where  {
+pub struct AccountUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Account,
     _name: String,
     _validate_only: Option<bool>,
@@ -20458,9 +20829,15 @@ pub struct AccountUpdateCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUpdateCall<'a, S> {}
 
-impl<'a> AccountUpdateCall<'a> {
+impl<'a, S> AccountUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20617,7 +20994,7 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a> {
+    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20627,14 +21004,14 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If true, the request is validated without actually updating the account.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> AccountUpdateCall<'a> {
+    pub fn validate_only(mut self, new_value: bool) -> AccountUpdateCall<'a, S> {
         self._validate_only = Some(new_value);
         self
     }
@@ -20644,7 +21021,7 @@ impl<'a> AccountUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20669,7 +21046,7 @@ impl<'a> AccountUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20709,7 +21086,7 @@ impl<'a> AccountUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20722,19 +21099,25 @@ impl<'a> AccountUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUpdateNotificationCall<'a>
-    where  {
+pub struct AccountUpdateNotificationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: Notifications,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AccountUpdateNotificationCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUpdateNotificationCall<'a, S> {}
 
-impl<'a> AccountUpdateNotificationCall<'a> {
+impl<'a, S> AccountUpdateNotificationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20888,7 +21271,7 @@ impl<'a> AccountUpdateNotificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Notifications) -> AccountUpdateNotificationCall<'a> {
+    pub fn request(mut self, new_value: Notifications) -> AccountUpdateNotificationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20898,7 +21281,7 @@ impl<'a> AccountUpdateNotificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUpdateNotificationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountUpdateNotificationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -20908,7 +21291,7 @@ impl<'a> AccountUpdateNotificationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateNotificationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateNotificationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20933,7 +21316,7 @@ impl<'a> AccountUpdateNotificationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateNotificationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateNotificationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20965,7 +21348,7 @@ impl<'a> AccountUpdateNotificationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20979,10 +21362,10 @@ impl<'a> AccountUpdateNotificationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AttributeListCall<'a>
-    where  {
+pub struct AttributeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
@@ -20993,9 +21376,15 @@ pub struct AttributeListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AttributeListCall<'a> {}
+impl<'a, S> client::CallBuilder for AttributeListCall<'a, S> {}
 
-impl<'a> AttributeListCall<'a> {
+impl<'a, S> AttributeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21127,21 +21516,21 @@ impl<'a> AttributeListCall<'a> {
     /// results than can fit into the requested page size.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AttributeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AttributeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// How many attributes to include per page. Default is 200, minimum is 1.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AttributeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AttributeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Resource name of the location to look up available attributes.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> AttributeListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AttributeListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -21149,21 +21538,21 @@ impl<'a> AttributeListCall<'a> {
     /// language is not available, they will be provided in English.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> AttributeListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> AttributeListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// The ISO 3166-1 alpha-2 country code to find available attributes.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> AttributeListCall<'a> {
+    pub fn country(mut self, new_value: &str) -> AttributeListCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
     /// The primary category stable ID to find available attributes.
     ///
     /// Sets the *category id* query property to the given value.
-    pub fn category_id(mut self, new_value: &str) -> AttributeListCall<'a> {
+    pub fn category_id(mut self, new_value: &str) -> AttributeListCall<'a, S> {
         self._category_id = Some(new_value.to_string());
         self
     }
@@ -21173,7 +21562,7 @@ impl<'a> AttributeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AttributeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AttributeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21198,7 +21587,7 @@ impl<'a> AttributeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AttributeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AttributeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21234,7 +21623,7 @@ impl<'a> AttributeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21247,10 +21636,10 @@ impl<'a> AttributeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CategoryListCall<'a>
-    where  {
+pub struct CategoryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _search_term: Option<String>,
     _region_code: Option<String>,
     _page_token: Option<String>,
@@ -21260,9 +21649,15 @@ pub struct CategoryListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for CategoryListCall<'a> {}
+impl<'a, S> client::CallBuilder for CategoryListCall<'a, S> {}
 
-impl<'a> CategoryListCall<'a> {
+impl<'a, S> CategoryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21389,21 +21784,21 @@ impl<'a> CategoryListCall<'a> {
     /// Optional filter string from user.
     ///
     /// Sets the *search term* query property to the given value.
-    pub fn search_term(mut self, new_value: &str) -> CategoryListCall<'a> {
+    pub fn search_term(mut self, new_value: &str) -> CategoryListCall<'a, S> {
         self._search_term = Some(new_value.to_string());
         self
     }
     /// The ISO 3166-1 alpha-2 country code.
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> CategoryListCall<'a> {
+    pub fn region_code(mut self, new_value: &str) -> CategoryListCall<'a, S> {
         self._region_code = Some(new_value.to_string());
         self
     }
     /// If specified, the next page of categories will be fetched.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CategoryListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CategoryListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -21411,7 +21806,7 @@ impl<'a> CategoryListCall<'a> {
     /// minimum is 1, and maximum page size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CategoryListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> CategoryListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -21419,7 +21814,7 @@ impl<'a> CategoryListCall<'a> {
     /// default to English.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> CategoryListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> CategoryListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -21429,7 +21824,7 @@ impl<'a> CategoryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CategoryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CategoryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21454,7 +21849,7 @@ impl<'a> CategoryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CategoryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CategoryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21486,7 +21881,7 @@ impl<'a> CategoryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21494,18 +21889,24 @@ impl<'a> CategoryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChainGetCall<'a>
-    where  {
+pub struct ChainGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ChainGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ChainGetCall<'a, S> {}
 
-impl<'a> ChainGetCall<'a> {
+impl<'a, S> ChainGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21646,7 +22047,7 @@ impl<'a> ChainGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ChainGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ChainGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -21656,7 +22057,7 @@ impl<'a> ChainGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChainGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChainGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21681,7 +22082,7 @@ impl<'a> ChainGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChainGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChainGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21712,7 +22113,7 @@ impl<'a> ChainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21722,19 +22123,25 @@ impl<'a> ChainGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChainSearchCall<'a>
-    where  {
+pub struct ChainSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _result_count: Option<i32>,
     _chain_display_name: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ChainSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for ChainSearchCall<'a, S> {}
 
-impl<'a> ChainSearchCall<'a> {
+impl<'a, S> ChainSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21853,7 +22260,7 @@ impl<'a> ChainSearchCall<'a> {
     /// The default is 10. The maximum possible value is 500.
     ///
     /// Sets the *result count* query property to the given value.
-    pub fn result_count(mut self, new_value: i32) -> ChainSearchCall<'a> {
+    pub fn result_count(mut self, new_value: i32) -> ChainSearchCall<'a, S> {
         self._result_count = Some(new_value);
         self
     }
@@ -21862,7 +22269,7 @@ impl<'a> ChainSearchCall<'a> {
     /// Examples: "walmart", "wal-mart", "walmmmart", "沃尔玛"
     ///
     /// Sets the *chain display name* query property to the given value.
-    pub fn chain_display_name(mut self, new_value: &str) -> ChainSearchCall<'a> {
+    pub fn chain_display_name(mut self, new_value: &str) -> ChainSearchCall<'a, S> {
         self._chain_display_name = Some(new_value.to_string());
         self
     }
@@ -21872,7 +22279,7 @@ impl<'a> ChainSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChainSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChainSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21897,7 +22304,7 @@ impl<'a> ChainSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChainSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChainSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21929,7 +22336,7 @@ impl<'a> ChainSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21942,19 +22349,25 @@ impl<'a> ChainSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GoogleLocationReportCall<'a>
-    where  {
+pub struct GoogleLocationReportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: ReportGoogleLocationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for GoogleLocationReportCall<'a> {}
+impl<'a, S> client::CallBuilder for GoogleLocationReportCall<'a, S> {}
 
-impl<'a> GoogleLocationReportCall<'a> {
+impl<'a, S> GoogleLocationReportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22108,7 +22521,7 @@ impl<'a> GoogleLocationReportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReportGoogleLocationRequest) -> GoogleLocationReportCall<'a> {
+    pub fn request(mut self, new_value: ReportGoogleLocationRequest) -> GoogleLocationReportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22119,7 +22532,7 @@ impl<'a> GoogleLocationReportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GoogleLocationReportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> GoogleLocationReportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22129,7 +22542,7 @@ impl<'a> GoogleLocationReportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleLocationReportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleLocationReportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22154,7 +22567,7 @@ impl<'a> GoogleLocationReportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GoogleLocationReportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GoogleLocationReportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22187,7 +22600,7 @@ impl<'a> GoogleLocationReportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22200,18 +22613,24 @@ impl<'a> GoogleLocationReportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GoogleLocationSearchCall<'a>
-    where  {
+pub struct GoogleLocationSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: SearchGoogleLocationsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for GoogleLocationSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for GoogleLocationSearchCall<'a, S> {}
 
-impl<'a> GoogleLocationSearchCall<'a> {
+impl<'a, S> GoogleLocationSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22339,7 +22758,7 @@ impl<'a> GoogleLocationSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchGoogleLocationsRequest) -> GoogleLocationSearchCall<'a> {
+    pub fn request(mut self, new_value: SearchGoogleLocationsRequest) -> GoogleLocationSearchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22349,7 +22768,7 @@ impl<'a> GoogleLocationSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleLocationSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleLocationSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22374,7 +22793,7 @@ impl<'a> GoogleLocationSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GoogleLocationSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GoogleLocationSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22409,7 +22828,7 @@ impl<'a> GoogleLocationSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusiness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22422,18 +22841,24 @@ impl<'a> GoogleLocationSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VerificationTokenGenerateCall<'a>
-    where  {
+pub struct VerificationTokenGenerateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusiness<>,
+    hub: &'a MyBusiness<S>,
     _request: GenerateVerificationTokenRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for VerificationTokenGenerateCall<'a> {}
+impl<'a, S> client::CallBuilder for VerificationTokenGenerateCall<'a, S> {}
 
-impl<'a> VerificationTokenGenerateCall<'a> {
+impl<'a, S> VerificationTokenGenerateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22561,7 +22986,7 @@ impl<'a> VerificationTokenGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a> {
+    pub fn request(mut self, new_value: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22571,7 +22996,7 @@ impl<'a> VerificationTokenGenerateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VerificationTokenGenerateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VerificationTokenGenerateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22596,7 +23021,7 @@ impl<'a> VerificationTokenGenerateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VerificationTokenGenerateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VerificationTokenGenerateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

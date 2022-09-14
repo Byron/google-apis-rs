@@ -1,4 +1,4 @@
-site_name: Cloud KMS v3.1.0+20220225
+site_name: Cloud KMS v4.0.1+20220225
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 

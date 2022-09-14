@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,34 +112,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct SiteVerification<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct SiteVerification<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for SiteVerification<> {}
+impl<'a, S> client::Hub for SiteVerification<S> {}
 
-impl<'a, > SiteVerification<> {
+impl<'a, S> SiteVerification<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SiteVerification<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> SiteVerification<S> {
         SiteVerification {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/siteVerification/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn web_resource(&'a self) -> WebResourceMethods<'a> {
+    pub fn web_resource(&'a self) -> WebResourceMethods<'a, S> {
         WebResourceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -307,22 +312,22 @@ impl client::Part for SiteVerificationWebResourceResourceSite {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_token(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.web_resource();
 /// # }
 /// ```
-pub struct WebResourceMethods<'a>
-    where  {
+pub struct WebResourceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
 }
 
-impl<'a> client::MethodsBuilder for WebResourceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for WebResourceMethods<'a, S> {}
 
-impl<'a> WebResourceMethods<'a> {
+impl<'a, S> WebResourceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -331,7 +336,7 @@ impl<'a> WebResourceMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The id of a verified site or domain.
-    pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a> {
+    pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a, S> {
         WebResourceDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -348,7 +353,7 @@ impl<'a> WebResourceMethods<'a> {
     /// # Arguments
     ///
     /// * `id` - The id of a verified site or domain.
-    pub fn get(&self, id: &str) -> WebResourceGetCall<'a> {
+    pub fn get(&self, id: &str) -> WebResourceGetCall<'a, S> {
         WebResourceGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -365,7 +370,7 @@ impl<'a> WebResourceMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_token(&self, request: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a> {
+    pub fn get_token(&self, request: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, S> {
         WebResourceGetTokenCall {
             hub: self.hub,
             _request: request,
@@ -383,7 +388,7 @@ impl<'a> WebResourceMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `verificationMethod` - The method to use for verifying a site or domain.
-    pub fn insert(&self, request: SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a> {
+    pub fn insert(&self, request: SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a, S> {
         WebResourceInsertCall {
             hub: self.hub,
             _request: request,
@@ -397,7 +402,7 @@ impl<'a> WebResourceMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get the list of your verified websites and domains.
-    pub fn list(&self) -> WebResourceListCall<'a> {
+    pub fn list(&self) -> WebResourceListCall<'a, S> {
         WebResourceListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -414,7 +419,7 @@ impl<'a> WebResourceMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The id of a verified site or domain.
-    pub fn patch(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a> {
+    pub fn patch(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a, S> {
         WebResourcePatchCall {
             hub: self.hub,
             _request: request,
@@ -433,7 +438,7 @@ impl<'a> WebResourceMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The id of a verified site or domain.
-    pub fn update(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a> {
+    pub fn update(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a, S> {
         WebResourceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -475,7 +480,7 @@ impl<'a> WebResourceMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -483,19 +488,25 @@ impl<'a> WebResourceMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceDeleteCall<'a>
-    where  {
+pub struct WebResourceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourceDeleteCall<'a, S> {}
 
-impl<'a> WebResourceDeleteCall<'a> {
+impl<'a, S> WebResourceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -627,7 +638,7 @@ impl<'a> WebResourceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a> {
+    pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -637,7 +648,7 @@ impl<'a> WebResourceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -658,7 +669,7 @@ impl<'a> WebResourceDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -678,9 +689,9 @@ impl<'a> WebResourceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -712,7 +723,7 @@ impl<'a> WebResourceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -720,19 +731,25 @@ impl<'a> WebResourceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceGetCall<'a>
-    where  {
+pub struct WebResourceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourceGetCall<'a, S> {}
 
-impl<'a> WebResourceGetCall<'a> {
+impl<'a, S> WebResourceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -875,7 +892,7 @@ impl<'a> WebResourceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a> {
+    pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -885,7 +902,7 @@ impl<'a> WebResourceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -906,7 +923,7 @@ impl<'a> WebResourceGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -926,9 +943,9 @@ impl<'a> WebResourceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -961,7 +978,7 @@ impl<'a> WebResourceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -974,19 +991,25 @@ impl<'a> WebResourceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceGetTokenCall<'a>
-    where  {
+pub struct WebResourceGetTokenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _request: SiteVerificationWebResourceGettokenRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourceGetTokenCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourceGetTokenCall<'a, S> {}
 
-impl<'a> WebResourceGetTokenCall<'a> {
+impl<'a, S> WebResourceGetTokenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1120,7 +1143,7 @@ impl<'a> WebResourceGetTokenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1130,7 +1153,7 @@ impl<'a> WebResourceGetTokenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetTokenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetTokenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1151,7 +1174,7 @@ impl<'a> WebResourceGetTokenCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetTokenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetTokenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1171,9 +1194,9 @@ impl<'a> WebResourceGetTokenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceGetTokenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourceGetTokenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1206,7 +1229,7 @@ impl<'a> WebResourceGetTokenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1219,10 +1242,10 @@ impl<'a> WebResourceGetTokenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceInsertCall<'a>
-    where  {
+pub struct WebResourceInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _request: SiteVerificationWebResourceResource,
     _verification_method: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1230,9 +1253,15 @@ pub struct WebResourceInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourceInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourceInsertCall<'a, S> {}
 
-impl<'a> WebResourceInsertCall<'a> {
+impl<'a, S> WebResourceInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1367,7 +1396,7 @@ impl<'a> WebResourceInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceInsertCall<'a> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1377,7 +1406,7 @@ impl<'a> WebResourceInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a> {
+    pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a, S> {
         self._verification_method = new_value.to_string();
         self
     }
@@ -1387,7 +1416,7 @@ impl<'a> WebResourceInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1408,7 +1437,7 @@ impl<'a> WebResourceInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1428,9 +1457,9 @@ impl<'a> WebResourceInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourceInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1462,7 +1491,7 @@ impl<'a> WebResourceInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1470,18 +1499,24 @@ impl<'a> WebResourceInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceListCall<'a>
-    where  {
+pub struct WebResourceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourceListCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourceListCall<'a, S> {}
 
-impl<'a> WebResourceListCall<'a> {
+impl<'a, S> WebResourceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1602,7 +1637,7 @@ impl<'a> WebResourceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1623,7 +1658,7 @@ impl<'a> WebResourceListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1643,9 +1678,9 @@ impl<'a> WebResourceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1678,7 +1713,7 @@ impl<'a> WebResourceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1691,10 +1726,10 @@ impl<'a> WebResourceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourcePatchCall<'a>
-    where  {
+pub struct WebResourcePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _request: SiteVerificationWebResourceResource,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1702,9 +1737,15 @@ pub struct WebResourcePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourcePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourcePatchCall<'a, S> {}
 
-impl<'a> WebResourcePatchCall<'a> {
+impl<'a, S> WebResourcePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1860,7 +1901,7 @@ impl<'a> WebResourcePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourcePatchCall<'a> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourcePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1870,7 +1911,7 @@ impl<'a> WebResourcePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -1880,7 +1921,7 @@ impl<'a> WebResourcePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourcePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourcePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1901,7 +1942,7 @@ impl<'a> WebResourcePatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourcePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourcePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1921,9 +1962,9 @@ impl<'a> WebResourcePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourcePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourcePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1956,7 +1997,7 @@ impl<'a> WebResourcePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SiteVerification::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1969,10 +2010,10 @@ impl<'a> WebResourcePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceUpdateCall<'a>
-    where  {
+pub struct WebResourceUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SiteVerification<>,
+    hub: &'a SiteVerification<S>,
     _request: SiteVerificationWebResourceResource,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1980,9 +2021,15 @@ pub struct WebResourceUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for WebResourceUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for WebResourceUpdateCall<'a, S> {}
 
-impl<'a> WebResourceUpdateCall<'a> {
+impl<'a, S> WebResourceUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2138,7 +2185,7 @@ impl<'a> WebResourceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceUpdateCall<'a> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2148,7 +2195,7 @@ impl<'a> WebResourceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a> {
+    pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
@@ -2158,7 +2205,7 @@ impl<'a> WebResourceUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2179,7 +2226,7 @@ impl<'a> WebResourceUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2199,9 +2246,9 @@ impl<'a> WebResourceUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> WebResourceUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

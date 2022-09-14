@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -82,37 +87,37 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct MyBusinessPlaceActions<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct MyBusinessPlaceActions<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for MyBusinessPlaceActions<> {}
+impl<'a, S> client::Hub for MyBusinessPlaceActions<S> {}
 
-impl<'a, > MyBusinessPlaceActions<> {
+impl<'a, S> MyBusinessPlaceActions<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusinessPlaceActions<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusinessPlaceActions<S> {
         MyBusinessPlaceActions {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://mybusinessplaceactions.googleapis.com/".to_string(),
             _root_url: "https://mybusinessplaceactions.googleapis.com/".to_string(),
         }
     }
 
-    pub fn locations(&'a self) -> LocationMethods<'a> {
+    pub fn locations(&'a self) -> LocationMethods<'a, S> {
         LocationMethods { hub: &self }
     }
-    pub fn place_action_type_metadata(&'a self) -> PlaceActionTypeMetadataMethods<'a> {
+    pub fn place_action_type_metadata(&'a self) -> PlaceActionTypeMetadataMethods<'a, S> {
         PlaceActionTypeMetadataMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -283,22 +288,22 @@ impl client::Part for PlaceActionTypeMetadata {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `place_action_links_create(...)`, `place_action_links_delete(...)`, `place_action_links_get(...)`, `place_action_links_list(...)` and `place_action_links_patch(...)`
 /// // to build up your call.
 /// let rb = hub.locations();
 /// # }
 /// ```
-pub struct LocationMethods<'a>
-    where  {
+pub struct LocationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
 }
 
-impl<'a> client::MethodsBuilder for LocationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LocationMethods<'a, S> {}
 
-impl<'a> LocationMethods<'a> {
+impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -308,7 +313,7 @@ impl<'a> LocationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the location where to create this place action link. `locations/{location_id}`.
-    pub fn place_action_links_create(&self, request: PlaceActionLink, parent: &str) -> LocationPlaceActionLinkCreateCall<'a> {
+    pub fn place_action_links_create(&self, request: PlaceActionLink, parent: &str) -> LocationPlaceActionLinkCreateCall<'a, S> {
         LocationPlaceActionLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -325,7 +330,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the place action link to remove from the location.
-    pub fn place_action_links_delete(&self, name: &str) -> LocationPlaceActionLinkDeleteCall<'a> {
+    pub fn place_action_links_delete(&self, name: &str) -> LocationPlaceActionLinkDeleteCall<'a, S> {
         LocationPlaceActionLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -341,7 +346,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the place action link to fetch.
-    pub fn place_action_links_get(&self, name: &str) -> LocationPlaceActionLinkGetCall<'a> {
+    pub fn place_action_links_get(&self, name: &str) -> LocationPlaceActionLinkGetCall<'a, S> {
         LocationPlaceActionLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -357,7 +362,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the location whose place action links will be listed. `locations/{location_id}`.
-    pub fn place_action_links_list(&self, parent: &str) -> LocationPlaceActionLinkListCall<'a> {
+    pub fn place_action_links_list(&self, parent: &str) -> LocationPlaceActionLinkListCall<'a, S> {
         LocationPlaceActionLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -377,7 +382,7 @@ impl<'a> LocationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Optional. The resource name, in the format `locations/{location_id}/placeActionLinks/{place_action_link_id}`. The name field will only be considered in UpdatePlaceActionLink and DeletePlaceActionLink requests for updating and deleting links respectively. However, it will be ignored in CreatePlaceActionLink request, where `place_action_link_id` will be assigned by the server on successful creation of a new link and returned as part of the response.
-    pub fn place_action_links_patch(&self, request: PlaceActionLink, name: &str) -> LocationPlaceActionLinkPatchCall<'a> {
+    pub fn place_action_links_patch(&self, request: PlaceActionLink, name: &str) -> LocationPlaceActionLinkPatchCall<'a, S> {
         LocationPlaceActionLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -412,27 +417,27 @@ impl<'a> LocationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.place_action_type_metadata();
 /// # }
 /// ```
-pub struct PlaceActionTypeMetadataMethods<'a>
-    where  {
+pub struct PlaceActionTypeMetadataMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
 }
 
-impl<'a> client::MethodsBuilder for PlaceActionTypeMetadataMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PlaceActionTypeMetadataMethods<'a, S> {}
 
-impl<'a> PlaceActionTypeMetadataMethods<'a> {
+impl<'a, S> PlaceActionTypeMetadataMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the list of available place action types for a location or country.
-    pub fn list(&self) -> PlaceActionTypeMetadataListCall<'a> {
+    pub fn list(&self) -> PlaceActionTypeMetadataListCall<'a, S> {
         PlaceActionTypeMetadataListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -476,7 +481,7 @@ impl<'a> PlaceActionTypeMetadataMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -489,19 +494,25 @@ impl<'a> PlaceActionTypeMetadataMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationPlaceActionLinkCreateCall<'a>
-    where  {
+pub struct LocationPlaceActionLinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
     _request: PlaceActionLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationPlaceActionLinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationPlaceActionLinkCreateCall<'a, S> {}
 
-impl<'a> LocationPlaceActionLinkCreateCall<'a> {
+impl<'a, S> LocationPlaceActionLinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -655,7 +666,7 @@ impl<'a> LocationPlaceActionLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlaceActionLink) -> LocationPlaceActionLinkCreateCall<'a> {
+    pub fn request(mut self, new_value: PlaceActionLink) -> LocationPlaceActionLinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -665,7 +676,7 @@ impl<'a> LocationPlaceActionLinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> LocationPlaceActionLinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> LocationPlaceActionLinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -675,7 +686,7 @@ impl<'a> LocationPlaceActionLinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -700,7 +711,7 @@ impl<'a> LocationPlaceActionLinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -731,7 +742,7 @@ impl<'a> LocationPlaceActionLinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -739,18 +750,24 @@ impl<'a> LocationPlaceActionLinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationPlaceActionLinkDeleteCall<'a>
-    where  {
+pub struct LocationPlaceActionLinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationPlaceActionLinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationPlaceActionLinkDeleteCall<'a, S> {}
 
-impl<'a> LocationPlaceActionLinkDeleteCall<'a> {
+impl<'a, S> LocationPlaceActionLinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -891,7 +908,7 @@ impl<'a> LocationPlaceActionLinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationPlaceActionLinkDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationPlaceActionLinkDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -901,7 +918,7 @@ impl<'a> LocationPlaceActionLinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -926,7 +943,7 @@ impl<'a> LocationPlaceActionLinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -957,7 +974,7 @@ impl<'a> LocationPlaceActionLinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -965,18 +982,24 @@ impl<'a> LocationPlaceActionLinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationPlaceActionLinkGetCall<'a>
-    where  {
+pub struct LocationPlaceActionLinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationPlaceActionLinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationPlaceActionLinkGetCall<'a, S> {}
 
-impl<'a> LocationPlaceActionLinkGetCall<'a> {
+impl<'a, S> LocationPlaceActionLinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1117,7 +1140,7 @@ impl<'a> LocationPlaceActionLinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationPlaceActionLinkGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationPlaceActionLinkGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1127,7 +1150,7 @@ impl<'a> LocationPlaceActionLinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1152,7 +1175,7 @@ impl<'a> LocationPlaceActionLinkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1183,7 +1206,7 @@ impl<'a> LocationPlaceActionLinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1194,10 +1217,10 @@ impl<'a> LocationPlaceActionLinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationPlaceActionLinkListCall<'a>
-    where  {
+pub struct LocationPlaceActionLinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1206,9 +1229,15 @@ pub struct LocationPlaceActionLinkListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationPlaceActionLinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationPlaceActionLinkListCall<'a, S> {}
 
-impl<'a> LocationPlaceActionLinkListCall<'a> {
+impl<'a, S> LocationPlaceActionLinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1358,28 +1387,28 @@ impl<'a> LocationPlaceActionLinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> LocationPlaceActionLinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> LocationPlaceActionLinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If specified, returns the next page of place action links.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LocationPlaceActionLinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LocationPlaceActionLinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. How many place action links to return per page. Default of 10. The minimum is 1.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> LocationPlaceActionLinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> LocationPlaceActionLinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. A filter constraining the place action links to return. The response includes entries that match the filter. We support only the following filter: 1. place_action_type=XYZ where XYZ is a valid PlaceActionType.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> LocationPlaceActionLinkListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> LocationPlaceActionLinkListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1389,7 +1418,7 @@ impl<'a> LocationPlaceActionLinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1414,7 +1443,7 @@ impl<'a> LocationPlaceActionLinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1446,7 +1475,7 @@ impl<'a> LocationPlaceActionLinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1460,10 +1489,10 @@ impl<'a> LocationPlaceActionLinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationPlaceActionLinkPatchCall<'a>
-    where  {
+pub struct LocationPlaceActionLinkPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
     _request: PlaceActionLink,
     _name: String,
     _update_mask: Option<String>,
@@ -1471,9 +1500,15 @@ pub struct LocationPlaceActionLinkPatchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationPlaceActionLinkPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationPlaceActionLinkPatchCall<'a, S> {}
 
-impl<'a> LocationPlaceActionLinkPatchCall<'a> {
+impl<'a, S> LocationPlaceActionLinkPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1630,7 +1665,7 @@ impl<'a> LocationPlaceActionLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlaceActionLink) -> LocationPlaceActionLinkPatchCall<'a> {
+    pub fn request(mut self, new_value: PlaceActionLink) -> LocationPlaceActionLinkPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1640,14 +1675,14 @@ impl<'a> LocationPlaceActionLinkPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationPlaceActionLinkPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationPlaceActionLinkPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields to update. The only editable fields are `uri`, `place_action_type` and `is_preferred`. If the updated link already exists at the same location with the same `place_action_type` and `uri`, fails with an `ALREADY_EXISTS` error.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> LocationPlaceActionLinkPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> LocationPlaceActionLinkPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -1657,7 +1692,7 @@ impl<'a> LocationPlaceActionLinkPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationPlaceActionLinkPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1682,7 +1717,7 @@ impl<'a> LocationPlaceActionLinkPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationPlaceActionLinkPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1713,7 +1748,7 @@ impl<'a> LocationPlaceActionLinkPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessPlaceActions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1725,10 +1760,10 @@ impl<'a> LocationPlaceActionLinkPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaceActionTypeMetadataListCall<'a>
-    where  {
+pub struct PlaceActionTypeMetadataListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessPlaceActions<>,
+    hub: &'a MyBusinessPlaceActions<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _language_code: Option<String>,
@@ -1737,9 +1772,15 @@ pub struct PlaceActionTypeMetadataListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlaceActionTypeMetadataListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlaceActionTypeMetadataListCall<'a, S> {}
 
-impl<'a> PlaceActionTypeMetadataListCall<'a> {
+impl<'a, S> PlaceActionTypeMetadataListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1863,28 +1904,28 @@ impl<'a> PlaceActionTypeMetadataListCall<'a> {
     /// Optional. If specified, the next page of place action type metadata is retrieved. The `pageToken` is returned when a call to `placeActionTypeMetadata.list` returns more results than can fit into the requested page size.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlaceActionTypeMetadataListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlaceActionTypeMetadataListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. How many action types to include per page. Default is 10, minimum is 1.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlaceActionTypeMetadataListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlaceActionTypeMetadataListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The IETF BCP-47 code of language to get display names in. If this language is not available, they will be provided in English.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> PlaceActionTypeMetadataListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> PlaceActionTypeMetadataListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Optional. A filter constraining the place action types to return metadata for. The response includes entries that match the filter. We support only the following filters: 1. location=XYZ where XYZ is a string indicating the resource name of a location, in the format `locations/{location_id}`. 2. region_code=XYZ where XYZ is a Unicode CLDR region code to find available action types. If no filter is provided, all place action types are returned.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PlaceActionTypeMetadataListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> PlaceActionTypeMetadataListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1894,7 +1935,7 @@ impl<'a> PlaceActionTypeMetadataListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaceActionTypeMetadataListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaceActionTypeMetadataListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1919,7 +1960,7 @@ impl<'a> PlaceActionTypeMetadataListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaceActionTypeMetadataListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaceActionTypeMetadataListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

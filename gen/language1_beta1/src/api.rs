@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,34 +112,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudNaturalLanguage<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudNaturalLanguage<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudNaturalLanguage<> {}
+impl<'a, S> client::Hub for CloudNaturalLanguage<S> {}
 
-impl<'a, > CloudNaturalLanguage<> {
+impl<'a, S> CloudNaturalLanguage<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudNaturalLanguage<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudNaturalLanguage<S> {
         CloudNaturalLanguage {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://language.googleapis.com/".to_string(),
             _root_url: "https://language.googleapis.com/".to_string(),
         }
     }
 
-    pub fn documents(&'a self) -> DocumentMethods<'a> {
+    pub fn documents(&'a self) -> DocumentMethods<'a, S> {
         DocumentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -573,22 +578,22 @@ impl client::Part for Token {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `analyze_entities(...)`, `analyze_sentiment(...)`, `analyze_syntax(...)` and `annotate_text(...)`
 /// // to build up your call.
 /// let rb = hub.documents();
 /// # }
 /// ```
-pub struct DocumentMethods<'a>
-    where  {
+pub struct DocumentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudNaturalLanguage<>,
+    hub: &'a CloudNaturalLanguage<S>,
 }
 
-impl<'a> client::MethodsBuilder for DocumentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DocumentMethods<'a, S> {}
 
-impl<'a> DocumentMethods<'a> {
+impl<'a, S> DocumentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -597,7 +602,7 @@ impl<'a> DocumentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_entities(&self, request: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a> {
+    pub fn analyze_entities(&self, request: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a, S> {
         DocumentAnalyzeEntityCall {
             hub: self.hub,
             _request: request,
@@ -614,7 +619,7 @@ impl<'a> DocumentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_sentiment(&self, request: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a> {
+    pub fn analyze_sentiment(&self, request: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a, S> {
         DocumentAnalyzeSentimentCall {
             hub: self.hub,
             _request: request,
@@ -631,7 +636,7 @@ impl<'a> DocumentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_syntax(&self, request: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a> {
+    pub fn analyze_syntax(&self, request: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, S> {
         DocumentAnalyzeSyntaxCall {
             hub: self.hub,
             _request: request,
@@ -648,7 +653,7 @@ impl<'a> DocumentMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn annotate_text(&self, request: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a> {
+    pub fn annotate_text(&self, request: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, S> {
         DocumentAnnotateTextCall {
             hub: self.hub,
             _request: request,
@@ -690,7 +695,7 @@ impl<'a> DocumentMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -703,19 +708,25 @@ impl<'a> DocumentMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeEntityCall<'a>
-    where  {
+pub struct DocumentAnalyzeEntityCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudNaturalLanguage<>,
+    hub: &'a CloudNaturalLanguage<S>,
     _request: AnalyzeEntitiesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DocumentAnalyzeEntityCall<'a> {}
+impl<'a, S> client::CallBuilder for DocumentAnalyzeEntityCall<'a, S> {}
 
-impl<'a> DocumentAnalyzeEntityCall<'a> {
+impl<'a, S> DocumentAnalyzeEntityCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -849,7 +860,7 @@ impl<'a> DocumentAnalyzeEntityCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a> {
+    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -859,7 +870,7 @@ impl<'a> DocumentAnalyzeEntityCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntityCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntityCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -884,7 +895,7 @@ impl<'a> DocumentAnalyzeEntityCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntityCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntityCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -904,9 +915,9 @@ impl<'a> DocumentAnalyzeEntityCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeEntityCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DocumentAnalyzeEntityCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -939,7 +950,7 @@ impl<'a> DocumentAnalyzeEntityCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -952,19 +963,25 @@ impl<'a> DocumentAnalyzeEntityCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeSentimentCall<'a>
-    where  {
+pub struct DocumentAnalyzeSentimentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudNaturalLanguage<>,
+    hub: &'a CloudNaturalLanguage<S>,
     _request: AnalyzeSentimentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DocumentAnalyzeSentimentCall<'a> {}
+impl<'a, S> client::CallBuilder for DocumentAnalyzeSentimentCall<'a, S> {}
 
-impl<'a> DocumentAnalyzeSentimentCall<'a> {
+impl<'a, S> DocumentAnalyzeSentimentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1098,7 +1115,7 @@ impl<'a> DocumentAnalyzeSentimentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a> {
+    pub fn request(mut self, new_value: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1108,7 +1125,7 @@ impl<'a> DocumentAnalyzeSentimentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSentimentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSentimentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1133,7 +1150,7 @@ impl<'a> DocumentAnalyzeSentimentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSentimentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSentimentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1153,9 +1170,9 @@ impl<'a> DocumentAnalyzeSentimentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeSentimentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DocumentAnalyzeSentimentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1188,7 +1205,7 @@ impl<'a> DocumentAnalyzeSentimentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1201,19 +1218,25 @@ impl<'a> DocumentAnalyzeSentimentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeSyntaxCall<'a>
-    where  {
+pub struct DocumentAnalyzeSyntaxCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudNaturalLanguage<>,
+    hub: &'a CloudNaturalLanguage<S>,
     _request: AnalyzeSyntaxRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DocumentAnalyzeSyntaxCall<'a> {}
+impl<'a, S> client::CallBuilder for DocumentAnalyzeSyntaxCall<'a, S> {}
 
-impl<'a> DocumentAnalyzeSyntaxCall<'a> {
+impl<'a, S> DocumentAnalyzeSyntaxCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1347,7 +1370,7 @@ impl<'a> DocumentAnalyzeSyntaxCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a> {
+    pub fn request(mut self, new_value: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1357,7 +1380,7 @@ impl<'a> DocumentAnalyzeSyntaxCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSyntaxCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSyntaxCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1382,7 +1405,7 @@ impl<'a> DocumentAnalyzeSyntaxCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSyntaxCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSyntaxCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1402,9 +1425,9 @@ impl<'a> DocumentAnalyzeSyntaxCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeSyntaxCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DocumentAnalyzeSyntaxCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1437,7 +1460,7 @@ impl<'a> DocumentAnalyzeSyntaxCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1450,19 +1473,25 @@ impl<'a> DocumentAnalyzeSyntaxCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnnotateTextCall<'a>
-    where  {
+pub struct DocumentAnnotateTextCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudNaturalLanguage<>,
+    hub: &'a CloudNaturalLanguage<S>,
     _request: AnnotateTextRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DocumentAnnotateTextCall<'a> {}
+impl<'a, S> client::CallBuilder for DocumentAnnotateTextCall<'a, S> {}
 
-impl<'a> DocumentAnnotateTextCall<'a> {
+impl<'a, S> DocumentAnnotateTextCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1596,7 +1625,7 @@ impl<'a> DocumentAnnotateTextCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a> {
+    pub fn request(mut self, new_value: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1606,7 +1635,7 @@ impl<'a> DocumentAnnotateTextCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnnotateTextCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnnotateTextCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1631,7 +1660,7 @@ impl<'a> DocumentAnnotateTextCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnnotateTextCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnnotateTextCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1651,9 +1680,9 @@ impl<'a> DocumentAnnotateTextCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnnotateTextCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DocumentAnnotateTextCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

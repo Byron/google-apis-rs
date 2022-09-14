@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -87,7 +92,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -119,40 +124,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Logging<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Logging<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Logging<> {}
+impl<'a, S> client::Hub for Logging<S> {}
 
-impl<'a, > Logging<> {
+impl<'a, S> Logging<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Logging<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Logging<S> {
         Logging {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://logging.googleapis.com/".to_string(),
             _root_url: "https://logging.googleapis.com/".to_string(),
         }
     }
 
-    pub fn entries(&'a self) -> EntryMethods<'a> {
+    pub fn entries(&'a self) -> EntryMethods<'a, S> {
         EntryMethods { hub: &self }
     }
-    pub fn monitored_resource_descriptors(&'a self) -> MonitoredResourceDescriptorMethods<'a> {
+    pub fn monitored_resource_descriptors(&'a self) -> MonitoredResourceDescriptorMethods<'a, S> {
         MonitoredResourceDescriptorMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -905,22 +910,22 @@ impl client::ResponseResult for WriteLogEntriesResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `write(...)`
 /// // to build up your call.
 /// let rb = hub.entries();
 /// # }
 /// ```
-pub struct EntryMethods<'a>
-    where  {
+pub struct EntryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
 }
 
-impl<'a> client::MethodsBuilder for EntryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EntryMethods<'a, S> {}
 
-impl<'a> EntryMethods<'a> {
+impl<'a, S> EntryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -929,7 +934,7 @@ impl<'a> EntryMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn list(&self, request: ListLogEntriesRequest) -> EntryListCall<'a> {
+    pub fn list(&self, request: ListLogEntriesRequest) -> EntryListCall<'a, S> {
         EntryListCall {
             hub: self.hub,
             _request: request,
@@ -946,7 +951,7 @@ impl<'a> EntryMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn write(&self, request: WriteLogEntriesRequest) -> EntryWriteCall<'a> {
+    pub fn write(&self, request: WriteLogEntriesRequest) -> EntryWriteCall<'a, S> {
         EntryWriteCall {
             hub: self.hub,
             _request: request,
@@ -980,27 +985,27 @@ impl<'a> EntryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.monitored_resource_descriptors();
 /// # }
 /// ```
-pub struct MonitoredResourceDescriptorMethods<'a>
-    where  {
+pub struct MonitoredResourceDescriptorMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
 }
 
-impl<'a> client::MethodsBuilder for MonitoredResourceDescriptorMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MonitoredResourceDescriptorMethods<'a, S> {}
 
-impl<'a> MonitoredResourceDescriptorMethods<'a> {
+impl<'a, S> MonitoredResourceDescriptorMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the descriptors for monitored resource types used by Logging.
-    pub fn list(&self) -> MonitoredResourceDescriptorListCall<'a> {
+    pub fn list(&self) -> MonitoredResourceDescriptorListCall<'a, S> {
         MonitoredResourceDescriptorListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1035,22 +1040,22 @@ impl<'a> MonitoredResourceDescriptorMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `metrics_create(...)`, `metrics_delete(...)`, `metrics_get(...)`, `metrics_list(...)`, `metrics_update(...)`, `sinks_create(...)`, `sinks_delete(...)`, `sinks_get(...)`, `sinks_list(...)` and `sinks_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1062,7 +1067,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `parent` - The resource name of the project in which to create the metric:
     ///              "projects/[PROJECT_ID]"
     ///              The new metric must be provided in the request.
-    pub fn metrics_create(&self, request: LogMetric, parent: &str) -> ProjectMetricCreateCall<'a> {
+    pub fn metrics_create(&self, request: LogMetric, parent: &str) -> ProjectMetricCreateCall<'a, S> {
         ProjectMetricCreateCall {
             hub: self.hub,
             _request: request,
@@ -1082,7 +1087,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `metricName` - The resource name of the metric to delete:
     ///                  "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
     ///                  
-    pub fn metrics_delete(&self, metric_name: &str) -> ProjectMetricDeleteCall<'a> {
+    pub fn metrics_delete(&self, metric_name: &str) -> ProjectMetricDeleteCall<'a, S> {
         ProjectMetricDeleteCall {
             hub: self.hub,
             _metric_name: metric_name.to_string(),
@@ -1101,7 +1106,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `metricName` - The resource name of the desired metric:
     ///                  "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
     ///                  
-    pub fn metrics_get(&self, metric_name: &str) -> ProjectMetricGetCall<'a> {
+    pub fn metrics_get(&self, metric_name: &str) -> ProjectMetricGetCall<'a, S> {
         ProjectMetricGetCall {
             hub: self.hub,
             _metric_name: metric_name.to_string(),
@@ -1120,7 +1125,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `parent` - Required. The name of the project containing the metrics:
     ///              "projects/[PROJECT_ID]"
     ///              
-    pub fn metrics_list(&self, parent: &str) -> ProjectMetricListCall<'a> {
+    pub fn metrics_list(&self, parent: &str) -> ProjectMetricListCall<'a, S> {
         ProjectMetricListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1142,7 +1147,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `metricName` - The resource name of the metric to update:
     ///                  "projects/[PROJECT_ID]/metrics/[METRIC_ID]"
     ///                  The updated metric must be provided in the request and it's name field must be the same as [METRIC_ID] If the metric does not exist in [PROJECT_ID], then a new metric is created.
-    pub fn metrics_update(&self, request: LogMetric, metric_name: &str) -> ProjectMetricUpdateCall<'a> {
+    pub fn metrics_update(&self, request: LogMetric, metric_name: &str) -> ProjectMetricUpdateCall<'a, S> {
         ProjectMetricUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1166,7 +1171,7 @@ impl<'a> ProjectMethods<'a> {
     ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
     ///              "folders/[FOLDER_ID]"
     ///              Examples: "projects/my-logging-project", "organizations/123456789".
-    pub fn sinks_create(&self, request: LogSink, parent: &str) -> ProjectSinkCreateCall<'a> {
+    pub fn sinks_create(&self, request: LogSink, parent: &str) -> ProjectSinkCreateCall<'a, S> {
         ProjectSinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -1190,7 +1195,7 @@ impl<'a> ProjectMethods<'a> {
     ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
     ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
-    pub fn sinks_delete(&self, sink_name: &str) -> ProjectSinkDeleteCall<'a> {
+    pub fn sinks_delete(&self, sink_name: &str) -> ProjectSinkDeleteCall<'a, S> {
         ProjectSinkDeleteCall {
             hub: self.hub,
             _sink_name: sink_name.to_string(),
@@ -1212,7 +1217,7 @@ impl<'a> ProjectMethods<'a> {
     ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
     ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
-    pub fn sinks_get(&self, sink_name: &str) -> ProjectSinkGetCall<'a> {
+    pub fn sinks_get(&self, sink_name: &str) -> ProjectSinkGetCall<'a, S> {
         ProjectSinkGetCall {
             hub: self.hub,
             _sink_name: sink_name.to_string(),
@@ -1234,7 +1239,7 @@ impl<'a> ProjectMethods<'a> {
     ///              "billingAccounts/[BILLING_ACCOUNT_ID]"
     ///              "folders/[FOLDER_ID]"
     ///              
-    pub fn sinks_list(&self, parent: &str) -> ProjectSinkListCall<'a> {
+    pub fn sinks_list(&self, parent: &str) -> ProjectSinkListCall<'a, S> {
         ProjectSinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1259,7 +1264,7 @@ impl<'a> ProjectMethods<'a> {
     ///                "billingAccounts/[BILLING_ACCOUNT_ID]/sinks/[SINK_ID]"
     ///                "folders/[FOLDER_ID]/sinks/[SINK_ID]"
     ///                Example: "projects/my-project-id/sinks/my-sink-id".
-    pub fn sinks_update(&self, request: LogSink, sink_name: &str) -> ProjectSinkUpdateCall<'a> {
+    pub fn sinks_update(&self, request: LogSink, sink_name: &str) -> ProjectSinkUpdateCall<'a, S> {
         ProjectSinkUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1304,7 +1309,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1317,19 +1322,25 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EntryListCall<'a>
-    where  {
+pub struct EntryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _request: ListLogEntriesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EntryListCall<'a> {}
+impl<'a, S> client::CallBuilder for EntryListCall<'a, S> {}
 
-impl<'a> EntryListCall<'a> {
+impl<'a, S> EntryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1463,7 +1474,7 @@ impl<'a> EntryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListLogEntriesRequest) -> EntryListCall<'a> {
+    pub fn request(mut self, new_value: ListLogEntriesRequest) -> EntryListCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1473,7 +1484,7 @@ impl<'a> EntryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1498,7 +1509,7 @@ impl<'a> EntryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EntryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EntryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1518,9 +1529,9 @@ impl<'a> EntryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EntryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EntryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1553,7 +1564,7 @@ impl<'a> EntryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1566,19 +1577,25 @@ impl<'a> EntryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EntryWriteCall<'a>
-    where  {
+pub struct EntryWriteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _request: WriteLogEntriesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EntryWriteCall<'a> {}
+impl<'a, S> client::CallBuilder for EntryWriteCall<'a, S> {}
 
-impl<'a> EntryWriteCall<'a> {
+impl<'a, S> EntryWriteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1712,7 +1729,7 @@ impl<'a> EntryWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WriteLogEntriesRequest) -> EntryWriteCall<'a> {
+    pub fn request(mut self, new_value: WriteLogEntriesRequest) -> EntryWriteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1722,7 +1739,7 @@ impl<'a> EntryWriteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntryWriteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntryWriteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1747,7 +1764,7 @@ impl<'a> EntryWriteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EntryWriteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EntryWriteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1767,9 +1784,9 @@ impl<'a> EntryWriteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EntryWriteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EntryWriteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1801,7 +1818,7 @@ impl<'a> EntryWriteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1811,10 +1828,10 @@ impl<'a> EntryWriteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MonitoredResourceDescriptorListCall<'a>
-    where  {
+pub struct MonitoredResourceDescriptorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1822,9 +1839,15 @@ pub struct MonitoredResourceDescriptorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MonitoredResourceDescriptorListCall<'a> {}
+impl<'a, S> client::CallBuilder for MonitoredResourceDescriptorListCall<'a, S> {}
 
-impl<'a> MonitoredResourceDescriptorListCall<'a> {
+impl<'a, S> MonitoredResourceDescriptorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1948,14 +1971,14 @@ impl<'a> MonitoredResourceDescriptorListCall<'a> {
     /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MonitoredResourceDescriptorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MonitoredResourceDescriptorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MonitoredResourceDescriptorListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> MonitoredResourceDescriptorListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1965,7 +1988,7 @@ impl<'a> MonitoredResourceDescriptorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonitoredResourceDescriptorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MonitoredResourceDescriptorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1990,7 +2013,7 @@ impl<'a> MonitoredResourceDescriptorListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MonitoredResourceDescriptorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MonitoredResourceDescriptorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2010,9 +2033,9 @@ impl<'a> MonitoredResourceDescriptorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MonitoredResourceDescriptorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MonitoredResourceDescriptorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2045,7 +2068,7 @@ impl<'a> MonitoredResourceDescriptorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2058,10 +2081,10 @@ impl<'a> MonitoredResourceDescriptorListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectMetricCreateCall<'a>
-    where  {
+pub struct ProjectMetricCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _request: LogMetric,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2069,9 +2092,15 @@ pub struct ProjectMetricCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectMetricCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectMetricCreateCall<'a, S> {}
 
-impl<'a> ProjectMetricCreateCall<'a> {
+impl<'a, S> ProjectMetricCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2231,7 +2260,7 @@ impl<'a> ProjectMetricCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LogMetric) -> ProjectMetricCreateCall<'a> {
+    pub fn request(mut self, new_value: LogMetric) -> ProjectMetricCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2243,7 +2272,7 @@ impl<'a> ProjectMetricCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectMetricCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectMetricCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2253,7 +2282,7 @@ impl<'a> ProjectMetricCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2278,7 +2307,7 @@ impl<'a> ProjectMetricCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2298,9 +2327,9 @@ impl<'a> ProjectMetricCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectMetricCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectMetricCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2332,7 +2361,7 @@ impl<'a> ProjectMetricCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2340,19 +2369,25 @@ impl<'a> ProjectMetricCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectMetricDeleteCall<'a>
-    where  {
+pub struct ProjectMetricDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _metric_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectMetricDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectMetricDeleteCall<'a, S> {}
 
-impl<'a> ProjectMetricDeleteCall<'a> {
+impl<'a, S> ProjectMetricDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2501,7 +2536,7 @@ impl<'a> ProjectMetricDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric_name(mut self, new_value: &str) -> ProjectMetricDeleteCall<'a> {
+    pub fn metric_name(mut self, new_value: &str) -> ProjectMetricDeleteCall<'a, S> {
         self._metric_name = new_value.to_string();
         self
     }
@@ -2511,7 +2546,7 @@ impl<'a> ProjectMetricDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2536,7 +2571,7 @@ impl<'a> ProjectMetricDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2556,9 +2591,9 @@ impl<'a> ProjectMetricDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectMetricDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectMetricDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2590,7 +2625,7 @@ impl<'a> ProjectMetricDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2598,19 +2633,25 @@ impl<'a> ProjectMetricDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectMetricGetCall<'a>
-    where  {
+pub struct ProjectMetricGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _metric_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectMetricGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectMetricGetCall<'a, S> {}
 
-impl<'a> ProjectMetricGetCall<'a> {
+impl<'a, S> ProjectMetricGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2759,7 +2800,7 @@ impl<'a> ProjectMetricGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric_name(mut self, new_value: &str) -> ProjectMetricGetCall<'a> {
+    pub fn metric_name(mut self, new_value: &str) -> ProjectMetricGetCall<'a, S> {
         self._metric_name = new_value.to_string();
         self
     }
@@ -2769,7 +2810,7 @@ impl<'a> ProjectMetricGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2794,7 +2835,7 @@ impl<'a> ProjectMetricGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2814,9 +2855,9 @@ impl<'a> ProjectMetricGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectMetricGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectMetricGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2848,7 +2889,7 @@ impl<'a> ProjectMetricGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2858,10 +2899,10 @@ impl<'a> ProjectMetricGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectMetricListCall<'a>
-    where  {
+pub struct ProjectMetricListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2870,9 +2911,15 @@ pub struct ProjectMetricListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectMetricListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectMetricListCall<'a, S> {}
 
-impl<'a> ProjectMetricListCall<'a> {
+impl<'a, S> ProjectMetricListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3027,21 +3074,21 @@ impl<'a> ProjectMetricListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectMetricListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectMetricListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectMetricListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectMetricListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectMetricListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectMetricListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3051,7 +3098,7 @@ impl<'a> ProjectMetricListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3076,7 +3123,7 @@ impl<'a> ProjectMetricListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3096,9 +3143,9 @@ impl<'a> ProjectMetricListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectMetricListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectMetricListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3131,7 +3178,7 @@ impl<'a> ProjectMetricListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3144,10 +3191,10 @@ impl<'a> ProjectMetricListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectMetricUpdateCall<'a>
-    where  {
+pub struct ProjectMetricUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _request: LogMetric,
     _metric_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3155,9 +3202,15 @@ pub struct ProjectMetricUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectMetricUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectMetricUpdateCall<'a, S> {}
 
-impl<'a> ProjectMetricUpdateCall<'a> {
+impl<'a, S> ProjectMetricUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3317,7 +3370,7 @@ impl<'a> ProjectMetricUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LogMetric) -> ProjectMetricUpdateCall<'a> {
+    pub fn request(mut self, new_value: LogMetric) -> ProjectMetricUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3329,7 +3382,7 @@ impl<'a> ProjectMetricUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric_name(mut self, new_value: &str) -> ProjectMetricUpdateCall<'a> {
+    pub fn metric_name(mut self, new_value: &str) -> ProjectMetricUpdateCall<'a, S> {
         self._metric_name = new_value.to_string();
         self
     }
@@ -3339,7 +3392,7 @@ impl<'a> ProjectMetricUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectMetricUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3364,7 +3417,7 @@ impl<'a> ProjectMetricUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectMetricUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3384,9 +3437,9 @@ impl<'a> ProjectMetricUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectMetricUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectMetricUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3419,7 +3472,7 @@ impl<'a> ProjectMetricUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3433,10 +3486,10 @@ impl<'a> ProjectMetricUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSinkCreateCall<'a>
-    where  {
+pub struct ProjectSinkCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _request: LogSink,
     _parent: String,
     _unique_writer_identity: Option<bool>,
@@ -3445,9 +3498,15 @@ pub struct ProjectSinkCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSinkCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSinkCreateCall<'a, S> {}
 
-impl<'a> ProjectSinkCreateCall<'a> {
+impl<'a, S> ProjectSinkCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3610,7 +3669,7 @@ impl<'a> ProjectSinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LogSink) -> ProjectSinkCreateCall<'a> {
+    pub fn request(mut self, new_value: LogSink) -> ProjectSinkCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3625,14 +3684,14 @@ impl<'a> ProjectSinkCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSinkCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSinkCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Determines the kind of IAM identity returned as writer_identity in the new sink. If this value is omitted or set to false, and if the sink's parent is a project, then the value returned as writer_identity is the same group or service account used by Logging before the addition of writer identities to this API. The sink's destination must be in the same project as the sink itself.If this field is set to true, or if the sink is owned by a non-project resource such as an organization, then the value of writer_identity will be a unique service account used only for exports from the new sink. For more information, see writer_identity in LogSink.
     ///
     /// Sets the *unique writer identity* query property to the given value.
-    pub fn unique_writer_identity(mut self, new_value: bool) -> ProjectSinkCreateCall<'a> {
+    pub fn unique_writer_identity(mut self, new_value: bool) -> ProjectSinkCreateCall<'a, S> {
         self._unique_writer_identity = Some(new_value);
         self
     }
@@ -3642,7 +3701,7 @@ impl<'a> ProjectSinkCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3667,7 +3726,7 @@ impl<'a> ProjectSinkCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3687,9 +3746,9 @@ impl<'a> ProjectSinkCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSinkCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSinkCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3721,7 +3780,7 @@ impl<'a> ProjectSinkCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3729,19 +3788,25 @@ impl<'a> ProjectSinkCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSinkDeleteCall<'a>
-    where  {
+pub struct ProjectSinkDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _sink_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSinkDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSinkDeleteCall<'a, S> {}
 
-impl<'a> ProjectSinkDeleteCall<'a> {
+impl<'a, S> ProjectSinkDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3893,7 +3958,7 @@ impl<'a> ProjectSinkDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sink_name(mut self, new_value: &str) -> ProjectSinkDeleteCall<'a> {
+    pub fn sink_name(mut self, new_value: &str) -> ProjectSinkDeleteCall<'a, S> {
         self._sink_name = new_value.to_string();
         self
     }
@@ -3903,7 +3968,7 @@ impl<'a> ProjectSinkDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3928,7 +3993,7 @@ impl<'a> ProjectSinkDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3948,9 +4013,9 @@ impl<'a> ProjectSinkDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSinkDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSinkDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3982,7 +4047,7 @@ impl<'a> ProjectSinkDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3990,19 +4055,25 @@ impl<'a> ProjectSinkDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSinkGetCall<'a>
-    where  {
+pub struct ProjectSinkGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _sink_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSinkGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSinkGetCall<'a, S> {}
 
-impl<'a> ProjectSinkGetCall<'a> {
+impl<'a, S> ProjectSinkGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4154,7 +4225,7 @@ impl<'a> ProjectSinkGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sink_name(mut self, new_value: &str) -> ProjectSinkGetCall<'a> {
+    pub fn sink_name(mut self, new_value: &str) -> ProjectSinkGetCall<'a, S> {
         self._sink_name = new_value.to_string();
         self
     }
@@ -4164,7 +4235,7 @@ impl<'a> ProjectSinkGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4189,7 +4260,7 @@ impl<'a> ProjectSinkGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4209,9 +4280,9 @@ impl<'a> ProjectSinkGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSinkGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSinkGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4243,7 +4314,7 @@ impl<'a> ProjectSinkGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4253,10 +4324,10 @@ impl<'a> ProjectSinkGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSinkListCall<'a>
-    where  {
+pub struct ProjectSinkListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4265,9 +4336,15 @@ pub struct ProjectSinkListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSinkListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSinkListCall<'a, S> {}
 
-impl<'a> ProjectSinkListCall<'a> {
+impl<'a, S> ProjectSinkListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4425,21 +4502,21 @@ impl<'a> ProjectSinkListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSinkListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSinkListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. pageToken must be the value of nextPageToken from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSinkListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSinkListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of nextPageToken in the response indicates that more results might be available.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSinkListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSinkListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4449,7 +4526,7 @@ impl<'a> ProjectSinkListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4474,7 +4551,7 @@ impl<'a> ProjectSinkListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4494,9 +4571,9 @@ impl<'a> ProjectSinkListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSinkListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSinkListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4529,7 +4606,7 @@ impl<'a> ProjectSinkListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Logging::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4544,10 +4621,10 @@ impl<'a> ProjectSinkListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSinkUpdateCall<'a>
-    where  {
+pub struct ProjectSinkUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Logging<>,
+    hub: &'a Logging<S>,
     _request: LogSink,
     _sink_name: String,
     _update_mask: Option<String>,
@@ -4557,9 +4634,15 @@ pub struct ProjectSinkUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSinkUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSinkUpdateCall<'a, S> {}
 
-impl<'a> ProjectSinkUpdateCall<'a> {
+impl<'a, S> ProjectSinkUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4725,7 +4808,7 @@ impl<'a> ProjectSinkUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LogSink) -> ProjectSinkUpdateCall<'a> {
+    pub fn request(mut self, new_value: LogSink) -> ProjectSinkUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4740,14 +4823,14 @@ impl<'a> ProjectSinkUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sink_name(mut self, new_value: &str) -> ProjectSinkUpdateCall<'a> {
+    pub fn sink_name(mut self, new_value: &str) -> ProjectSinkUpdateCall<'a, S> {
         self._sink_name = new_value.to_string();
         self
     }
     /// Optional. Field mask that specifies the fields in sink that need an update. A sink field will be overwritten if, and only if, it is in the update mask. name and output only fields cannot be updated.An empty updateMask is temporarily treated as using the following mask for backwards compatibility purposes:  destination,filter,includeChildren At some point in the future, behavior will be removed and specifying an empty updateMask will be an error.For a detailed FieldMask definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.FieldMaskExample: updateMask=filter.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSinkUpdateCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSinkUpdateCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4757,7 +4840,7 @@ impl<'a> ProjectSinkUpdateCall<'a> {
     /// It is an error if the old value is true and the new value is set to false or defaulted to false.
     ///
     /// Sets the *unique writer identity* query property to the given value.
-    pub fn unique_writer_identity(mut self, new_value: bool) -> ProjectSinkUpdateCall<'a> {
+    pub fn unique_writer_identity(mut self, new_value: bool) -> ProjectSinkUpdateCall<'a, S> {
         self._unique_writer_identity = Some(new_value);
         self
     }
@@ -4767,7 +4850,7 @@ impl<'a> ProjectSinkUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSinkUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4792,7 +4875,7 @@ impl<'a> ProjectSinkUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSinkUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4812,9 +4895,9 @@ impl<'a> ProjectSinkUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSinkUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSinkUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

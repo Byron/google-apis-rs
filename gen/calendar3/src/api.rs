@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -87,7 +92,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -136,55 +141,55 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CalendarHub<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CalendarHub<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CalendarHub<> {}
+impl<'a, S> client::Hub for CalendarHub<S> {}
 
-impl<'a, > CalendarHub<> {
+impl<'a, S> CalendarHub<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CalendarHub<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CalendarHub<S> {
         CalendarHub {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/calendar/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn acl(&'a self) -> AclMethods<'a> {
+    pub fn acl(&'a self) -> AclMethods<'a, S> {
         AclMethods { hub: &self }
     }
-    pub fn calendar_list(&'a self) -> CalendarListMethods<'a> {
+    pub fn calendar_list(&'a self) -> CalendarListMethods<'a, S> {
         CalendarListMethods { hub: &self }
     }
-    pub fn calendars(&'a self) -> CalendarMethods<'a> {
+    pub fn calendars(&'a self) -> CalendarMethods<'a, S> {
         CalendarMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a> {
+    pub fn channels(&'a self) -> ChannelMethods<'a, S> {
         ChannelMethods { hub: &self }
     }
-    pub fn colors(&'a self) -> ColorMethods<'a> {
+    pub fn colors(&'a self) -> ColorMethods<'a, S> {
         ColorMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a> {
+    pub fn events(&'a self) -> EventMethods<'a, S> {
         EventMethods { hub: &self }
     }
-    pub fn freebusy(&'a self) -> FreebusyMethods<'a> {
+    pub fn freebusy(&'a self) -> FreebusyMethods<'a, S> {
         FreebusyMethods { hub: &self }
     }
-    pub fn settings(&'a self) -> SettingMethods<'a> {
+    pub fn settings(&'a self) -> SettingMethods<'a, S> {
         SettingMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1431,22 +1436,22 @@ impl client::Part for EventSource {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)`, `update(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.acl();
 /// # }
 /// ```
-pub struct AclMethods<'a>
-    where  {
+pub struct AclMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for AclMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AclMethods<'a, S> {}
 
-impl<'a> AclMethods<'a> {
+impl<'a, S> AclMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1456,7 +1461,7 @@ impl<'a> AclMethods<'a> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a> {
+    pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a, S> {
         AclDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1475,7 +1480,7 @@ impl<'a> AclMethods<'a> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a> {
+    pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a, S> {
         AclGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1494,7 +1499,7 @@ impl<'a> AclMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn insert(&self, request: AclRule, calendar_id: &str) -> AclInsertCall<'a> {
+    pub fn insert(&self, request: AclRule, calendar_id: &str) -> AclInsertCall<'a, S> {
         AclInsertCall {
             hub: self.hub,
             _request: request,
@@ -1513,7 +1518,7 @@ impl<'a> AclMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn list(&self, calendar_id: &str) -> AclListCall<'a> {
+    pub fn list(&self, calendar_id: &str) -> AclListCall<'a, S> {
         AclListCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1536,7 +1541,7 @@ impl<'a> AclMethods<'a> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn patch(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a> {
+    pub fn patch(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a, S> {
         AclPatchCall {
             hub: self.hub,
             _request: request,
@@ -1558,7 +1563,7 @@ impl<'a> AclMethods<'a> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn update(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a> {
+    pub fn update(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a, S> {
         AclUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1579,7 +1584,7 @@ impl<'a> AclMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn watch(&self, request: Channel, calendar_id: &str) -> AclWatchCall<'a> {
+    pub fn watch(&self, request: Channel, calendar_id: &str) -> AclWatchCall<'a, S> {
         AclWatchCall {
             hub: self.hub,
             _request: request,
@@ -1618,22 +1623,22 @@ impl<'a> AclMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)`, `update(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.calendar_list();
 /// # }
 /// ```
-pub struct CalendarListMethods<'a>
-    where  {
+pub struct CalendarListMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for CalendarListMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CalendarListMethods<'a, S> {}
 
-impl<'a> CalendarListMethods<'a> {
+impl<'a, S> CalendarListMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1642,7 +1647,7 @@ impl<'a> CalendarListMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a> {
+    pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a, S> {
         CalendarListDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1659,7 +1664,7 @@ impl<'a> CalendarListMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a> {
+    pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a, S> {
         CalendarListGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1676,7 +1681,7 @@ impl<'a> CalendarListMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: CalendarListEntry) -> CalendarListInsertCall<'a> {
+    pub fn insert(&self, request: CalendarListEntry) -> CalendarListInsertCall<'a, S> {
         CalendarListInsertCall {
             hub: self.hub,
             _request: request,
@@ -1690,7 +1695,7 @@ impl<'a> CalendarListMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the calendars on the user's calendar list.
-    pub fn list(&self) -> CalendarListListCall<'a> {
+    pub fn list(&self) -> CalendarListListCall<'a, S> {
         CalendarListListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -1713,7 +1718,7 @@ impl<'a> CalendarListMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn patch(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a> {
+    pub fn patch(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a, S> {
         CalendarListPatchCall {
             hub: self.hub,
             _request: request,
@@ -1733,7 +1738,7 @@ impl<'a> CalendarListMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn update(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a> {
+    pub fn update(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a, S> {
         CalendarListUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1752,7 +1757,7 @@ impl<'a> CalendarListMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: Channel) -> CalendarListWatchCall<'a> {
+    pub fn watch(&self, request: Channel) -> CalendarListWatchCall<'a, S> {
         CalendarListWatchCall {
             hub: self.hub,
             _request: request,
@@ -1792,22 +1797,22 @@ impl<'a> CalendarListMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `clear(...)`, `delete(...)`, `get(...)`, `insert(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.calendars();
 /// # }
 /// ```
-pub struct CalendarMethods<'a>
-    where  {
+pub struct CalendarMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for CalendarMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CalendarMethods<'a, S> {}
 
-impl<'a> CalendarMethods<'a> {
+impl<'a, S> CalendarMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1816,7 +1821,7 @@ impl<'a> CalendarMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a> {
+    pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a, S> {
         CalendarClearCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1833,7 +1838,7 @@ impl<'a> CalendarMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a> {
+    pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a, S> {
         CalendarDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1850,7 +1855,7 @@ impl<'a> CalendarMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a> {
+    pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a, S> {
         CalendarGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1867,7 +1872,7 @@ impl<'a> CalendarMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Calendar) -> CalendarInsertCall<'a> {
+    pub fn insert(&self, request: Calendar) -> CalendarInsertCall<'a, S> {
         CalendarInsertCall {
             hub: self.hub,
             _request: request,
@@ -1885,7 +1890,7 @@ impl<'a> CalendarMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn patch(&self, request: Calendar, calendar_id: &str) -> CalendarPatchCall<'a> {
+    pub fn patch(&self, request: Calendar, calendar_id: &str) -> CalendarPatchCall<'a, S> {
         CalendarPatchCall {
             hub: self.hub,
             _request: request,
@@ -1904,7 +1909,7 @@ impl<'a> CalendarMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn update(&self, request: Calendar, calendar_id: &str) -> CalendarUpdateCall<'a> {
+    pub fn update(&self, request: Calendar, calendar_id: &str) -> CalendarUpdateCall<'a, S> {
         CalendarUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1939,22 +1944,22 @@ impl<'a> CalendarMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `stop(...)`
 /// // to build up your call.
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a>
-    where  {
+pub struct ChannelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ChannelMethods<'a, S> {}
 
-impl<'a> ChannelMethods<'a> {
+impl<'a, S> ChannelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1963,7 +1968,7 @@ impl<'a> ChannelMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a> {
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, S> {
         ChannelStopCall {
             hub: self.hub,
             _request: request,
@@ -1997,27 +2002,27 @@ impl<'a> ChannelMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.colors();
 /// # }
 /// ```
-pub struct ColorMethods<'a>
-    where  {
+pub struct ColorMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for ColorMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ColorMethods<'a, S> {}
 
-impl<'a> ColorMethods<'a> {
+impl<'a, S> ColorMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the color definitions for calendars and events.
-    pub fn get(&self) -> ColorGetCall<'a> {
+    pub fn get(&self) -> ColorGetCall<'a, S> {
         ColorGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2050,22 +2055,22 @@ impl<'a> ColorMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `import(...)`, `insert(...)`, `instances(...)`, `list(...)`, `move_(...)`, `patch(...)`, `quick_add(...)`, `update(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a>
-    where  {
+pub struct EventMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for EventMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EventMethods<'a, S> {}
 
-impl<'a> EventMethods<'a> {
+impl<'a, S> EventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2075,7 +2080,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a> {
+    pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a, S> {
         EventDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2096,7 +2101,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a> {
+    pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a, S> {
         EventGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2118,7 +2123,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn import(&self, request: Event, calendar_id: &str) -> EventImportCall<'a> {
+    pub fn import(&self, request: Event, calendar_id: &str) -> EventImportCall<'a, S> {
         EventImportCall {
             hub: self.hub,
             _request: request,
@@ -2139,7 +2144,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn insert(&self, request: Event, calendar_id: &str) -> EventInsertCall<'a> {
+    pub fn insert(&self, request: Event, calendar_id: &str) -> EventInsertCall<'a, S> {
         EventInsertCall {
             hub: self.hub,
             _request: request,
@@ -2163,7 +2168,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Recurring event identifier.
-    pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a> {
+    pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a, S> {
         EventInstanceCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2190,7 +2195,7 @@ impl<'a> EventMethods<'a> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn list(&self, calendar_id: &str) -> EventListCall<'a> {
+    pub fn list(&self, calendar_id: &str) -> EventListCall<'a, S> {
         EventListCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2226,7 +2231,7 @@ impl<'a> EventMethods<'a> {
     /// * `calendarId` - Calendar identifier of the source calendar where the event currently is on.
     /// * `eventId` - Event identifier.
     /// * `destination` - Calendar identifier of the target calendar where the event is to be moved to.
-    pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a> {
+    pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a, S> {
         EventMoveCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2249,7 +2254,7 @@ impl<'a> EventMethods<'a> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn patch(&self, request: Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a> {
+    pub fn patch(&self, request: Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a, S> {
         EventPatchCall {
             hub: self.hub,
             _request: request,
@@ -2275,7 +2280,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `text` - The text describing the event to be created.
-    pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a> {
+    pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a, S> {
         EventQuickAddCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2297,7 +2302,7 @@ impl<'a> EventMethods<'a> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn update(&self, request: Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a> {
+    pub fn update(&self, request: Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a, S> {
         EventUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2323,7 +2328,7 @@ impl<'a> EventMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn watch(&self, request: Channel, calendar_id: &str) -> EventWatchCall<'a> {
+    pub fn watch(&self, request: Channel, calendar_id: &str) -> EventWatchCall<'a, S> {
         EventWatchCall {
             hub: self.hub,
             _request: request,
@@ -2375,22 +2380,22 @@ impl<'a> EventMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `query(...)`
 /// // to build up your call.
 /// let rb = hub.freebusy();
 /// # }
 /// ```
-pub struct FreebusyMethods<'a>
-    where  {
+pub struct FreebusyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for FreebusyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FreebusyMethods<'a, S> {}
 
-impl<'a> FreebusyMethods<'a> {
+impl<'a, S> FreebusyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2399,7 +2404,7 @@ impl<'a> FreebusyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn query(&self, request: FreeBusyRequest) -> FreebusyQueryCall<'a> {
+    pub fn query(&self, request: FreeBusyRequest) -> FreebusyQueryCall<'a, S> {
         FreebusyQueryCall {
             hub: self.hub,
             _request: request,
@@ -2433,22 +2438,22 @@ impl<'a> FreebusyMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `list(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.settings();
 /// # }
 /// ```
-pub struct SettingMethods<'a>
-    where  {
+pub struct SettingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
 }
 
-impl<'a> client::MethodsBuilder for SettingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SettingMethods<'a, S> {}
 
-impl<'a> SettingMethods<'a> {
+impl<'a, S> SettingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2457,7 +2462,7 @@ impl<'a> SettingMethods<'a> {
     /// # Arguments
     ///
     /// * `setting` - The id of the user setting.
-    pub fn get(&self, setting: &str) -> SettingGetCall<'a> {
+    pub fn get(&self, setting: &str) -> SettingGetCall<'a, S> {
         SettingGetCall {
             hub: self.hub,
             _setting: setting.to_string(),
@@ -2470,7 +2475,7 @@ impl<'a> SettingMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all user settings for the authenticated user.
-    pub fn list(&self) -> SettingListCall<'a> {
+    pub fn list(&self) -> SettingListCall<'a, S> {
         SettingListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -2489,7 +2494,7 @@ impl<'a> SettingMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: Channel) -> SettingWatchCall<'a> {
+    pub fn watch(&self, request: Channel) -> SettingWatchCall<'a, S> {
         SettingWatchCall {
             hub: self.hub,
             _request: request,
@@ -2533,7 +2538,7 @@ impl<'a> SettingMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2541,10 +2546,10 @@ impl<'a> SettingMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclDeleteCall<'a>
-    where  {
+pub struct AclDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _rule_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2552,9 +2557,15 @@ pub struct AclDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AclDeleteCall<'a, S> {}
 
-impl<'a> AclDeleteCall<'a> {
+impl<'a, S> AclDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2687,7 +2698,7 @@ impl<'a> AclDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -2697,7 +2708,7 @@ impl<'a> AclDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a> {
+    pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, S> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -2707,7 +2718,7 @@ impl<'a> AclDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2728,7 +2739,7 @@ impl<'a> AclDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2748,9 +2759,9 @@ impl<'a> AclDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2782,7 +2793,7 @@ impl<'a> AclDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2790,10 +2801,10 @@ impl<'a> AclDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclGetCall<'a>
-    where  {
+pub struct AclGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _rule_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2801,9 +2812,15 @@ pub struct AclGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AclGetCall<'a, S> {}
 
-impl<'a> AclGetCall<'a> {
+impl<'a, S> AclGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2947,7 +2964,7 @@ impl<'a> AclGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -2957,7 +2974,7 @@ impl<'a> AclGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a> {
+    pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, S> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -2967,7 +2984,7 @@ impl<'a> AclGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2988,7 +3005,7 @@ impl<'a> AclGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3008,9 +3025,9 @@ impl<'a> AclGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3043,7 +3060,7 @@ impl<'a> AclGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3057,10 +3074,10 @@ impl<'a> AclGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclInsertCall<'a>
-    where  {
+pub struct AclInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: AclRule,
     _calendar_id: String,
     _send_notifications: Option<bool>,
@@ -3069,9 +3086,15 @@ pub struct AclInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AclInsertCall<'a, S> {}
 
-impl<'a> AclInsertCall<'a> {
+impl<'a, S> AclInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3230,7 +3253,7 @@ impl<'a> AclInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AclRule) -> AclInsertCall<'a> {
+    pub fn request(mut self, new_value: AclRule) -> AclInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3240,14 +3263,14 @@ impl<'a> AclInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether to send notifications about the calendar sharing change. Optional. The default is True.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> AclInsertCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> AclInsertCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -3257,7 +3280,7 @@ impl<'a> AclInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3278,7 +3301,7 @@ impl<'a> AclInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3298,9 +3321,9 @@ impl<'a> AclInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3332,7 +3355,7 @@ impl<'a> AclInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3344,10 +3367,10 @@ impl<'a> AclInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclListCall<'a>
-    where  {
+pub struct AclListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _sync_token: Option<String>,
     _show_deleted: Option<bool>,
@@ -3358,9 +3381,15 @@ pub struct AclListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclListCall<'a> {}
+impl<'a, S> client::CallBuilder for AclListCall<'a, S> {}
 
-impl<'a> AclListCall<'a> {
+impl<'a, S> AclListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3515,7 +3544,7 @@ impl<'a> AclListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -3525,28 +3554,28 @@ impl<'a> AclListCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AclListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AclListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AclListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> AclListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -3556,7 +3585,7 @@ impl<'a> AclListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3577,7 +3606,7 @@ impl<'a> AclListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3597,9 +3626,9 @@ impl<'a> AclListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3632,7 +3661,7 @@ impl<'a> AclListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3646,10 +3675,10 @@ impl<'a> AclListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclPatchCall<'a>
-    where  {
+pub struct AclPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
@@ -3659,9 +3688,15 @@ pub struct AclPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AclPatchCall<'a, S> {}
 
-impl<'a> AclPatchCall<'a> {
+impl<'a, S> AclPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3821,7 +3856,7 @@ impl<'a> AclPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AclRule) -> AclPatchCall<'a> {
+    pub fn request(mut self, new_value: AclRule) -> AclPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3831,7 +3866,7 @@ impl<'a> AclPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -3841,14 +3876,14 @@ impl<'a> AclPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a> {
+    pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, S> {
         self._rule_id = new_value.to_string();
         self
     }
     /// Whether to send notifications about the calendar sharing change. Note that there are no notifications on access removal. Optional. The default is True.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> AclPatchCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> AclPatchCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -3858,7 +3893,7 @@ impl<'a> AclPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3879,7 +3914,7 @@ impl<'a> AclPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3899,9 +3934,9 @@ impl<'a> AclPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3934,7 +3969,7 @@ impl<'a> AclPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3948,10 +3983,10 @@ impl<'a> AclPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclUpdateCall<'a>
-    where  {
+pub struct AclUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
@@ -3961,9 +3996,15 @@ pub struct AclUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AclUpdateCall<'a, S> {}
 
-impl<'a> AclUpdateCall<'a> {
+impl<'a, S> AclUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4123,7 +4164,7 @@ impl<'a> AclUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AclRule) -> AclUpdateCall<'a> {
+    pub fn request(mut self, new_value: AclRule) -> AclUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4133,7 +4174,7 @@ impl<'a> AclUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4143,14 +4184,14 @@ impl<'a> AclUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a> {
+    pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, S> {
         self._rule_id = new_value.to_string();
         self
     }
     /// Whether to send notifications about the calendar sharing change. Note that there are no notifications on access removal. Optional. The default is True.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> AclUpdateCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> AclUpdateCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -4160,7 +4201,7 @@ impl<'a> AclUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4181,7 +4222,7 @@ impl<'a> AclUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4201,9 +4242,9 @@ impl<'a> AclUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4236,7 +4277,7 @@ impl<'a> AclUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4253,10 +4294,10 @@ impl<'a> AclUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclWatchCall<'a>
-    where  {
+pub struct AclWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Channel,
     _calendar_id: String,
     _sync_token: Option<String>,
@@ -4268,9 +4309,15 @@ pub struct AclWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AclWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AclWatchCall<'a, S> {}
 
-impl<'a> AclWatchCall<'a> {
+impl<'a, S> AclWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4438,7 +4485,7 @@ impl<'a> AclWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> AclWatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> AclWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4448,7 +4495,7 @@ impl<'a> AclWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4458,28 +4505,28 @@ impl<'a> AclWatchCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4489,7 +4536,7 @@ impl<'a> AclWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4510,7 +4557,7 @@ impl<'a> AclWatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4530,9 +4577,9 @@ impl<'a> AclWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AclWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4564,7 +4611,7 @@ impl<'a> AclWatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4572,19 +4619,25 @@ impl<'a> AclWatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListDeleteCall<'a>
-    where  {
+pub struct CalendarListDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListDeleteCall<'a, S> {}
 
-impl<'a> CalendarListDeleteCall<'a> {
+impl<'a, S> CalendarListDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4716,7 +4769,7 @@ impl<'a> CalendarListDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4726,7 +4779,7 @@ impl<'a> CalendarListDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4747,7 +4800,7 @@ impl<'a> CalendarListDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4767,9 +4820,9 @@ impl<'a> CalendarListDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4801,7 +4854,7 @@ impl<'a> CalendarListDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4809,19 +4862,25 @@ impl<'a> CalendarListDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListGetCall<'a>
-    where  {
+pub struct CalendarListGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListGetCall<'a, S> {}
 
-impl<'a> CalendarListGetCall<'a> {
+impl<'a, S> CalendarListGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4964,7 +5023,7 @@ impl<'a> CalendarListGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4974,7 +5033,7 @@ impl<'a> CalendarListGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4995,7 +5054,7 @@ impl<'a> CalendarListGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5015,9 +5074,9 @@ impl<'a> CalendarListGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5050,7 +5109,7 @@ impl<'a> CalendarListGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5064,10 +5123,10 @@ impl<'a> CalendarListGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListInsertCall<'a>
-    where  {
+pub struct CalendarListInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: CalendarListEntry,
     _color_rgb_format: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5075,9 +5134,15 @@ pub struct CalendarListInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListInsertCall<'a, S> {}
 
-impl<'a> CalendarListInsertCall<'a> {
+impl<'a, S> CalendarListInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5214,14 +5279,14 @@ impl<'a> CalendarListInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListInsertCall<'a> {
+    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListInsertCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     ///
     /// Sets the *color rgb format* query property to the given value.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a, S> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -5231,7 +5296,7 @@ impl<'a> CalendarListInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5252,7 +5317,7 @@ impl<'a> CalendarListInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5272,9 +5337,9 @@ impl<'a> CalendarListInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5306,7 +5371,7 @@ impl<'a> CalendarListInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5320,10 +5385,10 @@ impl<'a> CalendarListInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListListCall<'a>
-    where  {
+pub struct CalendarListListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _sync_token: Option<String>,
     _show_hidden: Option<bool>,
     _show_deleted: Option<bool>,
@@ -5335,9 +5400,15 @@ pub struct CalendarListListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListListCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListListCall<'a, S> {}
 
-impl<'a> CalendarListListCall<'a> {
+impl<'a, S> CalendarListListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5477,42 +5548,42 @@ impl<'a> CalendarListListCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to show hidden entries. Optional. The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
-    pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a> {
+    pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a, S> {
         self._show_hidden = Some(new_value);
         self
     }
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The minimum access role for the user in the returned entries. Optional. The default is no restriction.
     ///
     /// Sets the *min access role* query property to the given value.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a> {
+    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, S> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -5522,7 +5593,7 @@ impl<'a> CalendarListListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5543,7 +5614,7 @@ impl<'a> CalendarListListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5563,9 +5634,9 @@ impl<'a> CalendarListListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5598,7 +5669,7 @@ impl<'a> CalendarListListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5612,10 +5683,10 @@ impl<'a> CalendarListListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListPatchCall<'a>
-    where  {
+pub struct CalendarListPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: CalendarListEntry,
     _calendar_id: String,
     _color_rgb_format: Option<bool>,
@@ -5624,9 +5695,15 @@ pub struct CalendarListPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListPatchCall<'a, S> {}
 
-impl<'a> CalendarListPatchCall<'a> {
+impl<'a, S> CalendarListPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5785,7 +5862,7 @@ impl<'a> CalendarListPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListPatchCall<'a> {
+    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5795,14 +5872,14 @@ impl<'a> CalendarListPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     ///
     /// Sets the *color rgb format* query property to the given value.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a, S> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -5812,7 +5889,7 @@ impl<'a> CalendarListPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5833,7 +5910,7 @@ impl<'a> CalendarListPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5853,9 +5930,9 @@ impl<'a> CalendarListPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5888,7 +5965,7 @@ impl<'a> CalendarListPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5902,10 +5979,10 @@ impl<'a> CalendarListPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListUpdateCall<'a>
-    where  {
+pub struct CalendarListUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: CalendarListEntry,
     _calendar_id: String,
     _color_rgb_format: Option<bool>,
@@ -5914,9 +5991,15 @@ pub struct CalendarListUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListUpdateCall<'a, S> {}
 
-impl<'a> CalendarListUpdateCall<'a> {
+impl<'a, S> CalendarListUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6075,7 +6158,7 @@ impl<'a> CalendarListUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListUpdateCall<'a> {
+    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6085,14 +6168,14 @@ impl<'a> CalendarListUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     ///
     /// Sets the *color rgb format* query property to the given value.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a, S> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -6102,7 +6185,7 @@ impl<'a> CalendarListUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6123,7 +6206,7 @@ impl<'a> CalendarListUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6143,9 +6226,9 @@ impl<'a> CalendarListUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6178,7 +6261,7 @@ impl<'a> CalendarListUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6197,10 +6280,10 @@ impl<'a> CalendarListUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListWatchCall<'a>
-    where  {
+pub struct CalendarListWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Channel,
     _sync_token: Option<String>,
     _show_hidden: Option<bool>,
@@ -6213,9 +6296,15 @@ pub struct CalendarListWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarListWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarListWatchCall<'a, S> {}
 
-impl<'a> CalendarListWatchCall<'a> {
+impl<'a, S> CalendarListWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6367,7 +6456,7 @@ impl<'a> CalendarListWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> CalendarListWatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> CalendarListWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6378,42 +6467,42 @@ impl<'a> CalendarListWatchCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to show hidden entries. Optional. The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
-    pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a> {
+    pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a, S> {
         self._show_hidden = Some(new_value);
         self
     }
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The minimum access role for the user in the returned entries. Optional. The default is no restriction.
     ///
     /// Sets the *min access role* query property to the given value.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a> {
+    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, S> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -6423,7 +6512,7 @@ impl<'a> CalendarListWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6444,7 +6533,7 @@ impl<'a> CalendarListWatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6464,9 +6553,9 @@ impl<'a> CalendarListWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarListWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6498,7 +6587,7 @@ impl<'a> CalendarListWatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6506,19 +6595,25 @@ impl<'a> CalendarListWatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarClearCall<'a>
-    where  {
+pub struct CalendarClearCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarClearCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarClearCall<'a, S> {}
 
-impl<'a> CalendarClearCall<'a> {
+impl<'a, S> CalendarClearCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6650,7 +6745,7 @@ impl<'a> CalendarClearCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6660,7 +6755,7 @@ impl<'a> CalendarClearCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarClearCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarClearCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6681,7 +6776,7 @@ impl<'a> CalendarClearCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6701,9 +6796,9 @@ impl<'a> CalendarClearCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarClearCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarClearCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6735,7 +6830,7 @@ impl<'a> CalendarClearCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6743,19 +6838,25 @@ impl<'a> CalendarClearCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarDeleteCall<'a>
-    where  {
+pub struct CalendarDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarDeleteCall<'a, S> {}
 
-impl<'a> CalendarDeleteCall<'a> {
+impl<'a, S> CalendarDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6887,7 +6988,7 @@ impl<'a> CalendarDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6897,7 +6998,7 @@ impl<'a> CalendarDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6918,7 +7019,7 @@ impl<'a> CalendarDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6938,9 +7039,9 @@ impl<'a> CalendarDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6972,7 +7073,7 @@ impl<'a> CalendarDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6980,19 +7081,25 @@ impl<'a> CalendarDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarGetCall<'a>
-    where  {
+pub struct CalendarGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarGetCall<'a, S> {}
 
-impl<'a> CalendarGetCall<'a> {
+impl<'a, S> CalendarGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7135,7 +7242,7 @@ impl<'a> CalendarGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7145,7 +7252,7 @@ impl<'a> CalendarGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7166,7 +7273,7 @@ impl<'a> CalendarGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7186,9 +7293,9 @@ impl<'a> CalendarGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7221,7 +7328,7 @@ impl<'a> CalendarGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7234,19 +7341,25 @@ impl<'a> CalendarGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarInsertCall<'a>
-    where  {
+pub struct CalendarInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Calendar,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarInsertCall<'a, S> {}
 
-impl<'a> CalendarInsertCall<'a> {
+impl<'a, S> CalendarInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7380,7 +7493,7 @@ impl<'a> CalendarInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Calendar) -> CalendarInsertCall<'a> {
+    pub fn request(mut self, new_value: Calendar) -> CalendarInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7390,7 +7503,7 @@ impl<'a> CalendarInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7411,7 +7524,7 @@ impl<'a> CalendarInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7431,9 +7544,9 @@ impl<'a> CalendarInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7466,7 +7579,7 @@ impl<'a> CalendarInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7479,10 +7592,10 @@ impl<'a> CalendarInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarPatchCall<'a>
-    where  {
+pub struct CalendarPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Calendar,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7490,9 +7603,15 @@ pub struct CalendarPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarPatchCall<'a, S> {}
 
-impl<'a> CalendarPatchCall<'a> {
+impl<'a, S> CalendarPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7648,7 +7767,7 @@ impl<'a> CalendarPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Calendar) -> CalendarPatchCall<'a> {
+    pub fn request(mut self, new_value: Calendar) -> CalendarPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7658,7 +7777,7 @@ impl<'a> CalendarPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7668,7 +7787,7 @@ impl<'a> CalendarPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7689,7 +7808,7 @@ impl<'a> CalendarPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7709,9 +7828,9 @@ impl<'a> CalendarPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7744,7 +7863,7 @@ impl<'a> CalendarPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7757,10 +7876,10 @@ impl<'a> CalendarPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarUpdateCall<'a>
-    where  {
+pub struct CalendarUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Calendar,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7768,9 +7887,15 @@ pub struct CalendarUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CalendarUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CalendarUpdateCall<'a, S> {}
 
-impl<'a> CalendarUpdateCall<'a> {
+impl<'a, S> CalendarUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7926,7 +8051,7 @@ impl<'a> CalendarUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Calendar) -> CalendarUpdateCall<'a> {
+    pub fn request(mut self, new_value: Calendar) -> CalendarUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7936,7 +8061,7 @@ impl<'a> CalendarUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7946,7 +8071,7 @@ impl<'a> CalendarUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7967,7 +8092,7 @@ impl<'a> CalendarUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7987,9 +8112,9 @@ impl<'a> CalendarUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CalendarUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8022,7 +8147,7 @@ impl<'a> CalendarUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8035,19 +8160,25 @@ impl<'a> CalendarUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelStopCall<'a>
-    where  {
+pub struct ChannelStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Channel,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ChannelStopCall<'a> {}
+impl<'a, S> client::CallBuilder for ChannelStopCall<'a, S> {}
 
-impl<'a> ChannelStopCall<'a> {
+impl<'a, S> ChannelStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8170,7 +8301,7 @@ impl<'a> ChannelStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8180,7 +8311,7 @@ impl<'a> ChannelStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8201,7 +8332,7 @@ impl<'a> ChannelStopCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8221,9 +8352,9 @@ impl<'a> ChannelStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ChannelStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8255,7 +8386,7 @@ impl<'a> ChannelStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8263,18 +8394,24 @@ impl<'a> ChannelStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColorGetCall<'a>
-    where  {
+pub struct ColorGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ColorGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ColorGetCall<'a, S> {}
 
-impl<'a> ColorGetCall<'a> {
+impl<'a, S> ColorGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8395,7 +8532,7 @@ impl<'a> ColorGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColorGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColorGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8416,7 +8553,7 @@ impl<'a> ColorGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8436,9 +8573,9 @@ impl<'a> ColorGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColorGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ColorGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8470,7 +8607,7 @@ impl<'a> ColorGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8480,10 +8617,10 @@ impl<'a> ColorGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventDeleteCall<'a>
-    where  {
+pub struct EventDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _event_id: String,
     _send_updates: Option<String>,
@@ -8493,9 +8630,15 @@ pub struct EventDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for EventDeleteCall<'a, S> {}
 
-impl<'a> EventDeleteCall<'a> {
+impl<'a, S> EventDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8634,7 +8777,7 @@ impl<'a> EventDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -8644,14 +8787,14 @@ impl<'a> EventDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
     /// Guests who should receive notifications about the deletion of the event.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventDeleteCall<'a> {
+    pub fn send_updates(mut self, new_value: &str) -> EventDeleteCall<'a, S> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -8660,7 +8803,7 @@ impl<'a> EventDeleteCall<'a> {
     /// Whether to send notifications about the deletion of the event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -8670,7 +8813,7 @@ impl<'a> EventDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8691,7 +8834,7 @@ impl<'a> EventDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8711,9 +8854,9 @@ impl<'a> EventDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8745,7 +8888,7 @@ impl<'a> EventDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8756,10 +8899,10 @@ impl<'a> EventDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventGetCall<'a>
-    where  {
+pub struct EventGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _event_id: String,
     _time_zone: Option<String>,
@@ -8770,9 +8913,15 @@ pub struct EventGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EventGetCall<'a, S> {}
 
-impl<'a> EventGetCall<'a> {
+impl<'a, S> EventGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8925,7 +9074,7 @@ impl<'a> EventGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -8935,28 +9084,28 @@ impl<'a> EventGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a> {
+    pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a, S> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, S> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -8966,7 +9115,7 @@ impl<'a> EventGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8987,7 +9136,7 @@ impl<'a> EventGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9007,9 +9156,9 @@ impl<'a> EventGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9042,7 +9191,7 @@ impl<'a> EventGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9057,10 +9206,10 @@ impl<'a> EventGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventImportCall<'a>
-    where  {
+pub struct EventImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Event,
     _calendar_id: String,
     _supports_attachments: Option<bool>,
@@ -9070,9 +9219,15 @@ pub struct EventImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventImportCall<'a> {}
+impl<'a, S> client::CallBuilder for EventImportCall<'a, S> {}
 
-impl<'a> EventImportCall<'a> {
+impl<'a, S> EventImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9234,7 +9389,7 @@ impl<'a> EventImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventImportCall<'a> {
+    pub fn request(mut self, new_value: Event) -> EventImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9244,21 +9399,21 @@ impl<'a> EventImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventImportCall<'a> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventImportCall<'a, S> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventImportCall<'a> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventImportCall<'a, S> {
         self._conference_data_version = Some(new_value);
         self
     }
@@ -9268,7 +9423,7 @@ impl<'a> EventImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9289,7 +9444,7 @@ impl<'a> EventImportCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9309,9 +9464,9 @@ impl<'a> EventImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9344,7 +9499,7 @@ impl<'a> EventImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9362,10 +9517,10 @@ impl<'a> EventImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventInsertCall<'a>
-    where  {
+pub struct EventInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Event,
     _calendar_id: String,
     _supports_attachments: Option<bool>,
@@ -9378,9 +9533,15 @@ pub struct EventInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for EventInsertCall<'a, S> {}
 
-impl<'a> EventInsertCall<'a> {
+impl<'a, S> EventInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9551,7 +9712,7 @@ impl<'a> EventInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventInsertCall<'a> {
+    pub fn request(mut self, new_value: Event) -> EventInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9561,21 +9722,21 @@ impl<'a> EventInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventInsertCall<'a> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventInsertCall<'a, S> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent. The default is false.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventInsertCall<'a> {
+    pub fn send_updates(mut self, new_value: &str) -> EventInsertCall<'a, S> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -9584,21 +9745,21 @@ impl<'a> EventInsertCall<'a> {
     /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventInsertCall<'a> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventInsertCall<'a, S> {
         self._conference_data_version = Some(new_value);
         self
     }
@@ -9608,7 +9769,7 @@ impl<'a> EventInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9629,7 +9790,7 @@ impl<'a> EventInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9649,9 +9810,9 @@ impl<'a> EventInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9683,7 +9844,7 @@ impl<'a> EventInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9700,10 +9861,10 @@ impl<'a> EventInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventInstanceCall<'a>
-    where  {
+pub struct EventInstanceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _event_id: String,
     _time_zone: Option<String>,
@@ -9720,9 +9881,15 @@ pub struct EventInstanceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventInstanceCall<'a> {}
+impl<'a, S> client::CallBuilder for EventInstanceCall<'a, S> {}
 
-impl<'a> EventInstanceCall<'a> {
+impl<'a, S> EventInstanceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9893,7 +10060,7 @@ impl<'a> EventInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -9903,70 +10070,70 @@ impl<'a> EventInstanceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset.
     ///
     /// Sets the *time min* query property to the given value.
-    pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._time_min = Some(new_value.to_string());
         self
     }
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset.
     ///
     /// Sets the *time max* query property to the given value.
-    pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._time_max = Some(new_value.to_string());
         self
     }
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events will still be included if singleEvents is False. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The original start time of the instance in the result. Optional.
     ///
     /// Sets the *original start* query property to the given value.
-    pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a> {
+    pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a, S> {
         self._original_start = Some(new_value.to_string());
         self
     }
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, S> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -9976,7 +10143,7 @@ impl<'a> EventInstanceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInstanceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInstanceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9997,7 +10164,7 @@ impl<'a> EventInstanceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10017,9 +10184,9 @@ impl<'a> EventInstanceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventInstanceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventInstanceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10051,7 +10218,7 @@ impl<'a> EventInstanceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10076,10 +10243,10 @@ impl<'a> EventInstanceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventListCall<'a>
-    where  {
+pub struct EventListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _updated_min: Option<String>,
     _time_zone: Option<String>,
@@ -10103,9 +10270,15 @@ pub struct EventListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventListCall<'a> {}
+impl<'a, S> client::CallBuilder for EventListCall<'a, S> {}
 
-impl<'a> EventListCall<'a> {
+impl<'a, S> EventListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10303,35 +10476,35 @@ impl<'a> EventListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// Lower bound (exclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMax is set, timeMin must be smaller than timeMax.
     ///
     /// Sets the *time min* query property to the given value.
-    pub fn time_min(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._time_min = Some(new_value.to_string());
         self
     }
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMin is set, timeMax must be greater than timeMin.
     ///
     /// Sets the *time max* query property to the given value.
-    pub fn time_max(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -10351,28 +10524,28 @@ impl<'a> EventListCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
     ///
     /// Sets the *single events* query property to the given value.
-    pub fn single_events(mut self, new_value: bool) -> EventListCall<'a> {
+    pub fn single_events(mut self, new_value: bool) -> EventListCall<'a, S> {
         self._single_events = Some(new_value);
         self
     }
     /// Whether to include hidden invitations in the result. Optional. The default is False.
     ///
     /// Sets the *show hidden invitations* query property to the given value.
-    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a> {
+    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a, S> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -10380,14 +10553,14 @@ impl<'a> EventListCall<'a> {
     ///
     /// Append the given value to the *shared extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -10395,49 +10568,49 @@ impl<'a> EventListCall<'a> {
     ///
     /// Append the given value to the *private extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> EventListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
     ///
     /// Sets the *i cal uid* query property to the given value.
-    pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a> {
+    pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a, S> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, S> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -10447,7 +10620,7 @@ impl<'a> EventListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10468,7 +10641,7 @@ impl<'a> EventListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10488,9 +10661,9 @@ impl<'a> EventListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10522,7 +10695,7 @@ impl<'a> EventListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10532,10 +10705,10 @@ impl<'a> EventListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventMoveCall<'a>
-    where  {
+pub struct EventMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _event_id: String,
     _destination: String,
@@ -10546,9 +10719,15 @@ pub struct EventMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for EventMoveCall<'a, S> {}
 
-impl<'a> EventMoveCall<'a> {
+impl<'a, S> EventMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10699,7 +10878,7 @@ impl<'a> EventMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -10709,7 +10888,7 @@ impl<'a> EventMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
@@ -10719,14 +10898,14 @@ impl<'a> EventMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a> {
+    pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, S> {
         self._destination = new_value.to_string();
         self
     }
     /// Guests who should receive notifications about the change of the event's organizer.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventMoveCall<'a> {
+    pub fn send_updates(mut self, new_value: &str) -> EventMoveCall<'a, S> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -10735,7 +10914,7 @@ impl<'a> EventMoveCall<'a> {
     /// Whether to send notifications about the change of the event's organizer. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -10745,7 +10924,7 @@ impl<'a> EventMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10766,7 +10945,7 @@ impl<'a> EventMoveCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10786,9 +10965,9 @@ impl<'a> EventMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10821,7 +11000,7 @@ impl<'a> EventMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10840,10 +11019,10 @@ impl<'a> EventMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventPatchCall<'a>
-    where  {
+pub struct EventPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Event,
     _calendar_id: String,
     _event_id: String,
@@ -10858,9 +11037,15 @@ pub struct EventPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EventPatchCall<'a, S> {}
 
-impl<'a> EventPatchCall<'a> {
+impl<'a, S> EventPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11035,7 +11220,7 @@ impl<'a> EventPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventPatchCall<'a> {
+    pub fn request(mut self, new_value: Event) -> EventPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11045,7 +11230,7 @@ impl<'a> EventPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11055,21 +11240,21 @@ impl<'a> EventPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventPatchCall<'a> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventPatchCall<'a, S> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Guests who should receive notifications about the event update (for example, title changes, etc.).
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventPatchCall<'a> {
+    pub fn send_updates(mut self, new_value: &str) -> EventPatchCall<'a, S> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -11078,28 +11263,28 @@ impl<'a> EventPatchCall<'a> {
     /// Whether to send notifications about the event update (for example, description changes, etc.). Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventPatchCall<'a> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventPatchCall<'a, S> {
         self._conference_data_version = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, S> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -11109,7 +11294,7 @@ impl<'a> EventPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11130,7 +11315,7 @@ impl<'a> EventPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11150,9 +11335,9 @@ impl<'a> EventPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11184,7 +11369,7 @@ impl<'a> EventPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11194,10 +11379,10 @@ impl<'a> EventPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventQuickAddCall<'a>
-    where  {
+pub struct EventQuickAddCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _calendar_id: String,
     _text: String,
     _send_updates: Option<String>,
@@ -11207,9 +11392,15 @@ pub struct EventQuickAddCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventQuickAddCall<'a> {}
+impl<'a, S> client::CallBuilder for EventQuickAddCall<'a, S> {}
 
-impl<'a> EventQuickAddCall<'a> {
+impl<'a, S> EventQuickAddCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11359,7 +11550,7 @@ impl<'a> EventQuickAddCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11369,14 +11560,14 @@ impl<'a> EventQuickAddCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a> {
+    pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, S> {
         self._text = new_value.to_string();
         self
     }
     /// Guests who should receive notifications about the creation of the new event.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventQuickAddCall<'a> {
+    pub fn send_updates(mut self, new_value: &str) -> EventQuickAddCall<'a, S> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -11385,7 +11576,7 @@ impl<'a> EventQuickAddCall<'a> {
     /// Whether to send notifications about the creation of the event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -11395,7 +11586,7 @@ impl<'a> EventQuickAddCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventQuickAddCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventQuickAddCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11416,7 +11607,7 @@ impl<'a> EventQuickAddCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11436,9 +11627,9 @@ impl<'a> EventQuickAddCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventQuickAddCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventQuickAddCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11471,7 +11662,7 @@ impl<'a> EventQuickAddCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11490,10 +11681,10 @@ impl<'a> EventQuickAddCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventUpdateCall<'a>
-    where  {
+pub struct EventUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Event,
     _calendar_id: String,
     _event_id: String,
@@ -11508,9 +11699,15 @@ pub struct EventUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for EventUpdateCall<'a, S> {}
 
-impl<'a> EventUpdateCall<'a> {
+impl<'a, S> EventUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11685,7 +11882,7 @@ impl<'a> EventUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventUpdateCall<'a> {
+    pub fn request(mut self, new_value: Event) -> EventUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11695,7 +11892,7 @@ impl<'a> EventUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11705,21 +11902,21 @@ impl<'a> EventUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventUpdateCall<'a> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventUpdateCall<'a, S> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Guests who should receive notifications about the event update (for example, title changes, etc.).
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventUpdateCall<'a> {
+    pub fn send_updates(mut self, new_value: &str) -> EventUpdateCall<'a, S> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -11728,28 +11925,28 @@ impl<'a> EventUpdateCall<'a> {
     /// Whether to send notifications about the event update (for example, description changes, etc.). Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, S> {
         self._send_notifications = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventUpdateCall<'a> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventUpdateCall<'a, S> {
         self._conference_data_version = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, S> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -11759,7 +11956,7 @@ impl<'a> EventUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11780,7 +11977,7 @@ impl<'a> EventUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11800,9 +11997,9 @@ impl<'a> EventUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11835,7 +12032,7 @@ impl<'a> EventUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11865,10 +12062,10 @@ impl<'a> EventUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventWatchCall<'a>
-    where  {
+pub struct EventWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Channel,
     _calendar_id: String,
     _updated_min: Option<String>,
@@ -11893,9 +12090,15 @@ pub struct EventWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for EventWatchCall<'a, S> {}
 
-impl<'a> EventWatchCall<'a> {
+impl<'a, S> EventWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12106,7 +12309,7 @@ impl<'a> EventWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> EventWatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> EventWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12116,35 +12319,35 @@ impl<'a> EventWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// Lower bound (exclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMax is set, timeMin must be smaller than timeMax.
     ///
     /// Sets the *time min* query property to the given value.
-    pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._time_min = Some(new_value.to_string());
         self
     }
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMin is set, timeMax must be greater than timeMin.
     ///
     /// Sets the *time max* query property to the given value.
-    pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -12164,28 +12367,28 @@ impl<'a> EventWatchCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
     ///
     /// Sets the *single events* query property to the given value.
-    pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a> {
+    pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a, S> {
         self._single_events = Some(new_value);
         self
     }
     /// Whether to include hidden invitations in the result. Optional. The default is False.
     ///
     /// Sets the *show hidden invitations* query property to the given value.
-    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a> {
+    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a, S> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -12193,14 +12396,14 @@ impl<'a> EventWatchCall<'a> {
     ///
     /// Append the given value to the *shared extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -12208,49 +12411,49 @@ impl<'a> EventWatchCall<'a> {
     ///
     /// Append the given value to the *private extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a, S> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
     ///
     /// Sets the *i cal uid* query property to the given value.
-    pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a> {
+    pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a, S> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, S> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -12260,7 +12463,7 @@ impl<'a> EventWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12281,7 +12484,7 @@ impl<'a> EventWatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12301,9 +12504,9 @@ impl<'a> EventWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12336,7 +12539,7 @@ impl<'a> EventWatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12349,19 +12552,25 @@ impl<'a> EventWatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FreebusyQueryCall<'a>
-    where  {
+pub struct FreebusyQueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: FreeBusyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FreebusyQueryCall<'a> {}
+impl<'a, S> client::CallBuilder for FreebusyQueryCall<'a, S> {}
 
-impl<'a> FreebusyQueryCall<'a> {
+impl<'a, S> FreebusyQueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12495,7 +12704,7 @@ impl<'a> FreebusyQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FreeBusyRequest) -> FreebusyQueryCall<'a> {
+    pub fn request(mut self, new_value: FreeBusyRequest) -> FreebusyQueryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12505,7 +12714,7 @@ impl<'a> FreebusyQueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FreebusyQueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FreebusyQueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12526,7 +12735,7 @@ impl<'a> FreebusyQueryCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12546,9 +12755,9 @@ impl<'a> FreebusyQueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FreebusyQueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FreebusyQueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12580,7 +12789,7 @@ impl<'a> FreebusyQueryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12588,19 +12797,25 @@ impl<'a> FreebusyQueryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingGetCall<'a>
-    where  {
+pub struct SettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _setting: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SettingGetCall<'a, S> {}
 
-impl<'a> SettingGetCall<'a> {
+impl<'a, S> SettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12743,7 +12958,7 @@ impl<'a> SettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a> {
+    pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, S> {
         self._setting = new_value.to_string();
         self
     }
@@ -12753,7 +12968,7 @@ impl<'a> SettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12774,7 +12989,7 @@ impl<'a> SettingGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12794,9 +13009,9 @@ impl<'a> SettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12828,7 +13043,7 @@ impl<'a> SettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12839,10 +13054,10 @@ impl<'a> SettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingListCall<'a>
-    where  {
+pub struct SettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _sync_token: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -12851,9 +13066,15 @@ pub struct SettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for SettingListCall<'a, S> {}
 
-impl<'a> SettingListCall<'a> {
+impl<'a, S> SettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12983,21 +13204,21 @@ impl<'a> SettingListCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -13007,7 +13228,7 @@ impl<'a> SettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13028,7 +13249,7 @@ impl<'a> SettingListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13048,9 +13269,9 @@ impl<'a> SettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13083,7 +13304,7 @@ impl<'a> SettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CalendarHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13099,10 +13320,10 @@ impl<'a> SettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingWatchCall<'a>
-    where  {
+pub struct SettingWatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CalendarHub<>,
+    hub: &'a CalendarHub<S>,
     _request: Channel,
     _sync_token: Option<String>,
     _page_token: Option<String>,
@@ -13112,9 +13333,15 @@ pub struct SettingWatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SettingWatchCall<'a> {}
+impl<'a, S> client::CallBuilder for SettingWatchCall<'a, S> {}
 
-impl<'a> SettingWatchCall<'a> {
+impl<'a, S> SettingWatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13257,7 +13484,7 @@ impl<'a> SettingWatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> SettingWatchCall<'a> {
+    pub fn request(mut self, new_value: Channel) -> SettingWatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13267,21 +13494,21 @@ impl<'a> SettingWatchCall<'a> {
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -13291,7 +13518,7 @@ impl<'a> SettingWatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingWatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingWatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13312,7 +13539,7 @@ impl<'a> SettingWatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13332,9 +13559,9 @@ impl<'a> SettingWatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingWatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SettingWatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

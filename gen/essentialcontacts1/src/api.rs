@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,40 +109,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Essentialcontacts<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Essentialcontacts<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Essentialcontacts<> {}
+impl<'a, S> client::Hub for Essentialcontacts<S> {}
 
-impl<'a, > Essentialcontacts<> {
+impl<'a, S> Essentialcontacts<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Essentialcontacts<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Essentialcontacts<S> {
         Essentialcontacts {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://essentialcontacts.googleapis.com/".to_string(),
             _root_url: "https://essentialcontacts.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a> {
+    pub fn folders(&'a self) -> FolderMethods<'a, S> {
         FolderMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -321,22 +326,22 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `contacts_compute(...)`, `contacts_create(...)`, `contacts_delete(...)`, `contacts_get(...)`, `contacts_list(...)`, `contacts_patch(...)` and `contacts_send_test_message(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a>
-    where  {
+pub struct FolderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
 }
 
-impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FolderMethods<'a, S> {}
 
-impl<'a> FolderMethods<'a> {
+impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -345,7 +350,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_compute(&self, parent: &str) -> FolderContactComputeCall<'a> {
+    pub fn contacts_compute(&self, parent: &str) -> FolderContactComputeCall<'a, S> {
         FolderContactComputeCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -366,7 +371,7 @@ impl<'a> FolderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource to save this contact for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> FolderContactCreateCall<'a> {
+    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> FolderContactCreateCall<'a, S> {
         FolderContactCreateCall {
             hub: self.hub,
             _request: request,
@@ -384,7 +389,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_delete(&self, name: &str) -> FolderContactDeleteCall<'a> {
+    pub fn contacts_delete(&self, name: &str) -> FolderContactDeleteCall<'a, S> {
         FolderContactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -401,7 +406,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_get(&self, name: &str) -> FolderContactGetCall<'a> {
+    pub fn contacts_get(&self, name: &str) -> FolderContactGetCall<'a, S> {
         FolderContactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -418,7 +423,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_list(&self, parent: &str) -> FolderContactListCall<'a> {
+    pub fn contacts_list(&self, parent: &str) -> FolderContactListCall<'a, S> {
         FolderContactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -438,7 +443,7 @@ impl<'a> FolderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> FolderContactPatchCall<'a> {
+    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> FolderContactPatchCall<'a, S> {
         FolderContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -458,7 +463,7 @@ impl<'a> FolderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - Required. The name of the resource to send the test message for. All contacts must either be set directly on this resource or inherited from another resource that is an ancestor of this one. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> FolderContactSendTestMessageCall<'a> {
+    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> FolderContactSendTestMessageCall<'a, S> {
         FolderContactSendTestMessageCall {
             hub: self.hub,
             _request: request,
@@ -493,22 +498,22 @@ impl<'a> FolderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `contacts_compute(...)`, `contacts_create(...)`, `contacts_delete(...)`, `contacts_get(...)`, `contacts_list(...)`, `contacts_patch(...)` and `contacts_send_test_message(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a>
-    where  {
+pub struct OrganizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
 
-impl<'a> OrganizationMethods<'a> {
+impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -517,7 +522,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_compute(&self, parent: &str) -> OrganizationContactComputeCall<'a> {
+    pub fn contacts_compute(&self, parent: &str) -> OrganizationContactComputeCall<'a, S> {
         OrganizationContactComputeCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -538,7 +543,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource to save this contact for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> OrganizationContactCreateCall<'a> {
+    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> OrganizationContactCreateCall<'a, S> {
         OrganizationContactCreateCall {
             hub: self.hub,
             _request: request,
@@ -556,7 +561,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_delete(&self, name: &str) -> OrganizationContactDeleteCall<'a> {
+    pub fn contacts_delete(&self, name: &str) -> OrganizationContactDeleteCall<'a, S> {
         OrganizationContactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -573,7 +578,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_get(&self, name: &str) -> OrganizationContactGetCall<'a> {
+    pub fn contacts_get(&self, name: &str) -> OrganizationContactGetCall<'a, S> {
         OrganizationContactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -590,7 +595,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_list(&self, parent: &str) -> OrganizationContactListCall<'a> {
+    pub fn contacts_list(&self, parent: &str) -> OrganizationContactListCall<'a, S> {
         OrganizationContactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -610,7 +615,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> OrganizationContactPatchCall<'a> {
+    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> OrganizationContactPatchCall<'a, S> {
         OrganizationContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -630,7 +635,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - Required. The name of the resource to send the test message for. All contacts must either be set directly on this resource or inherited from another resource that is an ancestor of this one. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> OrganizationContactSendTestMessageCall<'a> {
+    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> OrganizationContactSendTestMessageCall<'a, S> {
         OrganizationContactSendTestMessageCall {
             hub: self.hub,
             _request: request,
@@ -665,22 +670,22 @@ impl<'a> OrganizationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `contacts_compute(...)`, `contacts_create(...)`, `contacts_delete(...)`, `contacts_get(...)`, `contacts_list(...)`, `contacts_patch(...)` and `contacts_send_test_message(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -689,7 +694,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_compute(&self, parent: &str) -> ProjectContactComputeCall<'a> {
+    pub fn contacts_compute(&self, parent: &str) -> ProjectContactComputeCall<'a, S> {
         ProjectContactComputeCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -710,7 +715,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource to save this contact for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> ProjectContactCreateCall<'a> {
+    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> ProjectContactCreateCall<'a, S> {
         ProjectContactCreateCall {
             hub: self.hub,
             _request: request,
@@ -728,7 +733,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_delete(&self, name: &str) -> ProjectContactDeleteCall<'a> {
+    pub fn contacts_delete(&self, name: &str) -> ProjectContactDeleteCall<'a, S> {
         ProjectContactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -745,7 +750,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_get(&self, name: &str) -> ProjectContactGetCall<'a> {
+    pub fn contacts_get(&self, name: &str) -> ProjectContactGetCall<'a, S> {
         ProjectContactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -762,7 +767,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_list(&self, parent: &str) -> ProjectContactListCall<'a> {
+    pub fn contacts_list(&self, parent: &str) -> ProjectContactListCall<'a, S> {
         ProjectContactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -782,7 +787,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> ProjectContactPatchCall<'a> {
+    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> ProjectContactPatchCall<'a, S> {
         ProjectContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -802,7 +807,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - Required. The name of the resource to send the test message for. All contacts must either be set directly on this resource or inherited from another resource that is an ancestor of this one. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> ProjectContactSendTestMessageCall<'a> {
+    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> ProjectContactSendTestMessageCall<'a, S> {
         ProjectContactSendTestMessageCall {
             hub: self.hub,
             _request: request,
@@ -844,7 +849,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -855,10 +860,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactComputeCall<'a>
-    where  {
+pub struct FolderContactComputeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -868,9 +873,15 @@ pub struct FolderContactComputeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactComputeCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactComputeCall<'a, S> {}
 
-impl<'a> FolderContactComputeCall<'a> {
+impl<'a, S> FolderContactComputeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1028,21 +1039,21 @@ impl<'a> FolderContactComputeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderContactComputeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderContactComputeCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderContactComputeCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> FolderContactComputeCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1050,7 +1061,7 @@ impl<'a> FolderContactComputeCall<'a> {
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> FolderContactComputeCall<'a> {
+    pub fn add_notification_categories(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
         self._notification_categories.push(new_value.to_string());
         self
     }
@@ -1060,7 +1071,7 @@ impl<'a> FolderContactComputeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactComputeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactComputeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1085,7 +1096,7 @@ impl<'a> FolderContactComputeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactComputeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactComputeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1105,9 +1116,9 @@ impl<'a> FolderContactComputeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactComputeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactComputeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1140,7 +1151,7 @@ impl<'a> FolderContactComputeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1153,10 +1164,10 @@ impl<'a> FolderContactComputeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactCreateCall<'a>
-    where  {
+pub struct FolderContactCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1164,9 +1175,15 @@ pub struct FolderContactCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactCreateCall<'a, S> {}
 
-impl<'a> FolderContactCreateCall<'a> {
+impl<'a, S> FolderContactCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1326,7 +1343,7 @@ impl<'a> FolderContactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> FolderContactCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> FolderContactCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1336,7 +1353,7 @@ impl<'a> FolderContactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderContactCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderContactCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1346,7 +1363,7 @@ impl<'a> FolderContactCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1371,7 +1388,7 @@ impl<'a> FolderContactCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1391,9 +1408,9 @@ impl<'a> FolderContactCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1425,7 +1442,7 @@ impl<'a> FolderContactCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1433,19 +1450,25 @@ impl<'a> FolderContactCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactDeleteCall<'a>
-    where  {
+pub struct FolderContactDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactDeleteCall<'a, S> {}
 
-impl<'a> FolderContactDeleteCall<'a> {
+impl<'a, S> FolderContactDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1592,7 +1615,7 @@ impl<'a> FolderContactDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderContactDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderContactDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1602,7 +1625,7 @@ impl<'a> FolderContactDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1627,7 +1650,7 @@ impl<'a> FolderContactDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1647,9 +1670,9 @@ impl<'a> FolderContactDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1681,7 +1704,7 @@ impl<'a> FolderContactDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1689,19 +1712,25 @@ impl<'a> FolderContactDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactGetCall<'a>
-    where  {
+pub struct FolderContactGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactGetCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactGetCall<'a, S> {}
 
-impl<'a> FolderContactGetCall<'a> {
+impl<'a, S> FolderContactGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1848,7 +1877,7 @@ impl<'a> FolderContactGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderContactGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderContactGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1858,7 +1887,7 @@ impl<'a> FolderContactGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1883,7 +1912,7 @@ impl<'a> FolderContactGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1903,9 +1932,9 @@ impl<'a> FolderContactGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1937,7 +1966,7 @@ impl<'a> FolderContactGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1947,10 +1976,10 @@ impl<'a> FolderContactGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactListCall<'a>
-    where  {
+pub struct FolderContactListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1959,9 +1988,15 @@ pub struct FolderContactListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactListCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactListCall<'a, S> {}
 
-impl<'a> FolderContactListCall<'a> {
+impl<'a, S> FolderContactListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2114,21 +2149,21 @@ impl<'a> FolderContactListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderContactListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderContactListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderContactListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> FolderContactListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderContactListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> FolderContactListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2138,7 +2173,7 @@ impl<'a> FolderContactListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2163,7 +2198,7 @@ impl<'a> FolderContactListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2183,9 +2218,9 @@ impl<'a> FolderContactListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2218,7 +2253,7 @@ impl<'a> FolderContactListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2232,10 +2267,10 @@ impl<'a> FolderContactListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactPatchCall<'a>
-    where  {
+pub struct FolderContactPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _name: String,
     _update_mask: Option<String>,
@@ -2244,9 +2279,15 @@ pub struct FolderContactPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactPatchCall<'a, S> {}
 
-impl<'a> FolderContactPatchCall<'a> {
+impl<'a, S> FolderContactPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2409,7 +2450,7 @@ impl<'a> FolderContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> FolderContactPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> FolderContactPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2419,14 +2460,14 @@ impl<'a> FolderContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderContactPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderContactPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask applied to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> FolderContactPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> FolderContactPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2436,7 +2477,7 @@ impl<'a> FolderContactPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2461,7 +2502,7 @@ impl<'a> FolderContactPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2481,9 +2522,9 @@ impl<'a> FolderContactPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2516,7 +2557,7 @@ impl<'a> FolderContactPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2529,10 +2570,10 @@ impl<'a> FolderContactPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactSendTestMessageCall<'a>
-    where  {
+pub struct FolderContactSendTestMessageCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2540,9 +2581,15 @@ pub struct FolderContactSendTestMessageCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderContactSendTestMessageCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderContactSendTestMessageCall<'a, S> {}
 
-impl<'a> FolderContactSendTestMessageCall<'a> {
+impl<'a, S> FolderContactSendTestMessageCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2702,7 +2749,7 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> FolderContactSendTestMessageCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> FolderContactSendTestMessageCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2712,7 +2759,7 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderContactSendTestMessageCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> FolderContactSendTestMessageCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -2722,7 +2769,7 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactSendTestMessageCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactSendTestMessageCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2747,7 +2794,7 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactSendTestMessageCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactSendTestMessageCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2767,9 +2814,9 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderContactSendTestMessageCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderContactSendTestMessageCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2801,7 +2848,7 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2812,10 +2859,10 @@ impl<'a> FolderContactSendTestMessageCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactComputeCall<'a>
-    where  {
+pub struct OrganizationContactComputeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2825,9 +2872,15 @@ pub struct OrganizationContactComputeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactComputeCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactComputeCall<'a, S> {}
 
-impl<'a> OrganizationContactComputeCall<'a> {
+impl<'a, S> OrganizationContactComputeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2985,21 +3038,21 @@ impl<'a> OrganizationContactComputeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationContactComputeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationContactComputeCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationContactComputeCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationContactComputeCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3007,7 +3060,7 @@ impl<'a> OrganizationContactComputeCall<'a> {
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> OrganizationContactComputeCall<'a> {
+    pub fn add_notification_categories(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
         self._notification_categories.push(new_value.to_string());
         self
     }
@@ -3017,7 +3070,7 @@ impl<'a> OrganizationContactComputeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactComputeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactComputeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3042,7 +3095,7 @@ impl<'a> OrganizationContactComputeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactComputeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactComputeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3062,9 +3115,9 @@ impl<'a> OrganizationContactComputeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactComputeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactComputeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3097,7 +3150,7 @@ impl<'a> OrganizationContactComputeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3110,10 +3163,10 @@ impl<'a> OrganizationContactComputeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactCreateCall<'a>
-    where  {
+pub struct OrganizationContactCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3121,9 +3174,15 @@ pub struct OrganizationContactCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactCreateCall<'a, S> {}
 
-impl<'a> OrganizationContactCreateCall<'a> {
+impl<'a, S> OrganizationContactCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3283,7 +3342,7 @@ impl<'a> OrganizationContactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> OrganizationContactCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> OrganizationContactCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3293,7 +3352,7 @@ impl<'a> OrganizationContactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationContactCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationContactCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3303,7 +3362,7 @@ impl<'a> OrganizationContactCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3328,7 +3387,7 @@ impl<'a> OrganizationContactCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3348,9 +3407,9 @@ impl<'a> OrganizationContactCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3382,7 +3441,7 @@ impl<'a> OrganizationContactCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3390,19 +3449,25 @@ impl<'a> OrganizationContactCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactDeleteCall<'a>
-    where  {
+pub struct OrganizationContactDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactDeleteCall<'a, S> {}
 
-impl<'a> OrganizationContactDeleteCall<'a> {
+impl<'a, S> OrganizationContactDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3549,7 +3614,7 @@ impl<'a> OrganizationContactDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationContactDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationContactDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3559,7 +3624,7 @@ impl<'a> OrganizationContactDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3584,7 +3649,7 @@ impl<'a> OrganizationContactDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3604,9 +3669,9 @@ impl<'a> OrganizationContactDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3638,7 +3703,7 @@ impl<'a> OrganizationContactDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3646,19 +3711,25 @@ impl<'a> OrganizationContactDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactGetCall<'a>
-    where  {
+pub struct OrganizationContactGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactGetCall<'a, S> {}
 
-impl<'a> OrganizationContactGetCall<'a> {
+impl<'a, S> OrganizationContactGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3805,7 +3876,7 @@ impl<'a> OrganizationContactGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationContactGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationContactGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3815,7 +3886,7 @@ impl<'a> OrganizationContactGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3840,7 +3911,7 @@ impl<'a> OrganizationContactGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3860,9 +3931,9 @@ impl<'a> OrganizationContactGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3894,7 +3965,7 @@ impl<'a> OrganizationContactGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3904,10 +3975,10 @@ impl<'a> OrganizationContactGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactListCall<'a>
-    where  {
+pub struct OrganizationContactListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3916,9 +3987,15 @@ pub struct OrganizationContactListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactListCall<'a, S> {}
 
-impl<'a> OrganizationContactListCall<'a> {
+impl<'a, S> OrganizationContactListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4071,21 +4148,21 @@ impl<'a> OrganizationContactListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationContactListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationContactListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationContactListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationContactListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationContactListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationContactListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4095,7 +4172,7 @@ impl<'a> OrganizationContactListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4120,7 +4197,7 @@ impl<'a> OrganizationContactListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4140,9 +4217,9 @@ impl<'a> OrganizationContactListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4175,7 +4252,7 @@ impl<'a> OrganizationContactListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4189,10 +4266,10 @@ impl<'a> OrganizationContactListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactPatchCall<'a>
-    where  {
+pub struct OrganizationContactPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _name: String,
     _update_mask: Option<String>,
@@ -4201,9 +4278,15 @@ pub struct OrganizationContactPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactPatchCall<'a, S> {}
 
-impl<'a> OrganizationContactPatchCall<'a> {
+impl<'a, S> OrganizationContactPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4366,7 +4449,7 @@ impl<'a> OrganizationContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> OrganizationContactPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> OrganizationContactPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4376,14 +4459,14 @@ impl<'a> OrganizationContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationContactPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationContactPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask applied to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> OrganizationContactPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> OrganizationContactPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4393,7 +4476,7 @@ impl<'a> OrganizationContactPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4418,7 +4501,7 @@ impl<'a> OrganizationContactPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4438,9 +4521,9 @@ impl<'a> OrganizationContactPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4473,7 +4556,7 @@ impl<'a> OrganizationContactPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4486,10 +4569,10 @@ impl<'a> OrganizationContactPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactSendTestMessageCall<'a>
-    where  {
+pub struct OrganizationContactSendTestMessageCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4497,9 +4580,15 @@ pub struct OrganizationContactSendTestMessageCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationContactSendTestMessageCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationContactSendTestMessageCall<'a, S> {}
 
-impl<'a> OrganizationContactSendTestMessageCall<'a> {
+impl<'a, S> OrganizationContactSendTestMessageCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4659,7 +4748,7 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> OrganizationContactSendTestMessageCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> OrganizationContactSendTestMessageCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4669,7 +4758,7 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationContactSendTestMessageCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationContactSendTestMessageCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4679,7 +4768,7 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactSendTestMessageCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactSendTestMessageCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4704,7 +4793,7 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactSendTestMessageCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactSendTestMessageCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4724,9 +4813,9 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationContactSendTestMessageCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationContactSendTestMessageCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4758,7 +4847,7 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4769,10 +4858,10 @@ impl<'a> OrganizationContactSendTestMessageCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactComputeCall<'a>
-    where  {
+pub struct ProjectContactComputeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4782,9 +4871,15 @@ pub struct ProjectContactComputeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactComputeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactComputeCall<'a, S> {}
 
-impl<'a> ProjectContactComputeCall<'a> {
+impl<'a, S> ProjectContactComputeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4942,21 +5037,21 @@ impl<'a> ProjectContactComputeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectContactComputeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectContactComputeCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectContactComputeCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectContactComputeCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4964,7 +5059,7 @@ impl<'a> ProjectContactComputeCall<'a> {
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> ProjectContactComputeCall<'a> {
+    pub fn add_notification_categories(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
         self._notification_categories.push(new_value.to_string());
         self
     }
@@ -4974,7 +5069,7 @@ impl<'a> ProjectContactComputeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactComputeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactComputeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4999,7 +5094,7 @@ impl<'a> ProjectContactComputeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactComputeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactComputeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5019,9 +5114,9 @@ impl<'a> ProjectContactComputeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactComputeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactComputeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5054,7 +5149,7 @@ impl<'a> ProjectContactComputeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5067,10 +5162,10 @@ impl<'a> ProjectContactComputeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactCreateCall<'a>
-    where  {
+pub struct ProjectContactCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5078,9 +5173,15 @@ pub struct ProjectContactCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactCreateCall<'a, S> {}
 
-impl<'a> ProjectContactCreateCall<'a> {
+impl<'a, S> ProjectContactCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5240,7 +5341,7 @@ impl<'a> ProjectContactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> ProjectContactCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> ProjectContactCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5250,7 +5351,7 @@ impl<'a> ProjectContactCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectContactCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectContactCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5260,7 +5361,7 @@ impl<'a> ProjectContactCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5285,7 +5386,7 @@ impl<'a> ProjectContactCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5305,9 +5406,9 @@ impl<'a> ProjectContactCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5339,7 +5440,7 @@ impl<'a> ProjectContactCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5347,19 +5448,25 @@ impl<'a> ProjectContactCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactDeleteCall<'a>
-    where  {
+pub struct ProjectContactDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactDeleteCall<'a, S> {}
 
-impl<'a> ProjectContactDeleteCall<'a> {
+impl<'a, S> ProjectContactDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5506,7 +5613,7 @@ impl<'a> ProjectContactDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectContactDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectContactDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5516,7 +5623,7 @@ impl<'a> ProjectContactDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5541,7 +5648,7 @@ impl<'a> ProjectContactDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5561,9 +5668,9 @@ impl<'a> ProjectContactDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5595,7 +5702,7 @@ impl<'a> ProjectContactDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5603,19 +5710,25 @@ impl<'a> ProjectContactDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactGetCall<'a>
-    where  {
+pub struct ProjectContactGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactGetCall<'a, S> {}
 
-impl<'a> ProjectContactGetCall<'a> {
+impl<'a, S> ProjectContactGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5762,7 +5875,7 @@ impl<'a> ProjectContactGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectContactGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectContactGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5772,7 +5885,7 @@ impl<'a> ProjectContactGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5797,7 +5910,7 @@ impl<'a> ProjectContactGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5817,9 +5930,9 @@ impl<'a> ProjectContactGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5851,7 +5964,7 @@ impl<'a> ProjectContactGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5861,10 +5974,10 @@ impl<'a> ProjectContactGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactListCall<'a>
-    where  {
+pub struct ProjectContactListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5873,9 +5986,15 @@ pub struct ProjectContactListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactListCall<'a, S> {}
 
-impl<'a> ProjectContactListCall<'a> {
+impl<'a, S> ProjectContactListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6028,21 +6147,21 @@ impl<'a> ProjectContactListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectContactListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectContactListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectContactListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectContactListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectContactListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectContactListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6052,7 +6171,7 @@ impl<'a> ProjectContactListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6077,7 +6196,7 @@ impl<'a> ProjectContactListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6097,9 +6216,9 @@ impl<'a> ProjectContactListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6132,7 +6251,7 @@ impl<'a> ProjectContactListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6146,10 +6265,10 @@ impl<'a> ProjectContactListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactPatchCall<'a>
-    where  {
+pub struct ProjectContactPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _name: String,
     _update_mask: Option<String>,
@@ -6158,9 +6277,15 @@ pub struct ProjectContactPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactPatchCall<'a, S> {}
 
-impl<'a> ProjectContactPatchCall<'a> {
+impl<'a, S> ProjectContactPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6323,7 +6448,7 @@ impl<'a> ProjectContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> ProjectContactPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> ProjectContactPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6333,14 +6458,14 @@ impl<'a> ProjectContactPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectContactPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectContactPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask applied to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectContactPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectContactPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6350,7 +6475,7 @@ impl<'a> ProjectContactPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6375,7 +6500,7 @@ impl<'a> ProjectContactPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6395,9 +6520,9 @@ impl<'a> ProjectContactPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6430,7 +6555,7 @@ impl<'a> ProjectContactPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6443,10 +6568,10 @@ impl<'a> ProjectContactPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactSendTestMessageCall<'a>
-    where  {
+pub struct ProjectContactSendTestMessageCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Essentialcontacts<>,
+    hub: &'a Essentialcontacts<S>,
     _request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6454,9 +6579,15 @@ pub struct ProjectContactSendTestMessageCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectContactSendTestMessageCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectContactSendTestMessageCall<'a, S> {}
 
-impl<'a> ProjectContactSendTestMessageCall<'a> {
+impl<'a, S> ProjectContactSendTestMessageCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6616,7 +6747,7 @@ impl<'a> ProjectContactSendTestMessageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> ProjectContactSendTestMessageCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> ProjectContactSendTestMessageCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6626,7 +6757,7 @@ impl<'a> ProjectContactSendTestMessageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectContactSendTestMessageCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectContactSendTestMessageCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -6636,7 +6767,7 @@ impl<'a> ProjectContactSendTestMessageCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactSendTestMessageCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactSendTestMessageCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6661,7 +6792,7 @@ impl<'a> ProjectContactSendTestMessageCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactSendTestMessageCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactSendTestMessageCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6681,9 +6812,9 @@ impl<'a> ProjectContactSendTestMessageCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContactSendTestMessageCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectContactSendTestMessageCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

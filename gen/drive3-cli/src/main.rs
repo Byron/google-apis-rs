@@ -1,5 +1,5 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/cli/main.rs.mako'
+// This file was generated automatically from 'src/generator/templates/cli/main.rs.mako'
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 

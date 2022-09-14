@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,49 +109,49 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AdSenseHost<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AdSenseHost<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AdSenseHost<> {}
+impl<'a, S> client::Hub for AdSenseHost<S> {}
 
-impl<'a, > AdSenseHost<> {
+impl<'a, S> AdSenseHost<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AdSenseHost<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AdSenseHost<S> {
         AdSenseHost {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/adsensehost/v4.1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn adclients(&'a self) -> AdclientMethods<'a> {
+    pub fn adclients(&'a self) -> AdclientMethods<'a, S> {
         AdclientMethods { hub: &self }
     }
-    pub fn associationsessions(&'a self) -> AssociationsessionMethods<'a> {
+    pub fn associationsessions(&'a self) -> AssociationsessionMethods<'a, S> {
         AssociationsessionMethods { hub: &self }
     }
-    pub fn customchannels(&'a self) -> CustomchannelMethods<'a> {
+    pub fn customchannels(&'a self) -> CustomchannelMethods<'a, S> {
         CustomchannelMethods { hub: &self }
     }
-    pub fn reports(&'a self) -> ReportMethods<'a> {
+    pub fn reports(&'a self) -> ReportMethods<'a, S> {
         ReportMethods { hub: &self }
     }
-    pub fn urlchannels(&'a self) -> UrlchannelMethods<'a> {
+    pub fn urlchannels(&'a self) -> UrlchannelMethods<'a, S> {
         UrlchannelMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -725,22 +730,22 @@ impl client::Part for ReportHeaders {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `adclients_get(...)`, `adclients_list(...)`, `adunits_delete(...)`, `adunits_get(...)`, `adunits_get_ad_code(...)`, `adunits_insert(...)`, `adunits_list(...)`, `adunits_patch(...)`, `adunits_update(...)`, `get(...)`, `list(...)` and `reports_generate(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -750,7 +755,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Account which contains the ad client.
     /// * `adClientId` - Ad client to get.
-    pub fn adclients_get(&self, account_id: &str, ad_client_id: &str) -> AccountAdclientGetCall<'a> {
+    pub fn adclients_get(&self, account_id: &str, ad_client_id: &str) -> AccountAdclientGetCall<'a, S> {
         AccountAdclientGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -768,7 +773,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Account for which to list ad clients.
-    pub fn adclients_list(&self, account_id: &str) -> AccountAdclientListCall<'a> {
+    pub fn adclients_list(&self, account_id: &str) -> AccountAdclientListCall<'a, S> {
         AccountAdclientListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -789,7 +794,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Account which contains the ad unit.
     /// * `adClientId` - Ad client for which to get ad unit.
     /// * `adUnitId` - Ad unit to delete.
-    pub fn adunits_delete(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitDeleteCall<'a> {
+    pub fn adunits_delete(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitDeleteCall<'a, S> {
         AccountAdunitDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -810,7 +815,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Account which contains the ad unit.
     /// * `adClientId` - Ad client for which to get ad unit.
     /// * `adUnitId` - Ad unit to get.
-    pub fn adunits_get(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetCall<'a> {
+    pub fn adunits_get(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetCall<'a, S> {
         AccountAdunitGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -831,7 +836,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Account which contains the ad client.
     /// * `adClientId` - Ad client with contains the ad unit.
     /// * `adUnitId` - Ad unit to get the code for.
-    pub fn adunits_get_ad_code(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetAdCodeCall<'a> {
+    pub fn adunits_get_ad_code(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetAdCodeCall<'a, S> {
         AccountAdunitGetAdCodeCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -853,7 +858,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account which will contain the ad unit.
     /// * `adClientId` - Ad client into which to insert the ad unit.
-    pub fn adunits_insert(&self, request: AdUnit, account_id: &str, ad_client_id: &str) -> AccountAdunitInsertCall<'a> {
+    pub fn adunits_insert(&self, request: AdUnit, account_id: &str, ad_client_id: &str) -> AccountAdunitInsertCall<'a, S> {
         AccountAdunitInsertCall {
             hub: self.hub,
             _request: request,
@@ -873,7 +878,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `accountId` - Account which contains the ad client.
     /// * `adClientId` - Ad client for which to list ad units.
-    pub fn adunits_list(&self, account_id: &str, ad_client_id: &str) -> AccountAdunitListCall<'a> {
+    pub fn adunits_list(&self, account_id: &str, ad_client_id: &str) -> AccountAdunitListCall<'a, S> {
         AccountAdunitListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -897,7 +902,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Account which contains the ad client.
     /// * `adClientId` - Ad client which contains the ad unit.
     /// * `adUnitId` - Ad unit to get.
-    pub fn adunits_patch(&self, request: AdUnit, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitPatchCall<'a> {
+    pub fn adunits_patch(&self, request: AdUnit, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitPatchCall<'a, S> {
         AccountAdunitPatchCall {
             hub: self.hub,
             _request: request,
@@ -919,7 +924,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `accountId` - Account which contains the ad client.
     /// * `adClientId` - Ad client which contains the ad unit.
-    pub fn adunits_update(&self, request: AdUnit, account_id: &str, ad_client_id: &str) -> AccountAdunitUpdateCall<'a> {
+    pub fn adunits_update(&self, request: AdUnit, account_id: &str, ad_client_id: &str) -> AccountAdunitUpdateCall<'a, S> {
         AccountAdunitUpdateCall {
             hub: self.hub,
             _request: request,
@@ -940,7 +945,7 @@ impl<'a> AccountMethods<'a> {
     /// * `accountId` - Hosted account upon which to report.
     /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn reports_generate(&self, account_id: &str, start_date: &str, end_date: &str) -> AccountReportGenerateCall<'a> {
+    pub fn reports_generate(&self, account_id: &str, start_date: &str, end_date: &str) -> AccountReportGenerateCall<'a, S> {
         AccountReportGenerateCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -966,7 +971,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `accountId` - Account to get information about.
-    pub fn get(&self, account_id: &str) -> AccountGetCall<'a> {
+    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, S> {
         AccountGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -983,7 +988,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `filterAdClientId` - Ad clients to list accounts for.
-    pub fn list(&self, filter_ad_client_id: &Vec<String>) -> AccountListCall<'a> {
+    pub fn list(&self, filter_ad_client_id: &Vec<String>) -> AccountListCall<'a, S> {
         AccountListCall {
             hub: self.hub,
             _filter_ad_client_id: filter_ad_client_id.clone(),
@@ -1017,22 +1022,22 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.adclients();
 /// # }
 /// ```
-pub struct AdclientMethods<'a>
-    where  {
+pub struct AdclientMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
 }
 
-impl<'a> client::MethodsBuilder for AdclientMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AdclientMethods<'a, S> {}
 
-impl<'a> AdclientMethods<'a> {
+impl<'a, S> AdclientMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1041,7 +1046,7 @@ impl<'a> AdclientMethods<'a> {
     /// # Arguments
     ///
     /// * `adClientId` - Ad client to get.
-    pub fn get(&self, ad_client_id: &str) -> AdclientGetCall<'a> {
+    pub fn get(&self, ad_client_id: &str) -> AdclientGetCall<'a, S> {
         AdclientGetCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1054,7 +1059,7 @@ impl<'a> AdclientMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all host ad clients in this AdSense account.
-    pub fn list(&self) -> AdclientListCall<'a> {
+    pub fn list(&self) -> AdclientListCall<'a, S> {
         AdclientListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1089,22 +1094,22 @@ impl<'a> AdclientMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `start(...)` and `verify(...)`
 /// // to build up your call.
 /// let rb = hub.associationsessions();
 /// # }
 /// ```
-pub struct AssociationsessionMethods<'a>
-    where  {
+pub struct AssociationsessionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
 }
 
-impl<'a> client::MethodsBuilder for AssociationsessionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AssociationsessionMethods<'a, S> {}
 
-impl<'a> AssociationsessionMethods<'a> {
+impl<'a, S> AssociationsessionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1114,7 +1119,7 @@ impl<'a> AssociationsessionMethods<'a> {
     ///
     /// * `productCode` - Products to associate with the user.
     /// * `websiteUrl` - The URL of the user's hosted website.
-    pub fn start(&self, product_code: &Vec<String>, website_url: &str) -> AssociationsessionStartCall<'a> {
+    pub fn start(&self, product_code: &Vec<String>, website_url: &str) -> AssociationsessionStartCall<'a, S> {
         AssociationsessionStartCall {
             hub: self.hub,
             _product_code: product_code.clone(),
@@ -1135,7 +1140,7 @@ impl<'a> AssociationsessionMethods<'a> {
     /// # Arguments
     ///
     /// * `token` - The token returned to the association callback URL.
-    pub fn verify(&self, token: &str) -> AssociationsessionVerifyCall<'a> {
+    pub fn verify(&self, token: &str) -> AssociationsessionVerifyCall<'a, S> {
         AssociationsessionVerifyCall {
             hub: self.hub,
             _token: token.to_string(),
@@ -1169,22 +1174,22 @@ impl<'a> AssociationsessionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.customchannels();
 /// # }
 /// ```
-pub struct CustomchannelMethods<'a>
-    where  {
+pub struct CustomchannelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
 }
 
-impl<'a> client::MethodsBuilder for CustomchannelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CustomchannelMethods<'a, S> {}
 
-impl<'a> CustomchannelMethods<'a> {
+impl<'a, S> CustomchannelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1194,7 +1199,7 @@ impl<'a> CustomchannelMethods<'a> {
     ///
     /// * `adClientId` - Ad client from which to delete the custom channel.
     /// * `customChannelId` - Custom channel to delete.
-    pub fn delete(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelDeleteCall<'a> {
+    pub fn delete(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelDeleteCall<'a, S> {
         CustomchannelDeleteCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1213,7 +1218,7 @@ impl<'a> CustomchannelMethods<'a> {
     ///
     /// * `adClientId` - Ad client from which to get the custom channel.
     /// * `customChannelId` - Custom channel to get.
-    pub fn get(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelGetCall<'a> {
+    pub fn get(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelGetCall<'a, S> {
         CustomchannelGetCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1232,7 +1237,7 @@ impl<'a> CustomchannelMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `adClientId` - Ad client to which the new custom channel will be added.
-    pub fn insert(&self, request: CustomChannel, ad_client_id: &str) -> CustomchannelInsertCall<'a> {
+    pub fn insert(&self, request: CustomChannel, ad_client_id: &str) -> CustomchannelInsertCall<'a, S> {
         CustomchannelInsertCall {
             hub: self.hub,
             _request: request,
@@ -1250,7 +1255,7 @@ impl<'a> CustomchannelMethods<'a> {
     /// # Arguments
     ///
     /// * `adClientId` - Ad client for which to list custom channels.
-    pub fn list(&self, ad_client_id: &str) -> CustomchannelListCall<'a> {
+    pub fn list(&self, ad_client_id: &str) -> CustomchannelListCall<'a, S> {
         CustomchannelListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1271,7 +1276,7 @@ impl<'a> CustomchannelMethods<'a> {
     /// * `request` - No description provided.
     /// * `adClientId` - Ad client in which the custom channel will be updated.
     /// * `customChannelId` - Custom channel to get.
-    pub fn patch(&self, request: CustomChannel, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelPatchCall<'a> {
+    pub fn patch(&self, request: CustomChannel, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelPatchCall<'a, S> {
         CustomchannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -1291,7 +1296,7 @@ impl<'a> CustomchannelMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `adClientId` - Ad client in which the custom channel will be updated.
-    pub fn update(&self, request: CustomChannel, ad_client_id: &str) -> CustomchannelUpdateCall<'a> {
+    pub fn update(&self, request: CustomChannel, ad_client_id: &str) -> CustomchannelUpdateCall<'a, S> {
         CustomchannelUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1326,22 +1331,22 @@ impl<'a> CustomchannelMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `generate(...)`
 /// // to build up your call.
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a>
-    where  {
+pub struct ReportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
 }
 
-impl<'a> client::MethodsBuilder for ReportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ReportMethods<'a, S> {}
 
-impl<'a> ReportMethods<'a> {
+impl<'a, S> ReportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1351,7 +1356,7 @@ impl<'a> ReportMethods<'a> {
     ///
     /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
-    pub fn generate(&self, start_date: &str, end_date: &str) -> ReportGenerateCall<'a> {
+    pub fn generate(&self, start_date: &str, end_date: &str) -> ReportGenerateCall<'a, S> {
         ReportGenerateCall {
             hub: self.hub,
             _start_date: start_date.to_string(),
@@ -1393,22 +1398,22 @@ impl<'a> ReportMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.urlchannels();
 /// # }
 /// ```
-pub struct UrlchannelMethods<'a>
-    where  {
+pub struct UrlchannelMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
 }
 
-impl<'a> client::MethodsBuilder for UrlchannelMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UrlchannelMethods<'a, S> {}
 
-impl<'a> UrlchannelMethods<'a> {
+impl<'a, S> UrlchannelMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1418,7 +1423,7 @@ impl<'a> UrlchannelMethods<'a> {
     ///
     /// * `adClientId` - Ad client from which to delete the URL channel.
     /// * `urlChannelId` - URL channel to delete.
-    pub fn delete(&self, ad_client_id: &str, url_channel_id: &str) -> UrlchannelDeleteCall<'a> {
+    pub fn delete(&self, ad_client_id: &str, url_channel_id: &str) -> UrlchannelDeleteCall<'a, S> {
         UrlchannelDeleteCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1437,7 +1442,7 @@ impl<'a> UrlchannelMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `adClientId` - Ad client to which the new URL channel will be added.
-    pub fn insert(&self, request: UrlChannel, ad_client_id: &str) -> UrlchannelInsertCall<'a> {
+    pub fn insert(&self, request: UrlChannel, ad_client_id: &str) -> UrlchannelInsertCall<'a, S> {
         UrlchannelInsertCall {
             hub: self.hub,
             _request: request,
@@ -1455,7 +1460,7 @@ impl<'a> UrlchannelMethods<'a> {
     /// # Arguments
     ///
     /// * `adClientId` - Ad client for which to list URL channels.
-    pub fn list(&self, ad_client_id: &str) -> UrlchannelListCall<'a> {
+    pub fn list(&self, ad_client_id: &str) -> UrlchannelListCall<'a, S> {
         UrlchannelListCall {
             hub: self.hub,
             _ad_client_id: ad_client_id.to_string(),
@@ -1498,7 +1503,7 @@ impl<'a> UrlchannelMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1506,10 +1511,10 @@ impl<'a> UrlchannelMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdclientGetCall<'a>
-    where  {
+pub struct AccountAdclientGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _ad_client_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1517,9 +1522,15 @@ pub struct AccountAdclientGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdclientGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdclientGetCall<'a, S> {}
 
-impl<'a> AccountAdclientGetCall<'a> {
+impl<'a, S> AccountAdclientGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1663,7 +1674,7 @@ impl<'a> AccountAdclientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdclientGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdclientGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -1673,7 +1684,7 @@ impl<'a> AccountAdclientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdclientGetCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdclientGetCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -1683,7 +1694,7 @@ impl<'a> AccountAdclientGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdclientGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdclientGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1704,7 +1715,7 @@ impl<'a> AccountAdclientGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdclientGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdclientGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1724,9 +1735,9 @@ impl<'a> AccountAdclientGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdclientGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdclientGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1758,7 +1769,7 @@ impl<'a> AccountAdclientGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1768,10 +1779,10 @@ impl<'a> AccountAdclientGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdclientListCall<'a>
-    where  {
+pub struct AccountAdclientListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -1780,9 +1791,15 @@ pub struct AccountAdclientListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdclientListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdclientListCall<'a, S> {}
 
-impl<'a> AccountAdclientListCall<'a> {
+impl<'a, S> AccountAdclientListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1931,21 +1948,21 @@ impl<'a> AccountAdclientListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ad clients to include in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AccountAdclientListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AccountAdclientListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -1955,7 +1972,7 @@ impl<'a> AccountAdclientListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdclientListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdclientListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1976,7 +1993,7 @@ impl<'a> AccountAdclientListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdclientListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdclientListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1996,9 +2013,9 @@ impl<'a> AccountAdclientListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdclientListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdclientListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2030,7 +2047,7 @@ impl<'a> AccountAdclientListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2038,10 +2055,10 @@ impl<'a> AccountAdclientListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitDeleteCall<'a>
-    where  {
+pub struct AccountAdunitDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _ad_client_id: String,
     _ad_unit_id: String,
@@ -2050,9 +2067,15 @@ pub struct AccountAdunitDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitDeleteCall<'a, S> {}
 
-impl<'a> AccountAdunitDeleteCall<'a> {
+impl<'a, S> AccountAdunitDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2197,7 +2220,7 @@ impl<'a> AccountAdunitDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2207,7 +2230,7 @@ impl<'a> AccountAdunitDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -2217,7 +2240,7 @@ impl<'a> AccountAdunitDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a, S> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -2227,7 +2250,7 @@ impl<'a> AccountAdunitDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2248,7 +2271,7 @@ impl<'a> AccountAdunitDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2268,9 +2291,9 @@ impl<'a> AccountAdunitDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2302,7 +2325,7 @@ impl<'a> AccountAdunitDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2310,10 +2333,10 @@ impl<'a> AccountAdunitDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitGetCall<'a>
-    where  {
+pub struct AccountAdunitGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _ad_client_id: String,
     _ad_unit_id: String,
@@ -2322,9 +2345,15 @@ pub struct AccountAdunitGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitGetCall<'a, S> {}
 
-impl<'a> AccountAdunitGetCall<'a> {
+impl<'a, S> AccountAdunitGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2469,7 +2498,7 @@ impl<'a> AccountAdunitGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2479,7 +2508,7 @@ impl<'a> AccountAdunitGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -2489,7 +2518,7 @@ impl<'a> AccountAdunitGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, S> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -2499,7 +2528,7 @@ impl<'a> AccountAdunitGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2520,7 +2549,7 @@ impl<'a> AccountAdunitGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2540,9 +2569,9 @@ impl<'a> AccountAdunitGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2574,7 +2603,7 @@ impl<'a> AccountAdunitGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2583,10 +2612,10 @@ impl<'a> AccountAdunitGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitGetAdCodeCall<'a>
-    where  {
+pub struct AccountAdunitGetAdCodeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _ad_client_id: String,
     _ad_unit_id: String,
@@ -2596,9 +2625,15 @@ pub struct AccountAdunitGetAdCodeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitGetAdCodeCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitGetAdCodeCall<'a, S> {}
 
-impl<'a> AccountAdunitGetAdCodeCall<'a> {
+impl<'a, S> AccountAdunitGetAdCodeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2748,7 +2783,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2758,7 +2793,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -2768,7 +2803,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, S> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -2776,7 +2811,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     ///
     /// Append the given value to the *host custom channel id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_host_custom_channel_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a> {
+    pub fn add_host_custom_channel_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, S> {
         self._host_custom_channel_id.push(new_value.to_string());
         self
     }
@@ -2786,7 +2821,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitGetAdCodeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitGetAdCodeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2807,7 +2842,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetAdCodeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitGetAdCodeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2827,9 +2862,9 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitGetAdCodeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitGetAdCodeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2862,7 +2897,7 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2875,10 +2910,10 @@ impl<'a> AccountAdunitGetAdCodeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitInsertCall<'a>
-    where  {
+pub struct AccountAdunitInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: AdUnit,
     _account_id: String,
     _ad_client_id: String,
@@ -2887,9 +2922,15 @@ pub struct AccountAdunitInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitInsertCall<'a, S> {}
 
-impl<'a> AccountAdunitInsertCall<'a> {
+impl<'a, S> AccountAdunitInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3046,7 +3087,7 @@ impl<'a> AccountAdunitInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AdUnit) -> AccountAdunitInsertCall<'a> {
+    pub fn request(mut self, new_value: AdUnit) -> AccountAdunitInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3056,7 +3097,7 @@ impl<'a> AccountAdunitInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitInsertCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitInsertCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3066,7 +3107,7 @@ impl<'a> AccountAdunitInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitInsertCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitInsertCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -3076,7 +3117,7 @@ impl<'a> AccountAdunitInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3097,7 +3138,7 @@ impl<'a> AccountAdunitInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3117,9 +3158,9 @@ impl<'a> AccountAdunitInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3151,7 +3192,7 @@ impl<'a> AccountAdunitInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3162,10 +3203,10 @@ impl<'a> AccountAdunitInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitListCall<'a>
-    where  {
+pub struct AccountAdunitListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _ad_client_id: String,
     _page_token: Option<String>,
@@ -3176,9 +3217,15 @@ pub struct AccountAdunitListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitListCall<'a, S> {}
 
-impl<'a> AccountAdunitListCall<'a> {
+impl<'a, S> AccountAdunitListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3331,7 +3378,7 @@ impl<'a> AccountAdunitListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitListCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3341,28 +3388,28 @@ impl<'a> AccountAdunitListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitListCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
     /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountAdunitListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountAdunitListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ad units to include in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AccountAdunitListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AccountAdunitListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Whether to include inactive ad units. Default: true.
     ///
     /// Sets the *include inactive* query property to the given value.
-    pub fn include_inactive(mut self, new_value: bool) -> AccountAdunitListCall<'a> {
+    pub fn include_inactive(mut self, new_value: bool) -> AccountAdunitListCall<'a, S> {
         self._include_inactive = Some(new_value);
         self
     }
@@ -3372,7 +3419,7 @@ impl<'a> AccountAdunitListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3393,7 +3440,7 @@ impl<'a> AccountAdunitListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3413,9 +3460,9 @@ impl<'a> AccountAdunitListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3448,7 +3495,7 @@ impl<'a> AccountAdunitListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3461,10 +3508,10 @@ impl<'a> AccountAdunitListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitPatchCall<'a>
-    where  {
+pub struct AccountAdunitPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: AdUnit,
     _account_id: String,
     _ad_client_id: String,
@@ -3474,9 +3521,15 @@ pub struct AccountAdunitPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitPatchCall<'a, S> {}
 
-impl<'a> AccountAdunitPatchCall<'a> {
+impl<'a, S> AccountAdunitPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3634,7 +3687,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AdUnit) -> AccountAdunitPatchCall<'a> {
+    pub fn request(mut self, new_value: AdUnit) -> AccountAdunitPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3644,7 +3697,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3654,7 +3707,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -3664,7 +3717,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a> {
+    pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a, S> {
         self._ad_unit_id = new_value.to_string();
         self
     }
@@ -3674,7 +3727,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3695,7 +3748,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3715,9 +3768,9 @@ impl<'a> AccountAdunitPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3750,7 +3803,7 @@ impl<'a> AccountAdunitPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3763,10 +3816,10 @@ impl<'a> AccountAdunitPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdunitUpdateCall<'a>
-    where  {
+pub struct AccountAdunitUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: AdUnit,
     _account_id: String,
     _ad_client_id: String,
@@ -3775,9 +3828,15 @@ pub struct AccountAdunitUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAdunitUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAdunitUpdateCall<'a, S> {}
 
-impl<'a> AccountAdunitUpdateCall<'a> {
+impl<'a, S> AccountAdunitUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3934,7 +3993,7 @@ impl<'a> AccountAdunitUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AdUnit) -> AccountAdunitUpdateCall<'a> {
+    pub fn request(mut self, new_value: AdUnit) -> AccountAdunitUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3944,7 +4003,7 @@ impl<'a> AccountAdunitUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountAdunitUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountAdunitUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3954,7 +4013,7 @@ impl<'a> AccountAdunitUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitUpdateCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitUpdateCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -3964,7 +4023,7 @@ impl<'a> AccountAdunitUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdunitUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3985,7 +4044,7 @@ impl<'a> AccountAdunitUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdunitUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4005,9 +4064,9 @@ impl<'a> AccountAdunitUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAdunitUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAdunitUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4039,7 +4098,7 @@ impl<'a> AccountAdunitUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4054,10 +4113,10 @@ impl<'a> AccountAdunitUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountReportGenerateCall<'a>
-    where  {
+pub struct AccountReportGenerateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _start_date: String,
     _end_date: String,
@@ -4073,9 +4132,15 @@ pub struct AccountReportGenerateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountReportGenerateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountReportGenerateCall<'a, S> {}
 
-impl<'a> AccountReportGenerateCall<'a> {
+impl<'a, S> AccountReportGenerateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4249,7 +4314,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4259,7 +4324,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._start_date = new_value.to_string();
         self
     }
@@ -4269,14 +4334,14 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._end_date = new_value.to_string();
         self
     }
     /// Index of the first row of report data to return.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> AccountReportGenerateCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> AccountReportGenerateCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
@@ -4284,7 +4349,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Append the given value to the *sort* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._sort.push(new_value.to_string());
         self
     }
@@ -4292,21 +4357,21 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Append the given value to the *metric* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._metric.push(new_value.to_string());
         self
     }
     /// The maximum number of rows of report data to return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AccountReportGenerateCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AccountReportGenerateCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -4314,7 +4379,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Append the given value to the *filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._filter.push(new_value.to_string());
         self
     }
@@ -4322,7 +4387,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     ///
     /// Append the given value to the *dimension* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a> {
+    pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a, S> {
         self._dimension.push(new_value.to_string());
         self
     }
@@ -4332,7 +4397,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountReportGenerateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountReportGenerateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4353,7 +4418,7 @@ impl<'a> AccountReportGenerateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountReportGenerateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountReportGenerateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4373,9 +4438,9 @@ impl<'a> AccountReportGenerateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountReportGenerateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountReportGenerateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4407,7 +4472,7 @@ impl<'a> AccountReportGenerateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4415,19 +4480,25 @@ impl<'a> AccountReportGenerateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a>
-    where  {
+pub struct AccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetCall<'a, S> {}
 
-impl<'a> AccountGetCall<'a> {
+impl<'a, S> AccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4570,7 +4641,7 @@ impl<'a> AccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4580,7 +4651,7 @@ impl<'a> AccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4601,7 +4672,7 @@ impl<'a> AccountGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4621,9 +4692,9 @@ impl<'a> AccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4655,7 +4726,7 @@ impl<'a> AccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4663,19 +4734,25 @@ impl<'a> AccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a>
-    where  {
+pub struct AccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _filter_ad_client_id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListCall<'a, S> {}
 
-impl<'a> AccountListCall<'a> {
+impl<'a, S> AccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4802,7 +4879,7 @@ impl<'a> AccountListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_filter_ad_client_id(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn add_filter_ad_client_id(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._filter_ad_client_id.push(new_value.to_string());
         self
     }
@@ -4812,7 +4889,7 @@ impl<'a> AccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4833,7 +4910,7 @@ impl<'a> AccountListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4853,9 +4930,9 @@ impl<'a> AccountListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4887,7 +4964,7 @@ impl<'a> AccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4895,19 +4972,25 @@ impl<'a> AccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdclientGetCall<'a>
-    where  {
+pub struct AdclientGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _ad_client_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdclientGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AdclientGetCall<'a, S> {}
 
-impl<'a> AdclientGetCall<'a> {
+impl<'a, S> AdclientGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5050,7 +5133,7 @@ impl<'a> AdclientGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> AdclientGetCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> AdclientGetCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -5060,7 +5143,7 @@ impl<'a> AdclientGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdclientGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdclientGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5081,7 +5164,7 @@ impl<'a> AdclientGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AdclientGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdclientGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5101,9 +5184,9 @@ impl<'a> AdclientGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdclientGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdclientGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5135,7 +5218,7 @@ impl<'a> AdclientGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5145,10 +5228,10 @@ impl<'a> AdclientGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdclientListCall<'a>
-    where  {
+pub struct AdclientListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5156,9 +5239,15 @@ pub struct AdclientListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AdclientListCall<'a> {}
+impl<'a, S> client::CallBuilder for AdclientListCall<'a, S> {}
 
-impl<'a> AdclientListCall<'a> {
+impl<'a, S> AdclientListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5282,14 +5371,14 @@ impl<'a> AdclientListCall<'a> {
     /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdclientListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AdclientListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of ad clients to include in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AdclientListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AdclientListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -5299,7 +5388,7 @@ impl<'a> AdclientListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdclientListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdclientListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5320,7 +5409,7 @@ impl<'a> AdclientListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AdclientListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AdclientListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5340,9 +5429,9 @@ impl<'a> AdclientListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdclientListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AdclientListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5374,7 +5463,7 @@ impl<'a> AdclientListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5385,10 +5474,10 @@ impl<'a> AdclientListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AssociationsessionStartCall<'a>
-    where  {
+pub struct AssociationsessionStartCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _product_code: Vec<String>,
     _website_url: String,
     _website_locale: Option<String>,
@@ -5399,9 +5488,15 @@ pub struct AssociationsessionStartCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AssociationsessionStartCall<'a> {}
+impl<'a, S> client::CallBuilder for AssociationsessionStartCall<'a, S> {}
 
-impl<'a> AssociationsessionStartCall<'a> {
+impl<'a, S> AssociationsessionStartCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5538,7 +5633,7 @@ impl<'a> AssociationsessionStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_product_code(mut self, new_value: &str) -> AssociationsessionStartCall<'a> {
+    pub fn add_product_code(mut self, new_value: &str) -> AssociationsessionStartCall<'a, S> {
         self._product_code.push(new_value.to_string());
         self
     }
@@ -5548,28 +5643,28 @@ impl<'a> AssociationsessionStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn website_url(mut self, new_value: &str) -> AssociationsessionStartCall<'a> {
+    pub fn website_url(mut self, new_value: &str) -> AssociationsessionStartCall<'a, S> {
         self._website_url = new_value.to_string();
         self
     }
     /// The locale of the user's hosted website.
     ///
     /// Sets the *website locale* query property to the given value.
-    pub fn website_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a> {
+    pub fn website_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a, S> {
         self._website_locale = Some(new_value.to_string());
         self
     }
     /// The preferred locale of the user.
     ///
     /// Sets the *user locale* query property to the given value.
-    pub fn user_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a> {
+    pub fn user_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a, S> {
         self._user_locale = Some(new_value.to_string());
         self
     }
     /// The URL to redirect the user to once association is completed. It receives a token parameter that can then be used to retrieve the associated account.
     ///
     /// Sets the *callback url* query property to the given value.
-    pub fn callback_url(mut self, new_value: &str) -> AssociationsessionStartCall<'a> {
+    pub fn callback_url(mut self, new_value: &str) -> AssociationsessionStartCall<'a, S> {
         self._callback_url = Some(new_value.to_string());
         self
     }
@@ -5579,7 +5674,7 @@ impl<'a> AssociationsessionStartCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssociationsessionStartCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssociationsessionStartCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5600,7 +5695,7 @@ impl<'a> AssociationsessionStartCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AssociationsessionStartCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AssociationsessionStartCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5620,9 +5715,9 @@ impl<'a> AssociationsessionStartCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AssociationsessionStartCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AssociationsessionStartCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5654,7 +5749,7 @@ impl<'a> AssociationsessionStartCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5662,19 +5757,25 @@ impl<'a> AssociationsessionStartCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AssociationsessionVerifyCall<'a>
-    where  {
+pub struct AssociationsessionVerifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _token: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AssociationsessionVerifyCall<'a> {}
+impl<'a, S> client::CallBuilder for AssociationsessionVerifyCall<'a, S> {}
 
-impl<'a> AssociationsessionVerifyCall<'a> {
+impl<'a, S> AssociationsessionVerifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5796,7 +5897,7 @@ impl<'a> AssociationsessionVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn token(mut self, new_value: &str) -> AssociationsessionVerifyCall<'a> {
+    pub fn token(mut self, new_value: &str) -> AssociationsessionVerifyCall<'a, S> {
         self._token = new_value.to_string();
         self
     }
@@ -5806,7 +5907,7 @@ impl<'a> AssociationsessionVerifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssociationsessionVerifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssociationsessionVerifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5827,7 +5928,7 @@ impl<'a> AssociationsessionVerifyCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AssociationsessionVerifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AssociationsessionVerifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5847,9 +5948,9 @@ impl<'a> AssociationsessionVerifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AssociationsessionVerifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AssociationsessionVerifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5881,7 +5982,7 @@ impl<'a> AssociationsessionVerifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5889,10 +5990,10 @@ impl<'a> AssociationsessionVerifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomchannelDeleteCall<'a>
-    where  {
+pub struct CustomchannelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _ad_client_id: String,
     _custom_channel_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5900,9 +6001,15 @@ pub struct CustomchannelDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomchannelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomchannelDeleteCall<'a, S> {}
 
-impl<'a> CustomchannelDeleteCall<'a> {
+impl<'a, S> CustomchannelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6046,7 +6153,7 @@ impl<'a> CustomchannelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelDeleteCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelDeleteCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -6056,7 +6163,7 @@ impl<'a> CustomchannelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelDeleteCall<'a> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelDeleteCall<'a, S> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -6066,7 +6173,7 @@ impl<'a> CustomchannelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6087,7 +6194,7 @@ impl<'a> CustomchannelDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6107,9 +6214,9 @@ impl<'a> CustomchannelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomchannelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomchannelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6141,7 +6248,7 @@ impl<'a> CustomchannelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6149,10 +6256,10 @@ impl<'a> CustomchannelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomchannelGetCall<'a>
-    where  {
+pub struct CustomchannelGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _ad_client_id: String,
     _custom_channel_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6160,9 +6267,15 @@ pub struct CustomchannelGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomchannelGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomchannelGetCall<'a, S> {}
 
-impl<'a> CustomchannelGetCall<'a> {
+impl<'a, S> CustomchannelGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6306,7 +6419,7 @@ impl<'a> CustomchannelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelGetCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -6316,7 +6429,7 @@ impl<'a> CustomchannelGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelGetCall<'a> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, S> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -6326,7 +6439,7 @@ impl<'a> CustomchannelGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6347,7 +6460,7 @@ impl<'a> CustomchannelGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6367,9 +6480,9 @@ impl<'a> CustomchannelGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomchannelGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomchannelGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6402,7 +6515,7 @@ impl<'a> CustomchannelGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6415,10 +6528,10 @@ impl<'a> CustomchannelGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomchannelInsertCall<'a>
-    where  {
+pub struct CustomchannelInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: CustomChannel,
     _ad_client_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6426,9 +6539,15 @@ pub struct CustomchannelInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomchannelInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomchannelInsertCall<'a, S> {}
 
-impl<'a> CustomchannelInsertCall<'a> {
+impl<'a, S> CustomchannelInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6584,7 +6703,7 @@ impl<'a> CustomchannelInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomChannel) -> CustomchannelInsertCall<'a> {
+    pub fn request(mut self, new_value: CustomChannel) -> CustomchannelInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6594,7 +6713,7 @@ impl<'a> CustomchannelInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelInsertCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelInsertCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -6604,7 +6723,7 @@ impl<'a> CustomchannelInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6625,7 +6744,7 @@ impl<'a> CustomchannelInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6645,9 +6764,9 @@ impl<'a> CustomchannelInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomchannelInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomchannelInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6679,7 +6798,7 @@ impl<'a> CustomchannelInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6689,10 +6808,10 @@ impl<'a> CustomchannelInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomchannelListCall<'a>
-    where  {
+pub struct CustomchannelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _ad_client_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -6701,9 +6820,15 @@ pub struct CustomchannelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomchannelListCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomchannelListCall<'a, S> {}
 
-impl<'a> CustomchannelListCall<'a> {
+impl<'a, S> CustomchannelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6852,21 +6977,21 @@ impl<'a> CustomchannelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelListCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelListCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
     /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomchannelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CustomchannelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of custom channels to include in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CustomchannelListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> CustomchannelListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -6876,7 +7001,7 @@ impl<'a> CustomchannelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6897,7 +7022,7 @@ impl<'a> CustomchannelListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6917,9 +7042,9 @@ impl<'a> CustomchannelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomchannelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomchannelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6952,7 +7077,7 @@ impl<'a> CustomchannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6965,10 +7090,10 @@ impl<'a> CustomchannelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomchannelPatchCall<'a>
-    where  {
+pub struct CustomchannelPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: CustomChannel,
     _ad_client_id: String,
     _custom_channel_id: String,
@@ -6977,9 +7102,15 @@ pub struct CustomchannelPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomchannelPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomchannelPatchCall<'a, S> {}
 
-impl<'a> CustomchannelPatchCall<'a> {
+impl<'a, S> CustomchannelPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7136,7 +7267,7 @@ impl<'a> CustomchannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomChannel) -> CustomchannelPatchCall<'a> {
+    pub fn request(mut self, new_value: CustomChannel) -> CustomchannelPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7146,7 +7277,7 @@ impl<'a> CustomchannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelPatchCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelPatchCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -7156,7 +7287,7 @@ impl<'a> CustomchannelPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelPatchCall<'a> {
+    pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelPatchCall<'a, S> {
         self._custom_channel_id = new_value.to_string();
         self
     }
@@ -7166,7 +7297,7 @@ impl<'a> CustomchannelPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7187,7 +7318,7 @@ impl<'a> CustomchannelPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7207,9 +7338,9 @@ impl<'a> CustomchannelPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomchannelPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomchannelPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7242,7 +7373,7 @@ impl<'a> CustomchannelPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7255,10 +7386,10 @@ impl<'a> CustomchannelPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomchannelUpdateCall<'a>
-    where  {
+pub struct CustomchannelUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: CustomChannel,
     _ad_client_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7266,9 +7397,15 @@ pub struct CustomchannelUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomchannelUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomchannelUpdateCall<'a, S> {}
 
-impl<'a> CustomchannelUpdateCall<'a> {
+impl<'a, S> CustomchannelUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7424,7 +7561,7 @@ impl<'a> CustomchannelUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomChannel) -> CustomchannelUpdateCall<'a> {
+    pub fn request(mut self, new_value: CustomChannel) -> CustomchannelUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7434,7 +7571,7 @@ impl<'a> CustomchannelUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelUpdateCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelUpdateCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -7444,7 +7581,7 @@ impl<'a> CustomchannelUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomchannelUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7465,7 +7602,7 @@ impl<'a> CustomchannelUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomchannelUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7485,9 +7622,9 @@ impl<'a> CustomchannelUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomchannelUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomchannelUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7519,7 +7656,7 @@ impl<'a> CustomchannelUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7534,10 +7671,10 @@ impl<'a> CustomchannelUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReportGenerateCall<'a>
-    where  {
+pub struct ReportGenerateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _start_date: String,
     _end_date: String,
     _start_index: Option<u32>,
@@ -7552,9 +7689,15 @@ pub struct ReportGenerateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ReportGenerateCall<'a> {}
+impl<'a, S> client::CallBuilder for ReportGenerateCall<'a, S> {}
 
-impl<'a> ReportGenerateCall<'a> {
+impl<'a, S> ReportGenerateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7706,7 +7849,7 @@ impl<'a> ReportGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn start_date(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._start_date = new_value.to_string();
         self
     }
@@ -7716,14 +7859,14 @@ impl<'a> ReportGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn end_date(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._end_date = new_value.to_string();
         self
     }
     /// Index of the first row of report data to return.
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> ReportGenerateCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> ReportGenerateCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
@@ -7731,7 +7874,7 @@ impl<'a> ReportGenerateCall<'a> {
     ///
     /// Append the given value to the *sort* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sort(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn add_sort(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._sort.push(new_value.to_string());
         self
     }
@@ -7739,21 +7882,21 @@ impl<'a> ReportGenerateCall<'a> {
     ///
     /// Append the given value to the *metric* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_metric(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn add_metric(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._metric.push(new_value.to_string());
         self
     }
     /// The maximum number of rows of report data to return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ReportGenerateCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ReportGenerateCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -7761,7 +7904,7 @@ impl<'a> ReportGenerateCall<'a> {
     ///
     /// Append the given value to the *filter* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_filter(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn add_filter(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._filter.push(new_value.to_string());
         self
     }
@@ -7769,7 +7912,7 @@ impl<'a> ReportGenerateCall<'a> {
     ///
     /// Append the given value to the *dimension* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_dimension(mut self, new_value: &str) -> ReportGenerateCall<'a> {
+    pub fn add_dimension(mut self, new_value: &str) -> ReportGenerateCall<'a, S> {
         self._dimension.push(new_value.to_string());
         self
     }
@@ -7779,7 +7922,7 @@ impl<'a> ReportGenerateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportGenerateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportGenerateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7800,7 +7943,7 @@ impl<'a> ReportGenerateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReportGenerateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportGenerateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7820,9 +7963,9 @@ impl<'a> ReportGenerateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReportGenerateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ReportGenerateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7854,7 +7997,7 @@ impl<'a> ReportGenerateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7862,10 +8005,10 @@ impl<'a> ReportGenerateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlchannelDeleteCall<'a>
-    where  {
+pub struct UrlchannelDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _ad_client_id: String,
     _url_channel_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7873,9 +8016,15 @@ pub struct UrlchannelDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UrlchannelDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlchannelDeleteCall<'a, S> {}
 
-impl<'a> UrlchannelDeleteCall<'a> {
+impl<'a, S> UrlchannelDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8019,7 +8168,7 @@ impl<'a> UrlchannelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelDeleteCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelDeleteCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -8029,7 +8178,7 @@ impl<'a> UrlchannelDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn url_channel_id(mut self, new_value: &str) -> UrlchannelDeleteCall<'a> {
+    pub fn url_channel_id(mut self, new_value: &str) -> UrlchannelDeleteCall<'a, S> {
         self._url_channel_id = new_value.to_string();
         self
     }
@@ -8039,7 +8188,7 @@ impl<'a> UrlchannelDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlchannelDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlchannelDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8060,7 +8209,7 @@ impl<'a> UrlchannelDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8080,9 +8229,9 @@ impl<'a> UrlchannelDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlchannelDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UrlchannelDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8115,7 +8264,7 @@ impl<'a> UrlchannelDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8128,10 +8277,10 @@ impl<'a> UrlchannelDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlchannelInsertCall<'a>
-    where  {
+pub struct UrlchannelInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _request: UrlChannel,
     _ad_client_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8139,9 +8288,15 @@ pub struct UrlchannelInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UrlchannelInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlchannelInsertCall<'a, S> {}
 
-impl<'a> UrlchannelInsertCall<'a> {
+impl<'a, S> UrlchannelInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8297,7 +8452,7 @@ impl<'a> UrlchannelInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UrlChannel) -> UrlchannelInsertCall<'a> {
+    pub fn request(mut self, new_value: UrlChannel) -> UrlchannelInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8307,7 +8462,7 @@ impl<'a> UrlchannelInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelInsertCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelInsertCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
@@ -8317,7 +8472,7 @@ impl<'a> UrlchannelInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlchannelInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlchannelInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8338,7 +8493,7 @@ impl<'a> UrlchannelInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8358,9 +8513,9 @@ impl<'a> UrlchannelInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlchannelInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UrlchannelInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8392,7 +8547,7 @@ impl<'a> UrlchannelInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdSenseHost::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8402,10 +8557,10 @@ impl<'a> UrlchannelInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlchannelListCall<'a>
-    where  {
+pub struct UrlchannelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdSenseHost<>,
+    hub: &'a AdSenseHost<S>,
     _ad_client_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -8414,9 +8569,15 @@ pub struct UrlchannelListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UrlchannelListCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlchannelListCall<'a, S> {}
 
-impl<'a> UrlchannelListCall<'a> {
+impl<'a, S> UrlchannelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8565,21 +8726,21 @@ impl<'a> UrlchannelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelListCall<'a> {
+    pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelListCall<'a, S> {
         self._ad_client_id = new_value.to_string();
         self
     }
     /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UrlchannelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UrlchannelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of URL channels to include in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> UrlchannelListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> UrlchannelListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -8589,7 +8750,7 @@ impl<'a> UrlchannelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlchannelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlchannelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8610,7 +8771,7 @@ impl<'a> UrlchannelListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlchannelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8630,9 +8791,9 @@ impl<'a> UrlchannelListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlchannelListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UrlchannelListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

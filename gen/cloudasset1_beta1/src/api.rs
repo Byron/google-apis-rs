@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,40 +108,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudAsset<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudAsset<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudAsset<> {}
+impl<'a, S> client::Hub for CloudAsset<S> {}
 
-impl<'a, > CloudAsset<> {
+impl<'a, S> CloudAsset<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudAsset<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudAsset<S> {
         CloudAsset {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudasset.googleapis.com/".to_string(),
             _root_url: "https://cloudasset.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a> {
+    pub fn folders(&'a self) -> FolderMethods<'a, S> {
         FolderMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -941,22 +946,22 @@ impl client::Part for TimeWindow {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `export_assets(...)` and `operations_get(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a>
-    where  {
+pub struct FolderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
 }
 
-impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FolderMethods<'a, S> {}
 
-impl<'a> FolderMethods<'a> {
+impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -965,7 +970,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> FolderOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> FolderOperationGetCall<'a, S> {
         FolderOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -983,7 +988,7 @@ impl<'a> FolderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The relative name of the root asset. This can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id"), a project number (such as "projects/12345"), or a folder number (such as "folders/123").
-    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> FolderExportAssetCall<'a> {
+    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> FolderExportAssetCall<'a, S> {
         FolderExportAssetCall {
             hub: self.hub,
             _request: request,
@@ -1018,22 +1023,22 @@ impl<'a> FolderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_get_assets_history(...)`, `export_assets(...)` and `operations_get(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a>
-    where  {
+pub struct OrganizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
 
-impl<'a> OrganizationMethods<'a> {
+impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1042,7 +1047,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> OrganizationOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> OrganizationOperationGetCall<'a, S> {
         OrganizationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1059,7 +1064,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The relative name of the root asset. It can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id")", or a project number (such as "projects/12345").
-    pub fn batch_get_assets_history(&self, parent: &str) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn batch_get_assets_history(&self, parent: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         OrganizationBatchGetAssetsHistoryCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1081,7 +1086,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The relative name of the root asset. This can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id"), a project number (such as "projects/12345"), or a folder number (such as "folders/123").
-    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> OrganizationExportAssetCall<'a> {
+    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> OrganizationExportAssetCall<'a, S> {
         OrganizationExportAssetCall {
             hub: self.hub,
             _request: request,
@@ -1116,22 +1121,22 @@ impl<'a> OrganizationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_get_assets_history(...)`, `export_assets(...)` and `operations_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1140,7 +1145,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, S> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1157,7 +1162,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The relative name of the root asset. It can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id")", or a project number (such as "projects/12345").
-    pub fn batch_get_assets_history(&self, parent: &str) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn batch_get_assets_history(&self, parent: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         ProjectBatchGetAssetsHistoryCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1179,7 +1184,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The relative name of the root asset. This can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id"), a project number (such as "projects/12345"), or a folder number (such as "folders/123").
-    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> ProjectExportAssetCall<'a> {
+    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> ProjectExportAssetCall<'a, S> {
         ProjectExportAssetCall {
             hub: self.hub,
             _request: request,
@@ -1221,7 +1226,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1229,19 +1234,25 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderOperationGetCall<'a>
-    where  {
+pub struct FolderOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderOperationGetCall<'a, S> {}
 
-impl<'a> FolderOperationGetCall<'a> {
+impl<'a, S> FolderOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1388,7 +1399,7 @@ impl<'a> FolderOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1398,7 +1409,7 @@ impl<'a> FolderOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1423,7 +1434,7 @@ impl<'a> FolderOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1443,9 +1454,9 @@ impl<'a> FolderOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1478,7 +1489,7 @@ impl<'a> FolderOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1491,10 +1502,10 @@ impl<'a> FolderOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderExportAssetCall<'a>
-    where  {
+pub struct FolderExportAssetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _request: ExportAssetsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1502,9 +1513,15 @@ pub struct FolderExportAssetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderExportAssetCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderExportAssetCall<'a, S> {}
 
-impl<'a> FolderExportAssetCall<'a> {
+impl<'a, S> FolderExportAssetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1664,7 +1681,7 @@ impl<'a> FolderExportAssetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportAssetsRequest) -> FolderExportAssetCall<'a> {
+    pub fn request(mut self, new_value: ExportAssetsRequest) -> FolderExportAssetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1674,7 +1691,7 @@ impl<'a> FolderExportAssetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderExportAssetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderExportAssetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1684,7 +1701,7 @@ impl<'a> FolderExportAssetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderExportAssetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderExportAssetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1709,7 +1726,7 @@ impl<'a> FolderExportAssetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderExportAssetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderExportAssetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1729,9 +1746,9 @@ impl<'a> FolderExportAssetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderExportAssetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderExportAssetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1763,7 +1780,7 @@ impl<'a> FolderExportAssetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1771,19 +1788,25 @@ impl<'a> FolderExportAssetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationOperationGetCall<'a>
-    where  {
+pub struct OrganizationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationOperationGetCall<'a, S> {}
 
-impl<'a> OrganizationOperationGetCall<'a> {
+impl<'a, S> OrganizationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1930,7 +1953,7 @@ impl<'a> OrganizationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1940,7 +1963,7 @@ impl<'a> OrganizationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1965,7 +1988,7 @@ impl<'a> OrganizationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1985,9 +2008,9 @@ impl<'a> OrganizationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2019,7 +2042,7 @@ impl<'a> OrganizationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2031,10 +2054,10 @@ impl<'a> OrganizationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationBatchGetAssetsHistoryCall<'a>
-    where  {
+pub struct OrganizationBatchGetAssetsHistoryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _parent: String,
     _read_time_window_start_time: Option<String>,
     _read_time_window_end_time: Option<String>,
@@ -2045,9 +2068,15 @@ pub struct OrganizationBatchGetAssetsHistoryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationBatchGetAssetsHistoryCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationBatchGetAssetsHistoryCall<'a, S> {}
 
-impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
+impl<'a, S> OrganizationBatchGetAssetsHistoryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2208,28 +2237,28 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Start time of the time window (exclusive).
     ///
     /// Sets the *read time window.start time* query property to the given value.
-    pub fn read_time_window_start_time(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn read_time_window_start_time(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         self._read_time_window_start_time = Some(new_value.to_string());
         self
     }
     /// End time of the time window (inclusive). If not specified, the current timestamp is used instead.
     ///
     /// Sets the *read time window.end time* query property to the given value.
-    pub fn read_time_window_end_time(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn read_time_window_end_time(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         self._read_time_window_end_time = Some(new_value.to_string());
         self
     }
     /// Optional. The content type.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn content_type(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         self._content_type = Some(new_value.to_string());
         self
     }
@@ -2237,7 +2266,7 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
     ///
     /// Append the given value to the *asset names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_asset_names(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn add_asset_names(mut self, new_value: &str) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         self._asset_names.push(new_value.to_string());
         self
     }
@@ -2247,7 +2276,7 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationBatchGetAssetsHistoryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationBatchGetAssetsHistoryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2272,7 +2301,7 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationBatchGetAssetsHistoryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationBatchGetAssetsHistoryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2292,9 +2321,9 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationBatchGetAssetsHistoryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationBatchGetAssetsHistoryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2327,7 +2356,7 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2340,10 +2369,10 @@ impl<'a> OrganizationBatchGetAssetsHistoryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationExportAssetCall<'a>
-    where  {
+pub struct OrganizationExportAssetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _request: ExportAssetsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2351,9 +2380,15 @@ pub struct OrganizationExportAssetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationExportAssetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationExportAssetCall<'a, S> {}
 
-impl<'a> OrganizationExportAssetCall<'a> {
+impl<'a, S> OrganizationExportAssetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2513,7 +2548,7 @@ impl<'a> OrganizationExportAssetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportAssetsRequest) -> OrganizationExportAssetCall<'a> {
+    pub fn request(mut self, new_value: ExportAssetsRequest) -> OrganizationExportAssetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2523,7 +2558,7 @@ impl<'a> OrganizationExportAssetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationExportAssetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationExportAssetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2533,7 +2568,7 @@ impl<'a> OrganizationExportAssetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationExportAssetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationExportAssetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2558,7 +2593,7 @@ impl<'a> OrganizationExportAssetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationExportAssetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationExportAssetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2578,9 +2613,9 @@ impl<'a> OrganizationExportAssetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationExportAssetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationExportAssetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2612,7 +2647,7 @@ impl<'a> OrganizationExportAssetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2620,19 +2655,25 @@ impl<'a> OrganizationExportAssetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a>
-    where  {
+pub struct ProjectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationGetCall<'a, S> {}
 
-impl<'a> ProjectOperationGetCall<'a> {
+impl<'a, S> ProjectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2779,7 +2820,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2789,7 +2830,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2814,7 +2855,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2834,9 +2875,9 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2868,7 +2909,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2880,10 +2921,10 @@ impl<'a> ProjectOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBatchGetAssetsHistoryCall<'a>
-    where  {
+pub struct ProjectBatchGetAssetsHistoryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _parent: String,
     _read_time_window_start_time: Option<String>,
     _read_time_window_end_time: Option<String>,
@@ -2894,9 +2935,15 @@ pub struct ProjectBatchGetAssetsHistoryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBatchGetAssetsHistoryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBatchGetAssetsHistoryCall<'a, S> {}
 
-impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
+impl<'a, S> ProjectBatchGetAssetsHistoryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3057,28 +3104,28 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Start time of the time window (exclusive).
     ///
     /// Sets the *read time window.start time* query property to the given value.
-    pub fn read_time_window_start_time(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn read_time_window_start_time(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         self._read_time_window_start_time = Some(new_value.to_string());
         self
     }
     /// End time of the time window (inclusive). If not specified, the current timestamp is used instead.
     ///
     /// Sets the *read time window.end time* query property to the given value.
-    pub fn read_time_window_end_time(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn read_time_window_end_time(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         self._read_time_window_end_time = Some(new_value.to_string());
         self
     }
     /// Optional. The content type.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn content_type(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         self._content_type = Some(new_value.to_string());
         self
     }
@@ -3086,7 +3133,7 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
     ///
     /// Append the given value to the *asset names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_asset_names(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn add_asset_names(mut self, new_value: &str) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         self._asset_names.push(new_value.to_string());
         self
     }
@@ -3096,7 +3143,7 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBatchGetAssetsHistoryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBatchGetAssetsHistoryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3121,7 +3168,7 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBatchGetAssetsHistoryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBatchGetAssetsHistoryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3141,9 +3188,9 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBatchGetAssetsHistoryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBatchGetAssetsHistoryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3176,7 +3223,7 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudAsset::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3189,10 +3236,10 @@ impl<'a> ProjectBatchGetAssetsHistoryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectExportAssetCall<'a>
-    where  {
+pub struct ProjectExportAssetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudAsset<>,
+    hub: &'a CloudAsset<S>,
     _request: ExportAssetsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3200,9 +3247,15 @@ pub struct ProjectExportAssetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectExportAssetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectExportAssetCall<'a, S> {}
 
-impl<'a> ProjectExportAssetCall<'a> {
+impl<'a, S> ProjectExportAssetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3362,7 +3415,7 @@ impl<'a> ProjectExportAssetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportAssetsRequest) -> ProjectExportAssetCall<'a> {
+    pub fn request(mut self, new_value: ExportAssetsRequest) -> ProjectExportAssetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3372,7 +3425,7 @@ impl<'a> ProjectExportAssetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectExportAssetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectExportAssetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -3382,7 +3435,7 @@ impl<'a> ProjectExportAssetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectExportAssetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectExportAssetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3407,7 +3460,7 @@ impl<'a> ProjectExportAssetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectExportAssetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectExportAssetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3427,9 +3480,9 @@ impl<'a> ProjectExportAssetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectExportAssetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectExportAssetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

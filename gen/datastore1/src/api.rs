@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,34 +112,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Datastore<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Datastore<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Datastore<> {}
+impl<'a, S> client::Hub for Datastore<S> {}
 
-impl<'a, > Datastore<> {
+impl<'a, S> Datastore<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Datastore<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Datastore<S> {
         Datastore {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://datastore.googleapis.com/".to_string(),
             _root_url: "https://datastore.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1141,22 +1146,22 @@ impl client::Part for Value {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `allocate_ids(...)`, `begin_transaction(...)`, `commit(...)`, `export(...)`, `import(...)`, `indexes_create(...)`, `indexes_delete(...)`, `indexes_get(...)`, `indexes_list(...)`, `lookup(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `reserve_ids(...)`, `rollback(...)` and `run_query(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1166,7 +1171,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Project ID against which to make the request.
-    pub fn indexes_create(&self, request: GoogleDatastoreAdminV1Index, project_id: &str) -> ProjectIndexeCreateCall<'a> {
+    pub fn indexes_create(&self, request: GoogleDatastoreAdminV1Index, project_id: &str) -> ProjectIndexeCreateCall<'a, S> {
         ProjectIndexeCreateCall {
             hub: self.hub,
             _request: request,
@@ -1185,7 +1190,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Project ID against which to make the request.
     /// * `indexId` - The resource ID of the index to delete.
-    pub fn indexes_delete(&self, project_id: &str, index_id: &str) -> ProjectIndexeDeleteCall<'a> {
+    pub fn indexes_delete(&self, project_id: &str, index_id: &str) -> ProjectIndexeDeleteCall<'a, S> {
         ProjectIndexeDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1204,7 +1209,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Project ID against which to make the request.
     /// * `indexId` - The resource ID of the index to get.
-    pub fn indexes_get(&self, project_id: &str, index_id: &str) -> ProjectIndexeGetCall<'a> {
+    pub fn indexes_get(&self, project_id: &str, index_id: &str) -> ProjectIndexeGetCall<'a, S> {
         ProjectIndexeGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1222,7 +1227,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Project ID against which to make the request.
-    pub fn indexes_list(&self, project_id: &str) -> ProjectIndexeListCall<'a> {
+    pub fn indexes_list(&self, project_id: &str) -> ProjectIndexeListCall<'a, S> {
         ProjectIndexeListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1242,7 +1247,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn operations_cancel(&self, name: &str) -> ProjectOperationCancelCall<'a> {
+    pub fn operations_cancel(&self, name: &str) -> ProjectOperationCancelCall<'a, S> {
         ProjectOperationCancelCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1259,7 +1264,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a> {
+    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a, S> {
         ProjectOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1276,7 +1281,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, S> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1293,7 +1298,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a> {
+    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a, S> {
         ProjectOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1314,7 +1319,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn allocate_ids(&self, request: AllocateIdsRequest, project_id: &str) -> ProjectAllocateIdCall<'a> {
+    pub fn allocate_ids(&self, request: AllocateIdsRequest, project_id: &str) -> ProjectAllocateIdCall<'a, S> {
         ProjectAllocateIdCall {
             hub: self.hub,
             _request: request,
@@ -1333,7 +1338,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a> {
+    pub fn begin_transaction(&self, request: BeginTransactionRequest, project_id: &str) -> ProjectBeginTransactionCall<'a, S> {
         ProjectBeginTransactionCall {
             hub: self.hub,
             _request: request,
@@ -1352,7 +1357,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn commit(&self, request: CommitRequest, project_id: &str) -> ProjectCommitCall<'a> {
+    pub fn commit(&self, request: CommitRequest, project_id: &str) -> ProjectCommitCall<'a, S> {
         ProjectCommitCall {
             hub: self.hub,
             _request: request,
@@ -1371,7 +1376,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. Project ID against which to make the request.
-    pub fn export(&self, request: GoogleDatastoreAdminV1ExportEntitiesRequest, project_id: &str) -> ProjectExportCall<'a> {
+    pub fn export(&self, request: GoogleDatastoreAdminV1ExportEntitiesRequest, project_id: &str) -> ProjectExportCall<'a, S> {
         ProjectExportCall {
             hub: self.hub,
             _request: request,
@@ -1390,7 +1395,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. Project ID against which to make the request.
-    pub fn import(&self, request: GoogleDatastoreAdminV1ImportEntitiesRequest, project_id: &str) -> ProjectImportCall<'a> {
+    pub fn import(&self, request: GoogleDatastoreAdminV1ImportEntitiesRequest, project_id: &str) -> ProjectImportCall<'a, S> {
         ProjectImportCall {
             hub: self.hub,
             _request: request,
@@ -1409,7 +1414,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn lookup(&self, request: LookupRequest, project_id: &str) -> ProjectLookupCall<'a> {
+    pub fn lookup(&self, request: LookupRequest, project_id: &str) -> ProjectLookupCall<'a, S> {
         ProjectLookupCall {
             hub: self.hub,
             _request: request,
@@ -1428,7 +1433,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn reserve_ids(&self, request: ReserveIdsRequest, project_id: &str) -> ProjectReserveIdCall<'a> {
+    pub fn reserve_ids(&self, request: ReserveIdsRequest, project_id: &str) -> ProjectReserveIdCall<'a, S> {
         ProjectReserveIdCall {
             hub: self.hub,
             _request: request,
@@ -1447,7 +1452,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn rollback(&self, request: RollbackRequest, project_id: &str) -> ProjectRollbackCall<'a> {
+    pub fn rollback(&self, request: RollbackRequest, project_id: &str) -> ProjectRollbackCall<'a, S> {
         ProjectRollbackCall {
             hub: self.hub,
             _request: request,
@@ -1466,7 +1471,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the project against which to make the request.
-    pub fn run_query(&self, request: RunQueryRequest, project_id: &str) -> ProjectRunQueryCall<'a> {
+    pub fn run_query(&self, request: RunQueryRequest, project_id: &str) -> ProjectRunQueryCall<'a, S> {
         ProjectRunQueryCall {
             hub: self.hub,
             _request: request,
@@ -1509,7 +1514,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1522,10 +1527,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIndexeCreateCall<'a>
-    where  {
+pub struct ProjectIndexeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: GoogleDatastoreAdminV1Index,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1533,9 +1538,15 @@ pub struct ProjectIndexeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIndexeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIndexeCreateCall<'a, S> {}
 
-impl<'a> ProjectIndexeCreateCall<'a> {
+impl<'a, S> ProjectIndexeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1691,7 +1702,7 @@ impl<'a> ProjectIndexeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleDatastoreAdminV1Index) -> ProjectIndexeCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleDatastoreAdminV1Index) -> ProjectIndexeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1701,7 +1712,7 @@ impl<'a> ProjectIndexeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1711,7 +1722,7 @@ impl<'a> ProjectIndexeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1736,7 +1747,7 @@ impl<'a> ProjectIndexeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1756,9 +1767,9 @@ impl<'a> ProjectIndexeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIndexeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1790,7 +1801,7 @@ impl<'a> ProjectIndexeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1798,10 +1809,10 @@ impl<'a> ProjectIndexeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIndexeDeleteCall<'a>
-    where  {
+pub struct ProjectIndexeDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _project_id: String,
     _index_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1809,9 +1820,15 @@ pub struct ProjectIndexeDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIndexeDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIndexeDeleteCall<'a, S> {}
 
-impl<'a> ProjectIndexeDeleteCall<'a> {
+impl<'a, S> ProjectIndexeDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1955,7 +1972,7 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1965,7 +1982,7 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDeleteCall<'a> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeDeleteCall<'a, S> {
         self._index_id = new_value.to_string();
         self
     }
@@ -1975,7 +1992,7 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2000,7 +2017,7 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2020,9 +2037,9 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIndexeDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2054,7 +2071,7 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2062,10 +2079,10 @@ impl<'a> ProjectIndexeDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIndexeGetCall<'a>
-    where  {
+pub struct ProjectIndexeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _project_id: String,
     _index_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2073,9 +2090,15 @@ pub struct ProjectIndexeGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIndexeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIndexeGetCall<'a, S> {}
 
-impl<'a> ProjectIndexeGetCall<'a> {
+impl<'a, S> ProjectIndexeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2219,7 +2242,7 @@ impl<'a> ProjectIndexeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2229,7 +2252,7 @@ impl<'a> ProjectIndexeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeGetCall<'a> {
+    pub fn index_id(mut self, new_value: &str) -> ProjectIndexeGetCall<'a, S> {
         self._index_id = new_value.to_string();
         self
     }
@@ -2239,7 +2262,7 @@ impl<'a> ProjectIndexeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2264,7 +2287,7 @@ impl<'a> ProjectIndexeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2284,9 +2307,9 @@ impl<'a> ProjectIndexeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIndexeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2318,7 +2341,7 @@ impl<'a> ProjectIndexeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2329,10 +2352,10 @@ impl<'a> ProjectIndexeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectIndexeListCall<'a>
-    where  {
+pub struct ProjectIndexeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _project_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2342,9 +2365,15 @@ pub struct ProjectIndexeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectIndexeListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectIndexeListCall<'a, S> {}
 
-impl<'a> ProjectIndexeListCall<'a> {
+impl<'a, S> ProjectIndexeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2496,27 +2525,27 @@ impl<'a> ProjectIndexeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectIndexeListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectIndexeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return. If zero, then all results will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectIndexeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectIndexeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectIndexeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2526,7 +2555,7 @@ impl<'a> ProjectIndexeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectIndexeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2551,7 +2580,7 @@ impl<'a> ProjectIndexeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectIndexeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2571,9 +2600,9 @@ impl<'a> ProjectIndexeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectIndexeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectIndexeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2605,7 +2634,7 @@ impl<'a> ProjectIndexeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2613,19 +2642,25 @@ impl<'a> ProjectIndexeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationCancelCall<'a>
-    where  {
+pub struct ProjectOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectOperationCancelCall<'a> {
+impl<'a, S> ProjectOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2772,7 +2807,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2782,7 +2817,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2807,7 +2842,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2827,9 +2862,9 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2861,7 +2896,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2869,19 +2904,25 @@ impl<'a> ProjectOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationDeleteCall<'a>
-    where  {
+pub struct ProjectOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationDeleteCall<'a, S> {}
 
-impl<'a> ProjectOperationDeleteCall<'a> {
+impl<'a, S> ProjectOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3028,7 +3069,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3038,7 +3079,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3063,7 +3104,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3083,9 +3124,9 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3117,7 +3158,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3125,19 +3166,25 @@ impl<'a> ProjectOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a>
-    where  {
+pub struct ProjectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationGetCall<'a, S> {}
 
-impl<'a> ProjectOperationGetCall<'a> {
+impl<'a, S> ProjectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3284,7 +3331,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3294,7 +3341,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3319,7 +3366,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3339,9 +3386,9 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3373,7 +3420,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3384,10 +3431,10 @@ impl<'a> ProjectOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationListCall<'a>
-    where  {
+pub struct ProjectOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3397,9 +3444,15 @@ pub struct ProjectOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationListCall<'a, S> {}
 
-impl<'a> ProjectOperationListCall<'a> {
+impl<'a, S> ProjectOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3555,28 +3608,28 @@ impl<'a> ProjectOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3586,7 +3639,7 @@ impl<'a> ProjectOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3611,7 +3664,7 @@ impl<'a> ProjectOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3631,9 +3684,9 @@ impl<'a> ProjectOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3666,7 +3719,7 @@ impl<'a> ProjectOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3679,10 +3732,10 @@ impl<'a> ProjectOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAllocateIdCall<'a>
-    where  {
+pub struct ProjectAllocateIdCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: AllocateIdsRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3690,9 +3743,15 @@ pub struct ProjectAllocateIdCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectAllocateIdCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectAllocateIdCall<'a, S> {}
 
-impl<'a> ProjectAllocateIdCall<'a> {
+impl<'a, S> ProjectAllocateIdCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3848,7 +3907,7 @@ impl<'a> ProjectAllocateIdCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AllocateIdsRequest) -> ProjectAllocateIdCall<'a> {
+    pub fn request(mut self, new_value: AllocateIdsRequest) -> ProjectAllocateIdCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3858,7 +3917,7 @@ impl<'a> ProjectAllocateIdCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectAllocateIdCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectAllocateIdCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -3868,7 +3927,7 @@ impl<'a> ProjectAllocateIdCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAllocateIdCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAllocateIdCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3893,7 +3952,7 @@ impl<'a> ProjectAllocateIdCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAllocateIdCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAllocateIdCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3913,9 +3972,9 @@ impl<'a> ProjectAllocateIdCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAllocateIdCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectAllocateIdCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3948,7 +4007,7 @@ impl<'a> ProjectAllocateIdCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3961,10 +4020,10 @@ impl<'a> ProjectAllocateIdCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBeginTransactionCall<'a>
-    where  {
+pub struct ProjectBeginTransactionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: BeginTransactionRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3972,9 +4031,15 @@ pub struct ProjectBeginTransactionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectBeginTransactionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectBeginTransactionCall<'a, S> {}
 
-impl<'a> ProjectBeginTransactionCall<'a> {
+impl<'a, S> ProjectBeginTransactionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4130,7 +4195,7 @@ impl<'a> ProjectBeginTransactionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BeginTransactionRequest) -> ProjectBeginTransactionCall<'a> {
+    pub fn request(mut self, new_value: BeginTransactionRequest) -> ProjectBeginTransactionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4140,7 +4205,7 @@ impl<'a> ProjectBeginTransactionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectBeginTransactionCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectBeginTransactionCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -4150,7 +4215,7 @@ impl<'a> ProjectBeginTransactionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBeginTransactionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBeginTransactionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4175,7 +4240,7 @@ impl<'a> ProjectBeginTransactionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4195,9 +4260,9 @@ impl<'a> ProjectBeginTransactionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBeginTransactionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectBeginTransactionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4230,7 +4295,7 @@ impl<'a> ProjectBeginTransactionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4243,10 +4308,10 @@ impl<'a> ProjectBeginTransactionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectCommitCall<'a>
-    where  {
+pub struct ProjectCommitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: CommitRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4254,9 +4319,15 @@ pub struct ProjectCommitCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectCommitCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectCommitCall<'a, S> {}
 
-impl<'a> ProjectCommitCall<'a> {
+impl<'a, S> ProjectCommitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4412,7 +4483,7 @@ impl<'a> ProjectCommitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommitRequest) -> ProjectCommitCall<'a> {
+    pub fn request(mut self, new_value: CommitRequest) -> ProjectCommitCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4422,7 +4493,7 @@ impl<'a> ProjectCommitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectCommitCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectCommitCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -4432,7 +4503,7 @@ impl<'a> ProjectCommitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCommitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCommitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4457,7 +4528,7 @@ impl<'a> ProjectCommitCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectCommitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectCommitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4477,9 +4548,9 @@ impl<'a> ProjectCommitCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectCommitCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectCommitCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4512,7 +4583,7 @@ impl<'a> ProjectCommitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4525,10 +4596,10 @@ impl<'a> ProjectCommitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectExportCall<'a>
-    where  {
+pub struct ProjectExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: GoogleDatastoreAdminV1ExportEntitiesRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4536,9 +4607,15 @@ pub struct ProjectExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectExportCall<'a, S> {}
 
-impl<'a> ProjectExportCall<'a> {
+impl<'a, S> ProjectExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4694,7 +4771,7 @@ impl<'a> ProjectExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleDatastoreAdminV1ExportEntitiesRequest) -> ProjectExportCall<'a> {
+    pub fn request(mut self, new_value: GoogleDatastoreAdminV1ExportEntitiesRequest) -> ProjectExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4704,7 +4781,7 @@ impl<'a> ProjectExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectExportCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectExportCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -4714,7 +4791,7 @@ impl<'a> ProjectExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4739,7 +4816,7 @@ impl<'a> ProjectExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4759,9 +4836,9 @@ impl<'a> ProjectExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4794,7 +4871,7 @@ impl<'a> ProjectExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4807,10 +4884,10 @@ impl<'a> ProjectExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectImportCall<'a>
-    where  {
+pub struct ProjectImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: GoogleDatastoreAdminV1ImportEntitiesRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4818,9 +4895,15 @@ pub struct ProjectImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectImportCall<'a, S> {}
 
-impl<'a> ProjectImportCall<'a> {
+impl<'a, S> ProjectImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4976,7 +5059,7 @@ impl<'a> ProjectImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleDatastoreAdminV1ImportEntitiesRequest) -> ProjectImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleDatastoreAdminV1ImportEntitiesRequest) -> ProjectImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4986,7 +5069,7 @@ impl<'a> ProjectImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectImportCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectImportCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -4996,7 +5079,7 @@ impl<'a> ProjectImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5021,7 +5104,7 @@ impl<'a> ProjectImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5041,9 +5124,9 @@ impl<'a> ProjectImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5076,7 +5159,7 @@ impl<'a> ProjectImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5089,10 +5172,10 @@ impl<'a> ProjectImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLookupCall<'a>
-    where  {
+pub struct ProjectLookupCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: LookupRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5100,9 +5183,15 @@ pub struct ProjectLookupCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLookupCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLookupCall<'a, S> {}
 
-impl<'a> ProjectLookupCall<'a> {
+impl<'a, S> ProjectLookupCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5258,7 +5347,7 @@ impl<'a> ProjectLookupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LookupRequest) -> ProjectLookupCall<'a> {
+    pub fn request(mut self, new_value: LookupRequest) -> ProjectLookupCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5268,7 +5357,7 @@ impl<'a> ProjectLookupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectLookupCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectLookupCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5278,7 +5367,7 @@ impl<'a> ProjectLookupCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLookupCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLookupCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5303,7 +5392,7 @@ impl<'a> ProjectLookupCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLookupCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLookupCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5323,9 +5412,9 @@ impl<'a> ProjectLookupCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLookupCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLookupCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5358,7 +5447,7 @@ impl<'a> ProjectLookupCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5371,10 +5460,10 @@ impl<'a> ProjectLookupCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectReserveIdCall<'a>
-    where  {
+pub struct ProjectReserveIdCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: ReserveIdsRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5382,9 +5471,15 @@ pub struct ProjectReserveIdCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectReserveIdCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectReserveIdCall<'a, S> {}
 
-impl<'a> ProjectReserveIdCall<'a> {
+impl<'a, S> ProjectReserveIdCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5540,7 +5635,7 @@ impl<'a> ProjectReserveIdCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReserveIdsRequest) -> ProjectReserveIdCall<'a> {
+    pub fn request(mut self, new_value: ReserveIdsRequest) -> ProjectReserveIdCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5550,7 +5645,7 @@ impl<'a> ProjectReserveIdCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectReserveIdCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectReserveIdCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5560,7 +5655,7 @@ impl<'a> ProjectReserveIdCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectReserveIdCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectReserveIdCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5585,7 +5680,7 @@ impl<'a> ProjectReserveIdCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectReserveIdCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectReserveIdCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5605,9 +5700,9 @@ impl<'a> ProjectReserveIdCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectReserveIdCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectReserveIdCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5640,7 +5735,7 @@ impl<'a> ProjectReserveIdCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5653,10 +5748,10 @@ impl<'a> ProjectReserveIdCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRollbackCall<'a>
-    where  {
+pub struct ProjectRollbackCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: RollbackRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5664,9 +5759,15 @@ pub struct ProjectRollbackCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRollbackCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRollbackCall<'a, S> {}
 
-impl<'a> ProjectRollbackCall<'a> {
+impl<'a, S> ProjectRollbackCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5822,7 +5923,7 @@ impl<'a> ProjectRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RollbackRequest) -> ProjectRollbackCall<'a> {
+    pub fn request(mut self, new_value: RollbackRequest) -> ProjectRollbackCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5832,7 +5933,7 @@ impl<'a> ProjectRollbackCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRollbackCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRollbackCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -5842,7 +5943,7 @@ impl<'a> ProjectRollbackCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRollbackCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRollbackCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5867,7 +5968,7 @@ impl<'a> ProjectRollbackCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRollbackCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRollbackCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5887,9 +5988,9 @@ impl<'a> ProjectRollbackCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRollbackCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRollbackCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5922,7 +6023,7 @@ impl<'a> ProjectRollbackCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datastore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5935,10 +6036,10 @@ impl<'a> ProjectRollbackCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRunQueryCall<'a>
-    where  {
+pub struct ProjectRunQueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datastore<>,
+    hub: &'a Datastore<S>,
     _request: RunQueryRequest,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5946,9 +6047,15 @@ pub struct ProjectRunQueryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRunQueryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRunQueryCall<'a, S> {}
 
-impl<'a> ProjectRunQueryCall<'a> {
+impl<'a, S> ProjectRunQueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6104,7 +6211,7 @@ impl<'a> ProjectRunQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunQueryRequest) -> ProjectRunQueryCall<'a> {
+    pub fn request(mut self, new_value: RunQueryRequest) -> ProjectRunQueryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6114,7 +6221,7 @@ impl<'a> ProjectRunQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRunQueryCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRunQueryCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -6124,7 +6231,7 @@ impl<'a> ProjectRunQueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRunQueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRunQueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6149,7 +6256,7 @@ impl<'a> ProjectRunQueryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRunQueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRunQueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6169,9 +6276,9 @@ impl<'a> ProjectRunQueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRunQueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRunQueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

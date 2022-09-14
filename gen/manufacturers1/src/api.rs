@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ManufacturerCenter<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ManufacturerCenter<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ManufacturerCenter<> {}
+impl<'a, S> client::Hub for ManufacturerCenter<S> {}
 
-impl<'a, > ManufacturerCenter<> {
+impl<'a, S> ManufacturerCenter<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ManufacturerCenter<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ManufacturerCenter<S> {
         ManufacturerCenter {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://manufacturers.googleapis.com/".to_string(),
             _root_url: "https://manufacturers.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -512,22 +517,22 @@ impl client::Part for ProductDetail {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `products_delete(...)`, `products_get(...)`, `products_list(...)` and `products_update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ManufacturerCenter<>,
+    hub: &'a ManufacturerCenter<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -537,7 +542,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `parent` - Parent ID in the format `accounts/{account_id}`. `account_id` - The ID of the Manufacturer Center account.
     /// * `name` - Name in the format `{target_country}:{content_language}:{product_id}`. `target_country` - The target country of the product as a CLDR territory code (for example, US). `content_language` - The content language of the product as a two-letter ISO 639-1 language code (for example, en). `product_id` - The ID of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#id.
-    pub fn products_delete(&self, parent: &str, name: &str) -> AccountProductDeleteCall<'a> {
+    pub fn products_delete(&self, parent: &str, name: &str) -> AccountProductDeleteCall<'a, S> {
         AccountProductDeleteCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -556,7 +561,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `parent` - Parent ID in the format `accounts/{account_id}`. `account_id` - The ID of the Manufacturer Center account.
     /// * `name` - Name in the format `{target_country}:{content_language}:{product_id}`. `target_country` - The target country of the product as a CLDR territory code (for example, US). `content_language` - The content language of the product as a two-letter ISO 639-1 language code (for example, en). `product_id` - The ID of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#id.
-    pub fn products_get(&self, parent: &str, name: &str) -> AccountProductGetCall<'a> {
+    pub fn products_get(&self, parent: &str, name: &str) -> AccountProductGetCall<'a, S> {
         AccountProductGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -575,7 +580,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Parent ID in the format `accounts/{account_id}`. `account_id` - The ID of the Manufacturer Center account.
-    pub fn products_list(&self, parent: &str) -> AccountProductListCall<'a> {
+    pub fn products_list(&self, parent: &str) -> AccountProductListCall<'a, S> {
         AccountProductListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -597,7 +602,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `parent` - Parent ID in the format `accounts/{account_id}`. `account_id` - The ID of the Manufacturer Center account.
     /// * `name` - Name in the format `{target_country}:{content_language}:{product_id}`. `target_country` - The target country of the product as a CLDR territory code (for example, US). `content_language` - The content language of the product as a two-letter ISO 639-1 language code (for example, en). `product_id` - The ID of the product. For more information, see https://support.google.com/manufacturers/answer/6124116#id.
-    pub fn products_update(&self, request: Attributes, parent: &str, name: &str) -> AccountProductUpdateCall<'a> {
+    pub fn products_update(&self, request: Attributes, parent: &str, name: &str) -> AccountProductUpdateCall<'a, S> {
         AccountProductUpdateCall {
             hub: self.hub,
             _request: request,
@@ -640,7 +645,7 @@ impl<'a> AccountMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -648,10 +653,10 @@ impl<'a> AccountMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProductDeleteCall<'a>
-    where  {
+pub struct AccountProductDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManufacturerCenter<>,
+    hub: &'a ManufacturerCenter<S>,
     _parent: String,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -659,9 +664,15 @@ pub struct AccountProductDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProductDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProductDeleteCall<'a, S> {}
 
-impl<'a> AccountProductDeleteCall<'a> {
+impl<'a, S> AccountProductDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -809,7 +820,7 @@ impl<'a> AccountProductDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountProductDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountProductDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -819,7 +830,7 @@ impl<'a> AccountProductDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountProductDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountProductDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -829,7 +840,7 @@ impl<'a> AccountProductDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -854,7 +865,7 @@ impl<'a> AccountProductDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -874,9 +885,9 @@ impl<'a> AccountProductDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProductDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -908,7 +919,7 @@ impl<'a> AccountProductDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -917,10 +928,10 @@ impl<'a> AccountProductDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProductGetCall<'a>
-    where  {
+pub struct AccountProductGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManufacturerCenter<>,
+    hub: &'a ManufacturerCenter<S>,
     _parent: String,
     _name: String,
     _include: Vec<String>,
@@ -929,9 +940,15 @@ pub struct AccountProductGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProductGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProductGetCall<'a, S> {}
 
-impl<'a> AccountProductGetCall<'a> {
+impl<'a, S> AccountProductGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1084,7 +1101,7 @@ impl<'a> AccountProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountProductGetCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountProductGetCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1094,7 +1111,7 @@ impl<'a> AccountProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountProductGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountProductGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1102,7 +1119,7 @@ impl<'a> AccountProductGetCall<'a> {
     ///
     /// Append the given value to the *include* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_include(mut self, new_value: &str) -> AccountProductGetCall<'a> {
+    pub fn add_include(mut self, new_value: &str) -> AccountProductGetCall<'a, S> {
         self._include.push(new_value.to_string());
         self
     }
@@ -1112,7 +1129,7 @@ impl<'a> AccountProductGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1137,7 +1154,7 @@ impl<'a> AccountProductGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1157,9 +1174,9 @@ impl<'a> AccountProductGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProductGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1191,7 +1208,7 @@ impl<'a> AccountProductGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1202,10 +1219,10 @@ impl<'a> AccountProductGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProductListCall<'a>
-    where  {
+pub struct AccountProductListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManufacturerCenter<>,
+    hub: &'a ManufacturerCenter<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1215,9 +1232,15 @@ pub struct AccountProductListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProductListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProductListCall<'a, S> {}
 
-impl<'a> AccountProductListCall<'a> {
+impl<'a, S> AccountProductListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1375,21 +1398,21 @@ impl<'a> AccountProductListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountProductListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountProductListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of product statuses to return in the response, used for paging.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountProductListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AccountProductListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1397,7 +1420,7 @@ impl<'a> AccountProductListCall<'a> {
     ///
     /// Append the given value to the *include* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_include(mut self, new_value: &str) -> AccountProductListCall<'a> {
+    pub fn add_include(mut self, new_value: &str) -> AccountProductListCall<'a, S> {
         self._include.push(new_value.to_string());
         self
     }
@@ -1407,7 +1430,7 @@ impl<'a> AccountProductListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1432,7 +1455,7 @@ impl<'a> AccountProductListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1452,9 +1475,9 @@ impl<'a> AccountProductListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProductListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1487,7 +1510,7 @@ impl<'a> AccountProductListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManufacturerCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1500,10 +1523,10 @@ impl<'a> AccountProductListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProductUpdateCall<'a>
-    where  {
+pub struct AccountProductUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManufacturerCenter<>,
+    hub: &'a ManufacturerCenter<S>,
     _request: Attributes,
     _parent: String,
     _name: String,
@@ -1512,9 +1535,15 @@ pub struct AccountProductUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountProductUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountProductUpdateCall<'a, S> {}
 
-impl<'a> AccountProductUpdateCall<'a> {
+impl<'a, S> AccountProductUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1675,7 +1704,7 @@ impl<'a> AccountProductUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Attributes) -> AccountProductUpdateCall<'a> {
+    pub fn request(mut self, new_value: Attributes) -> AccountProductUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1685,7 +1714,7 @@ impl<'a> AccountProductUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountProductUpdateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> AccountProductUpdateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1695,7 +1724,7 @@ impl<'a> AccountProductUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountProductUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> AccountProductUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1705,7 +1734,7 @@ impl<'a> AccountProductUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProductUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1730,7 +1759,7 @@ impl<'a> AccountProductUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1750,9 +1779,9 @@ impl<'a> AccountProductUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountProductUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

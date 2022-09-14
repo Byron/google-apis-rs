@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -75,37 +80,37 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AdExperienceReport<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AdExperienceReport<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AdExperienceReport<> {}
+impl<'a, S> client::Hub for AdExperienceReport<S> {}
 
-impl<'a, > AdExperienceReport<> {
+impl<'a, S> AdExperienceReport<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AdExperienceReport<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AdExperienceReport<S> {
         AdExperienceReport {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://adexperiencereport.googleapis.com/".to_string(),
             _root_url: "https://adexperiencereport.googleapis.com/".to_string(),
         }
     }
 
-    pub fn sites(&'a self) -> SiteMethods<'a> {
+    pub fn sites(&'a self) -> SiteMethods<'a, S> {
         SiteMethods { hub: &self }
     }
-    pub fn violating_sites(&'a self) -> ViolatingSiteMethods<'a> {
+    pub fn violating_sites(&'a self) -> ViolatingSiteMethods<'a, S> {
         ViolatingSiteMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -234,22 +239,22 @@ impl client::ResponseResult for ViolatingSitesResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.sites();
 /// # }
 /// ```
-pub struct SiteMethods<'a>
-    where  {
+pub struct SiteMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExperienceReport<>,
+    hub: &'a AdExperienceReport<S>,
 }
 
-impl<'a> client::MethodsBuilder for SiteMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SiteMethods<'a, S> {}
 
-impl<'a> SiteMethods<'a> {
+impl<'a, S> SiteMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -258,7 +263,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the site whose summary to get, e.g. `sites/http%3A%2F%2Fwww.google.com%2F`. Format: `sites/{site}`
-    pub fn get(&self, name: &str) -> SiteGetCall<'a> {
+    pub fn get(&self, name: &str) -> SiteGetCall<'a, S> {
         SiteGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -291,27 +296,27 @@ impl<'a> SiteMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.violating_sites();
 /// # }
 /// ```
-pub struct ViolatingSiteMethods<'a>
-    where  {
+pub struct ViolatingSiteMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExperienceReport<>,
+    hub: &'a AdExperienceReport<S>,
 }
 
-impl<'a> client::MethodsBuilder for ViolatingSiteMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ViolatingSiteMethods<'a, S> {}
 
-impl<'a> ViolatingSiteMethods<'a> {
+impl<'a, S> ViolatingSiteMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists sites that are failing in the Ad Experience Report on at least one platform.
-    pub fn list(&self) -> ViolatingSiteListCall<'a> {
+    pub fn list(&self) -> ViolatingSiteListCall<'a, S> {
         ViolatingSiteListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -350,7 +355,7 @@ impl<'a> ViolatingSiteMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -358,18 +363,24 @@ impl<'a> ViolatingSiteMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteGetCall<'a>
-    where  {
+pub struct SiteGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExperienceReport<>,
+    hub: &'a AdExperienceReport<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for SiteGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteGetCall<'a, S> {}
 
-impl<'a> SiteGetCall<'a> {
+impl<'a, S> SiteGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -510,7 +521,7 @@ impl<'a> SiteGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> SiteGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -520,7 +531,7 @@ impl<'a> SiteGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -545,7 +556,7 @@ impl<'a> SiteGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -576,7 +587,7 @@ impl<'a> SiteGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AdExperienceReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -584,17 +595,23 @@ impl<'a> SiteGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ViolatingSiteListCall<'a>
-    where  {
+pub struct ViolatingSiteListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AdExperienceReport<>,
+    hub: &'a AdExperienceReport<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ViolatingSiteListCall<'a> {}
+impl<'a, S> client::CallBuilder for ViolatingSiteListCall<'a, S> {}
 
-impl<'a> ViolatingSiteListCall<'a> {
+impl<'a, S> ViolatingSiteListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -709,7 +726,7 @@ impl<'a> ViolatingSiteListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ViolatingSiteListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ViolatingSiteListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -734,7 +751,7 @@ impl<'a> ViolatingSiteListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ViolatingSiteListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ViolatingSiteListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

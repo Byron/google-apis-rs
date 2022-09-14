@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -101,43 +106,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Proximitybeacon<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Proximitybeacon<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Proximitybeacon<> {}
+impl<'a, S> client::Hub for Proximitybeacon<S> {}
 
-impl<'a, > Proximitybeacon<> {
+impl<'a, S> Proximitybeacon<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Proximitybeacon<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Proximitybeacon<S> {
         Proximitybeacon {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://proximitybeacon.googleapis.com/".to_string(),
             _root_url: "https://proximitybeacon.googleapis.com/".to_string(),
         }
     }
 
-    pub fn beaconinfo(&'a self) -> BeaconinfoMethods<'a> {
+    pub fn beaconinfo(&'a self) -> BeaconinfoMethods<'a, S> {
         BeaconinfoMethods { hub: &self }
     }
-    pub fn beacons(&'a self) -> BeaconMethods<'a> {
+    pub fn beacons(&'a self) -> BeaconMethods<'a, S> {
         BeaconMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a> {
+    pub fn methods(&'a self) -> MethodMethods<'a, S> {
         MethodMethods { hub: &self }
     }
-    pub fn namespaces(&'a self) -> NamespaceMethods<'a> {
+    pub fn namespaces(&'a self) -> NamespaceMethods<'a, S> {
         NamespaceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -852,22 +857,22 @@ impl client::Part for Observation {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `getforobserved(...)`
 /// // to build up your call.
 /// let rb = hub.beaconinfo();
 /// # }
 /// ```
-pub struct BeaconinfoMethods<'a>
-    where  {
+pub struct BeaconinfoMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
 }
 
-impl<'a> client::MethodsBuilder for BeaconinfoMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BeaconinfoMethods<'a, S> {}
 
-impl<'a> BeaconinfoMethods<'a> {
+impl<'a, S> BeaconinfoMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -880,7 +885,7 @@ impl<'a> BeaconinfoMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn getforobserved(&self, request: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a> {
+    pub fn getforobserved(&self, request: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a, S> {
         BeaconinfoGetforobservedCall {
             hub: self.hub,
             _request: request,
@@ -913,22 +918,22 @@ impl<'a> BeaconinfoMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `activate(...)`, `attachments_batch_delete(...)`, `attachments_create(...)`, `attachments_delete(...)`, `attachments_list(...)`, `deactivate(...)`, `decommission(...)`, `delete(...)`, `diagnostics_list(...)`, `get(...)`, `list(...)`, `register(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.beacons();
 /// # }
 /// ```
-pub struct BeaconMethods<'a>
-    where  {
+pub struct BeaconMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
 }
 
-impl<'a> client::MethodsBuilder for BeaconMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BeaconMethods<'a, S> {}
 
-impl<'a> BeaconMethods<'a> {
+impl<'a, S> BeaconMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -954,7 +959,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_batch_delete(&self, beacon_name: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
+    pub fn attachments_batch_delete(&self, beacon_name: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
         BeaconAttachmentBatchDeleteCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -996,7 +1001,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_create(&self, request: BeaconAttachment, beacon_name: &str) -> BeaconAttachmentCreateCall<'a> {
+    pub fn attachments_create(&self, request: BeaconAttachment, beacon_name: &str) -> BeaconAttachmentCreateCall<'a, S> {
         BeaconAttachmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1029,7 +1034,7 @@ impl<'a> BeaconMethods<'a> {
     ///                      Eddystone-EID beacons, the beacon ID portion (`3!893737abc9`) may be the
     ///                      beacon's current EID, or its "stable" Eddystone-UID.
     ///                      Required.
-    pub fn attachments_delete(&self, attachment_name: &str) -> BeaconAttachmentDeleteCall<'a> {
+    pub fn attachments_delete(&self, attachment_name: &str) -> BeaconAttachmentDeleteCall<'a, S> {
         BeaconAttachmentDeleteCall {
             hub: self.hub,
             _attachment_name: attachment_name.to_string(),
@@ -1064,7 +1069,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_list(&self, beacon_name: &str) -> BeaconAttachmentListCall<'a> {
+    pub fn attachments_list(&self, beacon_name: &str) -> BeaconAttachmentListCall<'a, S> {
         BeaconAttachmentListCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1090,7 +1095,7 @@ impl<'a> BeaconMethods<'a> {
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that the diagnostics are for.
-    pub fn diagnostics_list(&self, beacon_name: &str) -> BeaconDiagnosticListCall<'a> {
+    pub fn diagnostics_list(&self, beacon_name: &str) -> BeaconDiagnosticListCall<'a, S> {
         BeaconDiagnosticListCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1125,7 +1130,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn activate(&self, beacon_name: &str) -> BeaconActivateCall<'a> {
+    pub fn activate(&self, beacon_name: &str) -> BeaconActivateCall<'a, S> {
         BeaconActivateCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1157,7 +1162,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn deactivate(&self, beacon_name: &str) -> BeaconDeactivateCall<'a> {
+    pub fn deactivate(&self, beacon_name: &str) -> BeaconDeactivateCall<'a, S> {
         BeaconDeactivateCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1189,7 +1194,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID of the beacon's "stable" UID.
     ///                  Required.
-    pub fn decommission(&self, beacon_name: &str) -> BeaconDecommissionCall<'a> {
+    pub fn decommission(&self, beacon_name: &str) -> BeaconDecommissionCall<'a, S> {
         BeaconDecommissionCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1220,7 +1225,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn delete(&self, beacon_name: &str) -> BeaconDeleteCall<'a> {
+    pub fn delete(&self, beacon_name: &str) -> BeaconDeleteCall<'a, S> {
         BeaconDeleteCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1255,7 +1260,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn get(&self, beacon_name: &str) -> BeaconGetCall<'a> {
+    pub fn get(&self, beacon_name: &str) -> BeaconGetCall<'a, S> {
         BeaconGetCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1276,7 +1281,7 @@ impl<'a> BeaconMethods<'a> {
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    pub fn list(&self) -> BeaconListCall<'a> {
+    pub fn list(&self) -> BeaconListCall<'a, S> {
         BeaconListCall {
             hub: self.hub,
             _q: Default::default(),
@@ -1302,7 +1307,7 @@ impl<'a> BeaconMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn register(&self, request: Beacon) -> BeaconRegisterCall<'a> {
+    pub fn register(&self, request: Beacon) -> BeaconRegisterCall<'a, S> {
         BeaconRegisterCall {
             hub: self.hub,
             _request: request,
@@ -1337,7 +1342,7 @@ impl<'a> BeaconMethods<'a> {
     ///                  `3` for Eddystone, `1` for iBeacon, or `5` for AltBeacon.
     ///                  This field must be left empty when registering. After reading a beacon,
     ///                  clients can use the name for future operations.
-    pub fn update(&self, request: Beacon, beacon_name: &str) -> BeaconUpdateCall<'a> {
+    pub fn update(&self, request: Beacon, beacon_name: &str) -> BeaconUpdateCall<'a, S> {
         BeaconUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1373,22 +1378,22 @@ impl<'a> BeaconMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.namespaces();
 /// # }
 /// ```
-pub struct NamespaceMethods<'a>
-    where  {
+pub struct NamespaceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
 }
 
-impl<'a> client::MethodsBuilder for NamespaceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for NamespaceMethods<'a, S> {}
 
-impl<'a> NamespaceMethods<'a> {
+impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1400,7 +1405,7 @@ impl<'a> NamespaceMethods<'a> {
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    pub fn list(&self) -> NamespaceListCall<'a> {
+    pub fn list(&self) -> NamespaceListCall<'a, S> {
         NamespaceListCall {
             hub: self.hub,
             _project_id: Default::default(),
@@ -1420,7 +1425,7 @@ impl<'a> NamespaceMethods<'a> {
     /// * `request` - No description provided.
     /// * `namespaceName` - Resource name of this namespace. Namespaces names have the format:
     ///                     <code>namespaces/<var>namespace</var></code>.
-    pub fn update(&self, request: Namespace, namespace_name: &str) -> NamespaceUpdateCall<'a> {
+    pub fn update(&self, request: Namespace, namespace_name: &str) -> NamespaceUpdateCall<'a, S> {
         NamespaceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1456,22 +1461,22 @@ impl<'a> NamespaceMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_eidparams(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a>
-    where  {
+pub struct MethodMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
 }
 
-impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
 
-impl<'a> MethodMethods<'a> {
+impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1482,7 +1487,7 @@ impl<'a> MethodMethods<'a> {
     /// to provision and register multiple beacons. However, clients should be
     /// prepared to refresh this key when they encounter an error registering an
     /// Eddystone-EID beacon.
-    pub fn get_eidparams(&self) -> MethodGetEidparamCall<'a> {
+    pub fn get_eidparams(&self) -> MethodGetEidparamCall<'a, S> {
         MethodGetEidparamCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1527,7 +1532,7 @@ impl<'a> MethodMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1540,18 +1545,24 @@ impl<'a> MethodMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconinfoGetforobservedCall<'a>
-    where  {
+pub struct BeaconinfoGetforobservedCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _request: GetInfoForObservedBeaconsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for BeaconinfoGetforobservedCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconinfoGetforobservedCall<'a, S> {}
 
-impl<'a> BeaconinfoGetforobservedCall<'a> {
+impl<'a, S> BeaconinfoGetforobservedCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1679,7 +1690,7 @@ impl<'a> BeaconinfoGetforobservedCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a> {
+    pub fn request(mut self, new_value: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1689,7 +1700,7 @@ impl<'a> BeaconinfoGetforobservedCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconinfoGetforobservedCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconinfoGetforobservedCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1714,7 +1725,7 @@ impl<'a> BeaconinfoGetforobservedCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconinfoGetforobservedCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconinfoGetforobservedCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1756,7 +1767,7 @@ impl<'a> BeaconinfoGetforobservedCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1766,10 +1777,10 @@ impl<'a> BeaconinfoGetforobservedCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentBatchDeleteCall<'a>
-    where  {
+pub struct BeaconAttachmentBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _namespaced_type: Option<String>,
@@ -1778,9 +1789,15 @@ pub struct BeaconAttachmentBatchDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconAttachmentBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconAttachmentBatchDeleteCall<'a, S> {}
 
-impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
+impl<'a, S> BeaconAttachmentBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1939,7 +1956,7 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -1951,7 +1968,7 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -1961,7 +1978,7 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
     /// Optional.
     ///
     /// Sets the *namespaced type* query property to the given value.
-    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
+    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
         self._namespaced_type = Some(new_value.to_string());
         self
     }
@@ -1971,7 +1988,7 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1996,7 +2013,7 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2016,9 +2033,9 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconAttachmentBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2067,7 +2084,7 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2081,10 +2098,10 @@ impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentCreateCall<'a>
-    where  {
+pub struct BeaconAttachmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _request: BeaconAttachment,
     _beacon_name: String,
     _project_id: Option<String>,
@@ -2093,9 +2110,15 @@ pub struct BeaconAttachmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconAttachmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconAttachmentCreateCall<'a, S> {}
 
-impl<'a> BeaconAttachmentCreateCall<'a> {
+impl<'a, S> BeaconAttachmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2258,7 +2281,7 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BeaconAttachment) -> BeaconAttachmentCreateCall<'a> {
+    pub fn request(mut self, new_value: BeaconAttachment) -> BeaconAttachmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2274,7 +2297,7 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2284,7 +2307,7 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2294,7 +2317,7 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2319,7 +2342,7 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2339,9 +2362,9 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconAttachmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2382,7 +2405,7 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2391,10 +2414,10 @@ impl<'a> BeaconAttachmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentDeleteCall<'a>
-    where  {
+pub struct BeaconAttachmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _attachment_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2402,9 +2425,15 @@ pub struct BeaconAttachmentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconAttachmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconAttachmentDeleteCall<'a, S> {}
 
-impl<'a> BeaconAttachmentDeleteCall<'a> {
+impl<'a, S> BeaconAttachmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2559,7 +2588,7 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn attachment_name(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a> {
+    pub fn attachment_name(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, S> {
         self._attachment_name = new_value.to_string();
         self
     }
@@ -2568,7 +2597,7 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2578,7 +2607,7 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2603,7 +2632,7 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2623,9 +2652,9 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconAttachmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2668,7 +2697,7 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2678,10 +2707,10 @@ impl<'a> BeaconAttachmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentListCall<'a>
-    where  {
+pub struct BeaconAttachmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _namespaced_type: Option<String>,
@@ -2690,9 +2719,15 @@ pub struct BeaconAttachmentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconAttachmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconAttachmentListCall<'a, S> {}
 
-impl<'a> BeaconAttachmentListCall<'a> {
+impl<'a, S> BeaconAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2851,7 +2886,7 @@ impl<'a> BeaconAttachmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentListCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2863,7 +2898,7 @@ impl<'a> BeaconAttachmentListCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2872,7 +2907,7 @@ impl<'a> BeaconAttachmentListCall<'a> {
     /// "all types in all namespaces".
     ///
     /// Sets the *namespaced type* query property to the given value.
-    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentListCall<'a> {
+    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, S> {
         self._namespaced_type = Some(new_value.to_string());
         self
     }
@@ -2882,7 +2917,7 @@ impl<'a> BeaconAttachmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2907,7 +2942,7 @@ impl<'a> BeaconAttachmentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2927,9 +2962,9 @@ impl<'a> BeaconAttachmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconAttachmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2968,7 +3003,7 @@ impl<'a> BeaconAttachmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2980,10 +3015,10 @@ impl<'a> BeaconAttachmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDiagnosticListCall<'a>
-    where  {
+pub struct BeaconDiagnosticListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _page_token: Option<String>,
@@ -2994,9 +3029,15 @@ pub struct BeaconDiagnosticListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconDiagnosticListCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconDiagnosticListCall<'a, S> {}
 
-impl<'a> BeaconDiagnosticListCall<'a> {
+impl<'a, S> BeaconDiagnosticListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3155,7 +3196,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3164,7 +3205,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// diagnostic records. Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3172,7 +3213,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// response to a previous request. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3180,7 +3221,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// 10. Maximum 1000. Optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BeaconDiagnosticListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BeaconDiagnosticListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3188,7 +3229,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// beacons that have low batteries use `alert_filter=LOW_BATTERY`.
     ///
     /// Sets the *alert filter* query property to the given value.
-    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
+    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
         self._alert_filter = Some(new_value.to_string());
         self
     }
@@ -3198,7 +3239,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDiagnosticListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDiagnosticListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3223,7 +3264,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDiagnosticListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDiagnosticListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3243,9 +3284,9 @@ impl<'a> BeaconDiagnosticListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDiagnosticListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconDiagnosticListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3285,7 +3326,7 @@ impl<'a> BeaconDiagnosticListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3294,10 +3335,10 @@ impl<'a> BeaconDiagnosticListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconActivateCall<'a>
-    where  {
+pub struct BeaconActivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3305,9 +3346,15 @@ pub struct BeaconActivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconActivateCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconActivateCall<'a, S> {}
 
-impl<'a> BeaconActivateCall<'a> {
+impl<'a, S> BeaconActivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3463,7 +3510,7 @@ impl<'a> BeaconActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconActivateCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconActivateCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3473,7 +3520,7 @@ impl<'a> BeaconActivateCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconActivateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconActivateCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3483,7 +3530,7 @@ impl<'a> BeaconActivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconActivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconActivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3508,7 +3555,7 @@ impl<'a> BeaconActivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconActivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconActivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3528,9 +3575,9 @@ impl<'a> BeaconActivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconActivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconActivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3570,7 +3617,7 @@ impl<'a> BeaconActivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3579,10 +3626,10 @@ impl<'a> BeaconActivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDeactivateCall<'a>
-    where  {
+pub struct BeaconDeactivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3590,9 +3637,15 @@ pub struct BeaconDeactivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconDeactivateCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconDeactivateCall<'a, S> {}
 
-impl<'a> BeaconDeactivateCall<'a> {
+impl<'a, S> BeaconDeactivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3748,7 +3801,7 @@ impl<'a> BeaconDeactivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeactivateCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeactivateCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3758,7 +3811,7 @@ impl<'a> BeaconDeactivateCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDeactivateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDeactivateCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3768,7 +3821,7 @@ impl<'a> BeaconDeactivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeactivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeactivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3793,7 +3846,7 @@ impl<'a> BeaconDeactivateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeactivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeactivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3813,9 +3866,9 @@ impl<'a> BeaconDeactivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDeactivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconDeactivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3855,7 +3908,7 @@ impl<'a> BeaconDeactivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3864,10 +3917,10 @@ impl<'a> BeaconDeactivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDecommissionCall<'a>
-    where  {
+pub struct BeaconDecommissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3875,9 +3928,15 @@ pub struct BeaconDecommissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconDecommissionCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconDecommissionCall<'a, S> {}
 
-impl<'a> BeaconDecommissionCall<'a> {
+impl<'a, S> BeaconDecommissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4033,7 +4092,7 @@ impl<'a> BeaconDecommissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDecommissionCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDecommissionCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4043,7 +4102,7 @@ impl<'a> BeaconDecommissionCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDecommissionCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDecommissionCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4053,7 +4112,7 @@ impl<'a> BeaconDecommissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDecommissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDecommissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4078,7 +4137,7 @@ impl<'a> BeaconDecommissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDecommissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDecommissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4098,9 +4157,9 @@ impl<'a> BeaconDecommissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDecommissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconDecommissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4139,7 +4198,7 @@ impl<'a> BeaconDecommissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4148,10 +4207,10 @@ impl<'a> BeaconDecommissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDeleteCall<'a>
-    where  {
+pub struct BeaconDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4159,9 +4218,15 @@ pub struct BeaconDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconDeleteCall<'a, S> {}
 
-impl<'a> BeaconDeleteCall<'a> {
+impl<'a, S> BeaconDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4317,7 +4382,7 @@ impl<'a> BeaconDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeleteCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeleteCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4326,7 +4391,7 @@ impl<'a> BeaconDeleteCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDeleteCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4336,7 +4401,7 @@ impl<'a> BeaconDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4361,7 +4426,7 @@ impl<'a> BeaconDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4381,9 +4446,9 @@ impl<'a> BeaconDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4426,7 +4491,7 @@ impl<'a> BeaconDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4435,10 +4500,10 @@ impl<'a> BeaconDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconGetCall<'a>
-    where  {
+pub struct BeaconGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4446,9 +4511,15 @@ pub struct BeaconGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconGetCall<'a, S> {}
 
-impl<'a> BeaconGetCall<'a> {
+impl<'a, S> BeaconGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4604,7 +4675,7 @@ impl<'a> BeaconGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconGetCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconGetCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4614,7 +4685,7 @@ impl<'a> BeaconGetCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconGetCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4624,7 +4695,7 @@ impl<'a> BeaconGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4649,7 +4720,7 @@ impl<'a> BeaconGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4669,9 +4740,9 @@ impl<'a> BeaconGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4710,7 +4781,7 @@ impl<'a> BeaconGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4722,10 +4793,10 @@ impl<'a> BeaconGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconListCall<'a>
-    where  {
+pub struct BeaconListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _q: Option<String>,
     _project_id: Option<String>,
     _page_token: Option<String>,
@@ -4735,9 +4806,15 @@ pub struct BeaconListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconListCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconListCall<'a, S> {}
 
-impl<'a> BeaconListCall<'a> {
+impl<'a, S> BeaconListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4934,7 +5011,7 @@ impl<'a> BeaconListCall<'a> {
     /// /v1beta1/beacons?q=status:active%20lat:51.123%20lng:-1.095%20radius:1000`
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> BeaconListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> BeaconListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -4943,14 +5020,14 @@ impl<'a> BeaconListCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// A pagination token obtained from a previous request to list beacons.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BeaconListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> BeaconListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4958,7 +5035,7 @@ impl<'a> BeaconListCall<'a> {
     /// server-defined upper limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BeaconListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> BeaconListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4968,7 +5045,7 @@ impl<'a> BeaconListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4993,7 +5070,7 @@ impl<'a> BeaconListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5013,9 +5090,9 @@ impl<'a> BeaconListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5054,7 +5131,7 @@ impl<'a> BeaconListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5068,10 +5145,10 @@ impl<'a> BeaconListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconRegisterCall<'a>
-    where  {
+pub struct BeaconRegisterCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _request: Beacon,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5079,9 +5156,15 @@ pub struct BeaconRegisterCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconRegisterCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconRegisterCall<'a, S> {}
 
-impl<'a> BeaconRegisterCall<'a> {
+impl<'a, S> BeaconRegisterCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5218,7 +5301,7 @@ impl<'a> BeaconRegisterCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Beacon) -> BeaconRegisterCall<'a> {
+    pub fn request(mut self, new_value: Beacon) -> BeaconRegisterCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5228,7 +5311,7 @@ impl<'a> BeaconRegisterCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconRegisterCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconRegisterCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -5238,7 +5321,7 @@ impl<'a> BeaconRegisterCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconRegisterCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconRegisterCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5263,7 +5346,7 @@ impl<'a> BeaconRegisterCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconRegisterCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconRegisterCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5283,9 +5366,9 @@ impl<'a> BeaconRegisterCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconRegisterCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconRegisterCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5329,7 +5412,7 @@ impl<'a> BeaconRegisterCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5343,10 +5426,10 @@ impl<'a> BeaconRegisterCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconUpdateCall<'a>
-    where  {
+pub struct BeaconUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _request: Beacon,
     _beacon_name: String,
     _project_id: Option<String>,
@@ -5355,9 +5438,15 @@ pub struct BeaconUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BeaconUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for BeaconUpdateCall<'a, S> {}
 
-impl<'a> BeaconUpdateCall<'a> {
+impl<'a, S> BeaconUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5520,7 +5609,7 @@ impl<'a> BeaconUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Beacon) -> BeaconUpdateCall<'a> {
+    pub fn request(mut self, new_value: Beacon) -> BeaconUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5536,7 +5625,7 @@ impl<'a> BeaconUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconUpdateCall<'a> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconUpdateCall<'a, S> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -5546,7 +5635,7 @@ impl<'a> BeaconUpdateCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconUpdateCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -5556,7 +5645,7 @@ impl<'a> BeaconUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5581,7 +5670,7 @@ impl<'a> BeaconUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5601,9 +5690,9 @@ impl<'a> BeaconUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BeaconUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5642,7 +5731,7 @@ impl<'a> BeaconUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5651,19 +5740,25 @@ impl<'a> BeaconUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceListCall<'a>
-    where  {
+pub struct NamespaceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NamespaceListCall<'a> {}
+impl<'a, S> client::CallBuilder for NamespaceListCall<'a, S> {}
 
-impl<'a> NamespaceListCall<'a> {
+impl<'a, S> NamespaceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5785,7 +5880,7 @@ impl<'a> NamespaceListCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> NamespaceListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> NamespaceListCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -5795,7 +5890,7 @@ impl<'a> NamespaceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5820,7 +5915,7 @@ impl<'a> NamespaceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5840,9 +5935,9 @@ impl<'a> NamespaceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NamespaceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5876,7 +5971,7 @@ impl<'a> NamespaceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5890,10 +5985,10 @@ impl<'a> NamespaceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceUpdateCall<'a>
-    where  {
+pub struct NamespaceUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _request: Namespace,
     _namespace_name: String,
     _project_id: Option<String>,
@@ -5902,9 +5997,15 @@ pub struct NamespaceUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NamespaceUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for NamespaceUpdateCall<'a, S> {}
 
-impl<'a> NamespaceUpdateCall<'a> {
+impl<'a, S> NamespaceUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6067,7 +6168,7 @@ impl<'a> NamespaceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Namespace) -> NamespaceUpdateCall<'a> {
+    pub fn request(mut self, new_value: Namespace) -> NamespaceUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6078,7 +6179,7 @@ impl<'a> NamespaceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn namespace_name(mut self, new_value: &str) -> NamespaceUpdateCall<'a> {
+    pub fn namespace_name(mut self, new_value: &str) -> NamespaceUpdateCall<'a, S> {
         self._namespace_name = new_value.to_string();
         self
     }
@@ -6088,7 +6189,7 @@ impl<'a> NamespaceUpdateCall<'a> {
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> NamespaceUpdateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> NamespaceUpdateCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -6098,7 +6199,7 @@ impl<'a> NamespaceUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6123,7 +6224,7 @@ impl<'a> NamespaceUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6143,9 +6244,9 @@ impl<'a> NamespaceUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NamespaceUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6183,7 +6284,7 @@ impl<'a> NamespaceUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6191,18 +6292,24 @@ impl<'a> NamespaceUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetEidparamCall<'a>
-    where  {
+pub struct MethodGetEidparamCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Proximitybeacon<>,
+    hub: &'a Proximitybeacon<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodGetEidparamCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetEidparamCall<'a, S> {}
 
-impl<'a> MethodGetEidparamCall<'a> {
+impl<'a, S> MethodGetEidparamCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6323,7 +6430,7 @@ impl<'a> MethodGetEidparamCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEidparamCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEidparamCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6348,7 +6455,7 @@ impl<'a> MethodGetEidparamCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEidparamCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEidparamCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6368,9 +6475,9 @@ impl<'a> MethodGetEidparamCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetEidparamCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodGetEidparamCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

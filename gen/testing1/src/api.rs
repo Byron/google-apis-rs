@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -108,40 +113,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Testing<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Testing<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Testing<> {}
+impl<'a, S> client::Hub for Testing<S> {}
 
-impl<'a, > Testing<> {
+impl<'a, S> Testing<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Testing<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Testing<S> {
         Testing {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://testing.googleapis.com/".to_string(),
             _root_url: "https://testing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn application_detail_service(&'a self) -> ApplicationDetailServiceMethods<'a> {
+    pub fn application_detail_service(&'a self) -> ApplicationDetailServiceMethods<'a, S> {
         ApplicationDetailServiceMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn test_environment_catalog(&'a self) -> TestEnvironmentCatalogMethods<'a> {
+    pub fn test_environment_catalog(&'a self) -> TestEnvironmentCatalogMethods<'a, S> {
         TestEnvironmentCatalogMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1643,22 +1648,22 @@ impl client::Part for XcodeVersion {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_apk_details(...)`
 /// // to build up your call.
 /// let rb = hub.application_detail_service();
 /// # }
 /// ```
-pub struct ApplicationDetailServiceMethods<'a>
-    where  {
+pub struct ApplicationDetailServiceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
 }
 
-impl<'a> client::MethodsBuilder for ApplicationDetailServiceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ApplicationDetailServiceMethods<'a, S> {}
 
-impl<'a> ApplicationDetailServiceMethods<'a> {
+impl<'a, S> ApplicationDetailServiceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1667,7 +1672,7 @@ impl<'a> ApplicationDetailServiceMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_apk_details(&self, request: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a> {
+    pub fn get_apk_details(&self, request: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a, S> {
         ApplicationDetailServiceGetApkDetailCall {
             hub: self.hub,
             _request: request,
@@ -1701,22 +1706,22 @@ impl<'a> ApplicationDetailServiceMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `test_matrices_cancel(...)`, `test_matrices_create(...)` and `test_matrices_get(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1726,7 +1731,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Cloud project that owns the test.
     /// * `testMatrixId` - Test matrix that will be canceled.
-    pub fn test_matrices_cancel(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceCancelCall<'a> {
+    pub fn test_matrices_cancel(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceCancelCall<'a, S> {
         ProjectTestMatriceCancelCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1745,7 +1750,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - The GCE project under which this job will run.
-    pub fn test_matrices_create(&self, request: TestMatrix, project_id: &str) -> ProjectTestMatriceCreateCall<'a> {
+    pub fn test_matrices_create(&self, request: TestMatrix, project_id: &str) -> ProjectTestMatriceCreateCall<'a, S> {
         ProjectTestMatriceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1765,7 +1770,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Cloud project that owns the test matrix.
     /// * `testMatrixId` - Unique test matrix id which was assigned by the service.
-    pub fn test_matrices_get(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceGetCall<'a> {
+    pub fn test_matrices_get(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceGetCall<'a, S> {
         ProjectTestMatriceGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1800,22 +1805,22 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.test_environment_catalog();
 /// # }
 /// ```
-pub struct TestEnvironmentCatalogMethods<'a>
-    where  {
+pub struct TestEnvironmentCatalogMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
 }
 
-impl<'a> client::MethodsBuilder for TestEnvironmentCatalogMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TestEnvironmentCatalogMethods<'a, S> {}
 
-impl<'a> TestEnvironmentCatalogMethods<'a> {
+impl<'a, S> TestEnvironmentCatalogMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1824,7 +1829,7 @@ impl<'a> TestEnvironmentCatalogMethods<'a> {
     /// # Arguments
     ///
     /// * `environmentType` - Required. The type of environment that should be listed.
-    pub fn get(&self, environment_type: &str) -> TestEnvironmentCatalogGetCall<'a> {
+    pub fn get(&self, environment_type: &str) -> TestEnvironmentCatalogGetCall<'a, S> {
         TestEnvironmentCatalogGetCall {
             hub: self.hub,
             _environment_type: environment_type.to_string(),
@@ -1867,7 +1872,7 @@ impl<'a> TestEnvironmentCatalogMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1880,19 +1885,25 @@ impl<'a> TestEnvironmentCatalogMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationDetailServiceGetApkDetailCall<'a>
-    where  {
+pub struct ApplicationDetailServiceGetApkDetailCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
     _request: FileReference,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ApplicationDetailServiceGetApkDetailCall<'a> {}
+impl<'a, S> client::CallBuilder for ApplicationDetailServiceGetApkDetailCall<'a, S> {}
 
-impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
+impl<'a, S> ApplicationDetailServiceGetApkDetailCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2026,7 +2037,7 @@ impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a> {
+    pub fn request(mut self, new_value: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2036,7 +2047,7 @@ impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationDetailServiceGetApkDetailCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationDetailServiceGetApkDetailCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2061,7 +2072,7 @@ impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationDetailServiceGetApkDetailCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationDetailServiceGetApkDetailCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2081,9 +2092,9 @@ impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationDetailServiceGetApkDetailCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ApplicationDetailServiceGetApkDetailCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2115,7 +2126,7 @@ impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2123,10 +2134,10 @@ impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestMatriceCancelCall<'a>
-    where  {
+pub struct ProjectTestMatriceCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
     _project_id: String,
     _test_matrix_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2134,9 +2145,15 @@ pub struct ProjectTestMatriceCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTestMatriceCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTestMatriceCancelCall<'a, S> {}
 
-impl<'a> ProjectTestMatriceCancelCall<'a> {
+impl<'a, S> ProjectTestMatriceCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2280,7 +2297,7 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2290,7 +2307,7 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a> {
+    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a, S> {
         self._test_matrix_id = new_value.to_string();
         self
     }
@@ -2300,7 +2317,7 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2325,7 +2342,7 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2345,9 +2362,9 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTestMatriceCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2380,7 +2397,7 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2394,10 +2411,10 @@ impl<'a> ProjectTestMatriceCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestMatriceCreateCall<'a>
-    where  {
+pub struct ProjectTestMatriceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
     _request: TestMatrix,
     _project_id: String,
     _request_id: Option<String>,
@@ -2406,9 +2423,15 @@ pub struct ProjectTestMatriceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTestMatriceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTestMatriceCreateCall<'a, S> {}
 
-impl<'a> ProjectTestMatriceCreateCall<'a> {
+impl<'a, S> ProjectTestMatriceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2567,7 +2590,7 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestMatrix) -> ProjectTestMatriceCreateCall<'a> {
+    pub fn request(mut self, new_value: TestMatrix) -> ProjectTestMatriceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2577,14 +2600,14 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// A string id used to detect duplicated requests. Ids are automatically scoped to a project, so users should ensure the ID is unique per-project. A UUID is recommended. Optional, but strongly recommended.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
@@ -2594,7 +2617,7 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2619,7 +2642,7 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2639,9 +2662,9 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTestMatriceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2673,7 +2696,7 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2681,10 +2704,10 @@ impl<'a> ProjectTestMatriceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestMatriceGetCall<'a>
-    where  {
+pub struct ProjectTestMatriceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
     _project_id: String,
     _test_matrix_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2692,9 +2715,15 @@ pub struct ProjectTestMatriceGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTestMatriceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTestMatriceGetCall<'a, S> {}
 
-impl<'a> ProjectTestMatriceGetCall<'a> {
+impl<'a, S> ProjectTestMatriceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2838,7 +2867,7 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2848,7 +2877,7 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a> {
+    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a, S> {
         self._test_matrix_id = new_value.to_string();
         self
     }
@@ -2858,7 +2887,7 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2883,7 +2912,7 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2903,9 +2932,9 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTestMatriceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2937,7 +2966,7 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Testing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2946,10 +2975,10 @@ impl<'a> ProjectTestMatriceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TestEnvironmentCatalogGetCall<'a>
-    where  {
+pub struct TestEnvironmentCatalogGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Testing<>,
+    hub: &'a Testing<S>,
     _environment_type: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2957,9 +2986,15 @@ pub struct TestEnvironmentCatalogGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TestEnvironmentCatalogGetCall<'a> {}
+impl<'a, S> client::CallBuilder for TestEnvironmentCatalogGetCall<'a, S> {}
 
-impl<'a> TestEnvironmentCatalogGetCall<'a> {
+impl<'a, S> TestEnvironmentCatalogGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3105,14 +3140,14 @@ impl<'a> TestEnvironmentCatalogGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_type(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a> {
+    pub fn environment_type(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a, S> {
         self._environment_type = new_value.to_string();
         self
     }
     /// For authorization, the cloud project requesting the TestEnvironmentCatalog.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a, S> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3122,7 +3157,7 @@ impl<'a> TestEnvironmentCatalogGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestEnvironmentCatalogGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestEnvironmentCatalogGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3147,7 +3182,7 @@ impl<'a> TestEnvironmentCatalogGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TestEnvironmentCatalogGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TestEnvironmentCatalogGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3167,9 +3202,9 @@ impl<'a> TestEnvironmentCatalogGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TestEnvironmentCatalogGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TestEnvironmentCatalogGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

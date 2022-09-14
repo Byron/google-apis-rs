@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,37 +108,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct FactCheckTools<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct FactCheckTools<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for FactCheckTools<> {}
+impl<'a, S> client::Hub for FactCheckTools<S> {}
 
-impl<'a, > FactCheckTools<> {
+impl<'a, S> FactCheckTools<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FactCheckTools<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> FactCheckTools<S> {
         FactCheckTools {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://factchecktools.googleapis.com/".to_string(),
             _root_url: "https://factchecktools.googleapis.com/".to_string(),
         }
     }
 
-    pub fn claims(&'a self) -> ClaimMethods<'a> {
+    pub fn claims(&'a self) -> ClaimMethods<'a, S> {
         ClaimMethods { hub: &self }
     }
-    pub fn pages(&'a self) -> PageMethods<'a> {
+    pub fn pages(&'a self) -> PageMethods<'a, S> {
         PageMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -443,27 +448,27 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
 /// let rb = hub.claims();
 /// # }
 /// ```
-pub struct ClaimMethods<'a>
-    where  {
+pub struct ClaimMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
 }
 
-impl<'a> client::MethodsBuilder for ClaimMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ClaimMethods<'a, S> {}
 
-impl<'a> ClaimMethods<'a> {
+impl<'a, S> ClaimMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Search through fact-checked claims.
-    pub fn search(&self) -> ClaimSearchCall<'a> {
+    pub fn search(&self) -> ClaimSearchCall<'a, S> {
         ClaimSearchCall {
             hub: self.hub,
             _review_publisher_site_filter: Default::default(),
@@ -502,22 +507,22 @@ impl<'a> ClaimMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.pages();
 /// # }
 /// ```
-pub struct PageMethods<'a>
-    where  {
+pub struct PageMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
 }
 
-impl<'a> client::MethodsBuilder for PageMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PageMethods<'a, S> {}
 
-impl<'a> PageMethods<'a> {
+impl<'a, S> PageMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -526,7 +531,7 @@ impl<'a> PageMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageCreateCall<'a> {
+    pub fn create(&self, request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageCreateCall<'a, S> {
         PageCreateCall {
             hub: self.hub,
             _request: request,
@@ -543,7 +548,7 @@ impl<'a> PageMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource to delete, in the form of `pages/{page_id}`.
-    pub fn delete(&self, name: &str) -> PageDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> PageDeleteCall<'a, S> {
         PageDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -560,7 +565,7 @@ impl<'a> PageMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the resource to get, in the form of `pages/{page_id}`.
-    pub fn get(&self, name: &str) -> PageGetCall<'a> {
+    pub fn get(&self, name: &str) -> PageGetCall<'a, S> {
         PageGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -573,7 +578,7 @@ impl<'a> PageMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List the `ClaimReview` markup pages for a specific URL or for an organization.
-    pub fn list(&self) -> PageListCall<'a> {
+    pub fn list(&self) -> PageListCall<'a, S> {
         PageListCall {
             hub: self.hub,
             _url: Default::default(),
@@ -595,7 +600,7 @@ impl<'a> PageMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of this `ClaimReview` markup page resource, in the form of `pages/{page_id}`. Except for update requests, this field is output-only and should not be set by the user.
-    pub fn update(&self, request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage, name: &str) -> PageUpdateCall<'a> {
+    pub fn update(&self, request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage, name: &str) -> PageUpdateCall<'a, S> {
         PageUpdateCall {
             hub: self.hub,
             _request: request,
@@ -637,7 +642,7 @@ impl<'a> PageMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -652,10 +657,10 @@ impl<'a> PageMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ClaimSearchCall<'a>
-    where  {
+pub struct ClaimSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
     _review_publisher_site_filter: Option<String>,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -667,9 +672,15 @@ pub struct ClaimSearchCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ClaimSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for ClaimSearchCall<'a, S> {}
 
-impl<'a> ClaimSearchCall<'a> {
+impl<'a, S> ClaimSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -802,49 +813,49 @@ impl<'a> ClaimSearchCall<'a> {
     /// The review publisher site to filter results by, e.g. nytimes.com.
     ///
     /// Sets the *review publisher site filter* query property to the given value.
-    pub fn review_publisher_site_filter(mut self, new_value: &str) -> ClaimSearchCall<'a> {
+    pub fn review_publisher_site_filter(mut self, new_value: &str) -> ClaimSearchCall<'a, S> {
         self._review_publisher_site_filter = Some(new_value.to_string());
         self
     }
     /// Textual query string. Required unless `review_publisher_site_filter` is specified.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ClaimSearchCall<'a> {
+    pub fn query(mut self, new_value: &str) -> ClaimSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The pagination token. You may provide the `next_page_token` returned from a previous List request, if any, in order to get the next page. All other fields must have the same values as in the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ClaimSearchCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ClaimSearchCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The pagination size. We will return up to that many results. Defaults to 10 if not set.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ClaimSearchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ClaimSearchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An integer that specifies the current offset (that is, starting result location) in search results. This field is only considered if `page_token` is unset. For example, 0 means to return results starting from the first matching result, and 10 means to return from the 11th result.
     ///
     /// Sets the *offset* query property to the given value.
-    pub fn offset(mut self, new_value: i32) -> ClaimSearchCall<'a> {
+    pub fn offset(mut self, new_value: i32) -> ClaimSearchCall<'a, S> {
         self._offset = Some(new_value);
         self
     }
     /// The maximum age of the returned search results, in days. Age is determined by either claim date or review date, whichever is newer.
     ///
     /// Sets the *max age days* query property to the given value.
-    pub fn max_age_days(mut self, new_value: i32) -> ClaimSearchCall<'a> {
+    pub fn max_age_days(mut self, new_value: i32) -> ClaimSearchCall<'a, S> {
         self._max_age_days = Some(new_value);
         self
     }
     /// The BCP-47 language code, such as "en-US" or "sr-Latn". Can be used to restrict results by language, though we do not currently consider the region.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ClaimSearchCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ClaimSearchCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -854,7 +865,7 @@ impl<'a> ClaimSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ClaimSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ClaimSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -879,7 +890,7 @@ impl<'a> ClaimSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ClaimSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ClaimSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -911,7 +922,7 @@ impl<'a> ClaimSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -924,19 +935,25 @@ impl<'a> ClaimSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageCreateCall<'a>
-    where  {
+pub struct PageCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
     _request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for PageCreateCall<'a, S> {}
 
-impl<'a> PageCreateCall<'a> {
+impl<'a, S> PageCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1070,7 +1087,7 @@ impl<'a> PageCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1080,7 +1097,7 @@ impl<'a> PageCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1105,7 +1122,7 @@ impl<'a> PageCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1125,9 +1142,9 @@ impl<'a> PageCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1159,7 +1176,7 @@ impl<'a> PageCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1167,19 +1184,25 @@ impl<'a> PageCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageDeleteCall<'a>
-    where  {
+pub struct PageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PageDeleteCall<'a, S> {}
 
-impl<'a> PageDeleteCall<'a> {
+impl<'a, S> PageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1326,7 +1349,7 @@ impl<'a> PageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PageDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PageDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1336,7 +1359,7 @@ impl<'a> PageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1361,7 +1384,7 @@ impl<'a> PageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1381,9 +1404,9 @@ impl<'a> PageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1415,7 +1438,7 @@ impl<'a> PageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1423,19 +1446,25 @@ impl<'a> PageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageGetCall<'a>
-    where  {
+pub struct PageGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PageGetCall<'a, S> {}
 
-impl<'a> PageGetCall<'a> {
+impl<'a, S> PageGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1582,7 +1611,7 @@ impl<'a> PageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PageGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PageGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1592,7 +1621,7 @@ impl<'a> PageGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1617,7 +1646,7 @@ impl<'a> PageGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1637,9 +1666,9 @@ impl<'a> PageGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1671,7 +1700,7 @@ impl<'a> PageGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1684,10 +1713,10 @@ impl<'a> PageGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageListCall<'a>
-    where  {
+pub struct PageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
     _url: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1698,9 +1727,15 @@ pub struct PageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageListCall<'a> {}
+impl<'a, S> client::CallBuilder for PageListCall<'a, S> {}
 
-impl<'a> PageListCall<'a> {
+impl<'a, S> PageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1833,35 +1868,35 @@ impl<'a> PageListCall<'a> {
     /// The URL from which to get `ClaimReview` markup. There will be at most one result. If markup is associated with a more canonical version of the URL provided, we will return that URL instead. Cannot be specified along with an organization.
     ///
     /// Sets the *url* query property to the given value.
-    pub fn url(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn url(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._url = Some(new_value.to_string());
         self
     }
     /// The pagination token. You may provide the `next_page_token` returned from a previous List request, if any, in order to get the next page. All other fields must have the same values as in the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The pagination size. We will return up to that many results. Defaults to 10 if not set. Has no effect if a URL is requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PageListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PageListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The organization for which we want to fetch markups for. For instance, "site.com". Cannot be specified along with an URL.
     ///
     /// Sets the *organization* query property to the given value.
-    pub fn organization(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn organization(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._organization = Some(new_value.to_string());
         self
     }
     /// An integer that specifies the current offset (that is, starting result location) in search results. This field is only considered if `page_token` is unset, and if the request is not for a specific URL. For example, 0 means to return results starting from the first matching result, and 10 means to return from the 11th result.
     ///
     /// Sets the *offset* query property to the given value.
-    pub fn offset(mut self, new_value: i32) -> PageListCall<'a> {
+    pub fn offset(mut self, new_value: i32) -> PageListCall<'a, S> {
         self._offset = Some(new_value);
         self
     }
@@ -1871,7 +1906,7 @@ impl<'a> PageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1896,7 +1931,7 @@ impl<'a> PageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1916,9 +1951,9 @@ impl<'a> PageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1951,7 +1986,7 @@ impl<'a> PageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1964,10 +1999,10 @@ impl<'a> PageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageUpdateCall<'a>
-    where  {
+pub struct PageUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a FactCheckTools<>,
+    hub: &'a FactCheckTools<S>,
     _request: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1975,9 +2010,15 @@ pub struct PageUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PageUpdateCall<'a, S> {}
 
-impl<'a> PageUpdateCall<'a> {
+impl<'a, S> PageUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2137,7 +2178,7 @@ impl<'a> PageUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageUpdateCall<'a> {
+    pub fn request(mut self, new_value: GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage) -> PageUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2147,7 +2188,7 @@ impl<'a> PageUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PageUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> PageUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2157,7 +2198,7 @@ impl<'a> PageUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2182,7 +2223,7 @@ impl<'a> PageUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2202,9 +2243,9 @@ impl<'a> PageUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

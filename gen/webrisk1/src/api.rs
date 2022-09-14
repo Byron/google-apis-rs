@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,43 +108,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct WebRisk<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct WebRisk<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for WebRisk<> {}
+impl<'a, S> client::Hub for WebRisk<S> {}
 
-impl<'a, > WebRisk<> {
+impl<'a, S> WebRisk<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> WebRisk<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> WebRisk<S> {
         WebRisk {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://webrisk.googleapis.com/".to_string(),
             _root_url: "https://webrisk.googleapis.com/".to_string(),
         }
     }
 
-    pub fn hashes(&'a self) -> HasheMethods<'a> {
+    pub fn hashes(&'a self) -> HasheMethods<'a, S> {
         HasheMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
-    pub fn threat_lists(&'a self) -> ThreatListMethods<'a> {
+    pub fn threat_lists(&'a self) -> ThreatListMethods<'a, S> {
         ThreatListMethods { hub: &self }
     }
-    pub fn uris(&'a self) -> UriMethods<'a> {
+    pub fn uris(&'a self) -> UriMethods<'a, S> {
         UriMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -535,27 +540,27 @@ impl client::Part for GoogleRpcStatus {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
 /// let rb = hub.hashes();
 /// # }
 /// ```
-pub struct HasheMethods<'a>
-    where  {
+pub struct HasheMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
 }
 
-impl<'a> client::MethodsBuilder for HasheMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for HasheMethods<'a, S> {}
 
-impl<'a> HasheMethods<'a> {
+impl<'a, S> HasheMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the full hashes that match the requested hash prefix. This is used after a hash prefix is looked up in a threatList and there is a match. The client side threatList only holds partial hashes so the client must query this method to determine if there is a full hash match of a threat.
-    pub fn search(&self) -> HasheSearchCall<'a> {
+    pub fn search(&self) -> HasheSearchCall<'a, S> {
         HasheSearchCall {
             hub: self.hub,
             _threat_types: Default::default(),
@@ -590,22 +595,22 @@ impl<'a> HasheMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `submissions_create(...)` and `uris_submit(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -615,7 +620,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> ProjectOperationCancelCall<'a> {
+    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> ProjectOperationCancelCall<'a, S> {
         ProjectOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -632,7 +637,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a> {
+    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a, S> {
         ProjectOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -648,7 +653,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, S> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -665,7 +670,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a> {
+    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a, S> {
         ProjectOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -685,7 +690,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
-    pub fn submissions_create(&self, request: GoogleCloudWebriskV1Submission, parent: &str) -> ProjectSubmissionCreateCall<'a> {
+    pub fn submissions_create(&self, request: GoogleCloudWebriskV1Submission, parent: &str) -> ProjectSubmissionCreateCall<'a, S> {
         ProjectSubmissionCreateCall {
             hub: self.hub,
             _request: request,
@@ -704,7 +709,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
-    pub fn uris_submit(&self, request: GoogleCloudWebriskV1SubmitUriRequest, parent: &str) -> ProjectUriSubmitCall<'a> {
+    pub fn uris_submit(&self, request: GoogleCloudWebriskV1SubmitUriRequest, parent: &str) -> ProjectUriSubmitCall<'a, S> {
         ProjectUriSubmitCall {
             hub: self.hub,
             _request: request,
@@ -739,27 +744,27 @@ impl<'a> ProjectMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `compute_diff(...)`
 /// // to build up your call.
 /// let rb = hub.threat_lists();
 /// # }
 /// ```
-pub struct ThreatListMethods<'a>
-    where  {
+pub struct ThreatListMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThreatListMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThreatListMethods<'a, S> {}
 
-impl<'a> ThreatListMethods<'a> {
+impl<'a, S> ThreatListMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the most recent threat list diffs. These diffs should be applied to a local database of hashes to keep it up-to-date. If the local database is empty or excessively out-of-date, a complete snapshot of the database will be returned. This Method only updates a single ThreatList at a time. To update multiple ThreatList databases, this method needs to be called once for each list.
-    pub fn compute_diff(&self) -> ThreatListComputeDiffCall<'a> {
+    pub fn compute_diff(&self) -> ThreatListComputeDiffCall<'a, S> {
         ThreatListComputeDiffCall {
             hub: self.hub,
             _version_token: Default::default(),
@@ -797,27 +802,27 @@ impl<'a> ThreatListMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
 /// let rb = hub.uris();
 /// # }
 /// ```
-pub struct UriMethods<'a>
-    where  {
+pub struct UriMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
 }
 
-impl<'a> client::MethodsBuilder for UriMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UriMethods<'a, S> {}
 
-impl<'a> UriMethods<'a> {
+impl<'a, S> UriMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// This method is used to check whether a URI is on a given threatList. Multiple threatLists may be searched in a single query. The response will list all requested threatLists the URI was found to match. If the URI is not found on any of the requested ThreatList an empty response will be returned.
-    pub fn search(&self) -> UriSearchCall<'a> {
+    pub fn search(&self) -> UriSearchCall<'a, S> {
         UriSearchCall {
             hub: self.hub,
             _uri: Default::default(),
@@ -859,7 +864,7 @@ impl<'a> UriMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -869,10 +874,10 @@ impl<'a> UriMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct HasheSearchCall<'a>
-    where  {
+pub struct HasheSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _threat_types: Vec<String>,
     _hash_prefix: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -880,9 +885,15 @@ pub struct HasheSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for HasheSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for HasheSearchCall<'a, S> {}
 
-impl<'a> HasheSearchCall<'a> {
+impl<'a, S> HasheSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1009,14 +1020,14 @@ impl<'a> HasheSearchCall<'a> {
     ///
     /// Append the given value to the *threat types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_threat_types(mut self, new_value: &str) -> HasheSearchCall<'a> {
+    pub fn add_threat_types(mut self, new_value: &str) -> HasheSearchCall<'a, S> {
         self._threat_types.push(new_value.to_string());
         self
     }
     /// A hash prefix, consisting of the most significant 4-32 bytes of a SHA256 hash. For JSON requests, this field is base64-encoded. Note that if this parameter is provided by a URI, it must be encoded using the web safe base64 variant (RFC 4648).
     ///
     /// Sets the *hash prefix* query property to the given value.
-    pub fn hash_prefix(mut self, new_value: &str) -> HasheSearchCall<'a> {
+    pub fn hash_prefix(mut self, new_value: &str) -> HasheSearchCall<'a, S> {
         self._hash_prefix = Some(new_value.to_string());
         self
     }
@@ -1026,7 +1037,7 @@ impl<'a> HasheSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> HasheSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> HasheSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1051,7 +1062,7 @@ impl<'a> HasheSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> HasheSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> HasheSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1071,9 +1082,9 @@ impl<'a> HasheSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> HasheSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> HasheSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1106,7 +1117,7 @@ impl<'a> HasheSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1119,19 +1130,25 @@ impl<'a> HasheSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationCancelCall<'a>
-    where  {
+pub struct ProjectOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _request: GoogleLongrunningCancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ProjectOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectOperationCancelCall<'a> {
+impl<'a, S> ProjectOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1285,7 +1302,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> ProjectOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> ProjectOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1295,7 +1312,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1305,7 +1322,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1330,7 +1347,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1361,7 +1378,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1369,18 +1386,24 @@ impl<'a> ProjectOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationDeleteCall<'a>
-    where  {
+pub struct ProjectOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ProjectOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationDeleteCall<'a, S> {}
 
-impl<'a> ProjectOperationDeleteCall<'a> {
+impl<'a, S> ProjectOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1521,7 +1544,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1531,7 +1554,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1556,7 +1579,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1587,7 +1610,7 @@ impl<'a> ProjectOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1595,19 +1618,25 @@ impl<'a> ProjectOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a>
-    where  {
+pub struct ProjectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationGetCall<'a, S> {}
 
-impl<'a> ProjectOperationGetCall<'a> {
+impl<'a, S> ProjectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1754,7 +1783,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1764,7 +1793,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1789,7 +1818,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1809,9 +1838,9 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1843,7 +1872,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1854,10 +1883,10 @@ impl<'a> ProjectOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationListCall<'a>
-    where  {
+pub struct ProjectOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1866,9 +1895,15 @@ pub struct ProjectOperationListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ProjectOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationListCall<'a, S> {}
 
-impl<'a> ProjectOperationListCall<'a> {
+impl<'a, S> ProjectOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2018,28 +2053,28 @@ impl<'a> ProjectOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2049,7 +2084,7 @@ impl<'a> ProjectOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2074,7 +2109,7 @@ impl<'a> ProjectOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2106,7 +2141,7 @@ impl<'a> ProjectOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2119,10 +2154,10 @@ impl<'a> ProjectOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSubmissionCreateCall<'a>
-    where  {
+pub struct ProjectSubmissionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _request: GoogleCloudWebriskV1Submission,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2130,9 +2165,15 @@ pub struct ProjectSubmissionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSubmissionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSubmissionCreateCall<'a, S> {}
 
-impl<'a> ProjectSubmissionCreateCall<'a> {
+impl<'a, S> ProjectSubmissionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2292,7 +2333,7 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudWebriskV1Submission) -> ProjectSubmissionCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudWebriskV1Submission) -> ProjectSubmissionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2302,7 +2343,7 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSubmissionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSubmissionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2312,7 +2353,7 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSubmissionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSubmissionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2337,7 +2378,7 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubmissionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubmissionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2357,9 +2398,9 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubmissionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSubmissionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2392,7 +2433,7 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2405,10 +2446,10 @@ impl<'a> ProjectSubmissionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUriSubmitCall<'a>
-    where  {
+pub struct ProjectUriSubmitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _request: GoogleCloudWebriskV1SubmitUriRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2416,9 +2457,15 @@ pub struct ProjectUriSubmitCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectUriSubmitCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectUriSubmitCall<'a, S> {}
 
-impl<'a> ProjectUriSubmitCall<'a> {
+impl<'a, S> ProjectUriSubmitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2578,7 +2625,7 @@ impl<'a> ProjectUriSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudWebriskV1SubmitUriRequest) -> ProjectUriSubmitCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudWebriskV1SubmitUriRequest) -> ProjectUriSubmitCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2588,7 +2635,7 @@ impl<'a> ProjectUriSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectUriSubmitCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectUriSubmitCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2598,7 +2645,7 @@ impl<'a> ProjectUriSubmitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUriSubmitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUriSubmitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2623,7 +2670,7 @@ impl<'a> ProjectUriSubmitCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUriSubmitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUriSubmitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2643,9 +2690,9 @@ impl<'a> ProjectUriSubmitCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUriSubmitCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectUriSubmitCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2677,7 +2724,7 @@ impl<'a> ProjectUriSubmitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2690,10 +2737,10 @@ impl<'a> ProjectUriSubmitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatListComputeDiffCall<'a>
-    where  {
+pub struct ThreatListComputeDiffCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _version_token: Option<String>,
     _threat_type: Option<String>,
     _constraints_supported_compressions: Vec<String>,
@@ -2704,9 +2751,15 @@ pub struct ThreatListComputeDiffCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ThreatListComputeDiffCall<'a> {}
+impl<'a, S> client::CallBuilder for ThreatListComputeDiffCall<'a, S> {}
 
-impl<'a> ThreatListComputeDiffCall<'a> {
+impl<'a, S> ThreatListComputeDiffCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2841,14 +2894,14 @@ impl<'a> ThreatListComputeDiffCall<'a> {
     /// The current version token of the client for the requested list (the client version that was received from the last successful diff). If the client does not have a version token (this is the first time calling ComputeThreatListDiff), this may be left empty and a full database snapshot will be returned.
     ///
     /// Sets the *version token* query property to the given value.
-    pub fn version_token(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a> {
+    pub fn version_token(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, S> {
         self._version_token = Some(new_value.to_string());
         self
     }
     /// Required. The threat list to update. Only a single ThreatType should be specified per request. If you want to handle multiple ThreatTypes, you must make one request per ThreatType.
     ///
     /// Sets the *threat type* query property to the given value.
-    pub fn threat_type(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a> {
+    pub fn threat_type(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, S> {
         self._threat_type = Some(new_value.to_string());
         self
     }
@@ -2856,21 +2909,21 @@ impl<'a> ThreatListComputeDiffCall<'a> {
     ///
     /// Append the given value to the *constraints.supported compressions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_constraints_supported_compressions(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a> {
+    pub fn add_constraints_supported_compressions(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, S> {
         self._constraints_supported_compressions.push(new_value.to_string());
         self
     }
     /// The maximum size in number of entries. The diff will not contain more entries than this value. This should be a power of 2 between 2**10 and 2**20. If zero, no diff size limit is set.
     ///
     /// Sets the *constraints.max diff entries* query property to the given value.
-    pub fn constraints_max_diff_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a> {
+    pub fn constraints_max_diff_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a, S> {
         self._constraints_max_diff_entries = Some(new_value);
         self
     }
     /// Sets the maximum number of entries that the client is willing to have in the local database. This should be a power of 2 between 2**10 and 2**20. If zero, no database size limit is set.
     ///
     /// Sets the *constraints.max database entries* query property to the given value.
-    pub fn constraints_max_database_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a> {
+    pub fn constraints_max_database_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a, S> {
         self._constraints_max_database_entries = Some(new_value);
         self
     }
@@ -2880,7 +2933,7 @@ impl<'a> ThreatListComputeDiffCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListComputeDiffCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListComputeDiffCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2905,7 +2958,7 @@ impl<'a> ThreatListComputeDiffCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatListComputeDiffCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatListComputeDiffCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2925,9 +2978,9 @@ impl<'a> ThreatListComputeDiffCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ThreatListComputeDiffCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ThreatListComputeDiffCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2959,7 +3012,7 @@ impl<'a> ThreatListComputeDiffCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2969,10 +3022,10 @@ impl<'a> ThreatListComputeDiffCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UriSearchCall<'a>
-    where  {
+pub struct UriSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WebRisk<>,
+    hub: &'a WebRisk<S>,
     _uri: Option<String>,
     _threat_types: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2980,9 +3033,15 @@ pub struct UriSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UriSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for UriSearchCall<'a, S> {}
 
-impl<'a> UriSearchCall<'a> {
+impl<'a, S> UriSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3108,7 +3167,7 @@ impl<'a> UriSearchCall<'a> {
     /// Required. The URI to be checked for matches.
     ///
     /// Sets the *uri* query property to the given value.
-    pub fn uri(mut self, new_value: &str) -> UriSearchCall<'a> {
+    pub fn uri(mut self, new_value: &str) -> UriSearchCall<'a, S> {
         self._uri = Some(new_value.to_string());
         self
     }
@@ -3116,7 +3175,7 @@ impl<'a> UriSearchCall<'a> {
     ///
     /// Append the given value to the *threat types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_threat_types(mut self, new_value: &str) -> UriSearchCall<'a> {
+    pub fn add_threat_types(mut self, new_value: &str) -> UriSearchCall<'a, S> {
         self._threat_types.push(new_value.to_string());
         self
     }
@@ -3126,7 +3185,7 @@ impl<'a> UriSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UriSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UriSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3151,7 +3210,7 @@ impl<'a> UriSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UriSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UriSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3171,9 +3230,9 @@ impl<'a> UriSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UriSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UriSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

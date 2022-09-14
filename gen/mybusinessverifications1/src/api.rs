@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -77,37 +82,37 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct MyBusinessVerifications<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct MyBusinessVerifications<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for MyBusinessVerifications<> {}
+impl<'a, S> client::Hub for MyBusinessVerifications<S> {}
 
-impl<'a, > MyBusinessVerifications<> {
+impl<'a, S> MyBusinessVerifications<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusinessVerifications<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> MyBusinessVerifications<S> {
         MyBusinessVerifications {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://mybusinessverifications.googleapis.com/".to_string(),
             _root_url: "https://mybusinessverifications.googleapis.com/".to_string(),
         }
     }
 
-    pub fn locations(&'a self) -> LocationMethods<'a> {
+    pub fn locations(&'a self) -> LocationMethods<'a, S> {
         LocationMethods { hub: &self }
     }
-    pub fn verification_tokens(&'a self) -> VerificationTokenMethods<'a> {
+    pub fn verification_tokens(&'a self) -> VerificationTokenMethods<'a, S> {
         VerificationTokenMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -605,22 +610,22 @@ impl client::Part for WaitForVoiceOfMerchant {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `fetch_verification_options(...)`, `get_voice_of_merchant_state(...)`, `verifications_complete(...)`, `verifications_list(...)` and `verify(...)`
 /// // to build up your call.
 /// let rb = hub.locations();
 /// # }
 /// ```
-pub struct LocationMethods<'a>
-    where  {
+pub struct LocationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
 }
 
-impl<'a> client::MethodsBuilder for LocationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LocationMethods<'a, S> {}
 
-impl<'a> LocationMethods<'a> {
+impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -630,7 +635,7 @@ impl<'a> LocationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name of the verification to complete.
-    pub fn verifications_complete(&self, request: CompleteVerificationRequest, name: &str) -> LocationVerificationCompleteCall<'a> {
+    pub fn verifications_complete(&self, request: CompleteVerificationRequest, name: &str) -> LocationVerificationCompleteCall<'a, S> {
         LocationVerificationCompleteCall {
             hub: self.hub,
             _request: request,
@@ -647,7 +652,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Resource name of the location that verification requests belong to.
-    pub fn verifications_list(&self, parent: &str) -> LocationVerificationListCall<'a> {
+    pub fn verifications_list(&self, parent: &str) -> LocationVerificationListCall<'a, S> {
         LocationVerificationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -666,7 +671,7 @@ impl<'a> LocationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `location` - Required. The location to verify.
-    pub fn fetch_verification_options(&self, request: FetchVerificationOptionsRequest, location: &str) -> LocationFetchVerificationOptionCall<'a> {
+    pub fn fetch_verification_options(&self, request: FetchVerificationOptionsRequest, location: &str) -> LocationFetchVerificationOptionCall<'a, S> {
         LocationFetchVerificationOptionCall {
             hub: self.hub,
             _request: request,
@@ -683,7 +688,7 @@ impl<'a> LocationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the location.
-    pub fn get_voice_of_merchant_state(&self, name: &str) -> LocationGetVoiceOfMerchantStateCall<'a> {
+    pub fn get_voice_of_merchant_state(&self, name: &str) -> LocationGetVoiceOfMerchantStateCall<'a, S> {
         LocationGetVoiceOfMerchantStateCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -700,7 +705,7 @@ impl<'a> LocationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name of the location to verify.
-    pub fn verify(&self, request: VerifyLocationRequest, name: &str) -> LocationVerifyCall<'a> {
+    pub fn verify(&self, request: VerifyLocationRequest, name: &str) -> LocationVerifyCall<'a, S> {
         LocationVerifyCall {
             hub: self.hub,
             _request: request,
@@ -734,22 +739,22 @@ impl<'a> LocationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `generate(...)`
 /// // to build up your call.
 /// let rb = hub.verification_tokens();
 /// # }
 /// ```
-pub struct VerificationTokenMethods<'a>
-    where  {
+pub struct VerificationTokenMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
 }
 
-impl<'a> client::MethodsBuilder for VerificationTokenMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VerificationTokenMethods<'a, S> {}
 
-impl<'a> VerificationTokenMethods<'a> {
+impl<'a, S> VerificationTokenMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -758,7 +763,7 @@ impl<'a> VerificationTokenMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn generate(&self, request: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a> {
+    pub fn generate(&self, request: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a, S> {
         VerificationTokenGenerateCall {
             hub: self.hub,
             _request: request,
@@ -799,7 +804,7 @@ impl<'a> VerificationTokenMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -812,19 +817,25 @@ impl<'a> VerificationTokenMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationVerificationCompleteCall<'a>
-    where  {
+pub struct LocationVerificationCompleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
     _request: CompleteVerificationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationVerificationCompleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationVerificationCompleteCall<'a, S> {}
 
-impl<'a> LocationVerificationCompleteCall<'a> {
+impl<'a, S> LocationVerificationCompleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -978,7 +989,7 @@ impl<'a> LocationVerificationCompleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompleteVerificationRequest) -> LocationVerificationCompleteCall<'a> {
+    pub fn request(mut self, new_value: CompleteVerificationRequest) -> LocationVerificationCompleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -988,7 +999,7 @@ impl<'a> LocationVerificationCompleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationVerificationCompleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationVerificationCompleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -998,7 +1009,7 @@ impl<'a> LocationVerificationCompleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationVerificationCompleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationVerificationCompleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1023,7 +1034,7 @@ impl<'a> LocationVerificationCompleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationVerificationCompleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationVerificationCompleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1054,7 +1065,7 @@ impl<'a> LocationVerificationCompleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1064,10 +1075,10 @@ impl<'a> LocationVerificationCompleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationVerificationListCall<'a>
-    where  {
+pub struct LocationVerificationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1075,9 +1086,15 @@ pub struct LocationVerificationListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationVerificationListCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationVerificationListCall<'a, S> {}
 
-impl<'a> LocationVerificationListCall<'a> {
+impl<'a, S> LocationVerificationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1224,21 +1241,21 @@ impl<'a> LocationVerificationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> LocationVerificationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> LocationVerificationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If specified, returns the next page of verifications.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LocationVerificationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LocationVerificationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// How many verification to include per page. Minimum is 1, and the default and maximum page size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> LocationVerificationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> LocationVerificationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1248,7 +1265,7 @@ impl<'a> LocationVerificationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationVerificationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationVerificationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1273,7 +1290,7 @@ impl<'a> LocationVerificationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationVerificationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationVerificationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1305,7 +1322,7 @@ impl<'a> LocationVerificationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1318,19 +1335,25 @@ impl<'a> LocationVerificationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationFetchVerificationOptionCall<'a>
-    where  {
+pub struct LocationFetchVerificationOptionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
     _request: FetchVerificationOptionsRequest,
     _location: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationFetchVerificationOptionCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationFetchVerificationOptionCall<'a, S> {}
 
-impl<'a> LocationFetchVerificationOptionCall<'a> {
+impl<'a, S> LocationFetchVerificationOptionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1484,7 +1507,7 @@ impl<'a> LocationFetchVerificationOptionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FetchVerificationOptionsRequest) -> LocationFetchVerificationOptionCall<'a> {
+    pub fn request(mut self, new_value: FetchVerificationOptionsRequest) -> LocationFetchVerificationOptionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1494,7 +1517,7 @@ impl<'a> LocationFetchVerificationOptionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location(mut self, new_value: &str) -> LocationFetchVerificationOptionCall<'a> {
+    pub fn location(mut self, new_value: &str) -> LocationFetchVerificationOptionCall<'a, S> {
         self._location = new_value.to_string();
         self
     }
@@ -1504,7 +1527,7 @@ impl<'a> LocationFetchVerificationOptionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationFetchVerificationOptionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationFetchVerificationOptionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1529,7 +1552,7 @@ impl<'a> LocationFetchVerificationOptionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationFetchVerificationOptionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationFetchVerificationOptionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1560,7 +1583,7 @@ impl<'a> LocationFetchVerificationOptionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1568,18 +1591,24 @@ impl<'a> LocationFetchVerificationOptionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationGetVoiceOfMerchantStateCall<'a>
-    where  {
+pub struct LocationGetVoiceOfMerchantStateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationGetVoiceOfMerchantStateCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationGetVoiceOfMerchantStateCall<'a, S> {}
 
-impl<'a> LocationGetVoiceOfMerchantStateCall<'a> {
+impl<'a, S> LocationGetVoiceOfMerchantStateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1720,7 +1749,7 @@ impl<'a> LocationGetVoiceOfMerchantStateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationGetVoiceOfMerchantStateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationGetVoiceOfMerchantStateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1730,7 +1759,7 @@ impl<'a> LocationGetVoiceOfMerchantStateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetVoiceOfMerchantStateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationGetVoiceOfMerchantStateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1755,7 +1784,7 @@ impl<'a> LocationGetVoiceOfMerchantStateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationGetVoiceOfMerchantStateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationGetVoiceOfMerchantStateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1787,7 +1816,7 @@ impl<'a> LocationGetVoiceOfMerchantStateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1800,19 +1829,25 @@ impl<'a> LocationGetVoiceOfMerchantStateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationVerifyCall<'a>
-    where  {
+pub struct LocationVerifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
     _request: VerifyLocationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for LocationVerifyCall<'a> {}
+impl<'a, S> client::CallBuilder for LocationVerifyCall<'a, S> {}
 
-impl<'a> LocationVerifyCall<'a> {
+impl<'a, S> LocationVerifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1966,7 +2001,7 @@ impl<'a> LocationVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: VerifyLocationRequest) -> LocationVerifyCall<'a> {
+    pub fn request(mut self, new_value: VerifyLocationRequest) -> LocationVerifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1976,7 +2011,7 @@ impl<'a> LocationVerifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationVerifyCall<'a> {
+    pub fn name(mut self, new_value: &str) -> LocationVerifyCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1986,7 +2021,7 @@ impl<'a> LocationVerifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationVerifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationVerifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2011,7 +2046,7 @@ impl<'a> LocationVerifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationVerifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationVerifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2043,7 +2078,7 @@ impl<'a> LocationVerifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2056,18 +2091,24 @@ impl<'a> LocationVerifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VerificationTokenGenerateCall<'a>
-    where  {
+pub struct VerificationTokenGenerateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a MyBusinessVerifications<>,
+    hub: &'a MyBusinessVerifications<S>,
     _request: GenerateVerificationTokenRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for VerificationTokenGenerateCall<'a> {}
+impl<'a, S> client::CallBuilder for VerificationTokenGenerateCall<'a, S> {}
 
-impl<'a> VerificationTokenGenerateCall<'a> {
+impl<'a, S> VerificationTokenGenerateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2195,7 +2236,7 @@ impl<'a> VerificationTokenGenerateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a> {
+    pub fn request(mut self, new_value: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2205,7 +2246,7 @@ impl<'a> VerificationTokenGenerateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VerificationTokenGenerateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VerificationTokenGenerateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2230,7 +2271,7 @@ impl<'a> VerificationTokenGenerateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VerificationTokenGenerateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VerificationTokenGenerateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,34 +109,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Datapipelines<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Datapipelines<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Datapipelines<> {}
+impl<'a, S> client::Hub for Datapipelines<S> {}
 
-impl<'a, > Datapipelines<> {
+impl<'a, S> Datapipelines<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Datapipelines<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Datapipelines<S> {
         Datapipelines {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://datapipelines.googleapis.com/".to_string(),
             _root_url: "https://datapipelines.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -671,22 +676,22 @@ impl client::Part for GoogleRpcStatus {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_list_pipelines(...)`, `locations_pipelines_create(...)`, `locations_pipelines_delete(...)`, `locations_pipelines_get(...)`, `locations_pipelines_jobs_list(...)`, `locations_pipelines_patch(...)`, `locations_pipelines_run(...)` and `locations_pipelines_stop(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -695,7 +700,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The pipeline name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID`.
-    pub fn locations_pipelines_jobs_list(&self, parent: &str) -> ProjectLocationPipelineJobListCall<'a> {
+    pub fn locations_pipelines_jobs_list(&self, parent: &str) -> ProjectLocationPipelineJobListCall<'a, S> {
         ProjectLocationPipelineJobListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -715,7 +720,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The location name. For example: `projects/PROJECT_ID/locations/LOCATION_ID`.
-    pub fn locations_pipelines_create(&self, request: GoogleCloudDatapipelinesV1Pipeline, parent: &str) -> ProjectLocationPipelineCreateCall<'a> {
+    pub fn locations_pipelines_create(&self, request: GoogleCloudDatapipelinesV1Pipeline, parent: &str) -> ProjectLocationPipelineCreateCall<'a, S> {
         ProjectLocationPipelineCreateCall {
             hub: self.hub,
             _request: request,
@@ -733,7 +738,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The pipeline name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID`.
-    pub fn locations_pipelines_delete(&self, name: &str) -> ProjectLocationPipelineDeleteCall<'a> {
+    pub fn locations_pipelines_delete(&self, name: &str) -> ProjectLocationPipelineDeleteCall<'a, S> {
         ProjectLocationPipelineDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -750,7 +755,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The pipeline name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID`.
-    pub fn locations_pipelines_get(&self, name: &str) -> ProjectLocationPipelineGetCall<'a> {
+    pub fn locations_pipelines_get(&self, name: &str) -> ProjectLocationPipelineGetCall<'a, S> {
         ProjectLocationPipelineGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -768,7 +773,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The pipeline name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID`. * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]), hyphens (-), colons (:), and periods (.). For more information, see [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects). * `LOCATION_ID` is the canonical ID for the pipeline's location. The list of available locations can be obtained by calling `google.cloud.location.Locations.ListLocations`. Note that the Data Pipelines service is not available in all regions. It depends on Cloud Scheduler, an App Engine application, so it's only available in [App Engine regions](https://cloud.google.com/about/locations#region). * `PIPELINE_ID` is the ID of the pipeline. Must be unique for the selected project and location.
-    pub fn locations_pipelines_patch(&self, request: GoogleCloudDatapipelinesV1Pipeline, name: &str) -> ProjectLocationPipelinePatchCall<'a> {
+    pub fn locations_pipelines_patch(&self, request: GoogleCloudDatapipelinesV1Pipeline, name: &str) -> ProjectLocationPipelinePatchCall<'a, S> {
         ProjectLocationPipelinePatchCall {
             hub: self.hub,
             _request: request,
@@ -788,7 +793,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The pipeline name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID`.
-    pub fn locations_pipelines_run(&self, request: GoogleCloudDatapipelinesV1RunPipelineRequest, name: &str) -> ProjectLocationPipelineRunCall<'a> {
+    pub fn locations_pipelines_run(&self, request: GoogleCloudDatapipelinesV1RunPipelineRequest, name: &str) -> ProjectLocationPipelineRunCall<'a, S> {
         ProjectLocationPipelineRunCall {
             hub: self.hub,
             _request: request,
@@ -807,7 +812,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The pipeline name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/pipelines/PIPELINE_ID`.
-    pub fn locations_pipelines_stop(&self, request: GoogleCloudDatapipelinesV1StopPipelineRequest, name: &str) -> ProjectLocationPipelineStopCall<'a> {
+    pub fn locations_pipelines_stop(&self, request: GoogleCloudDatapipelinesV1StopPipelineRequest, name: &str) -> ProjectLocationPipelineStopCall<'a, S> {
         ProjectLocationPipelineStopCall {
             hub: self.hub,
             _request: request,
@@ -825,7 +830,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The location name. For example: `projects/PROJECT_ID/locations/LOCATION_ID`.
-    pub fn locations_list_pipelines(&self, parent: &str) -> ProjectLocationListPipelineCall<'a> {
+    pub fn locations_list_pipelines(&self, parent: &str) -> ProjectLocationListPipelineCall<'a, S> {
         ProjectLocationListPipelineCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -869,7 +874,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -879,10 +884,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelineJobListCall<'a>
-    where  {
+pub struct ProjectLocationPipelineJobListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -891,9 +896,15 @@ pub struct ProjectLocationPipelineJobListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelineJobListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelineJobListCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelineJobListCall<'a> {
+impl<'a, S> ProjectLocationPipelineJobListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1046,21 +1057,21 @@ impl<'a> ProjectLocationPipelineJobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationPipelineJobListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationPipelineJobListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListJobs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListJobs` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationPipelineJobListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationPipelineJobListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entities to return. The service may return fewer than this value, even if there are additional pages. If unspecified, the max limit will be determined by the backend implementation.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationPipelineJobListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationPipelineJobListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1070,7 +1081,7 @@ impl<'a> ProjectLocationPipelineJobListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineJobListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineJobListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1095,7 +1106,7 @@ impl<'a> ProjectLocationPipelineJobListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineJobListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineJobListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1115,9 +1126,9 @@ impl<'a> ProjectLocationPipelineJobListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelineJobListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelineJobListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1150,7 +1161,7 @@ impl<'a> ProjectLocationPipelineJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1163,10 +1174,10 @@ impl<'a> ProjectLocationPipelineJobListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelineCreateCall<'a>
-    where  {
+pub struct ProjectLocationPipelineCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _request: GoogleCloudDatapipelinesV1Pipeline,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1174,9 +1185,15 @@ pub struct ProjectLocationPipelineCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelineCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelineCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelineCreateCall<'a> {
+impl<'a, S> ProjectLocationPipelineCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1336,7 +1353,7 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1Pipeline) -> ProjectLocationPipelineCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1Pipeline) -> ProjectLocationPipelineCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1346,7 +1363,7 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationPipelineCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationPipelineCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1356,7 +1373,7 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1381,7 +1398,7 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1401,9 +1418,9 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelineCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelineCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1435,7 +1452,7 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1443,19 +1460,25 @@ impl<'a> ProjectLocationPipelineCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelineDeleteCall<'a>
-    where  {
+pub struct ProjectLocationPipelineDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelineDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelineDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelineDeleteCall<'a> {
+impl<'a, S> ProjectLocationPipelineDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1602,7 +1625,7 @@ impl<'a> ProjectLocationPipelineDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1612,7 +1635,7 @@ impl<'a> ProjectLocationPipelineDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1637,7 +1660,7 @@ impl<'a> ProjectLocationPipelineDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1657,9 +1680,9 @@ impl<'a> ProjectLocationPipelineDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelineDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelineDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1691,7 +1714,7 @@ impl<'a> ProjectLocationPipelineDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1699,19 +1722,25 @@ impl<'a> ProjectLocationPipelineDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelineGetCall<'a>
-    where  {
+pub struct ProjectLocationPipelineGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelineGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelineGetCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelineGetCall<'a> {
+impl<'a, S> ProjectLocationPipelineGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1858,7 +1887,7 @@ impl<'a> ProjectLocationPipelineGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1868,7 +1897,7 @@ impl<'a> ProjectLocationPipelineGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1893,7 +1922,7 @@ impl<'a> ProjectLocationPipelineGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1913,9 +1942,9 @@ impl<'a> ProjectLocationPipelineGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelineGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelineGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1948,7 +1977,7 @@ impl<'a> ProjectLocationPipelineGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1962,10 +1991,10 @@ impl<'a> ProjectLocationPipelineGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelinePatchCall<'a>
-    where  {
+pub struct ProjectLocationPipelinePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _request: GoogleCloudDatapipelinesV1Pipeline,
     _name: String,
     _update_mask: Option<String>,
@@ -1974,9 +2003,15 @@ pub struct ProjectLocationPipelinePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelinePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelinePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelinePatchCall<'a> {
+impl<'a, S> ProjectLocationPipelinePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2139,7 +2174,7 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1Pipeline) -> ProjectLocationPipelinePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1Pipeline) -> ProjectLocationPipelinePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2149,14 +2184,14 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelinePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelinePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The list of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationPipelinePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationPipelinePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2166,7 +2201,7 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelinePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelinePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2191,7 +2226,7 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelinePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelinePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2211,9 +2246,9 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelinePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelinePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2246,7 +2281,7 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2259,10 +2294,10 @@ impl<'a> ProjectLocationPipelinePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelineRunCall<'a>
-    where  {
+pub struct ProjectLocationPipelineRunCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _request: GoogleCloudDatapipelinesV1RunPipelineRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2270,9 +2305,15 @@ pub struct ProjectLocationPipelineRunCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelineRunCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelineRunCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelineRunCall<'a> {
+impl<'a, S> ProjectLocationPipelineRunCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2432,7 +2473,7 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1RunPipelineRequest) -> ProjectLocationPipelineRunCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1RunPipelineRequest) -> ProjectLocationPipelineRunCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2442,7 +2483,7 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineRunCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineRunCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2452,7 +2493,7 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineRunCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineRunCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2477,7 +2518,7 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineRunCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineRunCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2497,9 +2538,9 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelineRunCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelineRunCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2532,7 +2573,7 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2545,10 +2586,10 @@ impl<'a> ProjectLocationPipelineRunCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationPipelineStopCall<'a>
-    where  {
+pub struct ProjectLocationPipelineStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _request: GoogleCloudDatapipelinesV1StopPipelineRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2556,9 +2597,15 @@ pub struct ProjectLocationPipelineStopCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationPipelineStopCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationPipelineStopCall<'a, S> {}
 
-impl<'a> ProjectLocationPipelineStopCall<'a> {
+impl<'a, S> ProjectLocationPipelineStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2718,7 +2765,7 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1StopPipelineRequest) -> ProjectLocationPipelineStopCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDatapipelinesV1StopPipelineRequest) -> ProjectLocationPipelineStopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2728,7 +2775,7 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineStopCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationPipelineStopCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2738,7 +2785,7 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationPipelineStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2763,7 +2810,7 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationPipelineStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2783,9 +2830,9 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationPipelineStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationPipelineStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2817,7 +2864,7 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Datapipelines::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2828,10 +2875,10 @@ impl<'a> ProjectLocationPipelineStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListPipelineCall<'a>
-    where  {
+pub struct ProjectLocationListPipelineCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Datapipelines<>,
+    hub: &'a Datapipelines<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2841,9 +2888,15 @@ pub struct ProjectLocationListPipelineCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationListPipelineCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationListPipelineCall<'a, S> {}
 
-impl<'a> ProjectLocationListPipelineCall<'a> {
+impl<'a, S> ProjectLocationListPipelineCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2999,28 +3052,28 @@ impl<'a> ProjectLocationListPipelineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationListPipelineCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationListPipelineCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListPipelines` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListPipelines` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListPipelineCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListPipelineCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entities to return. The service may return fewer than this value, even if there are additional pages. If unspecified, the max limit is yet to be determined by the backend implementation.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListPipelineCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListPipelineCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// An expression for filtering the results of the request. If unspecified, all pipelines will be returned. Multiple filters can be applied and must be comma separated. Fields eligible for filtering are: + `type`: The type of the pipeline (streaming or batch). Allowed values are `ALL`, `BATCH`, and `STREAMING`. + `status`: The activity status of the pipeline. Allowed values are `ALL`, `ACTIVE`, `ARCHIVED`, and `PAUSED`. For example, to limit results to active batch processing pipelines: type:BATCH,status:ACTIVE
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListPipelineCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListPipelineCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3030,7 +3083,7 @@ impl<'a> ProjectLocationListPipelineCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListPipelineCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListPipelineCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3055,7 +3108,7 @@ impl<'a> ProjectLocationListPipelineCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListPipelineCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListPipelineCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3075,9 +3128,9 @@ impl<'a> ProjectLocationListPipelineCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListPipelineCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationListPipelineCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

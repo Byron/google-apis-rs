@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,76 +109,76 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ShoppingContent<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ShoppingContent<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ShoppingContent<> {}
+impl<'a, S> client::Hub for ShoppingContent<S> {}
 
-impl<'a, > ShoppingContent<> {
+impl<'a, S> ShoppingContent<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ShoppingContent<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ShoppingContent<S> {
         ShoppingContent {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://shoppingcontent.googleapis.com/content/v2/".to_string(),
             _root_url: "https://shoppingcontent.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a> {
+    pub fn accounts(&'a self) -> AccountMethods<'a, S> {
         AccountMethods { hub: &self }
     }
-    pub fn accountstatuses(&'a self) -> AccountstatuseMethods<'a> {
+    pub fn accountstatuses(&'a self) -> AccountstatuseMethods<'a, S> {
         AccountstatuseMethods { hub: &self }
     }
-    pub fn accounttax(&'a self) -> AccounttaxMethods<'a> {
+    pub fn accounttax(&'a self) -> AccounttaxMethods<'a, S> {
         AccounttaxMethods { hub: &self }
     }
-    pub fn datafeeds(&'a self) -> DatafeedMethods<'a> {
+    pub fn datafeeds(&'a self) -> DatafeedMethods<'a, S> {
         DatafeedMethods { hub: &self }
     }
-    pub fn datafeedstatuses(&'a self) -> DatafeedstatuseMethods<'a> {
+    pub fn datafeedstatuses(&'a self) -> DatafeedstatuseMethods<'a, S> {
         DatafeedstatuseMethods { hub: &self }
     }
-    pub fn inventory(&'a self) -> InventoryMethods<'a> {
+    pub fn inventory(&'a self) -> InventoryMethods<'a, S> {
         InventoryMethods { hub: &self }
     }
-    pub fn liasettings(&'a self) -> LiasettingMethods<'a> {
+    pub fn liasettings(&'a self) -> LiasettingMethods<'a, S> {
         LiasettingMethods { hub: &self }
     }
-    pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a> {
+    pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a, S> {
         OrderinvoiceMethods { hub: &self }
     }
-    pub fn orderreports(&'a self) -> OrderreportMethods<'a> {
+    pub fn orderreports(&'a self) -> OrderreportMethods<'a, S> {
         OrderreportMethods { hub: &self }
     }
-    pub fn orderreturns(&'a self) -> OrderreturnMethods<'a> {
+    pub fn orderreturns(&'a self) -> OrderreturnMethods<'a, S> {
         OrderreturnMethods { hub: &self }
     }
-    pub fn orders(&'a self) -> OrderMethods<'a> {
+    pub fn orders(&'a self) -> OrderMethods<'a, S> {
         OrderMethods { hub: &self }
     }
-    pub fn pos(&'a self) -> PoMethods<'a> {
+    pub fn pos(&'a self) -> PoMethods<'a, S> {
         PoMethods { hub: &self }
     }
-    pub fn products(&'a self) -> ProductMethods<'a> {
+    pub fn products(&'a self) -> ProductMethods<'a, S> {
         ProductMethods { hub: &self }
     }
-    pub fn productstatuses(&'a self) -> ProductstatuseMethods<'a> {
+    pub fn productstatuses(&'a self) -> ProductstatuseMethods<'a, S> {
         ProductstatuseMethods { hub: &self }
     }
-    pub fn shippingsettings(&'a self) -> ShippingsettingMethods<'a> {
+    pub fn shippingsettings(&'a self) -> ShippingsettingMethods<'a, S> {
         ShippingsettingMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -6977,27 +6982,27 @@ impl client::Part for Weight {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `authinfo(...)`, `claimwebsite(...)`, `custombatch(...)`, `delete(...)`, `get(...)`, `insert(...)`, `link(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a>
-    where  {
+pub struct AccountMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountMethods<'a, S> {}
 
-impl<'a> AccountMethods<'a> {
+impl<'a, S> AccountMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns information about the authenticated user.
-    pub fn authinfo(&self) -> AccountAuthinfoCall<'a> {
+    pub fn authinfo(&self) -> AccountAuthinfoCall<'a, S> {
         AccountAuthinfoCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -7014,7 +7019,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account whose website is claimed.
-    pub fn claimwebsite(&self, merchant_id: &str, account_id: &str) -> AccountClaimwebsiteCall<'a> {
+    pub fn claimwebsite(&self, merchant_id: &str, account_id: &str) -> AccountClaimwebsiteCall<'a, S> {
         AccountClaimwebsiteCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7033,7 +7038,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: AccountsCustomBatchRequest) -> AccountCustombatchCall<'a> {
+    pub fn custombatch(&self, request: AccountsCustomBatchRequest) -> AccountCustombatchCall<'a, S> {
         AccountCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7052,7 +7057,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account, and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
-    pub fn delete(&self, merchant_id: &str, account_id: &str) -> AccountDeleteCall<'a> {
+    pub fn delete(&self, merchant_id: &str, account_id: &str) -> AccountDeleteCall<'a, S> {
         AccountDeleteCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7073,7 +7078,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
-    pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountGetCall<'a, S> {
         AccountGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7092,7 +7097,7 @@ impl<'a> AccountMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn insert(&self, request: Account, merchant_id: &str) -> AccountInsertCall<'a> {
+    pub fn insert(&self, request: Account, merchant_id: &str) -> AccountInsertCall<'a, S> {
         AccountInsertCall {
             hub: self.hub,
             _request: request,
@@ -7113,7 +7118,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account that should be linked.
-    pub fn link(&self, request: AccountsLinkRequest, merchant_id: &str, account_id: &str) -> AccountLinkCall<'a> {
+    pub fn link(&self, request: AccountsLinkRequest, merchant_id: &str, account_id: &str) -> AccountLinkCall<'a, S> {
         AccountLinkCall {
             hub: self.hub,
             _request: request,
@@ -7132,7 +7137,7 @@ impl<'a> AccountMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> AccountListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> AccountListCall<'a, S> {
         AccountListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7153,7 +7158,7 @@ impl<'a> AccountMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
-    pub fn update(&self, request: Account, merchant_id: &str, account_id: &str) -> AccountUpdateCall<'a> {
+    pub fn update(&self, request: Account, merchant_id: &str, account_id: &str) -> AccountUpdateCall<'a, S> {
         AccountUpdateCall {
             hub: self.hub,
             _request: request,
@@ -7190,22 +7195,22 @@ impl<'a> AccountMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.accountstatuses();
 /// # }
 /// ```
-pub struct AccountstatuseMethods<'a>
-    where  {
+pub struct AccountstatuseMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccountstatuseMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccountstatuseMethods<'a, S> {}
 
-impl<'a> AccountstatuseMethods<'a> {
+impl<'a, S> AccountstatuseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7214,7 +7219,7 @@ impl<'a> AccountstatuseMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: AccountstatusesCustomBatchRequest) -> AccountstatuseCustombatchCall<'a> {
+    pub fn custombatch(&self, request: AccountstatusesCustomBatchRequest) -> AccountstatuseCustombatchCall<'a, S> {
         AccountstatuseCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7232,7 +7237,7 @@ impl<'a> AccountstatuseMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
-    pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountstatuseGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountstatuseGetCall<'a, S> {
         AccountstatuseGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7251,7 +7256,7 @@ impl<'a> AccountstatuseMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> AccountstatuseListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> AccountstatuseListCall<'a, S> {
         AccountstatuseListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7288,22 +7293,22 @@ impl<'a> AccountstatuseMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `get(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.accounttax();
 /// # }
 /// ```
-pub struct AccounttaxMethods<'a>
-    where  {
+pub struct AccounttaxMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for AccounttaxMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AccounttaxMethods<'a, S> {}
 
-impl<'a> AccounttaxMethods<'a> {
+impl<'a, S> AccounttaxMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7312,7 +7317,7 @@ impl<'a> AccounttaxMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: AccounttaxCustomBatchRequest) -> AccounttaxCustombatchCall<'a> {
+    pub fn custombatch(&self, request: AccounttaxCustomBatchRequest) -> AccounttaxCustombatchCall<'a, S> {
         AccounttaxCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7331,7 +7336,7 @@ impl<'a> AccounttaxMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
-    pub fn get(&self, merchant_id: &str, account_id: &str) -> AccounttaxGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, account_id: &str) -> AccounttaxGetCall<'a, S> {
         AccounttaxGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7349,7 +7354,7 @@ impl<'a> AccounttaxMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> AccounttaxListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> AccounttaxListCall<'a, S> {
         AccounttaxListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7370,7 +7375,7 @@ impl<'a> AccounttaxMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
-    pub fn update(&self, request: AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxUpdateCall<'a> {
+    pub fn update(&self, request: AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxUpdateCall<'a, S> {
         AccounttaxUpdateCall {
             hub: self.hub,
             _request: request,
@@ -7407,22 +7412,22 @@ impl<'a> AccounttaxMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `delete(...)`, `fetchnow(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.datafeeds();
 /// # }
 /// ```
-pub struct DatafeedMethods<'a>
-    where  {
+pub struct DatafeedMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for DatafeedMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DatafeedMethods<'a, S> {}
 
-impl<'a> DatafeedMethods<'a> {
+impl<'a, S> DatafeedMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7431,7 +7436,7 @@ impl<'a> DatafeedMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: DatafeedsCustomBatchRequest) -> DatafeedCustombatchCall<'a> {
+    pub fn custombatch(&self, request: DatafeedsCustomBatchRequest) -> DatafeedCustombatchCall<'a, S> {
         DatafeedCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7450,7 +7455,7 @@ impl<'a> DatafeedMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     /// * `datafeedId` - The ID of the datafeed.
-    pub fn delete(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedDeleteCall<'a> {
+    pub fn delete(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedDeleteCall<'a, S> {
         DatafeedDeleteCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7470,7 +7475,7 @@ impl<'a> DatafeedMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     /// * `datafeedId` - The ID of the datafeed to be fetched.
-    pub fn fetchnow(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedFetchnowCall<'a> {
+    pub fn fetchnow(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedFetchnowCall<'a, S> {
         DatafeedFetchnowCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7490,7 +7495,7 @@ impl<'a> DatafeedMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     /// * `datafeedId` - The ID of the datafeed.
-    pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedGetCall<'a, S> {
         DatafeedGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7509,7 +7514,7 @@ impl<'a> DatafeedMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
-    pub fn insert(&self, request: Datafeed, merchant_id: &str) -> DatafeedInsertCall<'a> {
+    pub fn insert(&self, request: Datafeed, merchant_id: &str) -> DatafeedInsertCall<'a, S> {
         DatafeedInsertCall {
             hub: self.hub,
             _request: request,
@@ -7528,7 +7533,7 @@ impl<'a> DatafeedMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the datafeeds. This account cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> DatafeedListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> DatafeedListCall<'a, S> {
         DatafeedListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7549,7 +7554,7 @@ impl<'a> DatafeedMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     /// * `datafeedId` - The ID of the datafeed.
-    pub fn update(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedUpdateCall<'a> {
+    pub fn update(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedUpdateCall<'a, S> {
         DatafeedUpdateCall {
             hub: self.hub,
             _request: request,
@@ -7586,22 +7591,22 @@ impl<'a> DatafeedMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.datafeedstatuses();
 /// # }
 /// ```
-pub struct DatafeedstatuseMethods<'a>
-    where  {
+pub struct DatafeedstatuseMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for DatafeedstatuseMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DatafeedstatuseMethods<'a, S> {}
 
-impl<'a> DatafeedstatuseMethods<'a> {
+impl<'a, S> DatafeedstatuseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7610,7 +7615,7 @@ impl<'a> DatafeedstatuseMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: DatafeedstatusesCustomBatchRequest) -> DatafeedstatuseCustombatchCall<'a> {
+    pub fn custombatch(&self, request: DatafeedstatusesCustomBatchRequest) -> DatafeedstatuseCustombatchCall<'a, S> {
         DatafeedstatuseCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7628,7 +7633,7 @@ impl<'a> DatafeedstatuseMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     /// * `datafeedId` - The ID of the datafeed.
-    pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedstatuseGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedstatuseGetCall<'a, S> {
         DatafeedstatuseGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7648,7 +7653,7 @@ impl<'a> DatafeedstatuseMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the datafeeds. This account cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> DatafeedstatuseListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> DatafeedstatuseListCall<'a, S> {
         DatafeedstatuseListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7684,22 +7689,22 @@ impl<'a> DatafeedstatuseMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)` and `set(...)`
 /// // to build up your call.
 /// let rb = hub.inventory();
 /// # }
 /// ```
-pub struct InventoryMethods<'a>
-    where  {
+pub struct InventoryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for InventoryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for InventoryMethods<'a, S> {}
 
-impl<'a> InventoryMethods<'a> {
+impl<'a, S> InventoryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7708,7 +7713,7 @@ impl<'a> InventoryMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a> {
+    pub fn custombatch(&self, request: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, S> {
         InventoryCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7729,7 +7734,7 @@ impl<'a> InventoryMethods<'a> {
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     /// * `storeCode` - The code of the store for which to update price and availability. Use `online` to update price and availability of an online product.
     /// * `productId` - The REST ID of the product for which to update price and availability.
-    pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a> {
+    pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, S> {
         InventorySetCall {
             hub: self.hub,
             _request: request,
@@ -7767,22 +7772,22 @@ impl<'a> InventoryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `get(...)`, `getaccessiblegmbaccounts(...)`, `list(...)`, `listposdataproviders(...)`, `requestgmbaccess(...)`, `requestinventoryverification(...)`, `setinventoryverificationcontact(...)`, `setposdataprovider(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.liasettings();
 /// # }
 /// ```
-pub struct LiasettingMethods<'a>
-    where  {
+pub struct LiasettingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for LiasettingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LiasettingMethods<'a, S> {}
 
-impl<'a> LiasettingMethods<'a> {
+impl<'a, S> LiasettingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7791,7 +7796,7 @@ impl<'a> LiasettingMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a> {
+    pub fn custombatch(&self, request: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a, S> {
         LiasettingCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -7810,7 +7815,7 @@ impl<'a> LiasettingMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get or update LIA settings.
-    pub fn get(&self, merchant_id: &str, account_id: &str) -> LiasettingGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, account_id: &str) -> LiasettingGetCall<'a, S> {
         LiasettingGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7829,7 +7834,7 @@ impl<'a> LiasettingMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to retrieve accessible Google My Business accounts.
-    pub fn getaccessiblegmbaccounts(&self, merchant_id: &str, account_id: &str) -> LiasettingGetaccessiblegmbaccountCall<'a> {
+    pub fn getaccessiblegmbaccounts(&self, merchant_id: &str, account_id: &str) -> LiasettingGetaccessiblegmbaccountCall<'a, S> {
         LiasettingGetaccessiblegmbaccountCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7847,7 +7852,7 @@ impl<'a> LiasettingMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> LiasettingListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> LiasettingListCall<'a, S> {
         LiasettingListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7862,7 +7867,7 @@ impl<'a> LiasettingMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the list of POS data providers that have active settings for the all eiligible countries.
-    pub fn listposdataproviders(&self) -> LiasettingListposdataproviderCall<'a> {
+    pub fn listposdataproviders(&self) -> LiasettingListposdataproviderCall<'a, S> {
         LiasettingListposdataproviderCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -7880,7 +7885,7 @@ impl<'a> LiasettingMethods<'a> {
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which GMB access is requested.
     /// * `gmbEmail` - The email of the Google My Business account.
-    pub fn requestgmbaccess(&self, merchant_id: &str, account_id: &str, gmb_email: &str) -> LiasettingRequestgmbaccesCall<'a> {
+    pub fn requestgmbaccess(&self, merchant_id: &str, account_id: &str, gmb_email: &str) -> LiasettingRequestgmbaccesCall<'a, S> {
         LiasettingRequestgmbaccesCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7901,7 +7906,7 @@ impl<'a> LiasettingMethods<'a> {
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `country` - The country for which inventory validation is requested.
-    pub fn requestinventoryverification(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingRequestinventoryverificationCall<'a> {
+    pub fn requestinventoryverification(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingRequestinventoryverificationCall<'a, S> {
         LiasettingRequestinventoryverificationCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7925,7 +7930,7 @@ impl<'a> LiasettingMethods<'a> {
     /// * `language` - The language for which inventory verification is requested.
     /// * `contactName` - The name of the inventory verification contact.
     /// * `contactEmail` - The email of the inventory verification contact.
-    pub fn setinventoryverificationcontact(&self, merchant_id: &str, account_id: &str, country: &str, language: &str, contact_name: &str, contact_email: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn setinventoryverificationcontact(&self, merchant_id: &str, account_id: &str, country: &str, language: &str, contact_name: &str, contact_email: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         LiasettingSetinventoryverificationcontactCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7949,7 +7954,7 @@ impl<'a> LiasettingMethods<'a> {
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to retrieve accessible Google My Business accounts.
     /// * `country` - The country for which the POS data provider is selected.
-    pub fn setposdataprovider(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn setposdataprovider(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingSetposdataproviderCall<'a, S> {
         LiasettingSetposdataproviderCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -7972,7 +7977,7 @@ impl<'a> LiasettingMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get or update LIA settings.
-    pub fn update(&self, request: LiaSettings, merchant_id: &str, account_id: &str) -> LiasettingUpdateCall<'a> {
+    pub fn update(&self, request: LiaSettings, merchant_id: &str, account_id: &str) -> LiasettingUpdateCall<'a, S> {
         LiasettingUpdateCall {
             hub: self.hub,
             _request: request,
@@ -8009,22 +8014,22 @@ impl<'a> LiasettingMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `createchargeinvoice(...)` and `createrefundinvoice(...)`
 /// // to build up your call.
 /// let rb = hub.orderinvoices();
 /// # }
 /// ```
-pub struct OrderinvoiceMethods<'a>
-    where  {
+pub struct OrderinvoiceMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderinvoiceMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderinvoiceMethods<'a, S> {}
 
-impl<'a> OrderinvoiceMethods<'a> {
+impl<'a, S> OrderinvoiceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8035,7 +8040,7 @@ impl<'a> OrderinvoiceMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         OrderinvoiceCreatechargeinvoiceCall {
             hub: self.hub,
             _request: request,
@@ -8056,7 +8061,7 @@ impl<'a> OrderinvoiceMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         OrderinvoiceCreaterefundinvoiceCall {
             hub: self.hub,
             _request: request,
@@ -8092,22 +8097,22 @@ impl<'a> OrderinvoiceMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `listdisbursements(...)` and `listtransactions(...)`
 /// // to build up your call.
 /// let rb = hub.orderreports();
 /// # }
 /// ```
-pub struct OrderreportMethods<'a>
-    where  {
+pub struct OrderreportMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderreportMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderreportMethods<'a, S> {}
 
-impl<'a> OrderreportMethods<'a> {
+impl<'a, S> OrderreportMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8116,7 +8121,7 @@ impl<'a> OrderreportMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn listdisbursements(&self, merchant_id: &str) -> OrderreportListdisbursementCall<'a> {
+    pub fn listdisbursements(&self, merchant_id: &str) -> OrderreportListdisbursementCall<'a, S> {
         OrderreportListdisbursementCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8138,7 +8143,7 @@ impl<'a> OrderreportMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `disbursementId` - The Google-provided ID of the disbursement (found in Wallet).
-    pub fn listtransactions(&self, merchant_id: &str, disbursement_id: &str) -> OrderreportListtransactionCall<'a> {
+    pub fn listtransactions(&self, merchant_id: &str, disbursement_id: &str) -> OrderreportListtransactionCall<'a, S> {
         OrderreportListtransactionCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8177,22 +8182,22 @@ impl<'a> OrderreportMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.orderreturns();
 /// # }
 /// ```
-pub struct OrderreturnMethods<'a>
-    where  {
+pub struct OrderreturnMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderreturnMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderreturnMethods<'a, S> {}
 
-impl<'a> OrderreturnMethods<'a> {
+impl<'a, S> OrderreturnMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8202,7 +8207,7 @@ impl<'a> OrderreturnMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `returnId` - Merchant order return ID generated by Google.
-    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a, S> {
         OrderreturnGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8220,7 +8225,7 @@ impl<'a> OrderreturnMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> OrderreturnListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> OrderreturnListCall<'a, S> {
         OrderreturnListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8259,22 +8264,22 @@ impl<'a> OrderreturnMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `acknowledge(...)`, `advancetestorder(...)`, `cancel(...)`, `cancellineitem(...)`, `canceltestorderbycustomer(...)`, `createtestorder(...)`, `createtestreturn(...)`, `custombatch(...)`, `get(...)`, `getbymerchantorderid(...)`, `gettestordertemplate(...)`, `instorerefundlineitem(...)`, `list(...)`, `refund(...)`, `rejectreturnlineitem(...)`, `returnlineitem(...)`, `returnrefundlineitem(...)`, `setlineitemmetadata(...)`, `shiplineitems(...)`, `updatelineitemshippingdetails(...)`, `updatemerchantorderid(...)` and `updateshipment(...)`
 /// // to build up your call.
 /// let rb = hub.orders();
 /// # }
 /// ```
-pub struct OrderMethods<'a>
-    where  {
+pub struct OrderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrderMethods<'a, S> {}
 
-impl<'a> OrderMethods<'a> {
+impl<'a, S> OrderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8285,7 +8290,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a> {
+    pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a, S> {
         OrderAcknowledgeCall {
             hub: self.hub,
             _request: request,
@@ -8305,7 +8310,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to modify.
-    pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a> {
+    pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a, S> {
         OrderAdvancetestorderCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8325,7 +8330,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to cancel.
-    pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a> {
+    pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a, S> {
         OrderCancelCall {
             hub: self.hub,
             _request: request,
@@ -8346,7 +8351,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a> {
+    pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a, S> {
         OrderCancellineitemCall {
             hub: self.hub,
             _request: request,
@@ -8367,7 +8372,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to cancel.
-    pub fn canceltestorderbycustomer(&self, request: OrdersCancelTestOrderByCustomerRequest, merchant_id: &str, order_id: &str) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn canceltestorderbycustomer(&self, request: OrdersCancelTestOrderByCustomerRequest, merchant_id: &str, order_id: &str) -> OrderCanceltestorderbycustomerCall<'a, S> {
         OrderCanceltestorderbycustomerCall {
             hub: self.hub,
             _request: request,
@@ -8387,7 +8392,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
-    pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a> {
+    pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a, S> {
         OrderCreatetestorderCall {
             hub: self.hub,
             _request: request,
@@ -8407,7 +8412,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createtestreturn(&self, request: OrdersCreateTestReturnRequest, merchant_id: &str, order_id: &str) -> OrderCreatetestreturnCall<'a> {
+    pub fn createtestreturn(&self, request: OrdersCreateTestReturnRequest, merchant_id: &str, order_id: &str) -> OrderCreatetestreturnCall<'a, S> {
         OrderCreatetestreturnCall {
             hub: self.hub,
             _request: request,
@@ -8426,7 +8431,7 @@ impl<'a> OrderMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a> {
+    pub fn custombatch(&self, request: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a, S> {
         OrderCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -8444,7 +8449,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a, S> {
         OrderGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8463,7 +8468,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `merchantOrderId` - The merchant order ID to be looked for.
-    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, S> {
         OrderGetbymerchantorderidCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8482,7 +8487,7 @@ impl<'a> OrderMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
     /// * `templateName` - The name of the template to retrieve.
-    pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a, S> {
         OrderGettestordertemplateCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8503,7 +8508,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a, S> {
         OrderInstorerefundlineitemCall {
             hub: self.hub,
             _request: request,
@@ -8522,7 +8527,7 @@ impl<'a> OrderMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> OrderListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> OrderListCall<'a, S> {
         OrderListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8548,7 +8553,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to refund.
-    pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a> {
+    pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a, S> {
         OrderRefundCall {
             hub: self.hub,
             _request: request,
@@ -8569,7 +8574,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a, S> {
         OrderRejectreturnlineitemCall {
             hub: self.hub,
             _request: request,
@@ -8590,7 +8595,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a> {
+    pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a, S> {
         OrderReturnlineitemCall {
             hub: self.hub,
             _request: request,
@@ -8611,7 +8616,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn returnrefundlineitem(&self, request: OrdersReturnRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn returnrefundlineitem(&self, request: OrdersReturnRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnrefundlineitemCall<'a, S> {
         OrderReturnrefundlineitemCall {
             hub: self.hub,
             _request: request,
@@ -8632,7 +8637,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a, S> {
         OrderSetlineitemmetadataCall {
             hub: self.hub,
             _request: request,
@@ -8653,7 +8658,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a> {
+    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a, S> {
         OrderShiplineitemCall {
             hub: self.hub,
             _request: request,
@@ -8674,7 +8679,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         OrderUpdatelineitemshippingdetailCall {
             hub: self.hub,
             _request: request,
@@ -8695,7 +8700,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a, S> {
         OrderUpdatemerchantorderidCall {
             hub: self.hub,
             _request: request,
@@ -8716,7 +8721,7 @@ impl<'a> OrderMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a> {
+    pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a, S> {
         OrderUpdateshipmentCall {
             hub: self.hub,
             _request: request,
@@ -8752,22 +8757,22 @@ impl<'a> OrderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `delete(...)`, `get(...)`, `insert(...)`, `inventory(...)`, `list(...)` and `sale(...)`
 /// // to build up your call.
 /// let rb = hub.pos();
 /// # }
 /// ```
-pub struct PoMethods<'a>
-    where  {
+pub struct PoMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for PoMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PoMethods<'a, S> {}
 
-impl<'a> PoMethods<'a> {
+impl<'a, S> PoMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8776,7 +8781,7 @@ impl<'a> PoMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: PosCustomBatchRequest) -> PoCustombatchCall<'a> {
+    pub fn custombatch(&self, request: PosCustomBatchRequest) -> PoCustombatchCall<'a, S> {
         PoCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -8796,7 +8801,7 @@ impl<'a> PoMethods<'a> {
     /// * `merchantId` - The ID of the POS or inventory data provider.
     /// * `targetMerchantId` - The ID of the target merchant.
     /// * `storeCode` - A store code that is unique per merchant.
-    pub fn delete(&self, merchant_id: &str, target_merchant_id: &str, store_code: &str) -> PoDeleteCall<'a> {
+    pub fn delete(&self, merchant_id: &str, target_merchant_id: &str, store_code: &str) -> PoDeleteCall<'a, S> {
         PoDeleteCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8818,7 +8823,7 @@ impl<'a> PoMethods<'a> {
     /// * `merchantId` - The ID of the POS or inventory data provider.
     /// * `targetMerchantId` - The ID of the target merchant.
     /// * `storeCode` - A store code that is unique per merchant.
-    pub fn get(&self, merchant_id: &str, target_merchant_id: &str, store_code: &str) -> PoGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, target_merchant_id: &str, store_code: &str) -> PoGetCall<'a, S> {
         PoGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8839,7 +8844,7 @@ impl<'a> PoMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the POS or inventory data provider.
     /// * `targetMerchantId` - The ID of the target merchant.
-    pub fn insert(&self, request: PosStore, merchant_id: &str, target_merchant_id: &str) -> PoInsertCall<'a> {
+    pub fn insert(&self, request: PosStore, merchant_id: &str, target_merchant_id: &str) -> PoInsertCall<'a, S> {
         PoInsertCall {
             hub: self.hub,
             _request: request,
@@ -8861,7 +8866,7 @@ impl<'a> PoMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the POS or inventory data provider.
     /// * `targetMerchantId` - The ID of the target merchant.
-    pub fn inventory(&self, request: PosInventoryRequest, merchant_id: &str, target_merchant_id: &str) -> PoInventoryCall<'a> {
+    pub fn inventory(&self, request: PosInventoryRequest, merchant_id: &str, target_merchant_id: &str) -> PoInventoryCall<'a, S> {
         PoInventoryCall {
             hub: self.hub,
             _request: request,
@@ -8882,7 +8887,7 @@ impl<'a> PoMethods<'a> {
     ///
     /// * `merchantId` - The ID of the POS or inventory data provider.
     /// * `targetMerchantId` - The ID of the target merchant.
-    pub fn list(&self, merchant_id: &str, target_merchant_id: &str) -> PoListCall<'a> {
+    pub fn list(&self, merchant_id: &str, target_merchant_id: &str) -> PoListCall<'a, S> {
         PoListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -8902,7 +8907,7 @@ impl<'a> PoMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the POS or inventory data provider.
     /// * `targetMerchantId` - The ID of the target merchant.
-    pub fn sale(&self, request: PosSaleRequest, merchant_id: &str, target_merchant_id: &str) -> PoSaleCall<'a> {
+    pub fn sale(&self, request: PosSaleRequest, merchant_id: &str, target_merchant_id: &str) -> PoSaleCall<'a, S> {
         PoSaleCall {
             hub: self.hub,
             _request: request,
@@ -8939,22 +8944,22 @@ impl<'a> PoMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.products();
 /// # }
 /// ```
-pub struct ProductMethods<'a>
-    where  {
+pub struct ProductMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProductMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProductMethods<'a, S> {}
 
-impl<'a> ProductMethods<'a> {
+impl<'a, S> ProductMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8963,7 +8968,7 @@ impl<'a> ProductMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: ProductsCustomBatchRequest) -> ProductCustombatchCall<'a> {
+    pub fn custombatch(&self, request: ProductsCustomBatchRequest) -> ProductCustombatchCall<'a, S> {
         ProductCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -8982,7 +8987,7 @@ impl<'a> ProductMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     /// * `productId` - The REST ID of the product.
-    pub fn delete(&self, merchant_id: &str, product_id: &str) -> ProductDeleteCall<'a> {
+    pub fn delete(&self, merchant_id: &str, product_id: &str) -> ProductDeleteCall<'a, S> {
         ProductDeleteCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9002,7 +9007,7 @@ impl<'a> ProductMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     /// * `productId` - The REST ID of the product.
-    pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a, S> {
         ProductGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9021,7 +9026,7 @@ impl<'a> ProductMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    pub fn insert(&self, request: Product, merchant_id: &str) -> ProductInsertCall<'a> {
+    pub fn insert(&self, request: Product, merchant_id: &str) -> ProductInsertCall<'a, S> {
         ProductInsertCall {
             hub: self.hub,
             _request: request,
@@ -9040,7 +9045,7 @@ impl<'a> ProductMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that contains the products. This account cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> ProductListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> ProductListCall<'a, S> {
         ProductListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9077,22 +9082,22 @@ impl<'a> ProductMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.productstatuses();
 /// # }
 /// ```
-pub struct ProductstatuseMethods<'a>
-    where  {
+pub struct ProductstatuseMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProductstatuseMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProductstatuseMethods<'a, S> {}
 
-impl<'a> ProductstatuseMethods<'a> {
+impl<'a, S> ProductstatuseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -9101,7 +9106,7 @@ impl<'a> ProductstatuseMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: ProductstatusesCustomBatchRequest) -> ProductstatuseCustombatchCall<'a> {
+    pub fn custombatch(&self, request: ProductstatusesCustomBatchRequest) -> ProductstatuseCustombatchCall<'a, S> {
         ProductstatuseCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -9120,7 +9125,7 @@ impl<'a> ProductstatuseMethods<'a> {
     ///
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     /// * `productId` - The REST ID of the product.
-    pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductstatuseGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductstatuseGetCall<'a, S> {
         ProductstatuseGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9140,7 +9145,7 @@ impl<'a> ProductstatuseMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that contains the products. This account cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> ProductstatuseListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> ProductstatuseListCall<'a, S> {
         ProductstatuseListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9179,22 +9184,22 @@ impl<'a> ProductstatuseMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `custombatch(...)`, `get(...)`, `getsupportedcarriers(...)`, `getsupportedholidays(...)`, `getsupportedpickupservices(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.shippingsettings();
 /// # }
 /// ```
-pub struct ShippingsettingMethods<'a>
-    where  {
+pub struct ShippingsettingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
 }
 
-impl<'a> client::MethodsBuilder for ShippingsettingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ShippingsettingMethods<'a, S> {}
 
-impl<'a> ShippingsettingMethods<'a> {
+impl<'a, S> ShippingsettingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -9203,7 +9208,7 @@ impl<'a> ShippingsettingMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: ShippingsettingsCustomBatchRequest) -> ShippingsettingCustombatchCall<'a> {
+    pub fn custombatch(&self, request: ShippingsettingsCustomBatchRequest) -> ShippingsettingCustombatchCall<'a, S> {
         ShippingsettingCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -9222,7 +9227,7 @@ impl<'a> ShippingsettingMethods<'a> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
-    pub fn get(&self, merchant_id: &str, account_id: &str) -> ShippingsettingGetCall<'a> {
+    pub fn get(&self, merchant_id: &str, account_id: &str) -> ShippingsettingGetCall<'a, S> {
         ShippingsettingGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9240,7 +9245,7 @@ impl<'a> ShippingsettingMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account for which to retrieve the supported carriers.
-    pub fn getsupportedcarriers(&self, merchant_id: &str) -> ShippingsettingGetsupportedcarrierCall<'a> {
+    pub fn getsupportedcarriers(&self, merchant_id: &str) -> ShippingsettingGetsupportedcarrierCall<'a, S> {
         ShippingsettingGetsupportedcarrierCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9257,7 +9262,7 @@ impl<'a> ShippingsettingMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account for which to retrieve the supported holidays.
-    pub fn getsupportedholidays(&self, merchant_id: &str) -> ShippingsettingGetsupportedholidayCall<'a> {
+    pub fn getsupportedholidays(&self, merchant_id: &str) -> ShippingsettingGetsupportedholidayCall<'a, S> {
         ShippingsettingGetsupportedholidayCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9274,7 +9279,7 @@ impl<'a> ShippingsettingMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account for which to retrieve the supported pickup services.
-    pub fn getsupportedpickupservices(&self, merchant_id: &str) -> ShippingsettingGetsupportedpickupserviceCall<'a> {
+    pub fn getsupportedpickupservices(&self, merchant_id: &str) -> ShippingsettingGetsupportedpickupserviceCall<'a, S> {
         ShippingsettingGetsupportedpickupserviceCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9291,7 +9296,7 @@ impl<'a> ShippingsettingMethods<'a> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> ShippingsettingListCall<'a> {
+    pub fn list(&self, merchant_id: &str) -> ShippingsettingListCall<'a, S> {
         ShippingsettingListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -9312,7 +9317,7 @@ impl<'a> ShippingsettingMethods<'a> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and `accountId` must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
-    pub fn update(&self, request: ShippingSettings, merchant_id: &str, account_id: &str) -> ShippingsettingUpdateCall<'a> {
+    pub fn update(&self, request: ShippingSettings, merchant_id: &str, account_id: &str) -> ShippingsettingUpdateCall<'a, S> {
         ShippingsettingUpdateCall {
             hub: self.hub,
             _request: request,
@@ -9356,7 +9361,7 @@ impl<'a> ShippingsettingMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9364,18 +9369,24 @@ impl<'a> ShippingsettingMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAuthinfoCall<'a>
-    where  {
+pub struct AccountAuthinfoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountAuthinfoCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountAuthinfoCall<'a, S> {}
 
-impl<'a> AccountAuthinfoCall<'a> {
+impl<'a, S> AccountAuthinfoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9496,7 +9507,7 @@ impl<'a> AccountAuthinfoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAuthinfoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAuthinfoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9521,7 +9532,7 @@ impl<'a> AccountAuthinfoCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAuthinfoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAuthinfoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9541,9 +9552,9 @@ impl<'a> AccountAuthinfoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountAuthinfoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountAuthinfoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9575,7 +9586,7 @@ impl<'a> AccountAuthinfoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9584,10 +9595,10 @@ impl<'a> AccountAuthinfoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountClaimwebsiteCall<'a>
-    where  {
+pub struct AccountClaimwebsiteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _overwrite: Option<bool>,
@@ -9596,9 +9607,15 @@ pub struct AccountClaimwebsiteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountClaimwebsiteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountClaimwebsiteCall<'a, S> {}
 
-impl<'a> AccountClaimwebsiteCall<'a> {
+impl<'a, S> AccountClaimwebsiteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9745,7 +9762,7 @@ impl<'a> AccountClaimwebsiteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountClaimwebsiteCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountClaimwebsiteCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9755,14 +9772,14 @@ impl<'a> AccountClaimwebsiteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountClaimwebsiteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountClaimwebsiteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Only available to selected merchants. When set to `True`, this flag removes any existing claim on the requested website by another account and replaces it with a claim from this account.
     ///
     /// Sets the *overwrite* query property to the given value.
-    pub fn overwrite(mut self, new_value: bool) -> AccountClaimwebsiteCall<'a> {
+    pub fn overwrite(mut self, new_value: bool) -> AccountClaimwebsiteCall<'a, S> {
         self._overwrite = Some(new_value);
         self
     }
@@ -9772,7 +9789,7 @@ impl<'a> AccountClaimwebsiteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClaimwebsiteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountClaimwebsiteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9797,7 +9814,7 @@ impl<'a> AccountClaimwebsiteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountClaimwebsiteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountClaimwebsiteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9817,9 +9834,9 @@ impl<'a> AccountClaimwebsiteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountClaimwebsiteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountClaimwebsiteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9852,7 +9869,7 @@ impl<'a> AccountClaimwebsiteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9866,10 +9883,10 @@ impl<'a> AccountClaimwebsiteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCustombatchCall<'a>
-    where  {
+pub struct AccountCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: AccountsCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9877,9 +9894,15 @@ pub struct AccountCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountCustombatchCall<'a, S> {}
 
-impl<'a> AccountCustombatchCall<'a> {
+impl<'a, S> AccountCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10016,14 +10039,14 @@ impl<'a> AccountCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccountsCustomBatchRequest) -> AccountCustombatchCall<'a> {
+    pub fn request(mut self, new_value: AccountsCustomBatchRequest) -> AccountCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccountCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> AccountCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -10033,7 +10056,7 @@ impl<'a> AccountCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10058,7 +10081,7 @@ impl<'a> AccountCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10078,9 +10101,9 @@ impl<'a> AccountCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10112,7 +10135,7 @@ impl<'a> AccountCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10122,10 +10145,10 @@ impl<'a> AccountCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountDeleteCall<'a>
-    where  {
+pub struct AccountDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _force: Option<bool>,
@@ -10135,9 +10158,15 @@ pub struct AccountDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountDeleteCall<'a, S> {}
 
-impl<'a> AccountDeleteCall<'a> {
+impl<'a, S> AccountDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10276,7 +10305,7 @@ impl<'a> AccountDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountDeleteCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountDeleteCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10286,21 +10315,21 @@ impl<'a> AccountDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Flag to delete sub-accounts with products. The default value is false.
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> AccountDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> AccountDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccountDeleteCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> AccountDeleteCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -10310,7 +10339,7 @@ impl<'a> AccountDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10335,7 +10364,7 @@ impl<'a> AccountDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10355,9 +10384,9 @@ impl<'a> AccountDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10389,7 +10418,7 @@ impl<'a> AccountDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10397,10 +10426,10 @@ impl<'a> AccountDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a>
-    where  {
+pub struct AccountGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10408,9 +10437,15 @@ pub struct AccountGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountGetCall<'a, S> {}
 
-impl<'a> AccountGetCall<'a> {
+impl<'a, S> AccountGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10554,7 +10589,7 @@ impl<'a> AccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10564,7 +10599,7 @@ impl<'a> AccountGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10574,7 +10609,7 @@ impl<'a> AccountGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10599,7 +10634,7 @@ impl<'a> AccountGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10619,9 +10654,9 @@ impl<'a> AccountGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10654,7 +10689,7 @@ impl<'a> AccountGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10668,10 +10703,10 @@ impl<'a> AccountGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInsertCall<'a>
-    where  {
+pub struct AccountInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: Account,
     _merchant_id: String,
     _dry_run: Option<bool>,
@@ -10680,9 +10715,15 @@ pub struct AccountInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountInsertCall<'a, S> {}
 
-impl<'a> AccountInsertCall<'a> {
+impl<'a, S> AccountInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10841,7 +10882,7 @@ impl<'a> AccountInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountInsertCall<'a> {
+    pub fn request(mut self, new_value: Account) -> AccountInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10851,14 +10892,14 @@ impl<'a> AccountInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountInsertCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountInsertCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccountInsertCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> AccountInsertCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -10868,7 +10909,7 @@ impl<'a> AccountInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10893,7 +10934,7 @@ impl<'a> AccountInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10913,9 +10954,9 @@ impl<'a> AccountInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10948,7 +10989,7 @@ impl<'a> AccountInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10961,10 +11002,10 @@ impl<'a> AccountInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountLinkCall<'a>
-    where  {
+pub struct AccountLinkCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: AccountsLinkRequest,
     _merchant_id: String,
     _account_id: String,
@@ -10973,9 +11014,15 @@ pub struct AccountLinkCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountLinkCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountLinkCall<'a, S> {}
 
-impl<'a> AccountLinkCall<'a> {
+impl<'a, S> AccountLinkCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11132,7 +11179,7 @@ impl<'a> AccountLinkCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccountsLinkRequest) -> AccountLinkCall<'a> {
+    pub fn request(mut self, new_value: AccountsLinkRequest) -> AccountLinkCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11142,7 +11189,7 @@ impl<'a> AccountLinkCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountLinkCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountLinkCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11152,7 +11199,7 @@ impl<'a> AccountLinkCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountLinkCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountLinkCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11162,7 +11209,7 @@ impl<'a> AccountLinkCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLinkCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountLinkCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11187,7 +11234,7 @@ impl<'a> AccountLinkCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountLinkCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountLinkCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11207,9 +11254,9 @@ impl<'a> AccountLinkCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountLinkCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountLinkCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11241,7 +11288,7 @@ impl<'a> AccountLinkCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11251,10 +11298,10 @@ impl<'a> AccountLinkCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a>
-    where  {
+pub struct AccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -11263,9 +11310,15 @@ pub struct AccountListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountListCall<'a, S> {}
 
-impl<'a> AccountListCall<'a> {
+impl<'a, S> AccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11414,21 +11467,21 @@ impl<'a> AccountListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of accounts to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AccountListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AccountListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -11438,7 +11491,7 @@ impl<'a> AccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11463,7 +11516,7 @@ impl<'a> AccountListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11483,9 +11536,9 @@ impl<'a> AccountListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11518,7 +11571,7 @@ impl<'a> AccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11532,10 +11585,10 @@ impl<'a> AccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUpdateCall<'a>
-    where  {
+pub struct AccountUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: Account,
     _merchant_id: String,
     _account_id: String,
@@ -11545,9 +11598,15 @@ pub struct AccountUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountUpdateCall<'a, S> {}
 
-impl<'a> AccountUpdateCall<'a> {
+impl<'a, S> AccountUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11707,7 +11766,7 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a> {
+    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11717,7 +11776,7 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountUpdateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountUpdateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11727,14 +11786,14 @@ impl<'a> AccountUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccountUpdateCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> AccountUpdateCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -11744,7 +11803,7 @@ impl<'a> AccountUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11769,7 +11828,7 @@ impl<'a> AccountUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11789,9 +11848,9 @@ impl<'a> AccountUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11824,7 +11883,7 @@ impl<'a> AccountUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11837,19 +11896,25 @@ impl<'a> AccountUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountstatuseCustombatchCall<'a>
-    where  {
+pub struct AccountstatuseCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: AccountstatusesCustomBatchRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountstatuseCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountstatuseCustombatchCall<'a, S> {}
 
-impl<'a> AccountstatuseCustombatchCall<'a> {
+impl<'a, S> AccountstatuseCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11983,7 +12048,7 @@ impl<'a> AccountstatuseCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccountstatusesCustomBatchRequest) -> AccountstatuseCustombatchCall<'a> {
+    pub fn request(mut self, new_value: AccountstatusesCustomBatchRequest) -> AccountstatuseCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11993,7 +12058,7 @@ impl<'a> AccountstatuseCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountstatuseCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountstatuseCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12018,7 +12083,7 @@ impl<'a> AccountstatuseCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountstatuseCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountstatuseCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12038,9 +12103,9 @@ impl<'a> AccountstatuseCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountstatuseCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountstatuseCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12072,7 +12137,7 @@ impl<'a> AccountstatuseCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12081,10 +12146,10 @@ impl<'a> AccountstatuseCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountstatuseGetCall<'a>
-    where  {
+pub struct AccountstatuseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _destinations: Vec<String>,
@@ -12093,9 +12158,15 @@ pub struct AccountstatuseGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountstatuseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountstatuseGetCall<'a, S> {}
 
-impl<'a> AccountstatuseGetCall<'a> {
+impl<'a, S> AccountstatuseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12244,7 +12315,7 @@ impl<'a> AccountstatuseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountstatuseGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountstatuseGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -12254,7 +12325,7 @@ impl<'a> AccountstatuseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountstatuseGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccountstatuseGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12262,7 +12333,7 @@ impl<'a> AccountstatuseGetCall<'a> {
     ///
     /// Append the given value to the *destinations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_destinations(mut self, new_value: &str) -> AccountstatuseGetCall<'a> {
+    pub fn add_destinations(mut self, new_value: &str) -> AccountstatuseGetCall<'a, S> {
         self._destinations.push(new_value.to_string());
         self
     }
@@ -12272,7 +12343,7 @@ impl<'a> AccountstatuseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountstatuseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountstatuseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12297,7 +12368,7 @@ impl<'a> AccountstatuseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountstatuseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountstatuseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12317,9 +12388,9 @@ impl<'a> AccountstatuseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountstatuseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountstatuseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12351,7 +12422,7 @@ impl<'a> AccountstatuseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12362,10 +12433,10 @@ impl<'a> AccountstatuseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountstatuseListCall<'a>
-    where  {
+pub struct AccountstatuseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -12375,9 +12446,15 @@ pub struct AccountstatuseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccountstatuseListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccountstatuseListCall<'a, S> {}
 
-impl<'a> AccountstatuseListCall<'a> {
+impl<'a, S> AccountstatuseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12531,21 +12608,21 @@ impl<'a> AccountstatuseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccountstatuseListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccountstatuseListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountstatuseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccountstatuseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of account statuses to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AccountstatuseListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AccountstatuseListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -12553,7 +12630,7 @@ impl<'a> AccountstatuseListCall<'a> {
     ///
     /// Append the given value to the *destinations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_destinations(mut self, new_value: &str) -> AccountstatuseListCall<'a> {
+    pub fn add_destinations(mut self, new_value: &str) -> AccountstatuseListCall<'a, S> {
         self._destinations.push(new_value.to_string());
         self
     }
@@ -12563,7 +12640,7 @@ impl<'a> AccountstatuseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountstatuseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountstatuseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12588,7 +12665,7 @@ impl<'a> AccountstatuseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountstatuseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountstatuseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12608,9 +12685,9 @@ impl<'a> AccountstatuseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountstatuseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccountstatuseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12643,7 +12720,7 @@ impl<'a> AccountstatuseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12657,10 +12734,10 @@ impl<'a> AccountstatuseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccounttaxCustombatchCall<'a>
-    where  {
+pub struct AccounttaxCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: AccounttaxCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12668,9 +12745,15 @@ pub struct AccounttaxCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccounttaxCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AccounttaxCustombatchCall<'a, S> {}
 
-impl<'a> AccounttaxCustombatchCall<'a> {
+impl<'a, S> AccounttaxCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12807,14 +12890,14 @@ impl<'a> AccounttaxCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccounttaxCustomBatchRequest) -> AccounttaxCustombatchCall<'a> {
+    pub fn request(mut self, new_value: AccounttaxCustomBatchRequest) -> AccounttaxCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccounttaxCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> AccounttaxCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -12824,7 +12907,7 @@ impl<'a> AccounttaxCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12849,7 +12932,7 @@ impl<'a> AccounttaxCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12869,9 +12952,9 @@ impl<'a> AccounttaxCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccounttaxCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccounttaxCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12903,7 +12986,7 @@ impl<'a> AccounttaxCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12911,10 +12994,10 @@ impl<'a> AccounttaxCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccounttaxGetCall<'a>
-    where  {
+pub struct AccounttaxGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12922,9 +13005,15 @@ pub struct AccounttaxGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccounttaxGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AccounttaxGetCall<'a, S> {}
 
-impl<'a> AccounttaxGetCall<'a> {
+impl<'a, S> AccounttaxGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13068,7 +13157,7 @@ impl<'a> AccounttaxGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -13078,7 +13167,7 @@ impl<'a> AccounttaxGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccounttaxGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccounttaxGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13088,7 +13177,7 @@ impl<'a> AccounttaxGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13113,7 +13202,7 @@ impl<'a> AccounttaxGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13133,9 +13222,9 @@ impl<'a> AccounttaxGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccounttaxGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccounttaxGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13167,7 +13256,7 @@ impl<'a> AccounttaxGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13177,10 +13266,10 @@ impl<'a> AccounttaxGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccounttaxListCall<'a>
-    where  {
+pub struct AccounttaxListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -13189,9 +13278,15 @@ pub struct AccounttaxListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccounttaxListCall<'a> {}
+impl<'a, S> client::CallBuilder for AccounttaxListCall<'a, S> {}
 
-impl<'a> AccounttaxListCall<'a> {
+impl<'a, S> AccounttaxListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13340,21 +13435,21 @@ impl<'a> AccounttaxListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccounttaxListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AccounttaxListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of tax settings to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AccounttaxListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> AccounttaxListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -13364,7 +13459,7 @@ impl<'a> AccounttaxListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13389,7 +13484,7 @@ impl<'a> AccounttaxListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13409,9 +13504,9 @@ impl<'a> AccounttaxListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccounttaxListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccounttaxListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13444,7 +13539,7 @@ impl<'a> AccounttaxListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13458,10 +13553,10 @@ impl<'a> AccounttaxListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccounttaxUpdateCall<'a>
-    where  {
+pub struct AccounttaxUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: AccountTax,
     _merchant_id: String,
     _account_id: String,
@@ -13471,9 +13566,15 @@ pub struct AccounttaxUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AccounttaxUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AccounttaxUpdateCall<'a, S> {}
 
-impl<'a> AccounttaxUpdateCall<'a> {
+impl<'a, S> AccounttaxUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13633,7 +13734,7 @@ impl<'a> AccounttaxUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccountTax) -> AccounttaxUpdateCall<'a> {
+    pub fn request(mut self, new_value: AccountTax) -> AccounttaxUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13643,7 +13744,7 @@ impl<'a> AccounttaxUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -13653,14 +13754,14 @@ impl<'a> AccounttaxUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> AccounttaxUpdateCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> AccounttaxUpdateCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -13670,7 +13771,7 @@ impl<'a> AccounttaxUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccounttaxUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13695,7 +13796,7 @@ impl<'a> AccounttaxUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AccounttaxUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13715,9 +13816,9 @@ impl<'a> AccounttaxUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccounttaxUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AccounttaxUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13750,7 +13851,7 @@ impl<'a> AccounttaxUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13764,10 +13865,10 @@ impl<'a> AccounttaxUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedCustombatchCall<'a>
-    where  {
+pub struct DatafeedCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: DatafeedsCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13775,9 +13876,15 @@ pub struct DatafeedCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedCustombatchCall<'a, S> {}
 
-impl<'a> DatafeedCustombatchCall<'a> {
+impl<'a, S> DatafeedCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13914,14 +14021,14 @@ impl<'a> DatafeedCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DatafeedsCustomBatchRequest) -> DatafeedCustombatchCall<'a> {
+    pub fn request(mut self, new_value: DatafeedsCustomBatchRequest) -> DatafeedCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -13931,7 +14038,7 @@ impl<'a> DatafeedCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13956,7 +14063,7 @@ impl<'a> DatafeedCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13976,9 +14083,9 @@ impl<'a> DatafeedCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14010,7 +14117,7 @@ impl<'a> DatafeedCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14019,10 +14126,10 @@ impl<'a> DatafeedCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedDeleteCall<'a>
-    where  {
+pub struct DatafeedDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _datafeed_id: String,
     _dry_run: Option<bool>,
@@ -14031,9 +14138,15 @@ pub struct DatafeedDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedDeleteCall<'a, S> {}
 
-impl<'a> DatafeedDeleteCall<'a> {
+impl<'a, S> DatafeedDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14169,7 +14282,7 @@ impl<'a> DatafeedDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedDeleteCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedDeleteCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -14179,14 +14292,14 @@ impl<'a> DatafeedDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedDeleteCall<'a> {
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedDeleteCall<'a, S> {
         self._datafeed_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedDeleteCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedDeleteCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -14196,7 +14309,7 @@ impl<'a> DatafeedDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14221,7 +14334,7 @@ impl<'a> DatafeedDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14241,9 +14354,9 @@ impl<'a> DatafeedDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14275,7 +14388,7 @@ impl<'a> DatafeedDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14284,10 +14397,10 @@ impl<'a> DatafeedDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedFetchnowCall<'a>
-    where  {
+pub struct DatafeedFetchnowCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _datafeed_id: String,
     _dry_run: Option<bool>,
@@ -14296,9 +14409,15 @@ pub struct DatafeedFetchnowCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedFetchnowCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedFetchnowCall<'a, S> {}
 
-impl<'a> DatafeedFetchnowCall<'a> {
+impl<'a, S> DatafeedFetchnowCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14445,7 +14564,7 @@ impl<'a> DatafeedFetchnowCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedFetchnowCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedFetchnowCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -14455,14 +14574,14 @@ impl<'a> DatafeedFetchnowCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedFetchnowCall<'a> {
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedFetchnowCall<'a, S> {
         self._datafeed_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedFetchnowCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedFetchnowCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -14472,7 +14591,7 @@ impl<'a> DatafeedFetchnowCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedFetchnowCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedFetchnowCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14497,7 +14616,7 @@ impl<'a> DatafeedFetchnowCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedFetchnowCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedFetchnowCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14517,9 +14636,9 @@ impl<'a> DatafeedFetchnowCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedFetchnowCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedFetchnowCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14551,7 +14670,7 @@ impl<'a> DatafeedFetchnowCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14559,10 +14678,10 @@ impl<'a> DatafeedFetchnowCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedGetCall<'a>
-    where  {
+pub struct DatafeedGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _datafeed_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14570,9 +14689,15 @@ pub struct DatafeedGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedGetCall<'a, S> {}
 
-impl<'a> DatafeedGetCall<'a> {
+impl<'a, S> DatafeedGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14716,7 +14841,7 @@ impl<'a> DatafeedGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -14726,7 +14851,7 @@ impl<'a> DatafeedGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedGetCall<'a> {
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedGetCall<'a, S> {
         self._datafeed_id = new_value.to_string();
         self
     }
@@ -14736,7 +14861,7 @@ impl<'a> DatafeedGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14761,7 +14886,7 @@ impl<'a> DatafeedGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14781,9 +14906,9 @@ impl<'a> DatafeedGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14816,7 +14941,7 @@ impl<'a> DatafeedGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14830,10 +14955,10 @@ impl<'a> DatafeedGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedInsertCall<'a>
-    where  {
+pub struct DatafeedInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: Datafeed,
     _merchant_id: String,
     _dry_run: Option<bool>,
@@ -14842,9 +14967,15 @@ pub struct DatafeedInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedInsertCall<'a, S> {}
 
-impl<'a> DatafeedInsertCall<'a> {
+impl<'a, S> DatafeedInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15003,7 +15134,7 @@ impl<'a> DatafeedInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Datafeed) -> DatafeedInsertCall<'a> {
+    pub fn request(mut self, new_value: Datafeed) -> DatafeedInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15013,14 +15144,14 @@ impl<'a> DatafeedInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedInsertCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedInsertCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedInsertCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedInsertCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -15030,7 +15161,7 @@ impl<'a> DatafeedInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15055,7 +15186,7 @@ impl<'a> DatafeedInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15075,9 +15206,9 @@ impl<'a> DatafeedInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15109,7 +15240,7 @@ impl<'a> DatafeedInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15119,10 +15250,10 @@ impl<'a> DatafeedInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedListCall<'a>
-    where  {
+pub struct DatafeedListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -15131,9 +15262,15 @@ pub struct DatafeedListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedListCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedListCall<'a, S> {}
 
-impl<'a> DatafeedListCall<'a> {
+impl<'a, S> DatafeedListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15282,21 +15419,21 @@ impl<'a> DatafeedListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DatafeedListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DatafeedListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of products to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> DatafeedListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> DatafeedListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -15306,7 +15443,7 @@ impl<'a> DatafeedListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15331,7 +15468,7 @@ impl<'a> DatafeedListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15351,9 +15488,9 @@ impl<'a> DatafeedListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15386,7 +15523,7 @@ impl<'a> DatafeedListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15400,10 +15537,10 @@ impl<'a> DatafeedListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedUpdateCall<'a>
-    where  {
+pub struct DatafeedUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: Datafeed,
     _merchant_id: String,
     _datafeed_id: String,
@@ -15413,9 +15550,15 @@ pub struct DatafeedUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedUpdateCall<'a, S> {}
 
-impl<'a> DatafeedUpdateCall<'a> {
+impl<'a, S> DatafeedUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15575,7 +15718,7 @@ impl<'a> DatafeedUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Datafeed) -> DatafeedUpdateCall<'a> {
+    pub fn request(mut self, new_value: Datafeed) -> DatafeedUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15585,7 +15728,7 @@ impl<'a> DatafeedUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -15595,14 +15738,14 @@ impl<'a> DatafeedUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a> {
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, S> {
         self._datafeed_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> DatafeedUpdateCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedUpdateCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -15612,7 +15755,7 @@ impl<'a> DatafeedUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15637,7 +15780,7 @@ impl<'a> DatafeedUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15657,9 +15800,9 @@ impl<'a> DatafeedUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15692,7 +15835,7 @@ impl<'a> DatafeedUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15705,19 +15848,25 @@ impl<'a> DatafeedUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedstatuseCustombatchCall<'a>
-    where  {
+pub struct DatafeedstatuseCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: DatafeedstatusesCustomBatchRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedstatuseCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedstatuseCustombatchCall<'a, S> {}
 
-impl<'a> DatafeedstatuseCustombatchCall<'a> {
+impl<'a, S> DatafeedstatuseCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15851,7 +16000,7 @@ impl<'a> DatafeedstatuseCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DatafeedstatusesCustomBatchRequest) -> DatafeedstatuseCustombatchCall<'a> {
+    pub fn request(mut self, new_value: DatafeedstatusesCustomBatchRequest) -> DatafeedstatuseCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15861,7 +16010,7 @@ impl<'a> DatafeedstatuseCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedstatuseCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedstatuseCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15886,7 +16035,7 @@ impl<'a> DatafeedstatuseCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedstatuseCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedstatuseCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15906,9 +16055,9 @@ impl<'a> DatafeedstatuseCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedstatuseCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedstatuseCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15940,7 +16089,7 @@ impl<'a> DatafeedstatuseCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15950,10 +16099,10 @@ impl<'a> DatafeedstatuseCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedstatuseGetCall<'a>
-    where  {
+pub struct DatafeedstatuseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _datafeed_id: String,
     _language: Option<String>,
@@ -15963,9 +16112,15 @@ pub struct DatafeedstatuseGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedstatuseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedstatuseGetCall<'a, S> {}
 
-impl<'a> DatafeedstatuseGetCall<'a> {
+impl<'a, S> DatafeedstatuseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16115,7 +16270,7 @@ impl<'a> DatafeedstatuseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -16125,21 +16280,21 @@ impl<'a> DatafeedstatuseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a> {
+    pub fn datafeed_id(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a, S> {
         self._datafeed_id = new_value.to_string();
         self
     }
     /// The language for which to get the datafeed status. If this parameter is provided then country must also be provided. Note that this parameter is required for feeds targeting multiple countries and languages, since a feed may have a different status for each target.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a> {
+    pub fn language(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a, S> {
         self._language = Some(new_value.to_string());
         self
     }
     /// The country for which to get the datafeed status. If this parameter is provided then language must also be provided. Note that this parameter is required for feeds targeting multiple countries and languages, since a feed may have a different status for each target.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a> {
+    pub fn country(mut self, new_value: &str) -> DatafeedstatuseGetCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -16149,7 +16304,7 @@ impl<'a> DatafeedstatuseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedstatuseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedstatuseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16174,7 +16329,7 @@ impl<'a> DatafeedstatuseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedstatuseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedstatuseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16194,9 +16349,9 @@ impl<'a> DatafeedstatuseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedstatuseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedstatuseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16228,7 +16383,7 @@ impl<'a> DatafeedstatuseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16238,10 +16393,10 @@ impl<'a> DatafeedstatuseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DatafeedstatuseListCall<'a>
-    where  {
+pub struct DatafeedstatuseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -16250,9 +16405,15 @@ pub struct DatafeedstatuseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DatafeedstatuseListCall<'a> {}
+impl<'a, S> client::CallBuilder for DatafeedstatuseListCall<'a, S> {}
 
-impl<'a> DatafeedstatuseListCall<'a> {
+impl<'a, S> DatafeedstatuseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16401,21 +16562,21 @@ impl<'a> DatafeedstatuseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> DatafeedstatuseListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> DatafeedstatuseListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DatafeedstatuseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> DatafeedstatuseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of products to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> DatafeedstatuseListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> DatafeedstatuseListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -16425,7 +16586,7 @@ impl<'a> DatafeedstatuseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedstatuseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DatafeedstatuseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16450,7 +16611,7 @@ impl<'a> DatafeedstatuseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DatafeedstatuseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DatafeedstatuseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16470,9 +16631,9 @@ impl<'a> DatafeedstatuseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DatafeedstatuseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DatafeedstatuseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16505,7 +16666,7 @@ impl<'a> DatafeedstatuseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16519,10 +16680,10 @@ impl<'a> DatafeedstatuseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventoryCustombatchCall<'a>
-    where  {
+pub struct InventoryCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: InventoryCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16530,9 +16691,15 @@ pub struct InventoryCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InventoryCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for InventoryCustombatchCall<'a, S> {}
 
-impl<'a> InventoryCustombatchCall<'a> {
+impl<'a, S> InventoryCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16669,14 +16836,14 @@ impl<'a> InventoryCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a> {
+    pub fn request(mut self, new_value: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> InventoryCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> InventoryCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -16686,7 +16853,7 @@ impl<'a> InventoryCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventoryCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventoryCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16711,7 +16878,7 @@ impl<'a> InventoryCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventoryCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InventoryCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16731,9 +16898,9 @@ impl<'a> InventoryCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventoryCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InventoryCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16766,7 +16933,7 @@ impl<'a> InventoryCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16780,10 +16947,10 @@ impl<'a> InventoryCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySetCall<'a>
-    where  {
+pub struct InventorySetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: InventorySetRequest,
     _merchant_id: String,
     _store_code: String,
@@ -16794,9 +16961,15 @@ pub struct InventorySetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for InventorySetCall<'a> {}
+impl<'a, S> client::CallBuilder for InventorySetCall<'a, S> {}
 
-impl<'a> InventorySetCall<'a> {
+impl<'a, S> InventorySetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16957,7 +17130,7 @@ impl<'a> InventorySetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InventorySetRequest) -> InventorySetCall<'a> {
+    pub fn request(mut self, new_value: InventorySetRequest) -> InventorySetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16967,7 +17140,7 @@ impl<'a> InventorySetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> InventorySetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> InventorySetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -16977,7 +17150,7 @@ impl<'a> InventorySetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn store_code(mut self, new_value: &str) -> InventorySetCall<'a> {
+    pub fn store_code(mut self, new_value: &str) -> InventorySetCall<'a, S> {
         self._store_code = new_value.to_string();
         self
     }
@@ -16987,14 +17160,14 @@ impl<'a> InventorySetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> InventorySetCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> InventorySetCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> InventorySetCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> InventorySetCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -17004,7 +17177,7 @@ impl<'a> InventorySetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17029,7 +17202,7 @@ impl<'a> InventorySetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17049,9 +17222,9 @@ impl<'a> InventorySetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> InventorySetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17084,7 +17257,7 @@ impl<'a> InventorySetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17098,10 +17271,10 @@ impl<'a> InventorySetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingCustombatchCall<'a>
-    where  {
+pub struct LiasettingCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: LiasettingsCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17109,9 +17282,15 @@ pub struct LiasettingCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingCustombatchCall<'a, S> {}
 
-impl<'a> LiasettingCustombatchCall<'a> {
+impl<'a, S> LiasettingCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17248,14 +17427,14 @@ impl<'a> LiasettingCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a> {
+    pub fn request(mut self, new_value: LiasettingsCustomBatchRequest) -> LiasettingCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> LiasettingCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> LiasettingCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -17265,7 +17444,7 @@ impl<'a> LiasettingCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17290,7 +17469,7 @@ impl<'a> LiasettingCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17310,9 +17489,9 @@ impl<'a> LiasettingCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17344,7 +17523,7 @@ impl<'a> LiasettingCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17352,10 +17531,10 @@ impl<'a> LiasettingCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingGetCall<'a>
-    where  {
+pub struct LiasettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17363,9 +17542,15 @@ pub struct LiasettingGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingGetCall<'a, S> {}
 
-impl<'a> LiasettingGetCall<'a> {
+impl<'a, S> LiasettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17509,7 +17694,7 @@ impl<'a> LiasettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -17519,7 +17704,7 @@ impl<'a> LiasettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -17529,7 +17714,7 @@ impl<'a> LiasettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17554,7 +17739,7 @@ impl<'a> LiasettingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17574,9 +17759,9 @@ impl<'a> LiasettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17608,7 +17793,7 @@ impl<'a> LiasettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17616,10 +17801,10 @@ impl<'a> LiasettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingGetaccessiblegmbaccountCall<'a>
-    where  {
+pub struct LiasettingGetaccessiblegmbaccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17627,9 +17812,15 @@ pub struct LiasettingGetaccessiblegmbaccountCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingGetaccessiblegmbaccountCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingGetaccessiblegmbaccountCall<'a, S> {}
 
-impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
+impl<'a, S> LiasettingGetaccessiblegmbaccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17773,7 +17964,7 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingGetaccessiblegmbaccountCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingGetaccessiblegmbaccountCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -17783,7 +17974,7 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingGetaccessiblegmbaccountCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingGetaccessiblegmbaccountCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -17793,7 +17984,7 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingGetaccessiblegmbaccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingGetaccessiblegmbaccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17818,7 +18009,7 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingGetaccessiblegmbaccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingGetaccessiblegmbaccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17838,9 +18029,9 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingGetaccessiblegmbaccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingGetaccessiblegmbaccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17872,7 +18063,7 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17882,10 +18073,10 @@ impl<'a> LiasettingGetaccessiblegmbaccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingListCall<'a>
-    where  {
+pub struct LiasettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -17894,9 +18085,15 @@ pub struct LiasettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingListCall<'a, S> {}
 
-impl<'a> LiasettingListCall<'a> {
+impl<'a, S> LiasettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18045,21 +18242,21 @@ impl<'a> LiasettingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiasettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LiasettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of LIA settings to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiasettingListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LiasettingListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -18069,7 +18266,7 @@ impl<'a> LiasettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18094,7 +18291,7 @@ impl<'a> LiasettingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18114,9 +18311,9 @@ impl<'a> LiasettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18148,7 +18345,7 @@ impl<'a> LiasettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18156,18 +18353,24 @@ impl<'a> LiasettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingListposdataproviderCall<'a>
-    where  {
+pub struct LiasettingListposdataproviderCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingListposdataproviderCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingListposdataproviderCall<'a, S> {}
 
-impl<'a> LiasettingListposdataproviderCall<'a> {
+impl<'a, S> LiasettingListposdataproviderCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18288,7 +18491,7 @@ impl<'a> LiasettingListposdataproviderCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingListposdataproviderCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingListposdataproviderCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18313,7 +18516,7 @@ impl<'a> LiasettingListposdataproviderCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingListposdataproviderCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingListposdataproviderCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18333,9 +18536,9 @@ impl<'a> LiasettingListposdataproviderCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingListposdataproviderCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingListposdataproviderCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18367,7 +18570,7 @@ impl<'a> LiasettingListposdataproviderCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18375,10 +18578,10 @@ impl<'a> LiasettingListposdataproviderCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingRequestgmbaccesCall<'a>
-    where  {
+pub struct LiasettingRequestgmbaccesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _gmb_email: String,
@@ -18387,9 +18590,15 @@ pub struct LiasettingRequestgmbaccesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingRequestgmbaccesCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingRequestgmbaccesCall<'a, S> {}
 
-impl<'a> LiasettingRequestgmbaccesCall<'a> {
+impl<'a, S> LiasettingRequestgmbaccesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18534,7 +18743,7 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -18544,7 +18753,7 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -18554,7 +18763,7 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn gmb_email(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a> {
+    pub fn gmb_email(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a, S> {
         self._gmb_email = new_value.to_string();
         self
     }
@@ -18564,7 +18773,7 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingRequestgmbaccesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingRequestgmbaccesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18589,7 +18798,7 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingRequestgmbaccesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingRequestgmbaccesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18609,9 +18818,9 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingRequestgmbaccesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingRequestgmbaccesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18643,7 +18852,7 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18651,10 +18860,10 @@ impl<'a> LiasettingRequestgmbaccesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingRequestinventoryverificationCall<'a>
-    where  {
+pub struct LiasettingRequestinventoryverificationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _country: String,
@@ -18663,9 +18872,15 @@ pub struct LiasettingRequestinventoryverificationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingRequestinventoryverificationCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingRequestinventoryverificationCall<'a, S> {}
 
-impl<'a> LiasettingRequestinventoryverificationCall<'a> {
+impl<'a, S> LiasettingRequestinventoryverificationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18810,7 +19025,7 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingRequestinventoryverificationCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingRequestinventoryverificationCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -18820,7 +19035,7 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingRequestinventoryverificationCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingRequestinventoryverificationCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -18830,7 +19045,7 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn country(mut self, new_value: &str) -> LiasettingRequestinventoryverificationCall<'a> {
+    pub fn country(mut self, new_value: &str) -> LiasettingRequestinventoryverificationCall<'a, S> {
         self._country = new_value.to_string();
         self
     }
@@ -18840,7 +19055,7 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingRequestinventoryverificationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingRequestinventoryverificationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18865,7 +19080,7 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingRequestinventoryverificationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingRequestinventoryverificationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18885,9 +19100,9 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingRequestinventoryverificationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingRequestinventoryverificationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18919,7 +19134,7 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18927,10 +19142,10 @@ impl<'a> LiasettingRequestinventoryverificationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingSetinventoryverificationcontactCall<'a>
-    where  {
+pub struct LiasettingSetinventoryverificationcontactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _country: String,
@@ -18942,9 +19157,15 @@ pub struct LiasettingSetinventoryverificationcontactCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingSetinventoryverificationcontactCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingSetinventoryverificationcontactCall<'a, S> {}
 
-impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
+impl<'a, S> LiasettingSetinventoryverificationcontactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19092,7 +19313,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -19102,7 +19323,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -19112,7 +19333,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn country(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn country(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._country = new_value.to_string();
         self
     }
@@ -19122,7 +19343,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn language(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._language = new_value.to_string();
         self
     }
@@ -19132,7 +19353,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn contact_name(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn contact_name(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._contact_name = new_value.to_string();
         self
     }
@@ -19142,7 +19363,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn contact_email(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn contact_email(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._contact_email = new_value.to_string();
         self
     }
@@ -19152,7 +19373,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingSetinventoryverificationcontactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingSetinventoryverificationcontactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19177,7 +19398,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingSetinventoryverificationcontactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingSetinventoryverificationcontactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19197,9 +19418,9 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingSetinventoryverificationcontactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingSetinventoryverificationcontactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19231,7 +19452,7 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19241,10 +19462,10 @@ impl<'a> LiasettingSetinventoryverificationcontactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingSetposdataproviderCall<'a>
-    where  {
+pub struct LiasettingSetposdataproviderCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _country: String,
@@ -19255,9 +19476,15 @@ pub struct LiasettingSetposdataproviderCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingSetposdataproviderCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingSetposdataproviderCall<'a, S> {}
 
-impl<'a> LiasettingSetposdataproviderCall<'a> {
+impl<'a, S> LiasettingSetposdataproviderCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19408,7 +19635,7 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -19418,7 +19645,7 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -19428,21 +19655,21 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn country(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn country(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, S> {
         self._country = new_value.to_string();
         self
     }
     /// The account ID by which this merchant is known to the POS data provider.
     ///
     /// Sets the *pos external account id* query property to the given value.
-    pub fn pos_external_account_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn pos_external_account_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, S> {
         self._pos_external_account_id = Some(new_value.to_string());
         self
     }
     /// The ID of POS data provider.
     ///
     /// Sets the *pos data provider id* query property to the given value.
-    pub fn pos_data_provider_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn pos_data_provider_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, S> {
         self._pos_data_provider_id = Some(new_value.to_string());
         self
     }
@@ -19452,7 +19679,7 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingSetposdataproviderCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingSetposdataproviderCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19477,7 +19704,7 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingSetposdataproviderCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingSetposdataproviderCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19497,9 +19724,9 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingSetposdataproviderCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingSetposdataproviderCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19532,7 +19759,7 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19546,10 +19773,10 @@ impl<'a> LiasettingSetposdataproviderCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiasettingUpdateCall<'a>
-    where  {
+pub struct LiasettingUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: LiaSettings,
     _merchant_id: String,
     _account_id: String,
@@ -19559,9 +19786,15 @@ pub struct LiasettingUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LiasettingUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for LiasettingUpdateCall<'a, S> {}
 
-impl<'a> LiasettingUpdateCall<'a> {
+impl<'a, S> LiasettingUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19721,7 +19954,7 @@ impl<'a> LiasettingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiaSettings) -> LiasettingUpdateCall<'a> {
+    pub fn request(mut self, new_value: LiaSettings) -> LiasettingUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19731,7 +19964,7 @@ impl<'a> LiasettingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> LiasettingUpdateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> LiasettingUpdateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -19741,14 +19974,14 @@ impl<'a> LiasettingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> LiasettingUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> LiasettingUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> LiasettingUpdateCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> LiasettingUpdateCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -19758,7 +19991,7 @@ impl<'a> LiasettingUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiasettingUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19783,7 +20016,7 @@ impl<'a> LiasettingUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiasettingUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LiasettingUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19803,9 +20036,9 @@ impl<'a> LiasettingUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiasettingUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LiasettingUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19838,7 +20071,7 @@ impl<'a> LiasettingUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19851,10 +20084,10 @@ impl<'a> LiasettingUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderinvoiceCreatechargeinvoiceCall<'a>
-    where  {
+pub struct OrderinvoiceCreatechargeinvoiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderinvoicesCreateChargeInvoiceRequest,
     _merchant_id: String,
     _order_id: String,
@@ -19863,9 +20096,15 @@ pub struct OrderinvoiceCreatechargeinvoiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a, S> {}
 
-impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
+impl<'a, S> OrderinvoiceCreatechargeinvoiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20022,7 +20261,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20032,7 +20271,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -20042,7 +20281,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -20052,7 +20291,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20077,7 +20316,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20097,9 +20336,9 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20132,7 +20371,7 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20145,10 +20384,10 @@ impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderinvoiceCreaterefundinvoiceCall<'a>
-    where  {
+pub struct OrderinvoiceCreaterefundinvoiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrderinvoicesCreateRefundInvoiceRequest,
     _merchant_id: String,
     _order_id: String,
@@ -20157,9 +20396,15 @@ pub struct OrderinvoiceCreaterefundinvoiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a, S> {}
 
-impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
+impl<'a, S> OrderinvoiceCreaterefundinvoiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20316,7 +20561,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20326,7 +20571,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -20336,7 +20581,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -20346,7 +20591,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20371,7 +20616,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20391,9 +20636,9 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20425,7 +20670,7 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20437,10 +20682,10 @@ impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreportListdisbursementCall<'a>
-    where  {
+pub struct OrderreportListdisbursementCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -20451,9 +20696,15 @@ pub struct OrderreportListdisbursementCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderreportListdisbursementCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderreportListdisbursementCall<'a, S> {}
 
-impl<'a> OrderreportListdisbursementCall<'a> {
+impl<'a, S> OrderreportListdisbursementCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20608,35 +20859,35 @@ impl<'a> OrderreportListdisbursementCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of disbursements to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderreportListdisbursementCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OrderreportListdisbursementCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The first date which disbursements occurred. In ISO 8601 format.
     ///
     /// Sets the *disbursement start date* query property to the given value.
-    pub fn disbursement_start_date(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a> {
+    pub fn disbursement_start_date(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a, S> {
         self._disbursement_start_date = Some(new_value.to_string());
         self
     }
     /// The last date which disbursements occurred. In ISO 8601 format. Default: current date.
     ///
     /// Sets the *disbursement end date* query property to the given value.
-    pub fn disbursement_end_date(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a> {
+    pub fn disbursement_end_date(mut self, new_value: &str) -> OrderreportListdisbursementCall<'a, S> {
         self._disbursement_end_date = Some(new_value.to_string());
         self
     }
@@ -20646,7 +20897,7 @@ impl<'a> OrderreportListdisbursementCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreportListdisbursementCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreportListdisbursementCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20671,7 +20922,7 @@ impl<'a> OrderreportListdisbursementCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreportListdisbursementCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreportListdisbursementCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20691,9 +20942,9 @@ impl<'a> OrderreportListdisbursementCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreportListdisbursementCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderreportListdisbursementCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20725,7 +20976,7 @@ impl<'a> OrderreportListdisbursementCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20737,10 +20988,10 @@ impl<'a> OrderreportListdisbursementCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreportListtransactionCall<'a>
-    where  {
+pub struct OrderreportListtransactionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _disbursement_id: String,
     _transaction_start_date: Option<String>,
@@ -20752,9 +21003,15 @@ pub struct OrderreportListtransactionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderreportListtransactionCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderreportListtransactionCall<'a, S> {}
 
-impl<'a> OrderreportListtransactionCall<'a> {
+impl<'a, S> OrderreportListtransactionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20910,7 +21167,7 @@ impl<'a> OrderreportListtransactionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreportListtransactionCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreportListtransactionCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -20920,35 +21177,35 @@ impl<'a> OrderreportListtransactionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn disbursement_id(mut self, new_value: &str) -> OrderreportListtransactionCall<'a> {
+    pub fn disbursement_id(mut self, new_value: &str) -> OrderreportListtransactionCall<'a, S> {
         self._disbursement_id = new_value.to_string();
         self
     }
     /// The first date in which transaction occurred. In ISO 8601 format.
     ///
     /// Sets the *transaction start date* query property to the given value.
-    pub fn transaction_start_date(mut self, new_value: &str) -> OrderreportListtransactionCall<'a> {
+    pub fn transaction_start_date(mut self, new_value: &str) -> OrderreportListtransactionCall<'a, S> {
         self._transaction_start_date = Some(new_value.to_string());
         self
     }
     /// The last date in which transaction occurred. In ISO 8601 format. Default: current date.
     ///
     /// Sets the *transaction end date* query property to the given value.
-    pub fn transaction_end_date(mut self, new_value: &str) -> OrderreportListtransactionCall<'a> {
+    pub fn transaction_end_date(mut self, new_value: &str) -> OrderreportListtransactionCall<'a, S> {
         self._transaction_end_date = Some(new_value.to_string());
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderreportListtransactionCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrderreportListtransactionCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of disbursements to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderreportListtransactionCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OrderreportListtransactionCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -20958,7 +21215,7 @@ impl<'a> OrderreportListtransactionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreportListtransactionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreportListtransactionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20983,7 +21240,7 @@ impl<'a> OrderreportListtransactionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreportListtransactionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreportListtransactionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21003,9 +21260,9 @@ impl<'a> OrderreportListtransactionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreportListtransactionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderreportListtransactionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21037,7 +21294,7 @@ impl<'a> OrderreportListtransactionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21045,10 +21302,10 @@ impl<'a> OrderreportListtransactionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreturnGetCall<'a>
-    where  {
+pub struct OrderreturnGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _return_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21056,9 +21313,15 @@ pub struct OrderreturnGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderreturnGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderreturnGetCall<'a, S> {}
 
-impl<'a> OrderreturnGetCall<'a> {
+impl<'a, S> OrderreturnGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21202,7 +21465,7 @@ impl<'a> OrderreturnGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -21212,7 +21475,7 @@ impl<'a> OrderreturnGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a> {
+    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, S> {
         self._return_id = new_value.to_string();
         self
     }
@@ -21222,7 +21485,7 @@ impl<'a> OrderreturnGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21247,7 +21510,7 @@ impl<'a> OrderreturnGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21267,9 +21530,9 @@ impl<'a> OrderreturnGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderreturnGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21301,7 +21564,7 @@ impl<'a> OrderreturnGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21314,10 +21577,10 @@ impl<'a> OrderreturnGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreturnListCall<'a>
-    where  {
+pub struct OrderreturnListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -21329,9 +21592,15 @@ pub struct OrderreturnListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderreturnListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderreturnListCall<'a, S> {}
 
-impl<'a> OrderreturnListCall<'a> {
+impl<'a, S> OrderreturnListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21489,42 +21758,42 @@ impl<'a> OrderreturnListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Return the results in the specified order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of order returns to return in the response, used for paging. The default value is 25 returns per page, and the maximum allowed value is 250 returns per page.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderreturnListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OrderreturnListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Obtains order returns created after this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *created start date* query property to the given value.
-    pub fn created_start_date(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn created_start_date(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._created_start_date = Some(new_value.to_string());
         self
     }
     /// Obtains order returns created before this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *created end date* query property to the given value.
-    pub fn created_end_date(mut self, new_value: &str) -> OrderreturnListCall<'a> {
+    pub fn created_end_date(mut self, new_value: &str) -> OrderreturnListCall<'a, S> {
         self._created_end_date = Some(new_value.to_string());
         self
     }
@@ -21534,7 +21803,7 @@ impl<'a> OrderreturnListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21559,7 +21828,7 @@ impl<'a> OrderreturnListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21579,9 +21848,9 @@ impl<'a> OrderreturnListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderreturnListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21614,7 +21883,7 @@ impl<'a> OrderreturnListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21627,10 +21896,10 @@ impl<'a> OrderreturnListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderAcknowledgeCall<'a>
-    where  {
+pub struct OrderAcknowledgeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersAcknowledgeRequest,
     _merchant_id: String,
     _order_id: String,
@@ -21639,9 +21908,15 @@ pub struct OrderAcknowledgeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderAcknowledgeCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderAcknowledgeCall<'a, S> {}
 
-impl<'a> OrderAcknowledgeCall<'a> {
+impl<'a, S> OrderAcknowledgeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21798,7 +22073,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersAcknowledgeRequest) -> OrderAcknowledgeCall<'a> {
+    pub fn request(mut self, new_value: OrdersAcknowledgeRequest) -> OrderAcknowledgeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21808,7 +22083,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -21818,7 +22093,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -21828,7 +22103,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAcknowledgeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAcknowledgeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21853,7 +22128,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderAcknowledgeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderAcknowledgeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21873,9 +22148,9 @@ impl<'a> OrderAcknowledgeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAcknowledgeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderAcknowledgeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21907,7 +22182,7 @@ impl<'a> OrderAcknowledgeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21915,10 +22190,10 @@ impl<'a> OrderAcknowledgeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderAdvancetestorderCall<'a>
-    where  {
+pub struct OrderAdvancetestorderCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21926,9 +22201,15 @@ pub struct OrderAdvancetestorderCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderAdvancetestorderCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderAdvancetestorderCall<'a, S> {}
 
-impl<'a> OrderAdvancetestorderCall<'a> {
+impl<'a, S> OrderAdvancetestorderCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22072,7 +22353,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -22082,7 +22363,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -22092,7 +22373,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAdvancetestorderCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAdvancetestorderCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22117,7 +22398,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderAdvancetestorderCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderAdvancetestorderCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22137,9 +22418,9 @@ impl<'a> OrderAdvancetestorderCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAdvancetestorderCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderAdvancetestorderCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22172,7 +22453,7 @@ impl<'a> OrderAdvancetestorderCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22185,10 +22466,10 @@ impl<'a> OrderAdvancetestorderCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCancelCall<'a>
-    where  {
+pub struct OrderCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCancelRequest,
     _merchant_id: String,
     _order_id: String,
@@ -22197,9 +22478,15 @@ pub struct OrderCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCancelCall<'a, S> {}
 
-impl<'a> OrderCancelCall<'a> {
+impl<'a, S> OrderCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22356,7 +22643,7 @@ impl<'a> OrderCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelRequest) -> OrderCancelCall<'a> {
+    pub fn request(mut self, new_value: OrdersCancelRequest) -> OrderCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22366,7 +22653,7 @@ impl<'a> OrderCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCancelCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCancelCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -22376,7 +22663,7 @@ impl<'a> OrderCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCancelCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCancelCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -22386,7 +22673,7 @@ impl<'a> OrderCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22411,7 +22698,7 @@ impl<'a> OrderCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22431,9 +22718,9 @@ impl<'a> OrderCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22466,7 +22753,7 @@ impl<'a> OrderCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22479,10 +22766,10 @@ impl<'a> OrderCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCancellineitemCall<'a>
-    where  {
+pub struct OrderCancellineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCancelLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -22491,9 +22778,15 @@ pub struct OrderCancellineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCancellineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCancellineitemCall<'a, S> {}
 
-impl<'a> OrderCancellineitemCall<'a> {
+impl<'a, S> OrderCancellineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22650,7 +22943,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelLineItemRequest) -> OrderCancellineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersCancelLineItemRequest) -> OrderCancellineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22660,7 +22953,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -22670,7 +22963,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -22680,7 +22973,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancellineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancellineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22705,7 +22998,7 @@ impl<'a> OrderCancellineitemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCancellineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCancellineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22725,9 +23018,9 @@ impl<'a> OrderCancellineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancellineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCancellineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22760,7 +23053,7 @@ impl<'a> OrderCancellineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22773,10 +23066,10 @@ impl<'a> OrderCancellineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCanceltestorderbycustomerCall<'a>
-    where  {
+pub struct OrderCanceltestorderbycustomerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCancelTestOrderByCustomerRequest,
     _merchant_id: String,
     _order_id: String,
@@ -22785,9 +23078,15 @@ pub struct OrderCanceltestorderbycustomerCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCanceltestorderbycustomerCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCanceltestorderbycustomerCall<'a, S> {}
 
-impl<'a> OrderCanceltestorderbycustomerCall<'a> {
+impl<'a, S> OrderCanceltestorderbycustomerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22944,7 +23243,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelTestOrderByCustomerRequest) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn request(mut self, new_value: OrdersCancelTestOrderByCustomerRequest) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22954,7 +23253,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -22964,7 +23263,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -22974,7 +23273,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCanceltestorderbycustomerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCanceltestorderbycustomerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22999,7 +23298,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCanceltestorderbycustomerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCanceltestorderbycustomerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23019,9 +23318,9 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCanceltestorderbycustomerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCanceltestorderbycustomerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23054,7 +23353,7 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23067,10 +23366,10 @@ impl<'a> OrderCanceltestorderbycustomerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCreatetestorderCall<'a>
-    where  {
+pub struct OrderCreatetestorderCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCreateTestOrderRequest,
     _merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23078,9 +23377,15 @@ pub struct OrderCreatetestorderCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCreatetestorderCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCreatetestorderCall<'a, S> {}
 
-impl<'a> OrderCreatetestorderCall<'a> {
+impl<'a, S> OrderCreatetestorderCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23236,7 +23541,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCreateTestOrderRequest) -> OrderCreatetestorderCall<'a> {
+    pub fn request(mut self, new_value: OrdersCreateTestOrderRequest) -> OrderCreatetestorderCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23246,7 +23551,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestorderCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestorderCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -23256,7 +23561,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestorderCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestorderCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23281,7 +23586,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestorderCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestorderCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23301,9 +23606,9 @@ impl<'a> OrderCreatetestorderCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestorderCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCreatetestorderCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23336,7 +23641,7 @@ impl<'a> OrderCreatetestorderCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23349,10 +23654,10 @@ impl<'a> OrderCreatetestorderCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCreatetestreturnCall<'a>
-    where  {
+pub struct OrderCreatetestreturnCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCreateTestReturnRequest,
     _merchant_id: String,
     _order_id: String,
@@ -23361,9 +23666,15 @@ pub struct OrderCreatetestreturnCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCreatetestreturnCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCreatetestreturnCall<'a, S> {}
 
-impl<'a> OrderCreatetestreturnCall<'a> {
+impl<'a, S> OrderCreatetestreturnCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23520,7 +23831,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCreateTestReturnRequest) -> OrderCreatetestreturnCall<'a> {
+    pub fn request(mut self, new_value: OrdersCreateTestReturnRequest) -> OrderCreatetestreturnCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23530,7 +23841,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -23540,7 +23851,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -23550,7 +23861,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestreturnCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestreturnCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23575,7 +23886,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestreturnCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestreturnCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23595,9 +23906,9 @@ impl<'a> OrderCreatetestreturnCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestreturnCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCreatetestreturnCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23630,7 +23941,7 @@ impl<'a> OrderCreatetestreturnCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23643,19 +23954,25 @@ impl<'a> OrderCreatetestreturnCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCustombatchCall<'a>
-    where  {
+pub struct OrderCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersCustomBatchRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderCustombatchCall<'a, S> {}
 
-impl<'a> OrderCustombatchCall<'a> {
+impl<'a, S> OrderCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23789,7 +24106,7 @@ impl<'a> OrderCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a> {
+    pub fn request(mut self, new_value: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23799,7 +24116,7 @@ impl<'a> OrderCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23824,7 +24141,7 @@ impl<'a> OrderCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23844,9 +24161,9 @@ impl<'a> OrderCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23878,7 +24195,7 @@ impl<'a> OrderCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23886,10 +24203,10 @@ impl<'a> OrderCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGetCall<'a>
-    where  {
+pub struct OrderGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23897,9 +24214,15 @@ pub struct OrderGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderGetCall<'a, S> {}
 
-impl<'a> OrderGetCall<'a> {
+impl<'a, S> OrderGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24043,7 +24366,7 @@ impl<'a> OrderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -24053,7 +24376,7 @@ impl<'a> OrderGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -24063,7 +24386,7 @@ impl<'a> OrderGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24088,7 +24411,7 @@ impl<'a> OrderGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24108,9 +24431,9 @@ impl<'a> OrderGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24142,7 +24465,7 @@ impl<'a> OrderGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24150,10 +24473,10 @@ impl<'a> OrderGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGetbymerchantorderidCall<'a>
-    where  {
+pub struct OrderGetbymerchantorderidCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _merchant_order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -24161,9 +24484,15 @@ pub struct OrderGetbymerchantorderidCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderGetbymerchantorderidCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderGetbymerchantorderidCall<'a, S> {}
 
-impl<'a> OrderGetbymerchantorderidCall<'a> {
+impl<'a, S> OrderGetbymerchantorderidCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24307,7 +24636,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -24317,7 +24646,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, S> {
         self._merchant_order_id = new_value.to_string();
         self
     }
@@ -24327,7 +24656,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetbymerchantorderidCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetbymerchantorderidCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24352,7 +24681,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24372,9 +24701,9 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24406,7 +24735,7 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24415,10 +24744,10 @@ impl<'a> OrderGetbymerchantorderidCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGettestordertemplateCall<'a>
-    where  {
+pub struct OrderGettestordertemplateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _template_name: String,
     _country: Option<String>,
@@ -24427,9 +24756,15 @@ pub struct OrderGettestordertemplateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderGettestordertemplateCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderGettestordertemplateCall<'a, S> {}
 
-impl<'a> OrderGettestordertemplateCall<'a> {
+impl<'a, S> OrderGettestordertemplateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24576,7 +24911,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -24586,14 +24921,14 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
         self._template_name = new_value.to_string();
         self
     }
     /// The country of the template to retrieve. Defaults to `US`.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
+    pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -24603,7 +24938,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGettestordertemplateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGettestordertemplateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24628,7 +24963,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGettestordertemplateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGettestordertemplateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24648,9 +24983,9 @@ impl<'a> OrderGettestordertemplateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGettestordertemplateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderGettestordertemplateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24683,7 +25018,7 @@ impl<'a> OrderGettestordertemplateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24696,10 +25031,10 @@ impl<'a> OrderGettestordertemplateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderInstorerefundlineitemCall<'a>
-    where  {
+pub struct OrderInstorerefundlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersInStoreRefundLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -24708,9 +25043,15 @@ pub struct OrderInstorerefundlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderInstorerefundlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderInstorerefundlineitemCall<'a, S> {}
 
-impl<'a> OrderInstorerefundlineitemCall<'a> {
+impl<'a, S> OrderInstorerefundlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24867,7 +25208,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24877,7 +25218,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -24887,7 +25228,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -24897,7 +25238,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderInstorerefundlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderInstorerefundlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24922,7 +25263,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24942,9 +25283,9 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24976,7 +25317,7 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24991,10 +25332,10 @@ impl<'a> OrderInstorerefundlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderListCall<'a>
-    where  {
+pub struct OrderListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _statuses: Vec<String>,
     _placed_date_start: Option<String>,
@@ -25008,9 +25349,15 @@ pub struct OrderListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderListCall<'a, S> {}
 
-impl<'a> OrderListCall<'a> {
+impl<'a, S> OrderListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25176,7 +25523,7 @@ impl<'a> OrderListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -25184,49 +25531,49 @@ impl<'a> OrderListCall<'a> {
     ///
     /// Append the given value to the *statuses* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._statuses.push(new_value.to_string());
         self
     }
     /// Obtains orders placed after this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *placed date start* query property to the given value.
-    pub fn placed_date_start(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn placed_date_start(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._placed_date_start = Some(new_value.to_string());
         self
     }
     /// Obtains orders placed before this date (exclusively), in ISO 8601 format.
     ///
     /// Sets the *placed date end* query property to the given value.
-    pub fn placed_date_end(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn placed_date_end(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._placed_date_end = Some(new_value.to_string());
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Order results by placement date in descending or ascending order. Acceptable values are: - placedDateAsc - placedDateDesc 
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of orders to return in the response, used for paging. The default value is 25 orders per page, and the maximum allowed value is 250 orders per page.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Obtains orders that match the acknowledgement status. When set to true, obtains orders that have been acknowledged. When false, obtains orders that have not been acknowledged. We recommend using this filter set to `false`, in conjunction with the `acknowledge` call, such that only un-acknowledged orders are returned. 
     ///
     /// Sets the *acknowledged* query property to the given value.
-    pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a> {
+    pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a, S> {
         self._acknowledged = Some(new_value);
         self
     }
@@ -25236,7 +25583,7 @@ impl<'a> OrderListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25261,7 +25608,7 @@ impl<'a> OrderListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25281,9 +25628,9 @@ impl<'a> OrderListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25316,7 +25663,7 @@ impl<'a> OrderListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25329,10 +25676,10 @@ impl<'a> OrderListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRefundCall<'a>
-    where  {
+pub struct OrderRefundCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersRefundRequest,
     _merchant_id: String,
     _order_id: String,
@@ -25341,9 +25688,15 @@ pub struct OrderRefundCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderRefundCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderRefundCall<'a, S> {}
 
-impl<'a> OrderRefundCall<'a> {
+impl<'a, S> OrderRefundCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25500,7 +25853,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersRefundRequest) -> OrderRefundCall<'a> {
+    pub fn request(mut self, new_value: OrdersRefundRequest) -> OrderRefundCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25510,7 +25863,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderRefundCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -25520,7 +25873,7 @@ impl<'a> OrderRefundCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -25530,7 +25883,7 @@ impl<'a> OrderRefundCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25555,7 +25908,7 @@ impl<'a> OrderRefundCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25575,9 +25928,9 @@ impl<'a> OrderRefundCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRefundCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderRefundCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25610,7 +25963,7 @@ impl<'a> OrderRefundCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25623,10 +25976,10 @@ impl<'a> OrderRefundCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRejectreturnlineitemCall<'a>
-    where  {
+pub struct OrderRejectreturnlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersRejectReturnLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -25635,9 +25988,15 @@ pub struct OrderRejectreturnlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderRejectreturnlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderRejectreturnlineitemCall<'a, S> {}
 
-impl<'a> OrderRejectreturnlineitemCall<'a> {
+impl<'a, S> OrderRejectreturnlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25794,7 +26153,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersRejectReturnLineItemRequest) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersRejectReturnLineItemRequest) -> OrderRejectreturnlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25804,7 +26163,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -25814,7 +26173,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -25824,7 +26183,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRejectreturnlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRejectreturnlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25849,7 +26208,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRejectreturnlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRejectreturnlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25869,9 +26228,9 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25904,7 +26263,7 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25917,10 +26276,10 @@ impl<'a> OrderRejectreturnlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderReturnlineitemCall<'a>
-    where  {
+pub struct OrderReturnlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersReturnLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -25929,9 +26288,15 @@ pub struct OrderReturnlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderReturnlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderReturnlineitemCall<'a, S> {}
 
-impl<'a> OrderReturnlineitemCall<'a> {
+impl<'a, S> OrderReturnlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26088,7 +26453,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersReturnLineItemRequest) -> OrderReturnlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersReturnLineItemRequest) -> OrderReturnlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26098,7 +26463,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -26108,7 +26473,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -26118,7 +26483,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26143,7 +26508,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26163,9 +26528,9 @@ impl<'a> OrderReturnlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderReturnlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26198,7 +26563,7 @@ impl<'a> OrderReturnlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26211,10 +26576,10 @@ impl<'a> OrderReturnlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderReturnrefundlineitemCall<'a>
-    where  {
+pub struct OrderReturnrefundlineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersReturnRefundLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -26223,9 +26588,15 @@ pub struct OrderReturnrefundlineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderReturnrefundlineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderReturnrefundlineitemCall<'a, S> {}
 
-impl<'a> OrderReturnrefundlineitemCall<'a> {
+impl<'a, S> OrderReturnrefundlineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26382,7 +26753,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersReturnRefundLineItemRequest) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersReturnRefundLineItemRequest) -> OrderReturnrefundlineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26392,7 +26763,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -26402,7 +26773,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -26412,7 +26783,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnrefundlineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnrefundlineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26437,7 +26808,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnrefundlineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnrefundlineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26457,9 +26828,9 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnrefundlineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderReturnrefundlineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26492,7 +26863,7 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26505,10 +26876,10 @@ impl<'a> OrderReturnrefundlineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderSetlineitemmetadataCall<'a>
-    where  {
+pub struct OrderSetlineitemmetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersSetLineItemMetadataRequest,
     _merchant_id: String,
     _order_id: String,
@@ -26517,9 +26888,15 @@ pub struct OrderSetlineitemmetadataCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderSetlineitemmetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderSetlineitemmetadataCall<'a, S> {}
 
-impl<'a> OrderSetlineitemmetadataCall<'a> {
+impl<'a, S> OrderSetlineitemmetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26676,7 +27053,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26686,7 +27063,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -26696,7 +27073,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -26706,7 +27083,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderSetlineitemmetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderSetlineitemmetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26731,7 +27108,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26751,9 +27128,9 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26786,7 +27163,7 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26799,10 +27176,10 @@ impl<'a> OrderSetlineitemmetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderShiplineitemCall<'a>
-    where  {
+pub struct OrderShiplineitemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersShipLineItemsRequest,
     _merchant_id: String,
     _order_id: String,
@@ -26811,9 +27188,15 @@ pub struct OrderShiplineitemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderShiplineitemCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderShiplineitemCall<'a, S> {}
 
-impl<'a> OrderShiplineitemCall<'a> {
+impl<'a, S> OrderShiplineitemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26970,7 +27353,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a> {
+    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26980,7 +27363,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -26990,7 +27373,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -27000,7 +27383,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderShiplineitemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderShiplineitemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27025,7 +27408,7 @@ impl<'a> OrderShiplineitemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27045,9 +27428,9 @@ impl<'a> OrderShiplineitemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderShiplineitemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderShiplineitemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27080,7 +27463,7 @@ impl<'a> OrderShiplineitemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27093,10 +27476,10 @@ impl<'a> OrderShiplineitemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdatelineitemshippingdetailCall<'a>
-    where  {
+pub struct OrderUpdatelineitemshippingdetailCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersUpdateLineItemShippingDetailsRequest,
     _merchant_id: String,
     _order_id: String,
@@ -27105,9 +27488,15 @@ pub struct OrderUpdatelineitemshippingdetailCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderUpdatelineitemshippingdetailCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderUpdatelineitemshippingdetailCall<'a, S> {}
 
-impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
+impl<'a, S> OrderUpdatelineitemshippingdetailCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27264,7 +27653,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27274,7 +27663,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -27284,7 +27673,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -27294,7 +27683,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatelineitemshippingdetailCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatelineitemshippingdetailCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27319,7 +27708,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27339,9 +27728,9 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27374,7 +27763,7 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27387,10 +27776,10 @@ impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdatemerchantorderidCall<'a>
-    where  {
+pub struct OrderUpdatemerchantorderidCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersUpdateMerchantOrderIdRequest,
     _merchant_id: String,
     _order_id: String,
@@ -27399,9 +27788,15 @@ pub struct OrderUpdatemerchantorderidCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderUpdatemerchantorderidCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderUpdatemerchantorderidCall<'a, S> {}
 
-impl<'a> OrderUpdatemerchantorderidCall<'a> {
+impl<'a, S> OrderUpdatemerchantorderidCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27558,7 +27953,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateMerchantOrderIdRequest) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn request(mut self, new_value: OrdersUpdateMerchantOrderIdRequest) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27568,7 +27963,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -27578,7 +27973,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -27588,7 +27983,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatemerchantorderidCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatemerchantorderidCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27613,7 +28008,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatemerchantorderidCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatemerchantorderidCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27633,9 +28028,9 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatemerchantorderidCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderUpdatemerchantorderidCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27668,7 +28063,7 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27681,10 +28076,10 @@ impl<'a> OrderUpdatemerchantorderidCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdateshipmentCall<'a>
-    where  {
+pub struct OrderUpdateshipmentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: OrdersUpdateShipmentRequest,
     _merchant_id: String,
     _order_id: String,
@@ -27693,9 +28088,15 @@ pub struct OrderUpdateshipmentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrderUpdateshipmentCall<'a> {}
+impl<'a, S> client::CallBuilder for OrderUpdateshipmentCall<'a, S> {}
 
-impl<'a> OrderUpdateshipmentCall<'a> {
+impl<'a, S> OrderUpdateshipmentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27852,7 +28253,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateShipmentRequest) -> OrderUpdateshipmentCall<'a> {
+    pub fn request(mut self, new_value: OrdersUpdateShipmentRequest) -> OrderUpdateshipmentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27862,7 +28263,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -27872,7 +28273,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a, S> {
         self._order_id = new_value.to_string();
         self
     }
@@ -27882,7 +28283,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdateshipmentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdateshipmentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27907,7 +28308,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdateshipmentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdateshipmentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27927,9 +28328,9 @@ impl<'a> OrderUpdateshipmentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdateshipmentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrderUpdateshipmentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27962,7 +28363,7 @@ impl<'a> OrderUpdateshipmentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27976,10 +28377,10 @@ impl<'a> OrderUpdateshipmentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoCustombatchCall<'a>
-    where  {
+pub struct PoCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: PosCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27987,9 +28388,15 @@ pub struct PoCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PoCustombatchCall<'a, S> {}
 
-impl<'a> PoCustombatchCall<'a> {
+impl<'a, S> PoCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28126,14 +28533,14 @@ impl<'a> PoCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PosCustomBatchRequest) -> PoCustombatchCall<'a> {
+    pub fn request(mut self, new_value: PosCustomBatchRequest) -> PoCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> PoCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> PoCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -28143,7 +28550,7 @@ impl<'a> PoCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28168,7 +28575,7 @@ impl<'a> PoCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28188,9 +28595,9 @@ impl<'a> PoCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28222,7 +28629,7 @@ impl<'a> PoCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28231,10 +28638,10 @@ impl<'a> PoCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoDeleteCall<'a>
-    where  {
+pub struct PoDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _target_merchant_id: String,
     _store_code: String,
@@ -28244,9 +28651,15 @@ pub struct PoDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PoDeleteCall<'a, S> {}
 
-impl<'a> PoDeleteCall<'a> {
+impl<'a, S> PoDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28383,7 +28796,7 @@ impl<'a> PoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -28393,7 +28806,7 @@ impl<'a> PoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a> {
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoDeleteCall<'a, S> {
         self._target_merchant_id = new_value.to_string();
         self
     }
@@ -28403,14 +28816,14 @@ impl<'a> PoDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn store_code(mut self, new_value: &str) -> PoDeleteCall<'a> {
+    pub fn store_code(mut self, new_value: &str) -> PoDeleteCall<'a, S> {
         self._store_code = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> PoDeleteCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> PoDeleteCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -28420,7 +28833,7 @@ impl<'a> PoDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28445,7 +28858,7 @@ impl<'a> PoDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28465,9 +28878,9 @@ impl<'a> PoDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28499,7 +28912,7 @@ impl<'a> PoDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28507,10 +28920,10 @@ impl<'a> PoDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoGetCall<'a>
-    where  {
+pub struct PoGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _target_merchant_id: String,
     _store_code: String,
@@ -28519,9 +28932,15 @@ pub struct PoGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PoGetCall<'a, S> {}
 
-impl<'a> PoGetCall<'a> {
+impl<'a, S> PoGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28666,7 +29085,7 @@ impl<'a> PoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> PoGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -28676,7 +29095,7 @@ impl<'a> PoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoGetCall<'a> {
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoGetCall<'a, S> {
         self._target_merchant_id = new_value.to_string();
         self
     }
@@ -28686,7 +29105,7 @@ impl<'a> PoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn store_code(mut self, new_value: &str) -> PoGetCall<'a> {
+    pub fn store_code(mut self, new_value: &str) -> PoGetCall<'a, S> {
         self._store_code = new_value.to_string();
         self
     }
@@ -28696,7 +29115,7 @@ impl<'a> PoGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28721,7 +29140,7 @@ impl<'a> PoGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28741,9 +29160,9 @@ impl<'a> PoGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28776,7 +29195,7 @@ impl<'a> PoGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28790,10 +29209,10 @@ impl<'a> PoGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoInsertCall<'a>
-    where  {
+pub struct PoInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: PosStore,
     _merchant_id: String,
     _target_merchant_id: String,
@@ -28803,9 +29222,15 @@ pub struct PoInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for PoInsertCall<'a, S> {}
 
-impl<'a> PoInsertCall<'a> {
+impl<'a, S> PoInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28965,7 +29390,7 @@ impl<'a> PoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PosStore) -> PoInsertCall<'a> {
+    pub fn request(mut self, new_value: PosStore) -> PoInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -28975,7 +29400,7 @@ impl<'a> PoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoInsertCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> PoInsertCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -28985,14 +29410,14 @@ impl<'a> PoInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoInsertCall<'a> {
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoInsertCall<'a, S> {
         self._target_merchant_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> PoInsertCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> PoInsertCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -29002,7 +29427,7 @@ impl<'a> PoInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29027,7 +29452,7 @@ impl<'a> PoInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29047,9 +29472,9 @@ impl<'a> PoInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29082,7 +29507,7 @@ impl<'a> PoInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29096,10 +29521,10 @@ impl<'a> PoInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoInventoryCall<'a>
-    where  {
+pub struct PoInventoryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: PosInventoryRequest,
     _merchant_id: String,
     _target_merchant_id: String,
@@ -29109,9 +29534,15 @@ pub struct PoInventoryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoInventoryCall<'a> {}
+impl<'a, S> client::CallBuilder for PoInventoryCall<'a, S> {}
 
-impl<'a> PoInventoryCall<'a> {
+impl<'a, S> PoInventoryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29271,7 +29702,7 @@ impl<'a> PoInventoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PosInventoryRequest) -> PoInventoryCall<'a> {
+    pub fn request(mut self, new_value: PosInventoryRequest) -> PoInventoryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29281,7 +29712,7 @@ impl<'a> PoInventoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoInventoryCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> PoInventoryCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -29291,14 +29722,14 @@ impl<'a> PoInventoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoInventoryCall<'a> {
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoInventoryCall<'a, S> {
         self._target_merchant_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> PoInventoryCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> PoInventoryCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -29308,7 +29739,7 @@ impl<'a> PoInventoryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoInventoryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoInventoryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29333,7 +29764,7 @@ impl<'a> PoInventoryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoInventoryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoInventoryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29353,9 +29784,9 @@ impl<'a> PoInventoryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoInventoryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoInventoryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29387,7 +29818,7 @@ impl<'a> PoInventoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29395,10 +29826,10 @@ impl<'a> PoInventoryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoListCall<'a>
-    where  {
+pub struct PoListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _target_merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29406,9 +29837,15 @@ pub struct PoListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoListCall<'a> {}
+impl<'a, S> client::CallBuilder for PoListCall<'a, S> {}
 
-impl<'a> PoListCall<'a> {
+impl<'a, S> PoListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29552,7 +29989,7 @@ impl<'a> PoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> PoListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -29562,7 +29999,7 @@ impl<'a> PoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoListCall<'a> {
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoListCall<'a, S> {
         self._target_merchant_id = new_value.to_string();
         self
     }
@@ -29572,7 +30009,7 @@ impl<'a> PoListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29597,7 +30034,7 @@ impl<'a> PoListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29617,9 +30054,9 @@ impl<'a> PoListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29652,7 +30089,7 @@ impl<'a> PoListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29666,10 +30103,10 @@ impl<'a> PoListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PoSaleCall<'a>
-    where  {
+pub struct PoSaleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: PosSaleRequest,
     _merchant_id: String,
     _target_merchant_id: String,
@@ -29679,9 +30116,15 @@ pub struct PoSaleCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PoSaleCall<'a> {}
+impl<'a, S> client::CallBuilder for PoSaleCall<'a, S> {}
 
-impl<'a> PoSaleCall<'a> {
+impl<'a, S> PoSaleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29841,7 +30284,7 @@ impl<'a> PoSaleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PosSaleRequest) -> PoSaleCall<'a> {
+    pub fn request(mut self, new_value: PosSaleRequest) -> PoSaleCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29851,7 +30294,7 @@ impl<'a> PoSaleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> PoSaleCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> PoSaleCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -29861,14 +30304,14 @@ impl<'a> PoSaleCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target_merchant_id(mut self, new_value: &str) -> PoSaleCall<'a> {
+    pub fn target_merchant_id(mut self, new_value: &str) -> PoSaleCall<'a, S> {
         self._target_merchant_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> PoSaleCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> PoSaleCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -29878,7 +30321,7 @@ impl<'a> PoSaleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoSaleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PoSaleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29903,7 +30346,7 @@ impl<'a> PoSaleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PoSaleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PoSaleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29923,9 +30366,9 @@ impl<'a> PoSaleCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PoSaleCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PoSaleCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29958,7 +30401,7 @@ impl<'a> PoSaleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29972,10 +30415,10 @@ impl<'a> PoSaleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductCustombatchCall<'a>
-    where  {
+pub struct ProductCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: ProductsCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29983,9 +30426,15 @@ pub struct ProductCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductCustombatchCall<'a, S> {}
 
-impl<'a> ProductCustombatchCall<'a> {
+impl<'a, S> ProductCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30122,14 +30571,14 @@ impl<'a> ProductCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ProductsCustomBatchRequest) -> ProductCustombatchCall<'a> {
+    pub fn request(mut self, new_value: ProductsCustomBatchRequest) -> ProductCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> ProductCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> ProductCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -30139,7 +30588,7 @@ impl<'a> ProductCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30164,7 +30613,7 @@ impl<'a> ProductCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30184,9 +30633,9 @@ impl<'a> ProductCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30218,7 +30667,7 @@ impl<'a> ProductCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30227,10 +30676,10 @@ impl<'a> ProductCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductDeleteCall<'a>
-    where  {
+pub struct ProductDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _product_id: String,
     _dry_run: Option<bool>,
@@ -30239,9 +30688,15 @@ pub struct ProductDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductDeleteCall<'a, S> {}
 
-impl<'a> ProductDeleteCall<'a> {
+impl<'a, S> ProductDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30377,7 +30832,7 @@ impl<'a> ProductDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductDeleteCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ProductDeleteCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -30387,14 +30842,14 @@ impl<'a> ProductDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductDeleteCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> ProductDeleteCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> ProductDeleteCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> ProductDeleteCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -30404,7 +30859,7 @@ impl<'a> ProductDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30429,7 +30884,7 @@ impl<'a> ProductDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30449,9 +30904,9 @@ impl<'a> ProductDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30483,7 +30938,7 @@ impl<'a> ProductDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30491,10 +30946,10 @@ impl<'a> ProductDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductGetCall<'a>
-    where  {
+pub struct ProductGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _product_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -30502,9 +30957,15 @@ pub struct ProductGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductGetCall<'a, S> {}
 
-impl<'a> ProductGetCall<'a> {
+impl<'a, S> ProductGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30648,7 +31109,7 @@ impl<'a> ProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ProductGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -30658,7 +31119,7 @@ impl<'a> ProductGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -30668,7 +31129,7 @@ impl<'a> ProductGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30693,7 +31154,7 @@ impl<'a> ProductGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30713,9 +31174,9 @@ impl<'a> ProductGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30748,7 +31209,7 @@ impl<'a> ProductGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30762,10 +31223,10 @@ impl<'a> ProductGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductInsertCall<'a>
-    where  {
+pub struct ProductInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: Product,
     _merchant_id: String,
     _dry_run: Option<bool>,
@@ -30774,9 +31235,15 @@ pub struct ProductInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductInsertCall<'a, S> {}
 
-impl<'a> ProductInsertCall<'a> {
+impl<'a, S> ProductInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30935,7 +31402,7 @@ impl<'a> ProductInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Product) -> ProductInsertCall<'a> {
+    pub fn request(mut self, new_value: Product) -> ProductInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -30945,14 +31412,14 @@ impl<'a> ProductInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductInsertCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ProductInsertCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> ProductInsertCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> ProductInsertCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -30962,7 +31429,7 @@ impl<'a> ProductInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30987,7 +31454,7 @@ impl<'a> ProductInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31007,9 +31474,9 @@ impl<'a> ProductInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31041,7 +31508,7 @@ impl<'a> ProductInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31052,10 +31519,10 @@ impl<'a> ProductInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductListCall<'a>
-    where  {
+pub struct ProductListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -31065,9 +31532,15 @@ pub struct ProductListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductListCall<'a, S> {}
 
-impl<'a> ProductListCall<'a> {
+impl<'a, S> ProductListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31219,28 +31692,28 @@ impl<'a> ProductListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ProductListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProductListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProductListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of products to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ProductListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ProductListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Flag to include the invalid inserted items in the result of the list request. By default the invalid items are not shown (the default value is false).
     ///
     /// Sets the *include invalid inserted items* query property to the given value.
-    pub fn include_invalid_inserted_items(mut self, new_value: bool) -> ProductListCall<'a> {
+    pub fn include_invalid_inserted_items(mut self, new_value: bool) -> ProductListCall<'a, S> {
         self._include_invalid_inserted_items = Some(new_value);
         self
     }
@@ -31250,7 +31723,7 @@ impl<'a> ProductListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31275,7 +31748,7 @@ impl<'a> ProductListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31295,9 +31768,9 @@ impl<'a> ProductListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31330,7 +31803,7 @@ impl<'a> ProductListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -31344,10 +31817,10 @@ impl<'a> ProductListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductstatuseCustombatchCall<'a>
-    where  {
+pub struct ProductstatuseCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: ProductstatusesCustomBatchRequest,
     _include_attributes: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -31355,9 +31828,15 @@ pub struct ProductstatuseCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductstatuseCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductstatuseCustombatchCall<'a, S> {}
 
-impl<'a> ProductstatuseCustombatchCall<'a> {
+impl<'a, S> ProductstatuseCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31494,14 +31973,14 @@ impl<'a> ProductstatuseCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ProductstatusesCustomBatchRequest) -> ProductstatuseCustombatchCall<'a> {
+    pub fn request(mut self, new_value: ProductstatusesCustomBatchRequest) -> ProductstatuseCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to include full product data in the results of this request. The default value is false.
     ///
     /// Sets the *include attributes* query property to the given value.
-    pub fn include_attributes(mut self, new_value: bool) -> ProductstatuseCustombatchCall<'a> {
+    pub fn include_attributes(mut self, new_value: bool) -> ProductstatuseCustombatchCall<'a, S> {
         self._include_attributes = Some(new_value);
         self
     }
@@ -31511,7 +31990,7 @@ impl<'a> ProductstatuseCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductstatuseCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductstatuseCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31536,7 +32015,7 @@ impl<'a> ProductstatuseCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductstatuseCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductstatuseCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31556,9 +32035,9 @@ impl<'a> ProductstatuseCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductstatuseCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductstatuseCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31590,7 +32069,7 @@ impl<'a> ProductstatuseCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31600,10 +32079,10 @@ impl<'a> ProductstatuseCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductstatuseGetCall<'a>
-    where  {
+pub struct ProductstatuseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _product_id: String,
     _include_attributes: Option<bool>,
@@ -31613,9 +32092,15 @@ pub struct ProductstatuseGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductstatuseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductstatuseGetCall<'a, S> {}
 
-impl<'a> ProductstatuseGetCall<'a> {
+impl<'a, S> ProductstatuseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31767,7 +32252,7 @@ impl<'a> ProductstatuseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductstatuseGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ProductstatuseGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -31777,14 +32262,14 @@ impl<'a> ProductstatuseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> ProductstatuseGetCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> ProductstatuseGetCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
     /// Flag to include full product data in the result of this get request. The default value is false.
     ///
     /// Sets the *include attributes* query property to the given value.
-    pub fn include_attributes(mut self, new_value: bool) -> ProductstatuseGetCall<'a> {
+    pub fn include_attributes(mut self, new_value: bool) -> ProductstatuseGetCall<'a, S> {
         self._include_attributes = Some(new_value);
         self
     }
@@ -31792,7 +32277,7 @@ impl<'a> ProductstatuseGetCall<'a> {
     ///
     /// Append the given value to the *destinations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_destinations(mut self, new_value: &str) -> ProductstatuseGetCall<'a> {
+    pub fn add_destinations(mut self, new_value: &str) -> ProductstatuseGetCall<'a, S> {
         self._destinations.push(new_value.to_string());
         self
     }
@@ -31802,7 +32287,7 @@ impl<'a> ProductstatuseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductstatuseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductstatuseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31827,7 +32312,7 @@ impl<'a> ProductstatuseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductstatuseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductstatuseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31847,9 +32332,9 @@ impl<'a> ProductstatuseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductstatuseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductstatuseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31881,7 +32366,7 @@ impl<'a> ProductstatuseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31894,10 +32379,10 @@ impl<'a> ProductstatuseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProductstatuseListCall<'a>
-    where  {
+pub struct ProductstatuseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -31909,9 +32394,15 @@ pub struct ProductstatuseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProductstatuseListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProductstatuseListCall<'a, S> {}
 
-impl<'a> ProductstatuseListCall<'a> {
+impl<'a, S> ProductstatuseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32071,35 +32562,35 @@ impl<'a> ProductstatuseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ProductstatuseListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ProductstatuseListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProductstatuseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProductstatuseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of product statuses to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ProductstatuseListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ProductstatuseListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Flag to include the invalid inserted items in the result of the list request. By default the invalid items are not shown (the default value is false).
     ///
     /// Sets the *include invalid inserted items* query property to the given value.
-    pub fn include_invalid_inserted_items(mut self, new_value: bool) -> ProductstatuseListCall<'a> {
+    pub fn include_invalid_inserted_items(mut self, new_value: bool) -> ProductstatuseListCall<'a, S> {
         self._include_invalid_inserted_items = Some(new_value);
         self
     }
     /// Flag to include full product data in the results of the list request. The default value is false.
     ///
     /// Sets the *include attributes* query property to the given value.
-    pub fn include_attributes(mut self, new_value: bool) -> ProductstatuseListCall<'a> {
+    pub fn include_attributes(mut self, new_value: bool) -> ProductstatuseListCall<'a, S> {
         self._include_attributes = Some(new_value);
         self
     }
@@ -32107,7 +32598,7 @@ impl<'a> ProductstatuseListCall<'a> {
     ///
     /// Append the given value to the *destinations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_destinations(mut self, new_value: &str) -> ProductstatuseListCall<'a> {
+    pub fn add_destinations(mut self, new_value: &str) -> ProductstatuseListCall<'a, S> {
         self._destinations.push(new_value.to_string());
         self
     }
@@ -32117,7 +32608,7 @@ impl<'a> ProductstatuseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductstatuseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProductstatuseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32142,7 +32633,7 @@ impl<'a> ProductstatuseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProductstatuseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProductstatuseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32162,9 +32653,9 @@ impl<'a> ProductstatuseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProductstatuseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProductstatuseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32197,7 +32688,7 @@ impl<'a> ProductstatuseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -32211,10 +32702,10 @@ impl<'a> ProductstatuseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingCustombatchCall<'a>
-    where  {
+pub struct ShippingsettingCustombatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: ShippingsettingsCustomBatchRequest,
     _dry_run: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -32222,9 +32713,15 @@ pub struct ShippingsettingCustombatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingCustombatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingCustombatchCall<'a, S> {}
 
-impl<'a> ShippingsettingCustombatchCall<'a> {
+impl<'a, S> ShippingsettingCustombatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32361,14 +32858,14 @@ impl<'a> ShippingsettingCustombatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShippingsettingsCustomBatchRequest) -> ShippingsettingCustombatchCall<'a> {
+    pub fn request(mut self, new_value: ShippingsettingsCustomBatchRequest) -> ShippingsettingCustombatchCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> ShippingsettingCustombatchCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> ShippingsettingCustombatchCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -32378,7 +32875,7 @@ impl<'a> ShippingsettingCustombatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingCustombatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingCustombatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32403,7 +32900,7 @@ impl<'a> ShippingsettingCustombatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingCustombatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingCustombatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32423,9 +32920,9 @@ impl<'a> ShippingsettingCustombatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingCustombatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingCustombatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32457,7 +32954,7 @@ impl<'a> ShippingsettingCustombatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32465,10 +32962,10 @@ impl<'a> ShippingsettingCustombatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingGetCall<'a>
-    where  {
+pub struct ShippingsettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -32476,9 +32973,15 @@ pub struct ShippingsettingGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingGetCall<'a, S> {}
 
-impl<'a> ShippingsettingGetCall<'a> {
+impl<'a, S> ShippingsettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32622,7 +33125,7 @@ impl<'a> ShippingsettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -32632,7 +33135,7 @@ impl<'a> ShippingsettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> ShippingsettingGetCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> ShippingsettingGetCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -32642,7 +33145,7 @@ impl<'a> ShippingsettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32667,7 +33170,7 @@ impl<'a> ShippingsettingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32687,9 +33190,9 @@ impl<'a> ShippingsettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32721,7 +33224,7 @@ impl<'a> ShippingsettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32729,19 +33232,25 @@ impl<'a> ShippingsettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingGetsupportedcarrierCall<'a>
-    where  {
+pub struct ShippingsettingGetsupportedcarrierCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingGetsupportedcarrierCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingGetsupportedcarrierCall<'a, S> {}
 
-impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
+impl<'a, S> ShippingsettingGetsupportedcarrierCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32884,7 +33393,7 @@ impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedcarrierCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedcarrierCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -32894,7 +33403,7 @@ impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetsupportedcarrierCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetsupportedcarrierCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32919,7 +33428,7 @@ impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedcarrierCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedcarrierCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32939,9 +33448,9 @@ impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingGetsupportedcarrierCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingGetsupportedcarrierCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32973,7 +33482,7 @@ impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32981,19 +33490,25 @@ impl<'a> ShippingsettingGetsupportedcarrierCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingGetsupportedholidayCall<'a>
-    where  {
+pub struct ShippingsettingGetsupportedholidayCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingGetsupportedholidayCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingGetsupportedholidayCall<'a, S> {}
 
-impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
+impl<'a, S> ShippingsettingGetsupportedholidayCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33136,7 +33651,7 @@ impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedholidayCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedholidayCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -33146,7 +33661,7 @@ impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetsupportedholidayCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetsupportedholidayCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33171,7 +33686,7 @@ impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedholidayCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedholidayCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33191,9 +33706,9 @@ impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingGetsupportedholidayCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingGetsupportedholidayCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33225,7 +33740,7 @@ impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33233,19 +33748,25 @@ impl<'a> ShippingsettingGetsupportedholidayCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingGetsupportedpickupserviceCall<'a>
-    where  {
+pub struct ShippingsettingGetsupportedpickupserviceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingGetsupportedpickupserviceCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingGetsupportedpickupserviceCall<'a, S> {}
 
-impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
+impl<'a, S> ShippingsettingGetsupportedpickupserviceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33388,7 +33909,7 @@ impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedpickupserviceCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingGetsupportedpickupserviceCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -33398,7 +33919,7 @@ impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetsupportedpickupserviceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingGetsupportedpickupserviceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33423,7 +33944,7 @@ impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedpickupserviceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingGetsupportedpickupserviceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33443,9 +33964,9 @@ impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingGetsupportedpickupserviceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingGetsupportedpickupserviceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33477,7 +33998,7 @@ impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33487,10 +34008,10 @@ impl<'a> ShippingsettingGetsupportedpickupserviceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingListCall<'a>
-    where  {
+pub struct ShippingsettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _merchant_id: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -33499,9 +34020,15 @@ pub struct ShippingsettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingListCall<'a, S> {}
 
-impl<'a> ShippingsettingListCall<'a> {
+impl<'a, S> ShippingsettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33650,21 +34177,21 @@ impl<'a> ShippingsettingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingListCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingListCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ShippingsettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ShippingsettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of shipping settings to return in the response, used for paging.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ShippingsettingListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ShippingsettingListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -33674,7 +34201,7 @@ impl<'a> ShippingsettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33699,7 +34226,7 @@ impl<'a> ShippingsettingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33719,9 +34246,9 @@ impl<'a> ShippingsettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33754,7 +34281,7 @@ impl<'a> ShippingsettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ShoppingContent::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -33768,10 +34295,10 @@ impl<'a> ShippingsettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShippingsettingUpdateCall<'a>
-    where  {
+pub struct ShippingsettingUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ShoppingContent<>,
+    hub: &'a ShoppingContent<S>,
     _request: ShippingSettings,
     _merchant_id: String,
     _account_id: String,
@@ -33781,9 +34308,15 @@ pub struct ShippingsettingUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ShippingsettingUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ShippingsettingUpdateCall<'a, S> {}
 
-impl<'a> ShippingsettingUpdateCall<'a> {
+impl<'a, S> ShippingsettingUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33943,7 +34476,7 @@ impl<'a> ShippingsettingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShippingSettings) -> ShippingsettingUpdateCall<'a> {
+    pub fn request(mut self, new_value: ShippingSettings) -> ShippingsettingUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -33953,7 +34486,7 @@ impl<'a> ShippingsettingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingUpdateCall<'a> {
+    pub fn merchant_id(mut self, new_value: &str) -> ShippingsettingUpdateCall<'a, S> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -33963,14 +34496,14 @@ impl<'a> ShippingsettingUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> ShippingsettingUpdateCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> ShippingsettingUpdateCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
     /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: bool) -> ShippingsettingUpdateCall<'a> {
+    pub fn dry_run(mut self, new_value: bool) -> ShippingsettingUpdateCall<'a, S> {
         self._dry_run = Some(new_value);
         self
     }
@@ -33980,7 +34513,7 @@ impl<'a> ShippingsettingUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShippingsettingUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34005,7 +34538,7 @@ impl<'a> ShippingsettingUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ShippingsettingUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34025,9 +34558,9 @@ impl<'a> ShippingsettingUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShippingsettingUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ShippingsettingUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -91,7 +96,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -123,37 +128,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Resourceviews<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Resourceviews<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Resourceviews<> {}
+impl<'a, S> client::Hub for Resourceviews<S> {}
 
-impl<'a, > Resourceviews<> {
+impl<'a, S> Resourceviews<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Resourceviews<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Resourceviews<S> {
         Resourceviews {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/resourceviews/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, S> {
         ZoneOperationMethods { hub: &self }
     }
-    pub fn zone_views(&'a self) -> ZoneViewMethods<'a> {
+    pub fn zone_views(&'a self) -> ZoneViewMethods<'a, S> {
         ZoneViewMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -595,22 +600,22 @@ impl client::Part for OperationWarningsData {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a>
-    where  {
+pub struct ZoneOperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
 }
 
-impl<'a> client::MethodsBuilder for ZoneOperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ZoneOperationMethods<'a, S> {}
 
-impl<'a> ZoneOperationMethods<'a> {
+impl<'a, S> ZoneOperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -621,7 +626,7 @@ impl<'a> ZoneOperationMethods<'a> {
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
     /// * `operation` - Name of the operation resource to return.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, S> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -641,7 +646,7 @@ impl<'a> ZoneOperationMethods<'a> {
     ///
     /// * `project` - Name of the project scoping this request.
     /// * `zone` - Name of the zone scoping this request.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, S> {
         ZoneOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -679,22 +684,22 @@ impl<'a> ZoneOperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_resources(...)`, `delete(...)`, `get(...)`, `get_service(...)`, `insert(...)`, `list(...)`, `list_resources(...)`, `remove_resources(...)` and `set_service(...)`
 /// // to build up your call.
 /// let rb = hub.zone_views();
 /// # }
 /// ```
-pub struct ZoneViewMethods<'a>
-    where  {
+pub struct ZoneViewMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
 }
 
-impl<'a> client::MethodsBuilder for ZoneViewMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ZoneViewMethods<'a, S> {}
 
-impl<'a> ZoneViewMethods<'a> {
+impl<'a, S> ZoneViewMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -706,7 +711,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn add_resources(&self, request: ZoneViewsAddResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewAddResourceCall<'a> {
+    pub fn add_resources(&self, request: ZoneViewsAddResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewAddResourceCall<'a, S> {
         ZoneViewAddResourceCall {
             hub: self.hub,
             _request: request,
@@ -728,7 +733,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn delete(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewDeleteCall<'a> {
+    pub fn delete(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewDeleteCall<'a, S> {
         ZoneViewDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -749,7 +754,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn get(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetCall<'a> {
+    pub fn get(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetCall<'a, S> {
         ZoneViewGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -770,7 +775,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn get_service(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetServiceCall<'a> {
+    pub fn get_service(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetServiceCall<'a, S> {
         ZoneViewGetServiceCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -792,7 +797,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `request` - No description provided.
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
-    pub fn insert(&self, request: ResourceView, project: &str, zone: &str) -> ZoneViewInsertCall<'a> {
+    pub fn insert(&self, request: ResourceView, project: &str, zone: &str) -> ZoneViewInsertCall<'a, S> {
         ZoneViewInsertCall {
             hub: self.hub,
             _request: request,
@@ -812,7 +817,7 @@ impl<'a> ZoneViewMethods<'a> {
     ///
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneViewListCall<'a> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneViewListCall<'a, S> {
         ZoneViewListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -834,7 +839,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn list_resources(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn list_resources(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewListResourceCall<'a, S> {
         ZoneViewListResourceCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -861,7 +866,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn remove_resources(&self, request: ZoneViewsRemoveResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewRemoveResourceCall<'a> {
+    pub fn remove_resources(&self, request: ZoneViewsRemoveResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewRemoveResourceCall<'a, S> {
         ZoneViewRemoveResourceCall {
             hub: self.hub,
             _request: request,
@@ -884,7 +889,7 @@ impl<'a> ZoneViewMethods<'a> {
     /// * `project` - The project name of the resource view.
     /// * `zone` - The zone name of the resource view.
     /// * `resourceView` - The name of the resource view.
-    pub fn set_service(&self, request: ZoneViewsSetServiceRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewSetServiceCall<'a> {
+    pub fn set_service(&self, request: ZoneViewsSetServiceRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewSetServiceCall<'a, S> {
         ZoneViewSetServiceCall {
             hub: self.hub,
             _request: request,
@@ -928,7 +933,7 @@ impl<'a> ZoneViewMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -936,10 +941,10 @@ impl<'a> ZoneViewMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a>
-    where  {
+pub struct ZoneOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -948,9 +953,15 @@ pub struct ZoneOperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneOperationGetCall<'a, S> {}
 
-impl<'a> ZoneOperationGetCall<'a> {
+impl<'a, S> ZoneOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1095,7 +1106,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1105,7 +1116,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -1115,7 +1126,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, S> {
         self._operation = new_value.to_string();
         self
     }
@@ -1125,7 +1136,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1146,7 +1157,7 @@ impl<'a> ZoneOperationGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1166,9 +1177,9 @@ impl<'a> ZoneOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1200,7 +1211,7 @@ impl<'a> ZoneOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1211,10 +1222,10 @@ impl<'a> ZoneOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationListCall<'a>
-    where  {
+pub struct ZoneOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -1225,9 +1236,15 @@ pub struct ZoneOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneOperationListCall<'a, S> {}
 
-impl<'a> ZoneOperationListCall<'a> {
+impl<'a, S> ZoneOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1380,7 +1397,7 @@ impl<'a> ZoneOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1390,28 +1407,28 @@ impl<'a> ZoneOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Optional. Filter expression for filtering listed resources.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1421,7 +1438,7 @@ impl<'a> ZoneOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1442,7 +1459,7 @@ impl<'a> ZoneOperationListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1462,9 +1479,9 @@ impl<'a> ZoneOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1497,7 +1514,7 @@ impl<'a> ZoneOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1510,10 +1527,10 @@ impl<'a> ZoneOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewAddResourceCall<'a>
-    where  {
+pub struct ZoneViewAddResourceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _request: ZoneViewsAddResourcesRequest,
     _project: String,
     _zone: String,
@@ -1523,9 +1540,15 @@ pub struct ZoneViewAddResourceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewAddResourceCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewAddResourceCall<'a, S> {}
 
-impl<'a> ZoneViewAddResourceCall<'a> {
+impl<'a, S> ZoneViewAddResourceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1683,7 +1706,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ZoneViewsAddResourcesRequest) -> ZoneViewAddResourceCall<'a> {
+    pub fn request(mut self, new_value: ZoneViewsAddResourcesRequest) -> ZoneViewAddResourceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1693,7 +1716,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1703,7 +1726,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -1713,7 +1736,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -1723,7 +1746,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewAddResourceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewAddResourceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1744,7 +1767,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewAddResourceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewAddResourceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1764,9 +1787,9 @@ impl<'a> ZoneViewAddResourceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewAddResourceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewAddResourceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1798,7 +1821,7 @@ impl<'a> ZoneViewAddResourceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1806,10 +1829,10 @@ impl<'a> ZoneViewAddResourceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewDeleteCall<'a>
-    where  {
+pub struct ZoneViewDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -1818,9 +1841,15 @@ pub struct ZoneViewDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewDeleteCall<'a, S> {}
 
-impl<'a> ZoneViewDeleteCall<'a> {
+impl<'a, S> ZoneViewDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1965,7 +1994,7 @@ impl<'a> ZoneViewDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1975,7 +2004,7 @@ impl<'a> ZoneViewDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewDeleteCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -1985,7 +2014,7 @@ impl<'a> ZoneViewDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewDeleteCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -1995,7 +2024,7 @@ impl<'a> ZoneViewDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2016,7 +2045,7 @@ impl<'a> ZoneViewDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2036,9 +2065,9 @@ impl<'a> ZoneViewDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2070,7 +2099,7 @@ impl<'a> ZoneViewDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2078,10 +2107,10 @@ impl<'a> ZoneViewDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewGetCall<'a>
-    where  {
+pub struct ZoneViewGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -2090,9 +2119,15 @@ pub struct ZoneViewGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewGetCall<'a, S> {}
 
-impl<'a> ZoneViewGetCall<'a> {
+impl<'a, S> ZoneViewGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2237,7 +2272,7 @@ impl<'a> ZoneViewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewGetCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewGetCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2247,7 +2282,7 @@ impl<'a> ZoneViewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewGetCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewGetCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -2257,7 +2292,7 @@ impl<'a> ZoneViewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -2267,7 +2302,7 @@ impl<'a> ZoneViewGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2288,7 +2323,7 @@ impl<'a> ZoneViewGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2308,9 +2343,9 @@ impl<'a> ZoneViewGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2342,7 +2377,7 @@ impl<'a> ZoneViewGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2351,10 +2386,10 @@ impl<'a> ZoneViewGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewGetServiceCall<'a>
-    where  {
+pub struct ZoneViewGetServiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -2364,9 +2399,15 @@ pub struct ZoneViewGetServiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewGetServiceCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewGetServiceCall<'a, S> {}
 
-impl<'a> ZoneViewGetServiceCall<'a> {
+impl<'a, S> ZoneViewGetServiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2514,7 +2555,7 @@ impl<'a> ZoneViewGetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2524,7 +2565,7 @@ impl<'a> ZoneViewGetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -2534,14 +2575,14 @@ impl<'a> ZoneViewGetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
     /// The name of the resource if user wants to get the service information of the resource.
     ///
     /// Sets the *resource name* query property to the given value.
-    pub fn resource_name(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, S> {
         self._resource_name = Some(new_value.to_string());
         self
     }
@@ -2551,7 +2592,7 @@ impl<'a> ZoneViewGetServiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewGetServiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewGetServiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2572,7 +2613,7 @@ impl<'a> ZoneViewGetServiceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetServiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewGetServiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2592,9 +2633,9 @@ impl<'a> ZoneViewGetServiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewGetServiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewGetServiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2627,7 +2668,7 @@ impl<'a> ZoneViewGetServiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2640,10 +2681,10 @@ impl<'a> ZoneViewGetServiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewInsertCall<'a>
-    where  {
+pub struct ZoneViewInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _request: ResourceView,
     _project: String,
     _zone: String,
@@ -2652,9 +2693,15 @@ pub struct ZoneViewInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewInsertCall<'a, S> {}
 
-impl<'a> ZoneViewInsertCall<'a> {
+impl<'a, S> ZoneViewInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2811,7 +2858,7 @@ impl<'a> ZoneViewInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResourceView) -> ZoneViewInsertCall<'a> {
+    pub fn request(mut self, new_value: ResourceView) -> ZoneViewInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2821,7 +2868,7 @@ impl<'a> ZoneViewInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewInsertCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewInsertCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2831,7 +2878,7 @@ impl<'a> ZoneViewInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewInsertCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewInsertCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -2841,7 +2888,7 @@ impl<'a> ZoneViewInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2862,7 +2909,7 @@ impl<'a> ZoneViewInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2882,9 +2929,9 @@ impl<'a> ZoneViewInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2916,7 +2963,7 @@ impl<'a> ZoneViewInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2926,10 +2973,10 @@ impl<'a> ZoneViewInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewListCall<'a>
-    where  {
+pub struct ZoneViewListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -2939,9 +2986,15 @@ pub struct ZoneViewListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewListCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewListCall<'a, S> {}
 
-impl<'a> ZoneViewListCall<'a> {
+impl<'a, S> ZoneViewListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3091,7 +3144,7 @@ impl<'a> ZoneViewListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3101,21 +3154,21 @@ impl<'a> ZoneViewListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewListCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewListCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ZoneViewListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneViewListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ZoneViewListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> ZoneViewListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -3125,7 +3178,7 @@ impl<'a> ZoneViewListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3146,7 +3199,7 @@ impl<'a> ZoneViewListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3166,9 +3219,9 @@ impl<'a> ZoneViewListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3200,7 +3253,7 @@ impl<'a> ZoneViewListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3213,10 +3266,10 @@ impl<'a> ZoneViewListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewListResourceCall<'a>
-    where  {
+pub struct ZoneViewListResourceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _project: String,
     _zone: String,
     _resource_view: String,
@@ -3230,9 +3283,15 @@ pub struct ZoneViewListResourceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewListResourceCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewListResourceCall<'a, S> {}
 
-impl<'a> ZoneViewListResourceCall<'a> {
+impl<'a, S> ZoneViewListResourceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3392,7 +3451,7 @@ impl<'a> ZoneViewListResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3402,7 +3461,7 @@ impl<'a> ZoneViewListResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -3412,42 +3471,42 @@ impl<'a> ZoneViewListResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
     /// The service name to return in the response. It is optional and if it is not set, all the service end points will be returned.
     ///
     /// Sets the *service name* query property to the given value.
-    pub fn service_name(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn service_name(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._service_name = Some(new_value.to_string());
         self
     }
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ZoneViewListResourceCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> ZoneViewListResourceCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The state of the instance to list. By default, it lists all instances.
     ///
     /// Sets the *list state* query property to the given value.
-    pub fn list_state(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn list_state(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._list_state = Some(new_value.to_string());
         self
     }
     /// The requested format of the return value. It can be URL or URL_PORT. A JSON object will be included in the response based on the format. The default format is NONE, which results in no JSON in the response.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> ZoneViewListResourceCall<'a> {
+    pub fn format(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, S> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -3457,7 +3516,7 @@ impl<'a> ZoneViewListResourceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewListResourceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewListResourceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3478,7 +3537,7 @@ impl<'a> ZoneViewListResourceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListResourceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewListResourceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3498,9 +3557,9 @@ impl<'a> ZoneViewListResourceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewListResourceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewListResourceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3533,7 +3592,7 @@ impl<'a> ZoneViewListResourceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3546,10 +3605,10 @@ impl<'a> ZoneViewListResourceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewRemoveResourceCall<'a>
-    where  {
+pub struct ZoneViewRemoveResourceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _request: ZoneViewsRemoveResourcesRequest,
     _project: String,
     _zone: String,
@@ -3559,9 +3618,15 @@ pub struct ZoneViewRemoveResourceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewRemoveResourceCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewRemoveResourceCall<'a, S> {}
 
-impl<'a> ZoneViewRemoveResourceCall<'a> {
+impl<'a, S> ZoneViewRemoveResourceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3719,7 +3784,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ZoneViewsRemoveResourcesRequest) -> ZoneViewRemoveResourceCall<'a> {
+    pub fn request(mut self, new_value: ZoneViewsRemoveResourcesRequest) -> ZoneViewRemoveResourceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3729,7 +3794,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -3739,7 +3804,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -3749,7 +3814,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -3759,7 +3824,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewRemoveResourceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewRemoveResourceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3780,7 +3845,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewRemoveResourceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewRemoveResourceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3800,9 +3865,9 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewRemoveResourceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewRemoveResourceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3835,7 +3900,7 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Resourceviews::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3848,10 +3913,10 @@ impl<'a> ZoneViewRemoveResourceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneViewSetServiceCall<'a>
-    where  {
+pub struct ZoneViewSetServiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Resourceviews<>,
+    hub: &'a Resourceviews<S>,
     _request: ZoneViewsSetServiceRequest,
     _project: String,
     _zone: String,
@@ -3861,9 +3926,15 @@ pub struct ZoneViewSetServiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ZoneViewSetServiceCall<'a> {}
+impl<'a, S> client::CallBuilder for ZoneViewSetServiceCall<'a, S> {}
 
-impl<'a> ZoneViewSetServiceCall<'a> {
+impl<'a, S> ZoneViewSetServiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4021,7 +4092,7 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ZoneViewsSetServiceRequest) -> ZoneViewSetServiceCall<'a> {
+    pub fn request(mut self, new_value: ZoneViewsSetServiceRequest) -> ZoneViewSetServiceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4031,7 +4102,7 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -4041,7 +4112,7 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a> {
+    pub fn zone(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, S> {
         self._zone = new_value.to_string();
         self
     }
@@ -4051,7 +4122,7 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_view(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a> {
+    pub fn resource_view(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, S> {
         self._resource_view = new_value.to_string();
         self
     }
@@ -4061,7 +4132,7 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewSetServiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneViewSetServiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4082,7 +4153,7 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewSetServiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneViewSetServiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4102,9 +4173,9 @@ impl<'a> ZoneViewSetServiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneViewSetServiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ZoneViewSetServiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

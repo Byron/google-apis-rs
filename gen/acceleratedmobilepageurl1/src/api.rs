@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -81,34 +86,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Acceleratedmobilepageurl<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Acceleratedmobilepageurl<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Acceleratedmobilepageurl<> {}
+impl<'a, S> client::Hub for Acceleratedmobilepageurl<S> {}
 
-impl<'a, > Acceleratedmobilepageurl<> {
+impl<'a, S> Acceleratedmobilepageurl<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Acceleratedmobilepageurl<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Acceleratedmobilepageurl<S> {
         Acceleratedmobilepageurl {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://acceleratedmobilepageurl.googleapis.com/".to_string(),
             _root_url: "https://acceleratedmobilepageurl.googleapis.com/".to_string(),
         }
     }
 
-    pub fn amp_urls(&'a self) -> AmpUrlMethods<'a> {
+    pub fn amp_urls(&'a self) -> AmpUrlMethods<'a, S> {
         AmpUrlMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -250,22 +255,22 @@ impl client::ResponseResult for BatchGetAmpUrlsResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_get(...)`
 /// // to build up your call.
 /// let rb = hub.amp_urls();
 /// # }
 /// ```
-pub struct AmpUrlMethods<'a>
-    where  {
+pub struct AmpUrlMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Acceleratedmobilepageurl<>,
+    hub: &'a Acceleratedmobilepageurl<S>,
 }
 
-impl<'a> client::MethodsBuilder for AmpUrlMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AmpUrlMethods<'a, S> {}
 
-impl<'a> AmpUrlMethods<'a> {
+impl<'a, S> AmpUrlMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -274,7 +279,7 @@ impl<'a> AmpUrlMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_get(&self, request: BatchGetAmpUrlsRequest) -> AmpUrlBatchGetCall<'a> {
+    pub fn batch_get(&self, request: BatchGetAmpUrlsRequest) -> AmpUrlBatchGetCall<'a, S> {
         AmpUrlBatchGetCall {
             hub: self.hub,
             _request: request,
@@ -315,7 +320,7 @@ impl<'a> AmpUrlMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Acceleratedmobilepageurl::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -328,18 +333,24 @@ impl<'a> AmpUrlMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AmpUrlBatchGetCall<'a>
-    where  {
+pub struct AmpUrlBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Acceleratedmobilepageurl<>,
+    hub: &'a Acceleratedmobilepageurl<S>,
     _request: BatchGetAmpUrlsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for AmpUrlBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AmpUrlBatchGetCall<'a, S> {}
 
-impl<'a> AmpUrlBatchGetCall<'a> {
+impl<'a, S> AmpUrlBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -467,7 +478,7 @@ impl<'a> AmpUrlBatchGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchGetAmpUrlsRequest) -> AmpUrlBatchGetCall<'a> {
+    pub fn request(mut self, new_value: BatchGetAmpUrlsRequest) -> AmpUrlBatchGetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -477,7 +488,7 @@ impl<'a> AmpUrlBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AmpUrlBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AmpUrlBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -502,7 +513,7 @@ impl<'a> AmpUrlBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AmpUrlBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AmpUrlBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

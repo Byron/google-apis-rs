@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,34 +109,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<> {}
+impl<'a, S> client::Hub for ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S> {}
 
-impl<'a, > ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<> {
+impl<'a, S> ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S> {
         ManagedServiceForMicrosoftActiveDirectoryConsumerAPI {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://managedidentities.googleapis.com/".to_string(),
             _root_url: "https://managedidentities.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -945,22 +950,22 @@ impl client::RequestValue for ValidateTrustRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_get(...)`, `locations_global_domains_attach_trust(...)`, `locations_global_domains_backups_create(...)`, `locations_global_domains_backups_delete(...)`, `locations_global_domains_backups_get(...)`, `locations_global_domains_backups_get_iam_policy(...)`, `locations_global_domains_backups_list(...)`, `locations_global_domains_backups_patch(...)`, `locations_global_domains_backups_set_iam_policy(...)`, `locations_global_domains_backups_test_iam_permissions(...)`, `locations_global_domains_create(...)`, `locations_global_domains_delete(...)`, `locations_global_domains_detach_trust(...)`, `locations_global_domains_get(...)`, `locations_global_domains_get_iam_policy(...)`, `locations_global_domains_get_ldapssettings(...)`, `locations_global_domains_list(...)`, `locations_global_domains_patch(...)`, `locations_global_domains_reconfigure_trust(...)`, `locations_global_domains_reset_admin_password(...)`, `locations_global_domains_restore(...)`, `locations_global_domains_set_iam_policy(...)`, `locations_global_domains_sql_integrations_get(...)`, `locations_global_domains_sql_integrations_list(...)`, `locations_global_domains_test_iam_permissions(...)`, `locations_global_domains_update_ldapssettings(...)`, `locations_global_domains_validate_trust(...)`, `locations_global_operations_cancel(...)`, `locations_global_operations_delete(...)`, `locations_global_operations_get(...)`, `locations_global_operations_list(...)`, `locations_global_peerings_create(...)`, `locations_global_peerings_delete(...)`, `locations_global_peerings_get(...)`, `locations_global_peerings_get_iam_policy(...)`, `locations_global_peerings_list(...)`, `locations_global_peerings_patch(...)`, `locations_global_peerings_set_iam_policy(...)`, `locations_global_peerings_test_iam_permissions(...)` and `locations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -970,7 +975,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_backups_create(&self, request: Backup, parent: &str) -> ProjectLocationGlobalDomainBackupCreateCall<'a> {
+    pub fn locations_global_domains_backups_create(&self, request: Backup, parent: &str) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S> {
         ProjectLocationGlobalDomainBackupCreateCall {
             hub: self.hub,
             _request: request,
@@ -989,7 +994,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The backup resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}/backups/{backup_id}`
-    pub fn locations_global_domains_backups_delete(&self, name: &str) -> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
+    pub fn locations_global_domains_backups_delete(&self, name: &str) -> ProjectLocationGlobalDomainBackupDeleteCall<'a, S> {
         ProjectLocationGlobalDomainBackupDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1006,7 +1011,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The backup resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}/backups/{backup_id}`
-    pub fn locations_global_domains_backups_get(&self, name: &str) -> ProjectLocationGlobalDomainBackupGetCall<'a> {
+    pub fn locations_global_domains_backups_get(&self, name: &str) -> ProjectLocationGlobalDomainBackupGetCall<'a, S> {
         ProjectLocationGlobalDomainBackupGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1023,7 +1028,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_domains_backups_get_iam_policy(&self, resource: &str) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
+    pub fn locations_global_domains_backups_get_iam_policy(&self, resource: &str) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S> {
         ProjectLocationGlobalDomainBackupGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1041,7 +1046,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_backups_list(&self, parent: &str) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn locations_global_domains_backups_list(&self, parent: &str) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         ProjectLocationGlobalDomainBackupListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1063,7 +1068,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The unique name of the Backup in the form of `projects/{project_id}/locations/global/domains/{domain_name}/backups/{name}`
-    pub fn locations_global_domains_backups_patch(&self, request: Backup, name: &str) -> ProjectLocationGlobalDomainBackupPatchCall<'a> {
+    pub fn locations_global_domains_backups_patch(&self, request: Backup, name: &str) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S> {
         ProjectLocationGlobalDomainBackupPatchCall {
             hub: self.hub,
             _request: request,
@@ -1083,7 +1088,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_domains_backups_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
+    pub fn locations_global_domains_backups_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S> {
         ProjectLocationGlobalDomainBackupSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1102,7 +1107,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_domains_backups_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
+    pub fn locations_global_domains_backups_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S> {
         ProjectLocationGlobalDomainBackupTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1120,7 +1125,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. SQLIntegration resource name using the form: `projects/{project_id}/locations/global/domains/{domain}/sqlIntegrations/{name}`
-    pub fn locations_global_domains_sql_integrations_get(&self, name: &str) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
+    pub fn locations_global_domains_sql_integrations_get(&self, name: &str) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S> {
         ProjectLocationGlobalDomainSqlIntegrationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1137,7 +1142,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the SqlIntegrations using the form: `projects/{project_id}/locations/global/domains/*`
-    pub fn locations_global_domains_sql_integrations_list(&self, parent: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn locations_global_domains_sql_integrations_list(&self, parent: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         ProjectLocationGlobalDomainSqlIntegrationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1159,7 +1164,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource domain name, project name and location using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_attach_trust(&self, request: AttachTrustRequest, name: &str) -> ProjectLocationGlobalDomainAttachTrustCall<'a> {
+    pub fn locations_global_domains_attach_trust(&self, request: AttachTrustRequest, name: &str) -> ProjectLocationGlobalDomainAttachTrustCall<'a, S> {
         ProjectLocationGlobalDomainAttachTrustCall {
             hub: self.hub,
             _request: request,
@@ -1178,7 +1183,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource project name and location using the form: `projects/{project_id}/locations/global`
-    pub fn locations_global_domains_create(&self, request: Domain, parent: &str) -> ProjectLocationGlobalDomainCreateCall<'a> {
+    pub fn locations_global_domains_create(&self, request: Domain, parent: &str) -> ProjectLocationGlobalDomainCreateCall<'a, S> {
         ProjectLocationGlobalDomainCreateCall {
             hub: self.hub,
             _request: request,
@@ -1197,7 +1202,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_delete(&self, name: &str) -> ProjectLocationGlobalDomainDeleteCall<'a> {
+    pub fn locations_global_domains_delete(&self, name: &str) -> ProjectLocationGlobalDomainDeleteCall<'a, S> {
         ProjectLocationGlobalDomainDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1215,7 +1220,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource domain name, project name, and location using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_detach_trust(&self, request: DetachTrustRequest, name: &str) -> ProjectLocationGlobalDomainDetachTrustCall<'a> {
+    pub fn locations_global_domains_detach_trust(&self, request: DetachTrustRequest, name: &str) -> ProjectLocationGlobalDomainDetachTrustCall<'a, S> {
         ProjectLocationGlobalDomainDetachTrustCall {
             hub: self.hub,
             _request: request,
@@ -1233,7 +1238,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_get(&self, name: &str) -> ProjectLocationGlobalDomainGetCall<'a> {
+    pub fn locations_global_domains_get(&self, name: &str) -> ProjectLocationGlobalDomainGetCall<'a, S> {
         ProjectLocationGlobalDomainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1250,7 +1255,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_domains_get_iam_policy(&self, resource: &str) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
+    pub fn locations_global_domains_get_iam_policy(&self, resource: &str) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S> {
         ProjectLocationGlobalDomainGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1268,7 +1273,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_get_ldapssettings(&self, name: &str) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
+    pub fn locations_global_domains_get_ldapssettings(&self, name: &str) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a, S> {
         ProjectLocationGlobalDomainGetLdapssettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1285,7 +1290,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the domain location using the form: `projects/{project_id}/locations/global`
-    pub fn locations_global_domains_list(&self, parent: &str) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn locations_global_domains_list(&self, parent: &str) -> ProjectLocationGlobalDomainListCall<'a, S> {
         ProjectLocationGlobalDomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1307,7 +1312,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The unique name of the domain using the form: `projects/{project_id}/locations/global/domains/{domain_name}`.
-    pub fn locations_global_domains_patch(&self, request: Domain, name: &str) -> ProjectLocationGlobalDomainPatchCall<'a> {
+    pub fn locations_global_domains_patch(&self, request: Domain, name: &str) -> ProjectLocationGlobalDomainPatchCall<'a, S> {
         ProjectLocationGlobalDomainPatchCall {
             hub: self.hub,
             _request: request,
@@ -1327,7 +1332,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource domain name, project name and location using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_reconfigure_trust(&self, request: ReconfigureTrustRequest, name: &str) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
+    pub fn locations_global_domains_reconfigure_trust(&self, request: ReconfigureTrustRequest, name: &str) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S> {
         ProjectLocationGlobalDomainReconfigureTrustCall {
             hub: self.hub,
             _request: request,
@@ -1346,7 +1351,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The domain resource name using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_reset_admin_password(&self, request: ResetAdminPasswordRequest, name: &str) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
+    pub fn locations_global_domains_reset_admin_password(&self, request: ResetAdminPasswordRequest, name: &str) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S> {
         ProjectLocationGlobalDomainResetAdminPasswordCall {
             hub: self.hub,
             _request: request,
@@ -1365,7 +1370,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name for the domain to which the backup belongs
-    pub fn locations_global_domains_restore(&self, request: RestoreDomainRequest, name: &str) -> ProjectLocationGlobalDomainRestoreCall<'a> {
+    pub fn locations_global_domains_restore(&self, request: RestoreDomainRequest, name: &str) -> ProjectLocationGlobalDomainRestoreCall<'a, S> {
         ProjectLocationGlobalDomainRestoreCall {
             hub: self.hub,
             _request: request,
@@ -1384,7 +1389,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_domains_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
+    pub fn locations_global_domains_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S> {
         ProjectLocationGlobalDomainSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1403,7 +1408,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_domains_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
+    pub fn locations_global_domains_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S> {
         ProjectLocationGlobalDomainTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1422,7 +1427,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the LDAPS settings. Uses the form: `projects/{project}/locations/{location}/domains/{domain}`.
-    pub fn locations_global_domains_update_ldapssettings(&self, request: LDAPSSettings, name: &str) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
+    pub fn locations_global_domains_update_ldapssettings(&self, request: LDAPSSettings, name: &str) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S> {
         ProjectLocationGlobalDomainUpdateLdapssettingCall {
             hub: self.hub,
             _request: request,
@@ -1442,7 +1447,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource domain name, project name, and location using the form: `projects/{project_id}/locations/global/domains/{domain_name}`
-    pub fn locations_global_domains_validate_trust(&self, request: ValidateTrustRequest, name: &str) -> ProjectLocationGlobalDomainValidateTrustCall<'a> {
+    pub fn locations_global_domains_validate_trust(&self, request: ValidateTrustRequest, name: &str) -> ProjectLocationGlobalDomainValidateTrustCall<'a, S> {
         ProjectLocationGlobalDomainValidateTrustCall {
             hub: self.hub,
             _request: request,
@@ -1461,7 +1466,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn locations_global_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationGlobalOperationCancelCall<'a> {
+    pub fn locations_global_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationGlobalOperationCancelCall<'a, S> {
         ProjectLocationGlobalOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1479,7 +1484,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn locations_global_operations_delete(&self, name: &str) -> ProjectLocationGlobalOperationDeleteCall<'a> {
+    pub fn locations_global_operations_delete(&self, name: &str) -> ProjectLocationGlobalOperationDeleteCall<'a, S> {
         ProjectLocationGlobalOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1496,7 +1501,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_global_operations_get(&self, name: &str) -> ProjectLocationGlobalOperationGetCall<'a> {
+    pub fn locations_global_operations_get(&self, name: &str) -> ProjectLocationGlobalOperationGetCall<'a, S> {
         ProjectLocationGlobalOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1513,7 +1518,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_global_operations_list(&self, name: &str) -> ProjectLocationGlobalOperationListCall<'a> {
+    pub fn locations_global_operations_list(&self, name: &str) -> ProjectLocationGlobalOperationListCall<'a, S> {
         ProjectLocationGlobalOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1534,7 +1539,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Resource project name and location using the form: `projects/{project_id}/locations/global`
-    pub fn locations_global_peerings_create(&self, request: Peering, parent: &str) -> ProjectLocationGlobalPeeringCreateCall<'a> {
+    pub fn locations_global_peerings_create(&self, request: Peering, parent: &str) -> ProjectLocationGlobalPeeringCreateCall<'a, S> {
         ProjectLocationGlobalPeeringCreateCall {
             hub: self.hub,
             _request: request,
@@ -1553,7 +1558,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Peering resource name using the form: `projects/{project_id}/locations/global/peerings/{peering_id}`
-    pub fn locations_global_peerings_delete(&self, name: &str) -> ProjectLocationGlobalPeeringDeleteCall<'a> {
+    pub fn locations_global_peerings_delete(&self, name: &str) -> ProjectLocationGlobalPeeringDeleteCall<'a, S> {
         ProjectLocationGlobalPeeringDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1570,7 +1575,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Peering resource name using the form: `projects/{project_id}/locations/global/peerings/{peering_id}`
-    pub fn locations_global_peerings_get(&self, name: &str) -> ProjectLocationGlobalPeeringGetCall<'a> {
+    pub fn locations_global_peerings_get(&self, name: &str) -> ProjectLocationGlobalPeeringGetCall<'a, S> {
         ProjectLocationGlobalPeeringGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1587,7 +1592,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_peerings_get_iam_policy(&self, resource: &str) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
+    pub fn locations_global_peerings_get_iam_policy(&self, resource: &str) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S> {
         ProjectLocationGlobalPeeringGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1605,7 +1610,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the peering location using the form: `projects/{project_id}/locations/global`
-    pub fn locations_global_peerings_list(&self, parent: &str) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn locations_global_peerings_list(&self, parent: &str) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         ProjectLocationGlobalPeeringListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1627,7 +1632,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Unique name of the peering in this scope including projects and location using the form: `projects/{project_id}/locations/global/peerings/{peering_id}`.
-    pub fn locations_global_peerings_patch(&self, request: Peering, name: &str) -> ProjectLocationGlobalPeeringPatchCall<'a> {
+    pub fn locations_global_peerings_patch(&self, request: Peering, name: &str) -> ProjectLocationGlobalPeeringPatchCall<'a, S> {
         ProjectLocationGlobalPeeringPatchCall {
             hub: self.hub,
             _request: request,
@@ -1647,7 +1652,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_peerings_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
+    pub fn locations_global_peerings_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S> {
         ProjectLocationGlobalPeeringSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1666,7 +1671,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_global_peerings_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
+    pub fn locations_global_peerings_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S> {
         ProjectLocationGlobalPeeringTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1684,7 +1689,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, S> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1701,7 +1706,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, S> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1746,7 +1751,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1760,10 +1765,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupCreateCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: Backup,
     _parent: String,
     _backup_id: Option<String>,
@@ -1772,9 +1777,15 @@ pub struct ProjectLocationGlobalDomainBackupCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1937,7 +1948,7 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Backup) -> ProjectLocationGlobalDomainBackupCreateCall<'a> {
+    pub fn request(mut self, new_value: Backup) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1947,14 +1958,14 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Backup Id, unique name to identify the backups with the following restrictions: * Must be lowercase letters, numbers, and hyphens * Must start with a letter. * Must contain between 1-63 characters. * Must end with a number or a letter. * Must be unique within the domain.
     ///
     /// Sets the *backup id* query property to the given value.
-    pub fn backup_id(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupCreateCall<'a> {
+    pub fn backup_id(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S> {
         self._backup_id = Some(new_value.to_string());
         self
     }
@@ -1964,7 +1975,7 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1989,7 +2000,7 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2009,9 +2020,9 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2043,7 +2054,7 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2051,19 +2062,25 @@ impl<'a> ProjectLocationGlobalDomainBackupCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupDeleteCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2210,7 +2227,7 @@ impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2220,7 +2237,7 @@ impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2245,7 +2262,7 @@ impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2265,9 +2282,9 @@ impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2299,7 +2316,7 @@ impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2307,19 +2324,25 @@ impl<'a> ProjectLocationGlobalDomainBackupDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupGetCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2466,7 +2489,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2476,7 +2499,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2501,7 +2524,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2521,9 +2544,9 @@ impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2555,7 +2578,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2564,10 +2587,10 @@ impl<'a> ProjectLocationGlobalDomainBackupGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2575,9 +2598,15 @@ pub struct ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2727,14 +2756,14 @@ impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -2744,7 +2773,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2769,7 +2798,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2789,9 +2818,9 @@ impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2823,7 +2852,7 @@ impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2835,10 +2864,10 @@ impl<'a> ProjectLocationGlobalDomainBackupGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupListCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2849,9 +2878,15 @@ pub struct ProjectLocationGlobalDomainBackupListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupListCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3010,35 +3045,35 @@ impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The `next_page_token` value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If not specified, a default value of 1000 will be used by the service. Regardless of the page_size value, the response may include a partial list and a caller should only rely on response's next_page_token to determine if there are more instances left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Filter specifying constraints of a list operation.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3048,7 +3083,7 @@ impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3073,7 +3108,7 @@ impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3093,9 +3128,9 @@ impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3128,7 +3163,7 @@ impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3142,10 +3177,10 @@ impl<'a> ProjectLocationGlobalDomainBackupListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupPatchCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: Backup,
     _name: String,
     _update_mask: Option<String>,
@@ -3154,9 +3189,15 @@ pub struct ProjectLocationGlobalDomainBackupPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3319,7 +3360,7 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Backup) -> ProjectLocationGlobalDomainBackupPatchCall<'a> {
+    pub fn request(mut self, new_value: Backup) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3329,14 +3370,14 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field may only include these fields from Backup: * `labels`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3346,7 +3387,7 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3371,7 +3412,7 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3391,9 +3432,9 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3426,7 +3467,7 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3439,10 +3480,10 @@ impl<'a> ProjectLocationGlobalDomainBackupPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3450,9 +3491,15 @@ pub struct ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3612,7 +3659,7 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3622,7 +3669,7 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3632,7 +3679,7 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3657,7 +3704,7 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3677,9 +3724,9 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3712,7 +3759,7 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3725,10 +3772,10 @@ impl<'a> ProjectLocationGlobalDomainBackupSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3736,9 +3783,15 @@ pub struct ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3898,7 +3951,7 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3908,7 +3961,7 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -3918,7 +3971,7 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3943,7 +3996,7 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3963,9 +4016,9 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3997,7 +4050,7 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4005,19 +4058,25 @@ impl<'a> ProjectLocationGlobalDomainBackupTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainSqlIntegrationGetCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4164,7 +4223,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4174,7 +4233,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4199,7 +4258,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4219,9 +4278,9 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4253,7 +4312,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4265,10 +4324,10 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainSqlIntegrationListCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4279,9 +4338,15 @@ pub struct ProjectLocationGlobalDomainSqlIntegrationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4440,35 +4505,35 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If not specified, a default value of 1000 will be used by the service. Regardless of the page_size value, the response may include a partial list and a caller should only rely on response'ANIZATIONs next_page_token to determine if there are more instances left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Filter specifying constraints of a list operation. For example, `SqlIntegration.name="sql"`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4478,7 +4543,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4503,7 +4568,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4523,9 +4588,9 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainSqlIntegrationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4558,7 +4623,7 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4571,10 +4636,10 @@ impl<'a> ProjectLocationGlobalDomainSqlIntegrationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainAttachTrustCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainAttachTrustCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: AttachTrustRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4582,9 +4647,15 @@ pub struct ProjectLocationGlobalDomainAttachTrustCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainAttachTrustCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainAttachTrustCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainAttachTrustCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4744,7 +4815,7 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AttachTrustRequest) -> ProjectLocationGlobalDomainAttachTrustCall<'a> {
+    pub fn request(mut self, new_value: AttachTrustRequest) -> ProjectLocationGlobalDomainAttachTrustCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4754,7 +4825,7 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainAttachTrustCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainAttachTrustCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4764,7 +4835,7 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainAttachTrustCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainAttachTrustCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4789,7 +4860,7 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainAttachTrustCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainAttachTrustCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4809,9 +4880,9 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainAttachTrustCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainAttachTrustCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4844,7 +4915,7 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4858,10 +4929,10 @@ impl<'a> ProjectLocationGlobalDomainAttachTrustCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainCreateCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: Domain,
     _parent: String,
     _domain_name: Option<String>,
@@ -4870,9 +4941,15 @@ pub struct ProjectLocationGlobalDomainCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5035,7 +5112,7 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> ProjectLocationGlobalDomainCreateCall<'a> {
+    pub fn request(mut self, new_value: Domain) -> ProjectLocationGlobalDomainCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5045,14 +5122,14 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The fully qualified domain name. e.g. mydomain.myorganization.com, with the following restrictions: * Must contain only lowercase letters, numbers, periods and hyphens. * Must start with a letter. * Must contain between 2-64 characters. * Must end with a number or a letter. * Must not start with period. * First segment length (mydomain for example above) shouldn't exceed 15 chars. * The last segment cannot be fully numeric. * Must be unique within the customer project.
     ///
     /// Sets the *domain name* query property to the given value.
-    pub fn domain_name(mut self, new_value: &str) -> ProjectLocationGlobalDomainCreateCall<'a> {
+    pub fn domain_name(mut self, new_value: &str) -> ProjectLocationGlobalDomainCreateCall<'a, S> {
         self._domain_name = Some(new_value.to_string());
         self
     }
@@ -5062,7 +5139,7 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5087,7 +5164,7 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5107,9 +5184,9 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5141,7 +5218,7 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5149,19 +5226,25 @@ impl<'a> ProjectLocationGlobalDomainCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainDeleteCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5308,7 +5391,7 @@ impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5318,7 +5401,7 @@ impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5343,7 +5426,7 @@ impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5363,9 +5446,9 @@ impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5398,7 +5481,7 @@ impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5411,10 +5494,10 @@ impl<'a> ProjectLocationGlobalDomainDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainDetachTrustCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainDetachTrustCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: DetachTrustRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5422,9 +5505,15 @@ pub struct ProjectLocationGlobalDomainDetachTrustCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainDetachTrustCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainDetachTrustCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainDetachTrustCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5584,7 +5673,7 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DetachTrustRequest) -> ProjectLocationGlobalDomainDetachTrustCall<'a> {
+    pub fn request(mut self, new_value: DetachTrustRequest) -> ProjectLocationGlobalDomainDetachTrustCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5594,7 +5683,7 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainDetachTrustCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainDetachTrustCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5604,7 +5693,7 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainDetachTrustCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainDetachTrustCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5629,7 +5718,7 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainDetachTrustCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainDetachTrustCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5649,9 +5738,9 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainDetachTrustCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainDetachTrustCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5683,7 +5772,7 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5691,19 +5780,25 @@ impl<'a> ProjectLocationGlobalDomainDetachTrustCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainGetCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5850,7 +5945,7 @@ impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5860,7 +5955,7 @@ impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5885,7 +5980,7 @@ impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5905,9 +6000,9 @@ impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5939,7 +6034,7 @@ impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5948,10 +6043,10 @@ impl<'a> ProjectLocationGlobalDomainGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5959,9 +6054,15 @@ pub struct ProjectLocationGlobalDomainGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6111,14 +6212,14 @@ impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -6128,7 +6229,7 @@ impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6153,7 +6254,7 @@ impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6173,9 +6274,9 @@ impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6207,7 +6308,7 @@ impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6215,19 +6316,25 @@ impl<'a> ProjectLocationGlobalDomainGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainGetLdapssettingCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainGetLdapssettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainGetLdapssettingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainGetLdapssettingCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainGetLdapssettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6374,7 +6481,7 @@ impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6384,7 +6491,7 @@ impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6409,7 +6516,7 @@ impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6429,9 +6536,9 @@ impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainGetLdapssettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6463,7 +6570,7 @@ impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6475,10 +6582,10 @@ impl<'a> ProjectLocationGlobalDomainGetLdapssettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainListCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6489,9 +6596,15 @@ pub struct ProjectLocationGlobalDomainListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainListCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainListCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6650,35 +6763,35 @@ impl<'a> ProjectLocationGlobalDomainListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The `next_page_token` value returned from a previous ListDomainsRequest request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If not specified, a default value of 1000 will be used. Regardless of the page_size value, the response may include a partial list. Callers should rely on a response's next_page_token to determine if there are additional results to list.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalDomainListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results. See [Sorting order](https://cloud.google.com/apis/design/design_patterns#sorting_order) for more information.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. A filter specifying constraints of a list operation. For example, `Domain.fqdn="mydomain.myorginization"`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalDomainListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6688,7 +6801,7 @@ impl<'a> ProjectLocationGlobalDomainListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6713,7 +6826,7 @@ impl<'a> ProjectLocationGlobalDomainListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6733,9 +6846,9 @@ impl<'a> ProjectLocationGlobalDomainListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6768,7 +6881,7 @@ impl<'a> ProjectLocationGlobalDomainListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6782,10 +6895,10 @@ impl<'a> ProjectLocationGlobalDomainListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainPatchCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: Domain,
     _name: String,
     _update_mask: Option<String>,
@@ -6794,9 +6907,15 @@ pub struct ProjectLocationGlobalDomainPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6959,7 +7078,7 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> ProjectLocationGlobalDomainPatchCall<'a> {
+    pub fn request(mut self, new_value: Domain) -> ProjectLocationGlobalDomainPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6969,14 +7088,14 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field may only include fields from Domain: * `labels` * `locations` * `authorized_networks` * `audit_logs_enabled`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalDomainPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalDomainPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6986,7 +7105,7 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7011,7 +7130,7 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7031,9 +7150,9 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7066,7 +7185,7 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7079,10 +7198,10 @@ impl<'a> ProjectLocationGlobalDomainPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainReconfigureTrustCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainReconfigureTrustCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: ReconfigureTrustRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7090,9 +7209,15 @@ pub struct ProjectLocationGlobalDomainReconfigureTrustCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainReconfigureTrustCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainReconfigureTrustCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7252,7 +7377,7 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReconfigureTrustRequest) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
+    pub fn request(mut self, new_value: ReconfigureTrustRequest) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7262,7 +7387,7 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7272,7 +7397,7 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7297,7 +7422,7 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7317,9 +7442,9 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainReconfigureTrustCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7352,7 +7477,7 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7365,10 +7490,10 @@ impl<'a> ProjectLocationGlobalDomainReconfigureTrustCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainResetAdminPasswordCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: ResetAdminPasswordRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7376,9 +7501,15 @@ pub struct ProjectLocationGlobalDomainResetAdminPasswordCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7538,7 +7669,7 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResetAdminPasswordRequest) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
+    pub fn request(mut self, new_value: ResetAdminPasswordRequest) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7548,7 +7679,7 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7558,7 +7689,7 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7583,7 +7714,7 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7603,9 +7734,9 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainResetAdminPasswordCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7638,7 +7769,7 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7651,10 +7782,10 @@ impl<'a> ProjectLocationGlobalDomainResetAdminPasswordCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainRestoreCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainRestoreCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: RestoreDomainRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7662,9 +7793,15 @@ pub struct ProjectLocationGlobalDomainRestoreCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainRestoreCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainRestoreCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainRestoreCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7824,7 +7961,7 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RestoreDomainRequest) -> ProjectLocationGlobalDomainRestoreCall<'a> {
+    pub fn request(mut self, new_value: RestoreDomainRequest) -> ProjectLocationGlobalDomainRestoreCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7834,7 +7971,7 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainRestoreCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainRestoreCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7844,7 +7981,7 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainRestoreCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainRestoreCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7869,7 +8006,7 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainRestoreCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainRestoreCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7889,9 +8026,9 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainRestoreCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainRestoreCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7924,7 +8061,7 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7937,10 +8074,10 @@ impl<'a> ProjectLocationGlobalDomainRestoreCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7948,9 +8085,15 @@ pub struct ProjectLocationGlobalDomainSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8110,7 +8253,7 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8120,7 +8263,7 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -8130,7 +8273,7 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8155,7 +8298,7 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8175,9 +8318,9 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8210,7 +8353,7 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8223,10 +8366,10 @@ impl<'a> ProjectLocationGlobalDomainSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8234,9 +8377,15 @@ pub struct ProjectLocationGlobalDomainTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8396,7 +8545,7 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8406,7 +8555,7 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -8416,7 +8565,7 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8441,7 +8590,7 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8461,9 +8610,9 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8496,7 +8645,7 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8510,10 +8659,10 @@ impl<'a> ProjectLocationGlobalDomainTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainUpdateLdapssettingCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: LDAPSSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -8522,9 +8671,15 @@ pub struct ProjectLocationGlobalDomainUpdateLdapssettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8687,7 +8842,7 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LDAPSSettings) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
+    pub fn request(mut self, new_value: LDAPSSettings) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8697,14 +8852,14 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -8714,7 +8869,7 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8739,7 +8894,7 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8759,9 +8914,9 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8794,7 +8949,7 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8807,10 +8962,10 @@ impl<'a> ProjectLocationGlobalDomainUpdateLdapssettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalDomainValidateTrustCall<'a>
-    where  {
+pub struct ProjectLocationGlobalDomainValidateTrustCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: ValidateTrustRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8818,9 +8973,15 @@ pub struct ProjectLocationGlobalDomainValidateTrustCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalDomainValidateTrustCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalDomainValidateTrustCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
+impl<'a, S> ProjectLocationGlobalDomainValidateTrustCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8980,7 +9141,7 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ValidateTrustRequest) -> ProjectLocationGlobalDomainValidateTrustCall<'a> {
+    pub fn request(mut self, new_value: ValidateTrustRequest) -> ProjectLocationGlobalDomainValidateTrustCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8990,7 +9151,7 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainValidateTrustCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalDomainValidateTrustCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9000,7 +9161,7 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainValidateTrustCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalDomainValidateTrustCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9025,7 +9186,7 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainValidateTrustCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalDomainValidateTrustCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9045,9 +9206,9 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalDomainValidateTrustCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalDomainValidateTrustCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9080,7 +9241,7 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9093,10 +9254,10 @@ impl<'a> ProjectLocationGlobalDomainValidateTrustCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalOperationCancelCall<'a>
-    where  {
+pub struct ProjectLocationGlobalOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9104,9 +9265,15 @@ pub struct ProjectLocationGlobalOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
+impl<'a, S> ProjectLocationGlobalOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9266,7 +9433,7 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationGlobalOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationGlobalOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9276,7 +9443,7 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9286,7 +9453,7 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9311,7 +9478,7 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9331,9 +9498,9 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9365,7 +9532,7 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9373,19 +9540,25 @@ impl<'a> ProjectLocationGlobalOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalOperationDeleteCall<'a>
-    where  {
+pub struct ProjectLocationGlobalOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalOperationDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
+impl<'a, S> ProjectLocationGlobalOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9532,7 +9705,7 @@ impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9542,7 +9715,7 @@ impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9567,7 +9740,7 @@ impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9587,9 +9760,9 @@ impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9621,7 +9794,7 @@ impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9629,19 +9802,25 @@ impl<'a> ProjectLocationGlobalOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationGlobalOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
+impl<'a, S> ProjectLocationGlobalOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9788,7 +9967,7 @@ impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9798,7 +9977,7 @@ impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9823,7 +10002,7 @@ impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9843,9 +10022,9 @@ impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9877,7 +10056,7 @@ impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9888,10 +10067,10 @@ impl<'a> ProjectLocationGlobalOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalOperationListCall<'a>
-    where  {
+pub struct ProjectLocationGlobalOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9901,9 +10080,15 @@ pub struct ProjectLocationGlobalOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalOperationListCall<'a> {
+impl<'a, S> ProjectLocationGlobalOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10059,28 +10244,28 @@ impl<'a> ProjectLocationGlobalOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10090,7 +10275,7 @@ impl<'a> ProjectLocationGlobalOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10115,7 +10300,7 @@ impl<'a> ProjectLocationGlobalOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10135,9 +10320,9 @@ impl<'a> ProjectLocationGlobalOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10170,7 +10355,7 @@ impl<'a> ProjectLocationGlobalOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10184,10 +10369,10 @@ impl<'a> ProjectLocationGlobalOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringCreateCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: Peering,
     _parent: String,
     _peering_id: Option<String>,
@@ -10196,9 +10381,15 @@ pub struct ProjectLocationGlobalPeeringCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10361,7 +10552,7 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Peering) -> ProjectLocationGlobalPeeringCreateCall<'a> {
+    pub fn request(mut self, new_value: Peering) -> ProjectLocationGlobalPeeringCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10371,14 +10562,14 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalPeeringCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalPeeringCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Peering Id, unique name to identify peering. It should follow the regex format "^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$"
     ///
     /// Sets the *peering id* query property to the given value.
-    pub fn peering_id(mut self, new_value: &str) -> ProjectLocationGlobalPeeringCreateCall<'a> {
+    pub fn peering_id(mut self, new_value: &str) -> ProjectLocationGlobalPeeringCreateCall<'a, S> {
         self._peering_id = Some(new_value.to_string());
         self
     }
@@ -10388,7 +10579,7 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10413,7 +10604,7 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10433,9 +10624,9 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10467,7 +10658,7 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10475,19 +10666,25 @@ impl<'a> ProjectLocationGlobalPeeringCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringDeleteCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10634,7 +10831,7 @@ impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalPeeringDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalPeeringDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10644,7 +10841,7 @@ impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10669,7 +10866,7 @@ impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10689,9 +10886,9 @@ impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10723,7 +10920,7 @@ impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10731,19 +10928,25 @@ impl<'a> ProjectLocationGlobalPeeringDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringGetCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10890,7 +11093,7 @@ impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalPeeringGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalPeeringGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10900,7 +11103,7 @@ impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10925,7 +11128,7 @@ impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10945,9 +11148,9 @@ impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10979,7 +11182,7 @@ impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10988,10 +11191,10 @@ impl<'a> ProjectLocationGlobalPeeringGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10999,9 +11202,15 @@ pub struct ProjectLocationGlobalPeeringGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11151,14 +11360,14 @@ impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -11168,7 +11377,7 @@ impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11193,7 +11402,7 @@ impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11213,9 +11422,9 @@ impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11247,7 +11456,7 @@ impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11259,10 +11468,10 @@ impl<'a> ProjectLocationGlobalPeeringGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringListCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11273,9 +11482,15 @@ pub struct ProjectLocationGlobalPeeringListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringListCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11434,35 +11649,35 @@ impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If not specified, a default value of 1000 will be used by the service. Regardless of the page_size value, the response may include a partial list and a caller should only rely on response's next_page_token to determine if there are more instances left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Filter specifying constraints of a list operation. For example, `peering.authorized_network="projects/myprojectid/global/networks/mynetwork"`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11472,7 +11687,7 @@ impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11497,7 +11712,7 @@ impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11517,9 +11732,9 @@ impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11552,7 +11767,7 @@ impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11566,10 +11781,10 @@ impl<'a> ProjectLocationGlobalPeeringListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringPatchCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: Peering,
     _name: String,
     _update_mask: Option<String>,
@@ -11578,9 +11793,15 @@ pub struct ProjectLocationGlobalPeeringPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11743,7 +11964,7 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Peering) -> ProjectLocationGlobalPeeringPatchCall<'a> {
+    pub fn request(mut self, new_value: Peering) -> ProjectLocationGlobalPeeringPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11753,14 +11974,14 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalPeeringPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalPeeringPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. The elements of the repeated paths field may only include these fields from Peering: * `labels`
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalPeeringPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGlobalPeeringPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11770,7 +11991,7 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11795,7 +12016,7 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11815,9 +12036,9 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11850,7 +12071,7 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11863,10 +12084,10 @@ impl<'a> ProjectLocationGlobalPeeringPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11874,9 +12095,15 @@ pub struct ProjectLocationGlobalPeeringSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12036,7 +12263,7 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12046,7 +12273,7 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -12056,7 +12283,7 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12081,7 +12308,7 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12101,9 +12328,9 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12136,7 +12363,7 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12149,10 +12376,10 @@ impl<'a> ProjectLocationGlobalPeeringSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGlobalPeeringTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12160,9 +12387,15 @@ pub struct ProjectLocationGlobalPeeringTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12322,7 +12555,7 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12332,7 +12565,7 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -12342,7 +12575,7 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12367,7 +12600,7 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12387,9 +12620,9 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGlobalPeeringTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12421,7 +12654,7 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12429,19 +12662,25 @@ impl<'a> ProjectLocationGlobalPeeringTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a>
-    where  {
+pub struct ProjectLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGetCall<'a> {
+impl<'a, S> ProjectLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12588,7 +12827,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12598,7 +12837,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12623,7 +12862,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12643,9 +12882,9 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12677,7 +12916,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ManagedServiceForMicrosoftActiveDirectoryConsumerAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12688,10 +12927,10 @@ impl<'a> ProjectLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a>
-    where  {
+pub struct ProjectLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<>,
+    hub: &'a ManagedServiceForMicrosoftActiveDirectoryConsumerAPI<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12701,9 +12940,15 @@ pub struct ProjectLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationListCall<'a, S> {}
 
-impl<'a> ProjectLocationListCall<'a> {
+impl<'a, S> ProjectLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12859,28 +13104,28 @@ impl<'a> ProjectLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service selects a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12890,7 +13135,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12915,7 +13160,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12935,9 +13180,9 @@ impl<'a> ProjectLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

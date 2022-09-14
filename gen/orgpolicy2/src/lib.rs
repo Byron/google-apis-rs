@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/api/lib.rs.mako'
+// This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *OrgPolicy API* crate version *3.1.0+20220305*, where *20220305* is the exact revision of the *orgpolicy:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v3.1.0*.
+//! This documentation was generated from *OrgPolicy API* crate version *4.0.1+20220305*, where *20220305* is the exact revision of the *orgpolicy:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v4.0.1*.
 //! 
 //! Everything else about the *OrgPolicy API* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/orgpolicy/docs/reference/rest/index.html).
@@ -107,7 +107,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = OrgPolicyAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+//! let mut hub = OrgPolicyAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -199,7 +199,7 @@
 #![allow(unused_imports, unused_mut, dead_code)]
 
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/api/lib.rs.mako'
+// This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
 #[macro_use]

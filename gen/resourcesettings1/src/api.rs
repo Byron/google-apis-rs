@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -98,40 +103,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ResourceSettings<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ResourceSettings<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ResourceSettings<> {}
+impl<'a, S> client::Hub for ResourceSettings<S> {}
 
-impl<'a, > ResourceSettings<> {
+impl<'a, S> ResourceSettings<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ResourceSettings<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ResourceSettings<S> {
         ResourceSettings {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://resourcesettings.googleapis.com/".to_string(),
             _root_url: "https://resourcesettings.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a> {
+    pub fn folders(&'a self) -> FolderMethods<'a, S> {
         FolderMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -335,22 +340,22 @@ impl client::Part for GoogleCloudResourcesettingsV1ValueStringSet {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `settings_get(...)`, `settings_list(...)` and `settings_patch(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a>
-    where  {
+pub struct FolderMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
 }
 
-impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FolderMethods<'a, S> {}
 
-impl<'a> FolderMethods<'a> {
+impl<'a, S> FolderMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -359,7 +364,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the setting to get. See Setting for naming requirements.
-    pub fn settings_get(&self, name: &str) -> FolderSettingGetCall<'a> {
+    pub fn settings_get(&self, name: &str) -> FolderSettingGetCall<'a, S> {
         FolderSettingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -377,7 +382,7 @@ impl<'a> FolderMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The project, folder, or organization that is the parent resource for this setting. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
-    pub fn settings_list(&self, parent: &str) -> FolderSettingListCall<'a> {
+    pub fn settings_list(&self, parent: &str) -> FolderSettingListCall<'a, S> {
         FolderSettingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -398,7 +403,7 @@ impl<'a> FolderMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the setting. Must be in one of the following forms: * `projects/{project_number}/settings/{setting_name}` * `folders/{folder_id}/settings/{setting_name}` * `organizations/{organization_id}/settings/{setting_name}` For example, "/projects/123/settings/gcp-enableMyFeature"
-    pub fn settings_patch(&self, request: GoogleCloudResourcesettingsV1Setting, name: &str) -> FolderSettingPatchCall<'a> {
+    pub fn settings_patch(&self, request: GoogleCloudResourcesettingsV1Setting, name: &str) -> FolderSettingPatchCall<'a, S> {
         FolderSettingPatchCall {
             hub: self.hub,
             _request: request,
@@ -433,22 +438,22 @@ impl<'a> FolderMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `settings_get(...)`, `settings_list(...)` and `settings_patch(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a>
-    where  {
+pub struct OrganizationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
 }
 
-impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
 
-impl<'a> OrganizationMethods<'a> {
+impl<'a, S> OrganizationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -457,7 +462,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the setting to get. See Setting for naming requirements.
-    pub fn settings_get(&self, name: &str) -> OrganizationSettingGetCall<'a> {
+    pub fn settings_get(&self, name: &str) -> OrganizationSettingGetCall<'a, S> {
         OrganizationSettingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -475,7 +480,7 @@ impl<'a> OrganizationMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The project, folder, or organization that is the parent resource for this setting. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
-    pub fn settings_list(&self, parent: &str) -> OrganizationSettingListCall<'a> {
+    pub fn settings_list(&self, parent: &str) -> OrganizationSettingListCall<'a, S> {
         OrganizationSettingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -496,7 +501,7 @@ impl<'a> OrganizationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the setting. Must be in one of the following forms: * `projects/{project_number}/settings/{setting_name}` * `folders/{folder_id}/settings/{setting_name}` * `organizations/{organization_id}/settings/{setting_name}` For example, "/projects/123/settings/gcp-enableMyFeature"
-    pub fn settings_patch(&self, request: GoogleCloudResourcesettingsV1Setting, name: &str) -> OrganizationSettingPatchCall<'a> {
+    pub fn settings_patch(&self, request: GoogleCloudResourcesettingsV1Setting, name: &str) -> OrganizationSettingPatchCall<'a, S> {
         OrganizationSettingPatchCall {
             hub: self.hub,
             _request: request,
@@ -531,22 +536,22 @@ impl<'a> OrganizationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `settings_get(...)`, `settings_list(...)` and `settings_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -555,7 +560,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the setting to get. See Setting for naming requirements.
-    pub fn settings_get(&self, name: &str) -> ProjectSettingGetCall<'a> {
+    pub fn settings_get(&self, name: &str) -> ProjectSettingGetCall<'a, S> {
         ProjectSettingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -573,7 +578,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The project, folder, or organization that is the parent resource for this setting. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`
-    pub fn settings_list(&self, parent: &str) -> ProjectSettingListCall<'a> {
+    pub fn settings_list(&self, parent: &str) -> ProjectSettingListCall<'a, S> {
         ProjectSettingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -594,7 +599,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the setting. Must be in one of the following forms: * `projects/{project_number}/settings/{setting_name}` * `folders/{folder_id}/settings/{setting_name}` * `organizations/{organization_id}/settings/{setting_name}` For example, "/projects/123/settings/gcp-enableMyFeature"
-    pub fn settings_patch(&self, request: GoogleCloudResourcesettingsV1Setting, name: &str) -> ProjectSettingPatchCall<'a> {
+    pub fn settings_patch(&self, request: GoogleCloudResourcesettingsV1Setting, name: &str) -> ProjectSettingPatchCall<'a, S> {
         ProjectSettingPatchCall {
             hub: self.hub,
             _request: request,
@@ -636,7 +641,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -645,10 +650,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderSettingGetCall<'a>
-    where  {
+pub struct FolderSettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -656,9 +661,15 @@ pub struct FolderSettingGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderSettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderSettingGetCall<'a, S> {}
 
-impl<'a> FolderSettingGetCall<'a> {
+impl<'a, S> FolderSettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -808,14 +819,14 @@ impl<'a> FolderSettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderSettingGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderSettingGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> FolderSettingGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> FolderSettingGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -825,7 +836,7 @@ impl<'a> FolderSettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -850,7 +861,7 @@ impl<'a> FolderSettingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderSettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderSettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -870,9 +881,9 @@ impl<'a> FolderSettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderSettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -904,7 +915,7 @@ impl<'a> FolderSettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -915,10 +926,10 @@ impl<'a> FolderSettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderSettingListCall<'a>
-    where  {
+pub struct FolderSettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -928,9 +939,15 @@ pub struct FolderSettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderSettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderSettingListCall<'a, S> {}
 
-impl<'a> FolderSettingListCall<'a> {
+impl<'a, S> FolderSettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1086,28 +1103,28 @@ impl<'a> FolderSettingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderSettingListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> FolderSettingListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> FolderSettingListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> FolderSettingListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Unused. A page token used to retrieve the next page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderSettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> FolderSettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Unused. The size of the page to be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderSettingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> FolderSettingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1117,7 +1134,7 @@ impl<'a> FolderSettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1142,7 +1159,7 @@ impl<'a> FolderSettingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderSettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderSettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1162,9 +1179,9 @@ impl<'a> FolderSettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderSettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1197,7 +1214,7 @@ impl<'a> FolderSettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1210,10 +1227,10 @@ impl<'a> FolderSettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderSettingPatchCall<'a>
-    where  {
+pub struct FolderSettingPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _request: GoogleCloudResourcesettingsV1Setting,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1221,9 +1238,15 @@ pub struct FolderSettingPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FolderSettingPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for FolderSettingPatchCall<'a, S> {}
 
-impl<'a> FolderSettingPatchCall<'a> {
+impl<'a, S> FolderSettingPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1383,7 +1406,7 @@ impl<'a> FolderSettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudResourcesettingsV1Setting) -> FolderSettingPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudResourcesettingsV1Setting) -> FolderSettingPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1393,7 +1416,7 @@ impl<'a> FolderSettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderSettingPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> FolderSettingPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1403,7 +1426,7 @@ impl<'a> FolderSettingPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSettingPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSettingPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1428,7 +1451,7 @@ impl<'a> FolderSettingPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderSettingPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderSettingPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1448,9 +1471,9 @@ impl<'a> FolderSettingPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSettingPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FolderSettingPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1482,7 +1505,7 @@ impl<'a> FolderSettingPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1491,10 +1514,10 @@ impl<'a> FolderSettingPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationSettingGetCall<'a>
-    where  {
+pub struct OrganizationSettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1502,9 +1525,15 @@ pub struct OrganizationSettingGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationSettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationSettingGetCall<'a, S> {}
 
-impl<'a> OrganizationSettingGetCall<'a> {
+impl<'a, S> OrganizationSettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1654,14 +1683,14 @@ impl<'a> OrganizationSettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationSettingGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationSettingGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> OrganizationSettingGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> OrganizationSettingGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -1671,7 +1700,7 @@ impl<'a> OrganizationSettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1696,7 +1725,7 @@ impl<'a> OrganizationSettingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1716,9 +1745,9 @@ impl<'a> OrganizationSettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationSettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationSettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1750,7 +1779,7 @@ impl<'a> OrganizationSettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1761,10 +1790,10 @@ impl<'a> OrganizationSettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationSettingListCall<'a>
-    where  {
+pub struct OrganizationSettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -1774,9 +1803,15 @@ pub struct OrganizationSettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationSettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationSettingListCall<'a, S> {}
 
-impl<'a> OrganizationSettingListCall<'a> {
+impl<'a, S> OrganizationSettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1932,28 +1967,28 @@ impl<'a> OrganizationSettingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationSettingListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationSettingListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> OrganizationSettingListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> OrganizationSettingListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Unused. A page token used to retrieve the next page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationSettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationSettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Unused. The size of the page to be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationSettingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationSettingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1963,7 +1998,7 @@ impl<'a> OrganizationSettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1988,7 +2023,7 @@ impl<'a> OrganizationSettingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2008,9 +2043,9 @@ impl<'a> OrganizationSettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationSettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationSettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2043,7 +2078,7 @@ impl<'a> OrganizationSettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2056,10 +2091,10 @@ impl<'a> OrganizationSettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationSettingPatchCall<'a>
-    where  {
+pub struct OrganizationSettingPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _request: GoogleCloudResourcesettingsV1Setting,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2067,9 +2102,15 @@ pub struct OrganizationSettingPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OrganizationSettingPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for OrganizationSettingPatchCall<'a, S> {}
 
-impl<'a> OrganizationSettingPatchCall<'a> {
+impl<'a, S> OrganizationSettingPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2229,7 +2270,7 @@ impl<'a> OrganizationSettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudResourcesettingsV1Setting) -> OrganizationSettingPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudResourcesettingsV1Setting) -> OrganizationSettingPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2239,7 +2280,7 @@ impl<'a> OrganizationSettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationSettingPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OrganizationSettingPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2249,7 +2290,7 @@ impl<'a> OrganizationSettingPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSettingPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationSettingPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2274,7 +2315,7 @@ impl<'a> OrganizationSettingPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSettingPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSettingPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2294,9 +2335,9 @@ impl<'a> OrganizationSettingPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationSettingPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OrganizationSettingPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2328,7 +2369,7 @@ impl<'a> OrganizationSettingPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2337,10 +2378,10 @@ impl<'a> OrganizationSettingPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSettingGetCall<'a>
-    where  {
+pub struct ProjectSettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2348,9 +2389,15 @@ pub struct ProjectSettingGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSettingGetCall<'a, S> {}
 
-impl<'a> ProjectSettingGetCall<'a> {
+impl<'a, S> ProjectSettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2500,14 +2547,14 @@ impl<'a> ProjectSettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSettingGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSettingGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSettingGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectSettingGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -2517,7 +2564,7 @@ impl<'a> ProjectSettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2542,7 +2589,7 @@ impl<'a> ProjectSettingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2562,9 +2609,9 @@ impl<'a> ProjectSettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2596,7 +2643,7 @@ impl<'a> ProjectSettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2607,10 +2654,10 @@ impl<'a> ProjectSettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSettingListCall<'a>
-    where  {
+pub struct ProjectSettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -2620,9 +2667,15 @@ pub struct ProjectSettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSettingListCall<'a, S> {}
 
-impl<'a> ProjectSettingListCall<'a> {
+impl<'a, S> ProjectSettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2778,28 +2831,28 @@ impl<'a> ProjectSettingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSettingListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSettingListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The SettingView for this request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectSettingListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectSettingListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Unused. A page token used to retrieve the next page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Unused. The size of the page to be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSettingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSettingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2809,7 +2862,7 @@ impl<'a> ProjectSettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2834,7 +2887,7 @@ impl<'a> ProjectSettingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2854,9 +2907,9 @@ impl<'a> ProjectSettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2889,7 +2942,7 @@ impl<'a> ProjectSettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ResourceSettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2902,10 +2955,10 @@ impl<'a> ProjectSettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSettingPatchCall<'a>
-    where  {
+pub struct ProjectSettingPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ResourceSettings<>,
+    hub: &'a ResourceSettings<S>,
     _request: GoogleCloudResourcesettingsV1Setting,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2913,9 +2966,15 @@ pub struct ProjectSettingPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectSettingPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectSettingPatchCall<'a, S> {}
 
-impl<'a> ProjectSettingPatchCall<'a> {
+impl<'a, S> ProjectSettingPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3075,7 +3134,7 @@ impl<'a> ProjectSettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudResourcesettingsV1Setting) -> ProjectSettingPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudResourcesettingsV1Setting) -> ProjectSettingPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3085,7 +3144,7 @@ impl<'a> ProjectSettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSettingPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectSettingPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3095,7 +3154,7 @@ impl<'a> ProjectSettingPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSettingPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSettingPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3120,7 +3179,7 @@ impl<'a> ProjectSettingPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSettingPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSettingPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3140,9 +3199,9 @@ impl<'a> ProjectSettingPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSettingPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectSettingPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

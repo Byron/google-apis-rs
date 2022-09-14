@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,46 +112,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct SearchConsole<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct SearchConsole<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for SearchConsole<> {}
+impl<'a, S> client::Hub for SearchConsole<S> {}
 
-impl<'a, > SearchConsole<> {
+impl<'a, S> SearchConsole<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SearchConsole<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> SearchConsole<S> {
         SearchConsole {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://searchconsole.googleapis.com/".to_string(),
             _root_url: "https://searchconsole.googleapis.com/".to_string(),
         }
     }
 
-    pub fn searchanalytics(&'a self) -> SearchanalyticMethods<'a> {
+    pub fn searchanalytics(&'a self) -> SearchanalyticMethods<'a, S> {
         SearchanalyticMethods { hub: &self }
     }
-    pub fn sitemaps(&'a self) -> SitemapMethods<'a> {
+    pub fn sitemaps(&'a self) -> SitemapMethods<'a, S> {
         SitemapMethods { hub: &self }
     }
-    pub fn sites(&'a self) -> SiteMethods<'a> {
+    pub fn sites(&'a self) -> SiteMethods<'a, S> {
         SiteMethods { hub: &self }
     }
-    pub fn url_inspection(&'a self) -> UrlInspectionMethods<'a> {
+    pub fn url_inspection(&'a self) -> UrlInspectionMethods<'a, S> {
         UrlInspectionMethods { hub: &self }
     }
-    pub fn url_testing_tools(&'a self) -> UrlTestingToolMethods<'a> {
+    pub fn url_testing_tools(&'a self) -> UrlTestingToolMethods<'a, S> {
         UrlTestingToolMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -815,22 +820,22 @@ impl client::Part for WmxSitemapContent {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `query(...)`
 /// // to build up your call.
 /// let rb = hub.searchanalytics();
 /// # }
 /// ```
-pub struct SearchanalyticMethods<'a>
-    where  {
+pub struct SearchanalyticMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
 }
 
-impl<'a> client::MethodsBuilder for SearchanalyticMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SearchanalyticMethods<'a, S> {}
 
-impl<'a> SearchanalyticMethods<'a> {
+impl<'a, S> SearchanalyticMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -840,7 +845,7 @@ impl<'a> SearchanalyticMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
-    pub fn query(&self, request: SearchAnalyticsQueryRequest, site_url: &str) -> SearchanalyticQueryCall<'a> {
+    pub fn query(&self, request: SearchAnalyticsQueryRequest, site_url: &str) -> SearchanalyticQueryCall<'a, S> {
         SearchanalyticQueryCall {
             hub: self.hub,
             _request: request,
@@ -875,22 +880,22 @@ impl<'a> SearchanalyticMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `list(...)` and `submit(...)`
 /// // to build up your call.
 /// let rb = hub.sitemaps();
 /// # }
 /// ```
-pub struct SitemapMethods<'a>
-    where  {
+pub struct SitemapMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
 }
 
-impl<'a> client::MethodsBuilder for SitemapMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SitemapMethods<'a, S> {}
 
-impl<'a> SitemapMethods<'a> {
+impl<'a, S> SitemapMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -900,7 +905,7 @@ impl<'a> SitemapMethods<'a> {
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
     /// * `feedpath` - The URL of the actual sitemap. For example: `http://www.example.com/sitemap.xml`.
-    pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a> {
+    pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a, S> {
         SitemapDeleteCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -919,7 +924,7 @@ impl<'a> SitemapMethods<'a> {
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
     /// * `feedpath` - The URL of the actual sitemap. For example: `http://www.example.com/sitemap.xml`.
-    pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a> {
+    pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a, S> {
         SitemapGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -937,7 +942,7 @@ impl<'a> SitemapMethods<'a> {
     /// # Arguments
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
-    pub fn list(&self, site_url: &str) -> SitemapListCall<'a> {
+    pub fn list(&self, site_url: &str) -> SitemapListCall<'a, S> {
         SitemapListCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -956,7 +961,7 @@ impl<'a> SitemapMethods<'a> {
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
     /// * `feedpath` - The URL of the actual sitemap. For example: `http://www.example.com/sitemap.xml`.
-    pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a> {
+    pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a, S> {
         SitemapSubmitCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -991,22 +996,22 @@ impl<'a> SitemapMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add(...)`, `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.sites();
 /// # }
 /// ```
-pub struct SiteMethods<'a>
-    where  {
+pub struct SiteMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
 }
 
-impl<'a> client::MethodsBuilder for SiteMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SiteMethods<'a, S> {}
 
-impl<'a> SiteMethods<'a> {
+impl<'a, S> SiteMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1015,7 +1020,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URL of the site to add.
-    pub fn add(&self, site_url: &str) -> SiteAddCall<'a> {
+    pub fn add(&self, site_url: &str) -> SiteAddCall<'a, S> {
         SiteAddCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -1032,7 +1037,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`.
-    pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a> {
+    pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a, S> {
         SiteDeleteCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -1049,7 +1054,7 @@ impl<'a> SiteMethods<'a> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`.
-    pub fn get(&self, site_url: &str) -> SiteGetCall<'a> {
+    pub fn get(&self, site_url: &str) -> SiteGetCall<'a, S> {
         SiteGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -1062,7 +1067,7 @@ impl<'a> SiteMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     ///  Lists the user's Search Console sites.
-    pub fn list(&self) -> SiteListCall<'a> {
+    pub fn list(&self) -> SiteListCall<'a, S> {
         SiteListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1095,22 +1100,22 @@ impl<'a> SiteMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `index_inspect(...)`
 /// // to build up your call.
 /// let rb = hub.url_inspection();
 /// # }
 /// ```
-pub struct UrlInspectionMethods<'a>
-    where  {
+pub struct UrlInspectionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
 }
 
-impl<'a> client::MethodsBuilder for UrlInspectionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UrlInspectionMethods<'a, S> {}
 
-impl<'a> UrlInspectionMethods<'a> {
+impl<'a, S> UrlInspectionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1119,7 +1124,7 @@ impl<'a> UrlInspectionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn index_inspect(&self, request: InspectUrlIndexRequest) -> UrlInspectionIndexInspectCall<'a> {
+    pub fn index_inspect(&self, request: InspectUrlIndexRequest) -> UrlInspectionIndexInspectCall<'a, S> {
         UrlInspectionIndexInspectCall {
             hub: self.hub,
             _request: request,
@@ -1153,22 +1158,22 @@ impl<'a> UrlInspectionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `mobile_friendly_test_run(...)`
 /// // to build up your call.
 /// let rb = hub.url_testing_tools();
 /// # }
 /// ```
-pub struct UrlTestingToolMethods<'a>
-    where  {
+pub struct UrlTestingToolMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
 }
 
-impl<'a> client::MethodsBuilder for UrlTestingToolMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UrlTestingToolMethods<'a, S> {}
 
-impl<'a> UrlTestingToolMethods<'a> {
+impl<'a, S> UrlTestingToolMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1177,7 +1182,7 @@ impl<'a> UrlTestingToolMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn mobile_friendly_test_run(&self, request: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a> {
+    pub fn mobile_friendly_test_run(&self, request: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a, S> {
         UrlTestingToolMobileFriendlyTestRunCall {
             hub: self.hub,
             _request: request,
@@ -1218,7 +1223,7 @@ impl<'a> UrlTestingToolMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1231,10 +1236,10 @@ impl<'a> UrlTestingToolMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SearchanalyticQueryCall<'a>
-    where  {
+pub struct SearchanalyticQueryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _request: SearchAnalyticsQueryRequest,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1242,9 +1247,15 @@ pub struct SearchanalyticQueryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SearchanalyticQueryCall<'a> {}
+impl<'a, S> client::CallBuilder for SearchanalyticQueryCall<'a, S> {}
 
-impl<'a> SearchanalyticQueryCall<'a> {
+impl<'a, S> SearchanalyticQueryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1400,7 +1411,7 @@ impl<'a> SearchanalyticQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchAnalyticsQueryRequest) -> SearchanalyticQueryCall<'a> {
+    pub fn request(mut self, new_value: SearchAnalyticsQueryRequest) -> SearchanalyticQueryCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1410,7 +1421,7 @@ impl<'a> SearchanalyticQueryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SearchanalyticQueryCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SearchanalyticQueryCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1420,7 +1431,7 @@ impl<'a> SearchanalyticQueryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchanalyticQueryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchanalyticQueryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1445,7 +1456,7 @@ impl<'a> SearchanalyticQueryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SearchanalyticQueryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SearchanalyticQueryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1465,9 +1476,9 @@ impl<'a> SearchanalyticQueryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SearchanalyticQueryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SearchanalyticQueryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1499,7 +1510,7 @@ impl<'a> SearchanalyticQueryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1507,10 +1518,10 @@ impl<'a> SearchanalyticQueryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapDeleteCall<'a>
-    where  {
+pub struct SitemapDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1518,9 +1529,15 @@ pub struct SitemapDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SitemapDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SitemapDeleteCall<'a, S> {}
 
-impl<'a> SitemapDeleteCall<'a> {
+impl<'a, S> SitemapDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1653,7 +1670,7 @@ impl<'a> SitemapDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1663,7 +1680,7 @@ impl<'a> SitemapDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a, S> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1673,7 +1690,7 @@ impl<'a> SitemapDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1698,7 +1715,7 @@ impl<'a> SitemapDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1718,9 +1735,9 @@ impl<'a> SitemapDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SitemapDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1752,7 +1769,7 @@ impl<'a> SitemapDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1760,10 +1777,10 @@ impl<'a> SitemapDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapGetCall<'a>
-    where  {
+pub struct SitemapGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1771,9 +1788,15 @@ pub struct SitemapGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SitemapGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SitemapGetCall<'a, S> {}
 
-impl<'a> SitemapGetCall<'a> {
+impl<'a, S> SitemapGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1917,7 +1940,7 @@ impl<'a> SitemapGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1927,7 +1950,7 @@ impl<'a> SitemapGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a, S> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1937,7 +1960,7 @@ impl<'a> SitemapGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1962,7 +1985,7 @@ impl<'a> SitemapGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1982,9 +2005,9 @@ impl<'a> SitemapGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SitemapGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2016,7 +2039,7 @@ impl<'a> SitemapGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2025,10 +2048,10 @@ impl<'a> SitemapGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapListCall<'a>
-    where  {
+pub struct SitemapListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _sitemap_index: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2036,9 +2059,15 @@ pub struct SitemapListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SitemapListCall<'a> {}
+impl<'a, S> client::CallBuilder for SitemapListCall<'a, S> {}
 
-impl<'a> SitemapListCall<'a> {
+impl<'a, S> SitemapListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2184,14 +2213,14 @@ impl<'a> SitemapListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
     ///  A URL of a site's sitemap index. For example: `http://www.example.com/sitemapindex.xml`.
     ///
     /// Sets the *sitemap index* query property to the given value.
-    pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a> {
+    pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a, S> {
         self._sitemap_index = Some(new_value.to_string());
         self
     }
@@ -2201,7 +2230,7 @@ impl<'a> SitemapListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2226,7 +2255,7 @@ impl<'a> SitemapListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2246,9 +2275,9 @@ impl<'a> SitemapListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SitemapListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2280,7 +2309,7 @@ impl<'a> SitemapListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2288,10 +2317,10 @@ impl<'a> SitemapListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapSubmitCall<'a>
-    where  {
+pub struct SitemapSubmitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2299,9 +2328,15 @@ pub struct SitemapSubmitCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SitemapSubmitCall<'a> {}
+impl<'a, S> client::CallBuilder for SitemapSubmitCall<'a, S> {}
 
-impl<'a> SitemapSubmitCall<'a> {
+impl<'a, S> SitemapSubmitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2434,7 +2469,7 @@ impl<'a> SitemapSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2444,7 +2479,7 @@ impl<'a> SitemapSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a, S> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -2454,7 +2489,7 @@ impl<'a> SitemapSubmitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapSubmitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapSubmitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2479,7 +2514,7 @@ impl<'a> SitemapSubmitCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2499,9 +2534,9 @@ impl<'a> SitemapSubmitCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapSubmitCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SitemapSubmitCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2533,7 +2568,7 @@ impl<'a> SitemapSubmitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2541,19 +2576,25 @@ impl<'a> SitemapSubmitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteAddCall<'a>
-    where  {
+pub struct SiteAddCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteAddCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteAddCall<'a, S> {}
 
-impl<'a> SiteAddCall<'a> {
+impl<'a, S> SiteAddCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2685,7 +2726,7 @@ impl<'a> SiteAddCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2695,7 +2736,7 @@ impl<'a> SiteAddCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteAddCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteAddCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2720,7 +2761,7 @@ impl<'a> SiteAddCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2740,9 +2781,9 @@ impl<'a> SiteAddCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteAddCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteAddCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2774,7 +2815,7 @@ impl<'a> SiteAddCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2782,19 +2823,25 @@ impl<'a> SiteAddCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDeleteCall<'a>
-    where  {
+pub struct SiteDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteDeleteCall<'a, S> {}
 
-impl<'a> SiteDeleteCall<'a> {
+impl<'a, S> SiteDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2926,7 +2973,7 @@ impl<'a> SiteDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2936,7 +2983,7 @@ impl<'a> SiteDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2961,7 +3008,7 @@ impl<'a> SiteDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2981,9 +3028,9 @@ impl<'a> SiteDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3015,7 +3062,7 @@ impl<'a> SiteDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3023,19 +3070,25 @@ impl<'a> SiteDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteGetCall<'a>
-    where  {
+pub struct SiteGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteGetCall<'a, S> {}
 
-impl<'a> SiteGetCall<'a> {
+impl<'a, S> SiteGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3178,7 +3231,7 @@ impl<'a> SiteGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a> {
+    pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a, S> {
         self._site_url = new_value.to_string();
         self
     }
@@ -3188,7 +3241,7 @@ impl<'a> SiteGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3213,7 +3266,7 @@ impl<'a> SiteGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3233,9 +3286,9 @@ impl<'a> SiteGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3267,7 +3320,7 @@ impl<'a> SiteGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3275,18 +3328,24 @@ impl<'a> SiteGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteListCall<'a>
-    where  {
+pub struct SiteListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SiteListCall<'a> {}
+impl<'a, S> client::CallBuilder for SiteListCall<'a, S> {}
 
-impl<'a> SiteListCall<'a> {
+impl<'a, S> SiteListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3407,7 +3466,7 @@ impl<'a> SiteListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3432,7 +3491,7 @@ impl<'a> SiteListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3452,9 +3511,9 @@ impl<'a> SiteListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SiteListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3487,7 +3546,7 @@ impl<'a> SiteListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3500,19 +3559,25 @@ impl<'a> SiteListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlInspectionIndexInspectCall<'a>
-    where  {
+pub struct UrlInspectionIndexInspectCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _request: InspectUrlIndexRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UrlInspectionIndexInspectCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlInspectionIndexInspectCall<'a, S> {}
 
-impl<'a> UrlInspectionIndexInspectCall<'a> {
+impl<'a, S> UrlInspectionIndexInspectCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3646,7 +3711,7 @@ impl<'a> UrlInspectionIndexInspectCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InspectUrlIndexRequest) -> UrlInspectionIndexInspectCall<'a> {
+    pub fn request(mut self, new_value: InspectUrlIndexRequest) -> UrlInspectionIndexInspectCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3656,7 +3721,7 @@ impl<'a> UrlInspectionIndexInspectCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlInspectionIndexInspectCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlInspectionIndexInspectCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3681,7 +3746,7 @@ impl<'a> UrlInspectionIndexInspectCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlInspectionIndexInspectCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlInspectionIndexInspectCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3701,9 +3766,9 @@ impl<'a> UrlInspectionIndexInspectCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlInspectionIndexInspectCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UrlInspectionIndexInspectCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3736,7 +3801,7 @@ impl<'a> UrlInspectionIndexInspectCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = SearchConsole::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3749,18 +3814,24 @@ impl<'a> UrlInspectionIndexInspectCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlTestingToolMobileFriendlyTestRunCall<'a>
-    where  {
+pub struct UrlTestingToolMobileFriendlyTestRunCall<'a, S>
+    where S: 'a {
 
-    hub: &'a SearchConsole<>,
+    hub: &'a SearchConsole<S>,
     _request: RunMobileFriendlyTestRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for UrlTestingToolMobileFriendlyTestRunCall<'a> {}
+impl<'a, S> client::CallBuilder for UrlTestingToolMobileFriendlyTestRunCall<'a, S> {}
 
-impl<'a> UrlTestingToolMobileFriendlyTestRunCall<'a> {
+impl<'a, S> UrlTestingToolMobileFriendlyTestRunCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3888,7 +3959,7 @@ impl<'a> UrlTestingToolMobileFriendlyTestRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a> {
+    pub fn request(mut self, new_value: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3898,7 +3969,7 @@ impl<'a> UrlTestingToolMobileFriendlyTestRunCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlTestingToolMobileFriendlyTestRunCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlTestingToolMobileFriendlyTestRunCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3923,7 +3994,7 @@ impl<'a> UrlTestingToolMobileFriendlyTestRunCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlTestingToolMobileFriendlyTestRunCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlTestingToolMobileFriendlyTestRunCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

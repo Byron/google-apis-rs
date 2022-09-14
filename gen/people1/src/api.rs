@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -114,7 +119,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -145,40 +150,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PeopleService<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PeopleService<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PeopleService<> {}
+impl<'a, S> client::Hub for PeopleService<S> {}
 
-impl<'a, > PeopleService<> {
+impl<'a, S> PeopleService<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PeopleService<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PeopleService<S> {
         PeopleService {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://people.googleapis.com/".to_string(),
             _root_url: "https://people.googleapis.com/".to_string(),
         }
     }
 
-    pub fn contact_groups(&'a self) -> ContactGroupMethods<'a> {
+    pub fn contact_groups(&'a self) -> ContactGroupMethods<'a, S> {
         ContactGroupMethods { hub: &self }
     }
-    pub fn other_contacts(&'a self) -> OtherContactMethods<'a> {
+    pub fn other_contacts(&'a self) -> OtherContactMethods<'a, S> {
         OtherContactMethods { hub: &self }
     }
-    pub fn people(&'a self) -> PeopleMethods<'a> {
+    pub fn people(&'a self) -> PeopleMethods<'a, S> {
         PeopleMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1863,22 +1868,22 @@ impl client::Part for UserDefined {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_get(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `members_modify(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.contact_groups();
 /// # }
 /// ```
-pub struct ContactGroupMethods<'a>
-    where  {
+pub struct ContactGroupMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
 }
 
-impl<'a> client::MethodsBuilder for ContactGroupMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ContactGroupMethods<'a, S> {}
 
-impl<'a> ContactGroupMethods<'a> {
+impl<'a, S> ContactGroupMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1888,7 +1893,7 @@ impl<'a> ContactGroupMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - Required. The resource name of the contact group to modify.
-    pub fn members_modify(&self, request: ModifyContactGroupMembersRequest, resource_name: &str) -> ContactGroupMemberModifyCall<'a> {
+    pub fn members_modify(&self, request: ModifyContactGroupMembersRequest, resource_name: &str) -> ContactGroupMemberModifyCall<'a, S> {
         ContactGroupMemberModifyCall {
             hub: self.hub,
             _request: request,
@@ -1902,7 +1907,7 @@ impl<'a> ContactGroupMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get a list of contact groups owned by the authenticated user by specifying a list of contact group resource names.
-    pub fn batch_get(&self) -> ContactGroupBatchGetCall<'a> {
+    pub fn batch_get(&self) -> ContactGroupBatchGetCall<'a, S> {
         ContactGroupBatchGetCall {
             hub: self.hub,
             _resource_names: Default::default(),
@@ -1921,7 +1926,7 @@ impl<'a> ContactGroupMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateContactGroupRequest) -> ContactGroupCreateCall<'a> {
+    pub fn create(&self, request: CreateContactGroupRequest) -> ContactGroupCreateCall<'a, S> {
         ContactGroupCreateCall {
             hub: self.hub,
             _request: request,
@@ -1938,7 +1943,7 @@ impl<'a> ContactGroupMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact group to delete.
-    pub fn delete(&self, resource_name: &str) -> ContactGroupDeleteCall<'a> {
+    pub fn delete(&self, resource_name: &str) -> ContactGroupDeleteCall<'a, S> {
         ContactGroupDeleteCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -1956,7 +1961,7 @@ impl<'a> ContactGroupMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact group to get.
-    pub fn get(&self, resource_name: &str) -> ContactGroupGetCall<'a> {
+    pub fn get(&self, resource_name: &str) -> ContactGroupGetCall<'a, S> {
         ContactGroupGetCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -1971,7 +1976,7 @@ impl<'a> ContactGroupMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all contact groups owned by the authenticated user. Members of the contact groups are not populated.
-    pub fn list(&self) -> ContactGroupListCall<'a> {
+    pub fn list(&self) -> ContactGroupListCall<'a, S> {
         ContactGroupListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -1992,7 +1997,7 @@ impl<'a> ContactGroupMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - The resource name for the contact group, assigned by the server. An ASCII string, in the form of `contactGroups/{contact_group_id}`.
-    pub fn update(&self, request: UpdateContactGroupRequest, resource_name: &str) -> ContactGroupUpdateCall<'a> {
+    pub fn update(&self, request: UpdateContactGroupRequest, resource_name: &str) -> ContactGroupUpdateCall<'a, S> {
         ContactGroupUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2027,22 +2032,22 @@ impl<'a> ContactGroupMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `copy_other_contact_to_my_contacts_group(...)`, `list(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.other_contacts();
 /// # }
 /// ```
-pub struct OtherContactMethods<'a>
-    where  {
+pub struct OtherContactMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
 }
 
-impl<'a> client::MethodsBuilder for OtherContactMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OtherContactMethods<'a, S> {}
 
-impl<'a> OtherContactMethods<'a> {
+impl<'a, S> OtherContactMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2052,7 +2057,7 @@ impl<'a> OtherContactMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - Required. The resource name of the "Other contact" to copy.
-    pub fn copy_other_contact_to_my_contacts_group(&self, request: CopyOtherContactToMyContactsGroupRequest, resource_name: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
+    pub fn copy_other_contact_to_my_contacts_group(&self, request: CopyOtherContactToMyContactsGroupRequest, resource_name: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S> {
         OtherContactCopyOtherContactToMyContactsGroupCall {
             hub: self.hub,
             _request: request,
@@ -2066,7 +2071,7 @@ impl<'a> OtherContactMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all "Other contacts", that is contacts that are not in a contact group. "Other contacts" are typically auto created contacts from interactions. Sync tokens expire 7 days after the full sync. A request with an expired sync token will result in a 410 error. In the case of such an error clients should make a full sync request without a `sync_token`. The first page of a full sync request has an additional quota. If the quota is exceeded, a 429 error will be returned. This quota is fixed and can not be increased. When the `sync_token` is specified, resources deleted since the last sync will be returned as a person with `PersonMetadata.deleted` set to true. When the `page_token` or `sync_token` is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at [List the user's other contacts that have changed](/people/v1/other-contacts#list_the_users_other_contacts_that_have_changed).
-    pub fn list(&self) -> OtherContactListCall<'a> {
+    pub fn list(&self) -> OtherContactListCall<'a, S> {
         OtherContactListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -2084,7 +2089,7 @@ impl<'a> OtherContactMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of contacts in the authenticated user's other contacts that matches the search query. The query matches on a contact's `names`, `emailAddresses`, and `phoneNumbers` fields that are from the OTHER_CONTACT source. **IMPORTANT**: Before searching, clients should send a warmup request with an empty query to update the cache. See https://developers.google.com/people/v1/other-contacts#search_the_users_other_contacts
-    pub fn search(&self) -> OtherContactSearchCall<'a> {
+    pub fn search(&self) -> OtherContactSearchCall<'a, S> {
         OtherContactSearchCall {
             hub: self.hub,
             _read_mask: Default::default(),
@@ -2120,22 +2125,22 @@ impl<'a> OtherContactMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_create_contacts(...)`, `batch_delete_contacts(...)`, `batch_update_contacts(...)`, `connections_list(...)`, `create_contact(...)`, `delete_contact(...)`, `delete_contact_photo(...)`, `get(...)`, `get_batch_get(...)`, `list_directory_people(...)`, `search_contacts(...)`, `search_directory_people(...)`, `update_contact(...)` and `update_contact_photo(...)`
 /// // to build up your call.
 /// let rb = hub.people();
 /// # }
 /// ```
-pub struct PeopleMethods<'a>
-    where  {
+pub struct PeopleMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
 }
 
-impl<'a> client::MethodsBuilder for PeopleMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PeopleMethods<'a, S> {}
 
-impl<'a> PeopleMethods<'a> {
+impl<'a, S> PeopleMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2144,7 +2149,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name to return connections for. Only `people/me` is valid.
-    pub fn connections_list(&self, resource_name: &str) -> PeopleConnectionListCall<'a> {
+    pub fn connections_list(&self, resource_name: &str) -> PeopleConnectionListCall<'a, S> {
         PeopleConnectionListCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2169,7 +2174,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_create_contacts(&self, request: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a> {
+    pub fn batch_create_contacts(&self, request: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a, S> {
         PeopleBatchCreateContactCall {
             hub: self.hub,
             _request: request,
@@ -2186,7 +2191,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_delete_contacts(&self, request: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a> {
+    pub fn batch_delete_contacts(&self, request: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a, S> {
         PeopleBatchDeleteContactCall {
             hub: self.hub,
             _request: request,
@@ -2203,7 +2208,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_update_contacts(&self, request: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a> {
+    pub fn batch_update_contacts(&self, request: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a, S> {
         PeopleBatchUpdateContactCall {
             hub: self.hub,
             _request: request,
@@ -2220,7 +2225,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create_contact(&self, request: Person) -> PeopleCreateContactCall<'a> {
+    pub fn create_contact(&self, request: Person) -> PeopleCreateContactCall<'a, S> {
         PeopleCreateContactCall {
             hub: self.hub,
             _request: request,
@@ -2239,7 +2244,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact to delete.
-    pub fn delete_contact(&self, resource_name: &str) -> PeopleDeleteContactCall<'a> {
+    pub fn delete_contact(&self, resource_name: &str) -> PeopleDeleteContactCall<'a, S> {
         PeopleDeleteContactCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2256,7 +2261,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact whose photo will be deleted.
-    pub fn delete_contact_photo(&self, resource_name: &str) -> PeopleDeleteContactPhotoCall<'a> {
+    pub fn delete_contact_photo(&self, resource_name: &str) -> PeopleDeleteContactPhotoCall<'a, S> {
         PeopleDeleteContactPhotoCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2275,7 +2280,7 @@ impl<'a> PeopleMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the person to provide information about. - To get information about the authenticated user, specify `people/me`. - To get information about a google account, specify `people/{account_id}`. - To get information about a contact, specify the resource name that identifies the contact as returned by `people.connections.list`.
-    pub fn get(&self, resource_name: &str) -> PeopleGetCall<'a> {
+    pub fn get(&self, resource_name: &str) -> PeopleGetCall<'a, S> {
         PeopleGetCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2291,7 +2296,7 @@ impl<'a> PeopleMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides information about a list of specific people by specifying a list of requested resource names. Use `people/me` to indicate the authenticated user. The request returns a 400 error if 'personFields' is not specified.
-    pub fn get_batch_get(&self) -> PeopleGetBatchGetCall<'a> {
+    pub fn get_batch_get(&self) -> PeopleGetBatchGetCall<'a, S> {
         PeopleGetBatchGetCall {
             hub: self.hub,
             _sources: Default::default(),
@@ -2307,7 +2312,7 @@ impl<'a> PeopleMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of domain profiles and domain contacts in the authenticated user's domain directory. When the `sync_token` is specified, resources deleted since the last sync will be returned as a person with `PersonMetadata.deleted` set to true. When the `page_token` or `sync_token` is specified, all other request parameters must match the first call. Writes may have a propagation delay of several minutes for sync requests. Incremental syncs are not intended for read-after-write use cases. See example usage at [List the directory people that have changed](/people/v1/directory#list_the_directory_people_that_have_changed).
-    pub fn list_directory_people(&self) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn list_directory_people(&self) -> PeopleListDirectoryPeopleCall<'a, S> {
         PeopleListDirectoryPeopleCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -2326,7 +2331,7 @@ impl<'a> PeopleMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of contacts in the authenticated user's grouped contacts that matches the search query. The query matches on a contact's `names`, `nickNames`, `emailAddresses`, `phoneNumbers`, and `organizations` fields that are from the CONTACT source. **IMPORTANT**: Before searching, clients should send a warmup request with an empty query to update the cache. See https://developers.google.com/people/v1/contacts#search_the_users_contacts
-    pub fn search_contacts(&self) -> PeopleSearchContactCall<'a> {
+    pub fn search_contacts(&self) -> PeopleSearchContactCall<'a, S> {
         PeopleSearchContactCall {
             hub: self.hub,
             _sources: Default::default(),
@@ -2342,7 +2347,7 @@ impl<'a> PeopleMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of domain profiles and domain contacts in the authenticated user's domain directory that match the search query.
-    pub fn search_directory_people(&self) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn search_directory_people(&self) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         PeopleSearchDirectoryPeopleCall {
             hub: self.hub,
             _sources: Default::default(),
@@ -2365,7 +2370,7 @@ impl<'a> PeopleMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - The resource name for the person, assigned by the server. An ASCII string with a max length of 27 characters, in the form of `people/{person_id}`.
-    pub fn update_contact(&self, request: Person, resource_name: &str) -> PeopleUpdateContactCall<'a> {
+    pub fn update_contact(&self, request: Person, resource_name: &str) -> PeopleUpdateContactCall<'a, S> {
         PeopleUpdateContactCall {
             hub: self.hub,
             _request: request,
@@ -2387,7 +2392,7 @@ impl<'a> PeopleMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - Required. Person resource name
-    pub fn update_contact_photo(&self, request: UpdateContactPhotoRequest, resource_name: &str) -> PeopleUpdateContactPhotoCall<'a> {
+    pub fn update_contact_photo(&self, request: UpdateContactPhotoRequest, resource_name: &str) -> PeopleUpdateContactPhotoCall<'a, S> {
         PeopleUpdateContactPhotoCall {
             hub: self.hub,
             _request: request,
@@ -2430,7 +2435,7 @@ impl<'a> PeopleMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2443,10 +2448,10 @@ impl<'a> PeopleMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupMemberModifyCall<'a>
-    where  {
+pub struct ContactGroupMemberModifyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: ModifyContactGroupMembersRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2454,9 +2459,15 @@ pub struct ContactGroupMemberModifyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupMemberModifyCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupMemberModifyCall<'a, S> {}
 
-impl<'a> ContactGroupMemberModifyCall<'a> {
+impl<'a, S> ContactGroupMemberModifyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2616,7 +2627,7 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyContactGroupMembersRequest) -> ContactGroupMemberModifyCall<'a> {
+    pub fn request(mut self, new_value: ModifyContactGroupMembersRequest) -> ContactGroupMemberModifyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2626,7 +2637,7 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupMemberModifyCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupMemberModifyCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -2636,7 +2647,7 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupMemberModifyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupMemberModifyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2661,7 +2672,7 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupMemberModifyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupMemberModifyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2681,9 +2692,9 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupMemberModifyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupMemberModifyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2715,7 +2726,7 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2726,10 +2737,10 @@ impl<'a> ContactGroupMemberModifyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupBatchGetCall<'a>
-    where  {
+pub struct ContactGroupBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_names: Vec<String>,
     _max_members: Option<i32>,
     _group_fields: Option<String>,
@@ -2738,9 +2749,15 @@ pub struct ContactGroupBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupBatchGetCall<'a, S> {}
 
-impl<'a> ContactGroupBatchGetCall<'a> {
+impl<'a, S> ContactGroupBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2870,21 +2887,21 @@ impl<'a> ContactGroupBatchGetCall<'a> {
     ///
     /// Append the given value to the *resource names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_resource_names(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a> {
+    pub fn add_resource_names(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a, S> {
         self._resource_names.push(new_value.to_string());
         self
     }
     /// Optional. Specifies the maximum number of members to return for each group. Defaults to 0 if not set, which will return zero members.
     ///
     /// Sets the *max members* query property to the given value.
-    pub fn max_members(mut self, new_value: i32) -> ContactGroupBatchGetCall<'a> {
+    pub fn max_members(mut self, new_value: i32) -> ContactGroupBatchGetCall<'a, S> {
         self._max_members = Some(new_value);
         self
     }
     /// Optional. A field mask to restrict which fields on the group are returned. Defaults to `metadata`, `groupType`, `memberCount`, and `name` if not set or set to empty. Valid fields are: * clientData * groupType * memberCount * metadata * name
     ///
     /// Sets the *group fields* query property to the given value.
-    pub fn group_fields(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a> {
+    pub fn group_fields(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a, S> {
         self._group_fields = Some(new_value.to_string());
         self
     }
@@ -2894,7 +2911,7 @@ impl<'a> ContactGroupBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2919,7 +2936,7 @@ impl<'a> ContactGroupBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2939,9 +2956,9 @@ impl<'a> ContactGroupBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2974,7 +2991,7 @@ impl<'a> ContactGroupBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2987,19 +3004,25 @@ impl<'a> ContactGroupBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupCreateCall<'a>
-    where  {
+pub struct ContactGroupCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: CreateContactGroupRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupCreateCall<'a, S> {}
 
-impl<'a> ContactGroupCreateCall<'a> {
+impl<'a, S> ContactGroupCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3133,7 +3156,7 @@ impl<'a> ContactGroupCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateContactGroupRequest) -> ContactGroupCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateContactGroupRequest) -> ContactGroupCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3143,7 +3166,7 @@ impl<'a> ContactGroupCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3168,7 +3191,7 @@ impl<'a> ContactGroupCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3188,9 +3211,9 @@ impl<'a> ContactGroupCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3222,7 +3245,7 @@ impl<'a> ContactGroupCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3231,10 +3254,10 @@ impl<'a> ContactGroupCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupDeleteCall<'a>
-    where  {
+pub struct ContactGroupDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_name: String,
     _delete_contacts: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3242,9 +3265,15 @@ pub struct ContactGroupDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupDeleteCall<'a, S> {}
 
-impl<'a> ContactGroupDeleteCall<'a> {
+impl<'a, S> ContactGroupDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3394,14 +3423,14 @@ impl<'a> ContactGroupDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupDeleteCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupDeleteCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Optional. Set to true to also delete the contacts in the specified group.
     ///
     /// Sets the *delete contacts* query property to the given value.
-    pub fn delete_contacts(mut self, new_value: bool) -> ContactGroupDeleteCall<'a> {
+    pub fn delete_contacts(mut self, new_value: bool) -> ContactGroupDeleteCall<'a, S> {
         self._delete_contacts = Some(new_value);
         self
     }
@@ -3411,7 +3440,7 @@ impl<'a> ContactGroupDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3436,7 +3465,7 @@ impl<'a> ContactGroupDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3456,9 +3485,9 @@ impl<'a> ContactGroupDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3490,7 +3519,7 @@ impl<'a> ContactGroupDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3500,10 +3529,10 @@ impl<'a> ContactGroupDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupGetCall<'a>
-    where  {
+pub struct ContactGroupGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_name: String,
     _max_members: Option<i32>,
     _group_fields: Option<String>,
@@ -3512,9 +3541,15 @@ pub struct ContactGroupGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupGetCall<'a, S> {}
 
-impl<'a> ContactGroupGetCall<'a> {
+impl<'a, S> ContactGroupGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3667,21 +3702,21 @@ impl<'a> ContactGroupGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupGetCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupGetCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Optional. Specifies the maximum number of members to return. Defaults to 0 if not set, which will return zero members.
     ///
     /// Sets the *max members* query property to the given value.
-    pub fn max_members(mut self, new_value: i32) -> ContactGroupGetCall<'a> {
+    pub fn max_members(mut self, new_value: i32) -> ContactGroupGetCall<'a, S> {
         self._max_members = Some(new_value);
         self
     }
     /// Optional. A field mask to restrict which fields on the group are returned. Defaults to `metadata`, `groupType`, `memberCount`, and `name` if not set or set to empty. Valid fields are: * clientData * groupType * memberCount * metadata * name
     ///
     /// Sets the *group fields* query property to the given value.
-    pub fn group_fields(mut self, new_value: &str) -> ContactGroupGetCall<'a> {
+    pub fn group_fields(mut self, new_value: &str) -> ContactGroupGetCall<'a, S> {
         self._group_fields = Some(new_value.to_string());
         self
     }
@@ -3691,7 +3726,7 @@ impl<'a> ContactGroupGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3716,7 +3751,7 @@ impl<'a> ContactGroupGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3736,9 +3771,9 @@ impl<'a> ContactGroupGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3770,7 +3805,7 @@ impl<'a> ContactGroupGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3782,10 +3817,10 @@ impl<'a> ContactGroupGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupListCall<'a>
-    where  {
+pub struct ContactGroupListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _sync_token: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3795,9 +3830,15 @@ pub struct ContactGroupListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupListCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupListCall<'a, S> {}
 
-impl<'a> ContactGroupListCall<'a> {
+impl<'a, S> ContactGroupListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3927,28 +3968,28 @@ impl<'a> ContactGroupListCall<'a> {
     /// Optional. A sync token, returned by a previous call to `contactgroups.list`. Only resources changed since the sync token was created will be returned.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> ContactGroupListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> ContactGroupListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Optional. The next_page_token value returned from a previous call to [ListContactGroups](/people/api/rest/v1/contactgroups/list). Requests the next page of resources.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ContactGroupListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ContactGroupListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of resources to return. Valid values are between 1 and 1000, inclusive. Defaults to 30 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ContactGroupListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ContactGroupListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. A field mask to restrict which fields on the group are returned. Defaults to `metadata`, `groupType`, `memberCount`, and `name` if not set or set to empty. Valid fields are: * clientData * groupType * memberCount * metadata * name
     ///
     /// Sets the *group fields* query property to the given value.
-    pub fn group_fields(mut self, new_value: &str) -> ContactGroupListCall<'a> {
+    pub fn group_fields(mut self, new_value: &str) -> ContactGroupListCall<'a, S> {
         self._group_fields = Some(new_value.to_string());
         self
     }
@@ -3958,7 +3999,7 @@ impl<'a> ContactGroupListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3983,7 +4024,7 @@ impl<'a> ContactGroupListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4003,9 +4044,9 @@ impl<'a> ContactGroupListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4038,7 +4079,7 @@ impl<'a> ContactGroupListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4051,10 +4092,10 @@ impl<'a> ContactGroupListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupUpdateCall<'a>
-    where  {
+pub struct ContactGroupUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: UpdateContactGroupRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4062,9 +4103,15 @@ pub struct ContactGroupUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ContactGroupUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ContactGroupUpdateCall<'a, S> {}
 
-impl<'a> ContactGroupUpdateCall<'a> {
+impl<'a, S> ContactGroupUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4224,7 +4271,7 @@ impl<'a> ContactGroupUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateContactGroupRequest) -> ContactGroupUpdateCall<'a> {
+    pub fn request(mut self, new_value: UpdateContactGroupRequest) -> ContactGroupUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4234,7 +4281,7 @@ impl<'a> ContactGroupUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupUpdateCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupUpdateCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -4244,7 +4291,7 @@ impl<'a> ContactGroupUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4269,7 +4316,7 @@ impl<'a> ContactGroupUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4289,9 +4336,9 @@ impl<'a> ContactGroupUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ContactGroupUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4324,7 +4371,7 @@ impl<'a> ContactGroupUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4337,10 +4384,10 @@ impl<'a> ContactGroupUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OtherContactCopyOtherContactToMyContactsGroupCall<'a>
-    where  {
+pub struct OtherContactCopyOtherContactToMyContactsGroupCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: CopyOtherContactToMyContactsGroupRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4348,9 +4395,15 @@ pub struct OtherContactCopyOtherContactToMyContactsGroupCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OtherContactCopyOtherContactToMyContactsGroupCall<'a> {}
+impl<'a, S> client::CallBuilder for OtherContactCopyOtherContactToMyContactsGroupCall<'a, S> {}
 
-impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
+impl<'a, S> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4510,7 +4563,7 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CopyOtherContactToMyContactsGroupRequest) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
+    pub fn request(mut self, new_value: CopyOtherContactToMyContactsGroupRequest) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4520,7 +4573,7 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -4530,7 +4583,7 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4555,7 +4608,7 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4575,9 +4628,9 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4609,7 +4662,7 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4623,10 +4676,10 @@ impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OtherContactListCall<'a>
-    where  {
+pub struct OtherContactListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _sync_token: Option<String>,
     _sources: Vec<String>,
     _request_sync_token: Option<bool>,
@@ -4638,9 +4691,15 @@ pub struct OtherContactListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OtherContactListCall<'a> {}
+impl<'a, S> client::CallBuilder for OtherContactListCall<'a, S> {}
 
-impl<'a> OtherContactListCall<'a> {
+impl<'a, S> OtherContactListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4778,7 +4837,7 @@ impl<'a> OtherContactListCall<'a> {
     /// Optional. A sync token, received from a previous response `next_sync_token` Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to `otherContacts.list` must match the first call that provided the sync token. More details about sync behavior at `otherContacts.list`.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> OtherContactListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> OtherContactListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -4786,35 +4845,35 @@ impl<'a> OtherContactListCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> OtherContactListCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> OtherContactListCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. Whether the response should return `next_sync_token` on the last page of results. It can be used to get incremental changes since the last request by setting it on the request `sync_token`. More details about sync behavior at `otherContacts.list`.
     ///
     /// Sets the *request sync token* query property to the given value.
-    pub fn request_sync_token(mut self, new_value: bool) -> OtherContactListCall<'a> {
+    pub fn request_sync_token(mut self, new_value: bool) -> OtherContactListCall<'a, S> {
         self._request_sync_token = Some(new_value);
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. What values are valid depend on what ReadSourceType is used. If READ_SOURCE_TYPE_CONTACT is used, valid values are: * emailAddresses * metadata * names * phoneNumbers * photos If READ_SOURCE_TYPE_PROFILE is used, valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> OtherContactListCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> OtherContactListCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous response `next_page_token`. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `otherContacts.list` must match the first call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OtherContactListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OtherContactListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of "Other contacts" to include in the response. Valid values are between 1 and 1000, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OtherContactListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OtherContactListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4824,7 +4883,7 @@ impl<'a> OtherContactListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4849,7 +4908,7 @@ impl<'a> OtherContactListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OtherContactListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OtherContactListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4869,9 +4928,9 @@ impl<'a> OtherContactListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OtherContactListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4903,7 +4962,7 @@ impl<'a> OtherContactListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4914,10 +4973,10 @@ impl<'a> OtherContactListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OtherContactSearchCall<'a>
-    where  {
+pub struct OtherContactSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _read_mask: Option<String>,
     _query: Option<String>,
     _page_size: Option<i32>,
@@ -4926,9 +4985,15 @@ pub struct OtherContactSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OtherContactSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for OtherContactSearchCall<'a, S> {}
 
-impl<'a> OtherContactSearchCall<'a> {
+impl<'a, S> OtherContactSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5055,21 +5120,21 @@ impl<'a> OtherContactSearchCall<'a> {
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * emailAddresses * metadata * names * phoneNumbers
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> OtherContactSearchCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> OtherContactSearchCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Required. The plain-text query for the request. The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n".
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OtherContactSearchCall<'a> {
+    pub fn query(mut self, new_value: &str) -> OtherContactSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. The number of results to return. Defaults to 10 if field is not set, or set to 0. Values greater than 30 will be capped to 30.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OtherContactSearchCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OtherContactSearchCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5079,7 +5144,7 @@ impl<'a> OtherContactSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5104,7 +5169,7 @@ impl<'a> OtherContactSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OtherContactSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OtherContactSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5124,9 +5189,9 @@ impl<'a> OtherContactSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OtherContactSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5158,7 +5223,7 @@ impl<'a> OtherContactSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5174,10 +5239,10 @@ impl<'a> OtherContactSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleConnectionListCall<'a>
-    where  {
+pub struct PeopleConnectionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_name: String,
     _sync_token: Option<String>,
     _sources: Vec<String>,
@@ -5192,9 +5257,15 @@ pub struct PeopleConnectionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleConnectionListCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleConnectionListCall<'a, S> {}
 
-impl<'a> PeopleConnectionListCall<'a> {
+impl<'a, S> PeopleConnectionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5367,14 +5438,14 @@ impl<'a> PeopleConnectionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Optional. A sync token, received from a previous response `next_sync_token` Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to `people.connections.list` must match the first call that provided the sync token. More details about sync behavior at `people.connections.list`.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -5382,49 +5453,49 @@ impl<'a> PeopleConnectionListCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. The order in which the connections should be sorted. Defaults to `LAST_MODIFIED_ASCENDING`.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn sort_order(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._sort_order = Some(new_value.to_string());
         self
     }
     /// Optional. Whether the response should return `next_sync_token` on the last page of results. It can be used to get incremental changes since the last request by setting it on the request `sync_token`. More details about sync behavior at `people.connections.list`.
     ///
     /// Sets the *request sync token* query property to the given value.
-    pub fn request_sync_token(mut self, new_value: bool) -> PeopleConnectionListCall<'a> {
+    pub fn request_sync_token(mut self, new_value: bool) -> PeopleConnectionListCall<'a, S> {
         self._request_sync_token = Some(new_value);
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._request_mask_include_field = Some(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._person_fields = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous response `next_page_token`. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `people.connections.list` must match the first call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of connections to include in the response. Valid values are between 1 and 1000, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleConnectionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleConnectionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5434,7 +5505,7 @@ impl<'a> PeopleConnectionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleConnectionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleConnectionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5459,7 +5530,7 @@ impl<'a> PeopleConnectionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleConnectionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleConnectionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5479,9 +5550,9 @@ impl<'a> PeopleConnectionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleConnectionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleConnectionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5514,7 +5585,7 @@ impl<'a> PeopleConnectionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5527,19 +5598,25 @@ impl<'a> PeopleConnectionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleBatchCreateContactCall<'a>
-    where  {
+pub struct PeopleBatchCreateContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: BatchCreateContactsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleBatchCreateContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleBatchCreateContactCall<'a, S> {}
 
-impl<'a> PeopleBatchCreateContactCall<'a> {
+impl<'a, S> PeopleBatchCreateContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5673,7 +5750,7 @@ impl<'a> PeopleBatchCreateContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a> {
+    pub fn request(mut self, new_value: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5683,7 +5760,7 @@ impl<'a> PeopleBatchCreateContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchCreateContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchCreateContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5708,7 +5785,7 @@ impl<'a> PeopleBatchCreateContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchCreateContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchCreateContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5728,9 +5805,9 @@ impl<'a> PeopleBatchCreateContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchCreateContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleBatchCreateContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5763,7 +5840,7 @@ impl<'a> PeopleBatchCreateContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5776,19 +5853,25 @@ impl<'a> PeopleBatchCreateContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleBatchDeleteContactCall<'a>
-    where  {
+pub struct PeopleBatchDeleteContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: BatchDeleteContactsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleBatchDeleteContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleBatchDeleteContactCall<'a, S> {}
 
-impl<'a> PeopleBatchDeleteContactCall<'a> {
+impl<'a, S> PeopleBatchDeleteContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5922,7 +6005,7 @@ impl<'a> PeopleBatchDeleteContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a> {
+    pub fn request(mut self, new_value: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5932,7 +6015,7 @@ impl<'a> PeopleBatchDeleteContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchDeleteContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchDeleteContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5957,7 +6040,7 @@ impl<'a> PeopleBatchDeleteContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchDeleteContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchDeleteContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5977,9 +6060,9 @@ impl<'a> PeopleBatchDeleteContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchDeleteContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleBatchDeleteContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6012,7 +6095,7 @@ impl<'a> PeopleBatchDeleteContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6025,19 +6108,25 @@ impl<'a> PeopleBatchDeleteContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleBatchUpdateContactCall<'a>
-    where  {
+pub struct PeopleBatchUpdateContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: BatchUpdateContactsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleBatchUpdateContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleBatchUpdateContactCall<'a, S> {}
 
-impl<'a> PeopleBatchUpdateContactCall<'a> {
+impl<'a, S> PeopleBatchUpdateContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6171,7 +6260,7 @@ impl<'a> PeopleBatchUpdateContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a> {
+    pub fn request(mut self, new_value: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6181,7 +6270,7 @@ impl<'a> PeopleBatchUpdateContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchUpdateContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchUpdateContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6206,7 +6295,7 @@ impl<'a> PeopleBatchUpdateContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchUpdateContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchUpdateContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6226,9 +6315,9 @@ impl<'a> PeopleBatchUpdateContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchUpdateContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleBatchUpdateContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6261,7 +6350,7 @@ impl<'a> PeopleBatchUpdateContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6276,10 +6365,10 @@ impl<'a> PeopleBatchUpdateContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleCreateContactCall<'a>
-    where  {
+pub struct PeopleCreateContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: Person,
     _sources: Vec<String>,
     _person_fields: Option<String>,
@@ -6288,9 +6377,15 @@ pub struct PeopleCreateContactCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleCreateContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleCreateContactCall<'a, S> {}
 
-impl<'a> PeopleCreateContactCall<'a> {
+impl<'a, S> PeopleCreateContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6432,7 +6527,7 @@ impl<'a> PeopleCreateContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Person) -> PeopleCreateContactCall<'a> {
+    pub fn request(mut self, new_value: Person) -> PeopleCreateContactCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6440,14 +6535,14 @@ impl<'a> PeopleCreateContactCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleCreateContactCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleCreateContactCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Defaults to all fields if not set. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleCreateContactCall<'a> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleCreateContactCall<'a, S> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -6457,7 +6552,7 @@ impl<'a> PeopleCreateContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleCreateContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleCreateContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6482,7 +6577,7 @@ impl<'a> PeopleCreateContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleCreateContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleCreateContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6502,9 +6597,9 @@ impl<'a> PeopleCreateContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleCreateContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleCreateContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6536,7 +6631,7 @@ impl<'a> PeopleCreateContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6544,19 +6639,25 @@ impl<'a> PeopleCreateContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleDeleteContactCall<'a>
-    where  {
+pub struct PeopleDeleteContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleDeleteContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleDeleteContactCall<'a, S> {}
 
-impl<'a> PeopleDeleteContactCall<'a> {
+impl<'a, S> PeopleDeleteContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6703,7 +6804,7 @@ impl<'a> PeopleDeleteContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -6713,7 +6814,7 @@ impl<'a> PeopleDeleteContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6738,7 +6839,7 @@ impl<'a> PeopleDeleteContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6758,9 +6859,9 @@ impl<'a> PeopleDeleteContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleDeleteContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6792,7 +6893,7 @@ impl<'a> PeopleDeleteContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6802,10 +6903,10 @@ impl<'a> PeopleDeleteContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleDeleteContactPhotoCall<'a>
-    where  {
+pub struct PeopleDeleteContactPhotoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_name: String,
     _sources: Vec<String>,
     _person_fields: Option<String>,
@@ -6814,9 +6915,15 @@ pub struct PeopleDeleteContactPhotoCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleDeleteContactPhotoCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleDeleteContactPhotoCall<'a, S> {}
 
-impl<'a> PeopleDeleteContactPhotoCall<'a> {
+impl<'a, S> PeopleDeleteContactPhotoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6971,7 +7078,7 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -6979,14 +7086,14 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. A field mask to restrict which fields on the person are returned. Multiple fields can be specified by separating them with commas. Defaults to empty if not set, which will skip the post mutate get. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a, S> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -6996,7 +7103,7 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactPhotoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactPhotoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7021,7 +7128,7 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactPhotoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactPhotoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7041,9 +7148,9 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactPhotoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleDeleteContactPhotoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7075,7 +7182,7 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7086,10 +7193,10 @@ impl<'a> PeopleDeleteContactPhotoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleGetCall<'a>
-    where  {
+pub struct PeopleGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _resource_name: String,
     _sources: Vec<String>,
     _request_mask_include_field: Option<String>,
@@ -7099,9 +7206,15 @@ pub struct PeopleGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleGetCall<'a, S> {}
 
-impl<'a> PeopleGetCall<'a> {
+impl<'a, S> PeopleGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7259,7 +7372,7 @@ impl<'a> PeopleGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleGetCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleGetCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -7267,21 +7380,21 @@ impl<'a> PeopleGetCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleGetCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleGetCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetCall<'a> {
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetCall<'a, S> {
         self._request_mask_include_field = Some(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on the person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleGetCall<'a> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleGetCall<'a, S> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -7291,7 +7404,7 @@ impl<'a> PeopleGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7316,7 +7429,7 @@ impl<'a> PeopleGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7336,9 +7449,9 @@ impl<'a> PeopleGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7370,7 +7483,7 @@ impl<'a> PeopleGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7382,10 +7495,10 @@ impl<'a> PeopleGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleGetBatchGetCall<'a>
-    where  {
+pub struct PeopleGetBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _sources: Vec<String>,
     _resource_names: Vec<String>,
     _request_mask_include_field: Option<String>,
@@ -7395,9 +7508,15 @@ pub struct PeopleGetBatchGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleGetBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleGetBatchGetCall<'a, S> {}
 
-impl<'a> PeopleGetBatchGetCall<'a> {
+impl<'a, S> PeopleGetBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7532,7 +7651,7 @@ impl<'a> PeopleGetBatchGetCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
@@ -7540,21 +7659,21 @@ impl<'a> PeopleGetBatchGetCall<'a> {
     ///
     /// Append the given value to the *resource names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_resource_names(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
+    pub fn add_resource_names(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, S> {
         self._resource_names.push(new_value.to_string());
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, S> {
         self._request_mask_include_field = Some(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, S> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -7564,7 +7683,7 @@ impl<'a> PeopleGetBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7589,7 +7708,7 @@ impl<'a> PeopleGetBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7609,9 +7728,9 @@ impl<'a> PeopleGetBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleGetBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7643,7 +7762,7 @@ impl<'a> PeopleGetBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7658,10 +7777,10 @@ impl<'a> PeopleGetBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleListDirectoryPeopleCall<'a>
-    where  {
+pub struct PeopleListDirectoryPeopleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _sync_token: Option<String>,
     _sources: Vec<String>,
     _request_sync_token: Option<bool>,
@@ -7674,9 +7793,15 @@ pub struct PeopleListDirectoryPeopleCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleListDirectoryPeopleCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleListDirectoryPeopleCall<'a, S> {}
 
-impl<'a> PeopleListDirectoryPeopleCall<'a> {
+impl<'a, S> PeopleListDirectoryPeopleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7819,7 +7944,7 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
     /// Optional. A sync token, received from a previous response `next_sync_token` Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to `people.listDirectoryPeople` must match the first call that provided the sync token. More details about sync behavior at `people.listDirectoryPeople`.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn sync_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -7827,35 +7952,35 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. Whether the response should return `next_sync_token`. It can be used to get incremental changes since the last request by setting it on the request `sync_token`. More details about sync behavior at `people.listDirectoryPeople`.
     ///
     /// Sets the *request sync token* query property to the given value.
-    pub fn request_sync_token(mut self, new_value: bool) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn request_sync_token(mut self, new_value: bool) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._request_sync_token = Some(new_value);
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous response `next_page_token`. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `people.listDirectoryPeople` must match the first call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of people to include in the response. Valid values are between 1 and 1000, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7863,7 +7988,7 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
     ///
     /// Append the given value to the *merge sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._merge_sources.push(new_value.to_string());
         self
     }
@@ -7873,7 +7998,7 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListDirectoryPeopleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListDirectoryPeopleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7898,7 +8023,7 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleListDirectoryPeopleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleListDirectoryPeopleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7918,9 +8043,9 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListDirectoryPeopleCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleListDirectoryPeopleCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7952,7 +8077,7 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7964,10 +8089,10 @@ impl<'a> PeopleListDirectoryPeopleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleSearchContactCall<'a>
-    where  {
+pub struct PeopleSearchContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _sources: Vec<String>,
     _read_mask: Option<String>,
     _query: Option<String>,
@@ -7977,9 +8102,15 @@ pub struct PeopleSearchContactCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleSearchContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleSearchContactCall<'a, S> {}
 
-impl<'a> PeopleSearchContactCall<'a> {
+impl<'a, S> PeopleSearchContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8112,28 +8243,28 @@ impl<'a> PeopleSearchContactCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleSearchContactCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleSearchContactCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchContactCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchContactCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Required. The plain-text query for the request. The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n".
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> PeopleSearchContactCall<'a> {
+    pub fn query(mut self, new_value: &str) -> PeopleSearchContactCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. The number of results to return. Defaults to 10 if field is not set, or set to 0. Values greater than 30 will be capped to 30.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleSearchContactCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleSearchContactCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -8143,7 +8274,7 @@ impl<'a> PeopleSearchContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8168,7 +8299,7 @@ impl<'a> PeopleSearchContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8188,9 +8319,9 @@ impl<'a> PeopleSearchContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleSearchContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8222,7 +8353,7 @@ impl<'a> PeopleSearchContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8236,10 +8367,10 @@ impl<'a> PeopleSearchContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleSearchDirectoryPeopleCall<'a>
-    where  {
+pub struct PeopleSearchDirectoryPeopleCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _sources: Vec<String>,
     _read_mask: Option<String>,
     _query: Option<String>,
@@ -8251,9 +8382,15 @@ pub struct PeopleSearchDirectoryPeopleCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleSearchDirectoryPeopleCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleSearchDirectoryPeopleCall<'a, S> {}
 
-impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
+impl<'a, S> PeopleSearchDirectoryPeopleCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8394,35 +8531,35 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Required. Prefix query that matches fields in the person. Does NOT use the read_mask for determining what fields to match.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn query(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous response `next_page_token`. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `SearchDirectoryPeople` must match the first call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of people to include in the response. Valid values are between 1 and 500, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -8430,7 +8567,7 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
     ///
     /// Append the given value to the *merge sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._merge_sources.push(new_value.to_string());
         self
     }
@@ -8440,7 +8577,7 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchDirectoryPeopleCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchDirectoryPeopleCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8465,7 +8602,7 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchDirectoryPeopleCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchDirectoryPeopleCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8485,9 +8622,9 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchDirectoryPeopleCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleSearchDirectoryPeopleCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8520,7 +8657,7 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8536,10 +8673,10 @@ impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleUpdateContactCall<'a>
-    where  {
+pub struct PeopleUpdateContactCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: Person,
     _resource_name: String,
     _update_person_fields: Option<String>,
@@ -8550,9 +8687,15 @@ pub struct PeopleUpdateContactCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleUpdateContactCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleUpdateContactCall<'a, S> {}
 
-impl<'a> PeopleUpdateContactCall<'a> {
+impl<'a, S> PeopleUpdateContactCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8723,7 +8866,7 @@ impl<'a> PeopleUpdateContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Person) -> PeopleUpdateContactCall<'a> {
+    pub fn request(mut self, new_value: Person) -> PeopleUpdateContactCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8733,14 +8876,14 @@ impl<'a> PeopleUpdateContactCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Required. A field mask to restrict which fields on the person are updated. Multiple fields can be specified by separating them with commas. All updated fields will be replaced. Valid values are: * addresses * biographies * birthdays * calendarUrls * clientData * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * relations * sipAddresses * urls * userDefined
     ///
     /// Sets the *update person fields* query property to the given value.
-    pub fn update_person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
+    pub fn update_person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, S> {
         self._update_person_fields = Some(new_value.to_string());
         self
     }
@@ -8748,14 +8891,14 @@ impl<'a> PeopleUpdateContactCall<'a> {
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, S> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Defaults to all fields if not set. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, S> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -8765,7 +8908,7 @@ impl<'a> PeopleUpdateContactCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8790,7 +8933,7 @@ impl<'a> PeopleUpdateContactCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8810,9 +8953,9 @@ impl<'a> PeopleUpdateContactCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleUpdateContactCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8845,7 +8988,7 @@ impl<'a> PeopleUpdateContactCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PeopleService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8858,10 +9001,10 @@ impl<'a> PeopleUpdateContactCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleUpdateContactPhotoCall<'a>
-    where  {
+pub struct PeopleUpdateContactPhotoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PeopleService<>,
+    hub: &'a PeopleService<S>,
     _request: UpdateContactPhotoRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8869,9 +9012,15 @@ pub struct PeopleUpdateContactPhotoCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PeopleUpdateContactPhotoCall<'a> {}
+impl<'a, S> client::CallBuilder for PeopleUpdateContactPhotoCall<'a, S> {}
 
-impl<'a> PeopleUpdateContactPhotoCall<'a> {
+impl<'a, S> PeopleUpdateContactPhotoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9031,7 +9180,7 @@ impl<'a> PeopleUpdateContactPhotoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateContactPhotoRequest) -> PeopleUpdateContactPhotoCall<'a> {
+    pub fn request(mut self, new_value: UpdateContactPhotoRequest) -> PeopleUpdateContactPhotoCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9041,7 +9190,7 @@ impl<'a> PeopleUpdateContactPhotoCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactPhotoCall<'a> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactPhotoCall<'a, S> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -9051,7 +9200,7 @@ impl<'a> PeopleUpdateContactPhotoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactPhotoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactPhotoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9076,7 +9225,7 @@ impl<'a> PeopleUpdateContactPhotoCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactPhotoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactPhotoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9096,9 +9245,9 @@ impl<'a> PeopleUpdateContactPhotoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactPhotoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PeopleUpdateContactPhotoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

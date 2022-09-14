@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -78,7 +83,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -108,37 +113,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Surveys<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Surveys<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Surveys<> {}
+impl<'a, S> client::Hub for Surveys<S> {}
 
-impl<'a, > Surveys<> {
+impl<'a, S> Surveys<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Surveys<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Surveys<S> {
         Surveys {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/surveys/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn results(&'a self) -> ResultMethods<'a> {
+    pub fn results(&'a self) -> ResultMethods<'a, S> {
         ResultMethods { hub: &self }
     }
-    pub fn surveys(&'a self) -> SurveyMethods<'a> {
+    pub fn surveys(&'a self) -> SurveyMethods<'a, S> {
         SurveyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -595,22 +600,22 @@ impl client::Part for TokenPagination {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.results();
 /// # }
 /// ```
-pub struct ResultMethods<'a>
-    where  {
+pub struct ResultMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
 }
 
-impl<'a> client::MethodsBuilder for ResultMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ResultMethods<'a, S> {}
 
-impl<'a> ResultMethods<'a> {
+impl<'a, S> ResultMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -620,7 +625,7 @@ impl<'a> ResultMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn get(&self, request: ResultsGetRequest, survey_url_id: &str) -> ResultGetCall<'a> {
+    pub fn get(&self, request: ResultsGetRequest, survey_url_id: &str) -> ResultGetCall<'a, S> {
         ResultGetCall {
             hub: self.hub,
             _request: request,
@@ -655,22 +660,22 @@ impl<'a> ResultMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `start(...)`, `stop(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.surveys();
 /// # }
 /// ```
-pub struct SurveyMethods<'a>
-    where  {
+pub struct SurveyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
 }
 
-impl<'a> client::MethodsBuilder for SurveyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SurveyMethods<'a, S> {}
 
-impl<'a> SurveyMethods<'a> {
+impl<'a, S> SurveyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -679,7 +684,7 @@ impl<'a> SurveyMethods<'a> {
     /// # Arguments
     ///
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn delete(&self, survey_url_id: &str) -> SurveyDeleteCall<'a> {
+    pub fn delete(&self, survey_url_id: &str) -> SurveyDeleteCall<'a, S> {
         SurveyDeleteCall {
             hub: self.hub,
             _survey_url_id: survey_url_id.to_string(),
@@ -696,7 +701,7 @@ impl<'a> SurveyMethods<'a> {
     /// # Arguments
     ///
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn get(&self, survey_url_id: &str) -> SurveyGetCall<'a> {
+    pub fn get(&self, survey_url_id: &str) -> SurveyGetCall<'a, S> {
         SurveyGetCall {
             hub: self.hub,
             _survey_url_id: survey_url_id.to_string(),
@@ -713,7 +718,7 @@ impl<'a> SurveyMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Survey) -> SurveyInsertCall<'a> {
+    pub fn insert(&self, request: Survey) -> SurveyInsertCall<'a, S> {
         SurveyInsertCall {
             hub: self.hub,
             _request: request,
@@ -726,7 +731,7 @@ impl<'a> SurveyMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the surveys owned by the authenticated user.
-    pub fn list(&self) -> SurveyListCall<'a> {
+    pub fn list(&self) -> SurveyListCall<'a, S> {
         SurveyListCall {
             hub: self.hub,
             _token: Default::default(),
@@ -746,7 +751,7 @@ impl<'a> SurveyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resourceId` - No description provided.
-    pub fn start(&self, request: SurveysStartRequest, resource_id: &str) -> SurveyStartCall<'a> {
+    pub fn start(&self, request: SurveysStartRequest, resource_id: &str) -> SurveyStartCall<'a, S> {
         SurveyStartCall {
             hub: self.hub,
             _request: request,
@@ -764,7 +769,7 @@ impl<'a> SurveyMethods<'a> {
     /// # Arguments
     ///
     /// * `resourceId` - No description provided.
-    pub fn stop(&self, resource_id: &str) -> SurveyStopCall<'a> {
+    pub fn stop(&self, resource_id: &str) -> SurveyStopCall<'a, S> {
         SurveyStopCall {
             hub: self.hub,
             _resource_id: resource_id.to_string(),
@@ -782,7 +787,7 @@ impl<'a> SurveyMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn update(&self, request: Survey, survey_url_id: &str) -> SurveyUpdateCall<'a> {
+    pub fn update(&self, request: Survey, survey_url_id: &str) -> SurveyUpdateCall<'a, S> {
         SurveyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -830,7 +835,7 @@ impl<'a> SurveyMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -843,10 +848,10 @@ impl<'a> SurveyMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ResultGetCall<'a>
-    where  {
+pub struct ResultGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _request: ResultsGetRequest,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -854,9 +859,15 @@ pub struct ResultGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ResultGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ResultGetCall<'a, S> {}
 
-impl<'a> ResultGetCall<'a> {
+impl<'a, S> ResultGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1028,7 +1039,7 @@ impl<'a> ResultGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResultsGetRequest) -> ResultGetCall<'a> {
+    pub fn request(mut self, new_value: ResultsGetRequest) -> ResultGetCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1038,7 +1049,7 @@ impl<'a> ResultGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> ResultGetCall<'a> {
+    pub fn survey_url_id(mut self, new_value: &str) -> ResultGetCall<'a, S> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -1048,7 +1059,7 @@ impl<'a> ResultGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResultGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResultGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1069,7 +1080,7 @@ impl<'a> ResultGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ResultGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ResultGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1089,9 +1100,9 @@ impl<'a> ResultGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ResultGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ResultGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1123,7 +1134,7 @@ impl<'a> ResultGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1131,19 +1142,25 @@ impl<'a> ResultGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyDeleteCall<'a>
-    where  {
+pub struct SurveyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyDeleteCall<'a, S> {}
 
-impl<'a> SurveyDeleteCall<'a> {
+impl<'a, S> SurveyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1286,7 +1303,7 @@ impl<'a> SurveyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> SurveyDeleteCall<'a> {
+    pub fn survey_url_id(mut self, new_value: &str) -> SurveyDeleteCall<'a, S> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -1296,7 +1313,7 @@ impl<'a> SurveyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1317,7 +1334,7 @@ impl<'a> SurveyDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1337,9 +1354,9 @@ impl<'a> SurveyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1371,7 +1388,7 @@ impl<'a> SurveyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1379,19 +1396,25 @@ impl<'a> SurveyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyGetCall<'a>
-    where  {
+pub struct SurveyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyGetCall<'a, S> {}
 
-impl<'a> SurveyGetCall<'a> {
+impl<'a, S> SurveyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1534,7 +1557,7 @@ impl<'a> SurveyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> SurveyGetCall<'a> {
+    pub fn survey_url_id(mut self, new_value: &str) -> SurveyGetCall<'a, S> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -1544,7 +1567,7 @@ impl<'a> SurveyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1565,7 +1588,7 @@ impl<'a> SurveyGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1585,9 +1608,9 @@ impl<'a> SurveyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1620,7 +1643,7 @@ impl<'a> SurveyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1633,19 +1656,25 @@ impl<'a> SurveyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyInsertCall<'a>
-    where  {
+pub struct SurveyInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _request: Survey,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyInsertCall<'a, S> {}
 
-impl<'a> SurveyInsertCall<'a> {
+impl<'a, S> SurveyInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1779,7 +1808,7 @@ impl<'a> SurveyInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Survey) -> SurveyInsertCall<'a> {
+    pub fn request(mut self, new_value: Survey) -> SurveyInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1789,7 +1818,7 @@ impl<'a> SurveyInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1810,7 +1839,7 @@ impl<'a> SurveyInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1830,9 +1859,9 @@ impl<'a> SurveyInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1864,7 +1893,7 @@ impl<'a> SurveyInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1875,10 +1904,10 @@ impl<'a> SurveyInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyListCall<'a>
-    where  {
+pub struct SurveyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _token: Option<String>,
     _start_index: Option<u32>,
     _max_results: Option<u32>,
@@ -1887,9 +1916,15 @@ pub struct SurveyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyListCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyListCall<'a, S> {}
 
-impl<'a> SurveyListCall<'a> {
+impl<'a, S> SurveyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2015,19 +2050,19 @@ impl<'a> SurveyListCall<'a> {
 
     ///
     /// Sets the *token* query property to the given value.
-    pub fn token(mut self, new_value: &str) -> SurveyListCall<'a> {
+    pub fn token(mut self, new_value: &str) -> SurveyListCall<'a, S> {
         self._token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> SurveyListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> SurveyListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SurveyListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> SurveyListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -2037,7 +2072,7 @@ impl<'a> SurveyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2058,7 +2093,7 @@ impl<'a> SurveyListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2078,9 +2113,9 @@ impl<'a> SurveyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2113,7 +2148,7 @@ impl<'a> SurveyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2126,10 +2161,10 @@ impl<'a> SurveyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyStartCall<'a>
-    where  {
+pub struct SurveyStartCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _request: SurveysStartRequest,
     _resource_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2137,9 +2172,15 @@ pub struct SurveyStartCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyStartCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyStartCall<'a, S> {}
 
-impl<'a> SurveyStartCall<'a> {
+impl<'a, S> SurveyStartCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2295,7 +2336,7 @@ impl<'a> SurveyStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SurveysStartRequest) -> SurveyStartCall<'a> {
+    pub fn request(mut self, new_value: SurveysStartRequest) -> SurveyStartCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2304,7 +2345,7 @@ impl<'a> SurveyStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_id(mut self, new_value: &str) -> SurveyStartCall<'a> {
+    pub fn resource_id(mut self, new_value: &str) -> SurveyStartCall<'a, S> {
         self._resource_id = new_value.to_string();
         self
     }
@@ -2314,7 +2355,7 @@ impl<'a> SurveyStartCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStartCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStartCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2335,7 +2376,7 @@ impl<'a> SurveyStartCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyStartCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyStartCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2355,9 +2396,9 @@ impl<'a> SurveyStartCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyStartCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyStartCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2389,7 +2430,7 @@ impl<'a> SurveyStartCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2397,19 +2438,25 @@ impl<'a> SurveyStartCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyStopCall<'a>
-    where  {
+pub struct SurveyStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _resource_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyStopCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyStopCall<'a, S> {}
 
-impl<'a> SurveyStopCall<'a> {
+impl<'a, S> SurveyStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2551,7 +2598,7 @@ impl<'a> SurveyStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_id(mut self, new_value: &str) -> SurveyStopCall<'a> {
+    pub fn resource_id(mut self, new_value: &str) -> SurveyStopCall<'a, S> {
         self._resource_id = new_value.to_string();
         self
     }
@@ -2561,7 +2608,7 @@ impl<'a> SurveyStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2582,7 +2629,7 @@ impl<'a> SurveyStopCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2602,9 +2649,9 @@ impl<'a> SurveyStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2637,7 +2684,7 @@ impl<'a> SurveyStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Surveys::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2650,10 +2697,10 @@ impl<'a> SurveyStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyUpdateCall<'a>
-    where  {
+pub struct SurveyUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Surveys<>,
+    hub: &'a Surveys<S>,
     _request: Survey,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2661,9 +2708,15 @@ pub struct SurveyUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SurveyUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for SurveyUpdateCall<'a, S> {}
 
-impl<'a> SurveyUpdateCall<'a> {
+impl<'a, S> SurveyUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2819,7 +2872,7 @@ impl<'a> SurveyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Survey) -> SurveyUpdateCall<'a> {
+    pub fn request(mut self, new_value: Survey) -> SurveyUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2829,7 +2882,7 @@ impl<'a> SurveyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> SurveyUpdateCall<'a> {
+    pub fn survey_url_id(mut self, new_value: &str) -> SurveyUpdateCall<'a, S> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -2839,7 +2892,7 @@ impl<'a> SurveyUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2860,7 +2913,7 @@ impl<'a> SurveyUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2880,9 +2933,9 @@ impl<'a> SurveyUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SurveyUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

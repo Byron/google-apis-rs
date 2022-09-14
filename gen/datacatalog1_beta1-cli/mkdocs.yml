@@ -1,4 +1,4 @@
-site_name: Data Catalog v3.1.0+20220224
+site_name: Data Catalog v4.0.1+20220224
 site_url: http://byron.github.io/google-apis-rs/google-datacatalog1_beta1-cli
 site_description: A complete library to interact with Data Catalog (protocol v1beta1)
 

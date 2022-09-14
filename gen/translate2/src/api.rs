@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,40 +112,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Translate<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Translate<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Translate<> {}
+impl<'a, S> client::Hub for Translate<S> {}
 
-impl<'a, > Translate<> {
+impl<'a, S> Translate<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Translate<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Translate<S> {
         Translate {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://translation.googleapis.com/language/translate/".to_string(),
             _root_url: "https://translation.googleapis.com/".to_string(),
         }
     }
 
-    pub fn detections(&'a self) -> DetectionMethods<'a> {
+    pub fn detections(&'a self) -> DetectionMethods<'a, S> {
         DetectionMethods { hub: &self }
     }
-    pub fn languages(&'a self) -> LanguageMethods<'a> {
+    pub fn languages(&'a self) -> LanguageMethods<'a, S> {
         LanguageMethods { hub: &self }
     }
-    pub fn translations(&'a self) -> TranslationMethods<'a> {
+    pub fn translations(&'a self) -> TranslationMethods<'a, S> {
         TranslationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -382,22 +387,22 @@ impl client::Part for DetectionsResourceNested {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `detect(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.detections();
 /// # }
 /// ```
-pub struct DetectionMethods<'a>
-    where  {
+pub struct DetectionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
 }
 
-impl<'a> client::MethodsBuilder for DetectionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DetectionMethods<'a, S> {}
 
-impl<'a> DetectionMethods<'a> {
+impl<'a, S> DetectionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -406,7 +411,7 @@ impl<'a> DetectionMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn detect(&self, request: DetectLanguageRequest) -> DetectionDetectCall<'a> {
+    pub fn detect(&self, request: DetectLanguageRequest) -> DetectionDetectCall<'a, S> {
         DetectionDetectCall {
             hub: self.hub,
             _request: request,
@@ -424,7 +429,7 @@ impl<'a> DetectionMethods<'a> {
     ///
     /// * `q` - The input text upon which to perform language detection. Repeat this
     ///         parameter to perform language detection on multiple text inputs.
-    pub fn list(&self, q: &Vec<String>) -> DetectionListCall<'a> {
+    pub fn list(&self, q: &Vec<String>) -> DetectionListCall<'a, S> {
         DetectionListCall {
             hub: self.hub,
             _q: q.clone(),
@@ -458,27 +463,27 @@ impl<'a> DetectionMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.languages();
 /// # }
 /// ```
-pub struct LanguageMethods<'a>
-    where  {
+pub struct LanguageMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
 }
 
-impl<'a> client::MethodsBuilder for LanguageMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LanguageMethods<'a, S> {}
 
-impl<'a> LanguageMethods<'a> {
+impl<'a, S> LanguageMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of supported languages for translation.
-    pub fn list(&self) -> LanguageListCall<'a> {
+    pub fn list(&self) -> LanguageListCall<'a, S> {
         LanguageListCall {
             hub: self.hub,
             _target: Default::default(),
@@ -513,22 +518,22 @@ impl<'a> LanguageMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `translate(...)`
 /// // to build up your call.
 /// let rb = hub.translations();
 /// # }
 /// ```
-pub struct TranslationMethods<'a>
-    where  {
+pub struct TranslationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
 }
 
-impl<'a> client::MethodsBuilder for TranslationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TranslationMethods<'a, S> {}
 
-impl<'a> TranslationMethods<'a> {
+impl<'a, S> TranslationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -540,7 +545,7 @@ impl<'a> TranslationMethods<'a> {
     ///         operations on multiple text inputs.
     /// * `target` - The language to use for translation of the input text, set to one of the
     ///              language codes listed in Language Support.
-    pub fn list(&self, q: &Vec<String>, target: &str) -> TranslationListCall<'a> {
+    pub fn list(&self, q: &Vec<String>, target: &str) -> TranslationListCall<'a, S> {
         TranslationListCall {
             hub: self.hub,
             _q: q.clone(),
@@ -562,7 +567,7 @@ impl<'a> TranslationMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn translate(&self, request: TranslateTextRequest) -> TranslationTranslateCall<'a> {
+    pub fn translate(&self, request: TranslateTextRequest) -> TranslationTranslateCall<'a, S> {
         TranslationTranslateCall {
             hub: self.hub,
             _request: request,
@@ -604,7 +609,7 @@ impl<'a> TranslationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -617,19 +622,25 @@ impl<'a> TranslationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DetectionDetectCall<'a>
-    where  {
+pub struct DetectionDetectCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
     _request: DetectLanguageRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DetectionDetectCall<'a> {}
+impl<'a, S> client::CallBuilder for DetectionDetectCall<'a, S> {}
 
-impl<'a> DetectionDetectCall<'a> {
+impl<'a, S> DetectionDetectCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -763,7 +774,7 @@ impl<'a> DetectionDetectCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DetectLanguageRequest) -> DetectionDetectCall<'a> {
+    pub fn request(mut self, new_value: DetectLanguageRequest) -> DetectionDetectCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -773,7 +784,7 @@ impl<'a> DetectionDetectCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DetectionDetectCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DetectionDetectCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -800,7 +811,7 @@ impl<'a> DetectionDetectCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DetectionDetectCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DetectionDetectCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -820,9 +831,9 @@ impl<'a> DetectionDetectCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DetectionDetectCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DetectionDetectCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -854,7 +865,7 @@ impl<'a> DetectionDetectCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -862,19 +873,25 @@ impl<'a> DetectionDetectCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DetectionListCall<'a>
-    where  {
+pub struct DetectionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
     _q: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DetectionListCall<'a> {}
+impl<'a, S> client::CallBuilder for DetectionListCall<'a, S> {}
 
-impl<'a> DetectionListCall<'a> {
+impl<'a, S> DetectionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1002,7 +1019,7 @@ impl<'a> DetectionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_q(mut self, new_value: &str) -> DetectionListCall<'a> {
+    pub fn add_q(mut self, new_value: &str) -> DetectionListCall<'a, S> {
         self._q.push(new_value.to_string());
         self
     }
@@ -1012,7 +1029,7 @@ impl<'a> DetectionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DetectionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DetectionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1039,7 +1056,7 @@ impl<'a> DetectionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DetectionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DetectionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1059,9 +1076,9 @@ impl<'a> DetectionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DetectionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DetectionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1093,7 +1110,7 @@ impl<'a> DetectionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1103,10 +1120,10 @@ impl<'a> DetectionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LanguageListCall<'a>
-    where  {
+pub struct LanguageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
     _target: Option<String>,
     _model: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1114,9 +1131,15 @@ pub struct LanguageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LanguageListCall<'a> {}
+impl<'a, S> client::CallBuilder for LanguageListCall<'a, S> {}
 
-impl<'a> LanguageListCall<'a> {
+impl<'a, S> LanguageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1241,14 +1264,14 @@ impl<'a> LanguageListCall<'a> {
     /// languages.
     ///
     /// Sets the *target* query property to the given value.
-    pub fn target(mut self, new_value: &str) -> LanguageListCall<'a> {
+    pub fn target(mut self, new_value: &str) -> LanguageListCall<'a, S> {
         self._target = Some(new_value.to_string());
         self
     }
     /// The model type for which supported languages should be returned.
     ///
     /// Sets the *model* query property to the given value.
-    pub fn model(mut self, new_value: &str) -> LanguageListCall<'a> {
+    pub fn model(mut self, new_value: &str) -> LanguageListCall<'a, S> {
         self._model = Some(new_value.to_string());
         self
     }
@@ -1258,7 +1281,7 @@ impl<'a> LanguageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LanguageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LanguageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1285,7 +1308,7 @@ impl<'a> LanguageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LanguageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LanguageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1305,9 +1328,9 @@ impl<'a> LanguageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LanguageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LanguageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1339,7 +1362,7 @@ impl<'a> LanguageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1351,10 +1374,10 @@ impl<'a> LanguageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TranslationListCall<'a>
-    where  {
+pub struct TranslationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
     _q: Vec<String>,
     _target: String,
     _source: Option<String>,
@@ -1366,9 +1389,15 @@ pub struct TranslationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TranslationListCall<'a> {}
+impl<'a, S> client::CallBuilder for TranslationListCall<'a, S> {}
 
-impl<'a> TranslationListCall<'a> {
+impl<'a, S> TranslationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1511,7 +1540,7 @@ impl<'a> TranslationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_q(mut self, new_value: &str) -> TranslationListCall<'a> {
+    pub fn add_q(mut self, new_value: &str) -> TranslationListCall<'a, S> {
         self._q.push(new_value.to_string());
         self
     }
@@ -1522,7 +1551,7 @@ impl<'a> TranslationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn target(mut self, new_value: &str) -> TranslationListCall<'a> {
+    pub fn target(mut self, new_value: &str) -> TranslationListCall<'a, S> {
         self._target = new_value.to_string();
         self
     }
@@ -1532,7 +1561,7 @@ impl<'a> TranslationListCall<'a> {
     /// the response.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> TranslationListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> TranslationListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -1540,7 +1569,7 @@ impl<'a> TranslationListCall<'a> {
     /// listed in public documentation.
     ///
     /// Sets the *model* query property to the given value.
-    pub fn model(mut self, new_value: &str) -> TranslationListCall<'a> {
+    pub fn model(mut self, new_value: &str) -> TranslationListCall<'a, S> {
         self._model = Some(new_value.to_string());
         self
     }
@@ -1548,7 +1577,7 @@ impl<'a> TranslationListCall<'a> {
     /// value of "html" indicates HTML and a value of "text" indicates plain-text.
     ///
     /// Sets the *format* query property to the given value.
-    pub fn format(mut self, new_value: &str) -> TranslationListCall<'a> {
+    pub fn format(mut self, new_value: &str) -> TranslationListCall<'a, S> {
         self._format = Some(new_value.to_string());
         self
     }
@@ -1556,7 +1585,7 @@ impl<'a> TranslationListCall<'a> {
     ///
     /// Append the given value to the *cid* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_cid(mut self, new_value: &str) -> TranslationListCall<'a> {
+    pub fn add_cid(mut self, new_value: &str) -> TranslationListCall<'a, S> {
         self._cid.push(new_value.to_string());
         self
     }
@@ -1566,7 +1595,7 @@ impl<'a> TranslationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TranslationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TranslationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1593,7 +1622,7 @@ impl<'a> TranslationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TranslationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TranslationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1613,9 +1642,9 @@ impl<'a> TranslationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TranslationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TranslationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1648,7 +1677,7 @@ impl<'a> TranslationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Translate::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1661,19 +1690,25 @@ impl<'a> TranslationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TranslationTranslateCall<'a>
-    where  {
+pub struct TranslationTranslateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Translate<>,
+    hub: &'a Translate<S>,
     _request: TranslateTextRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TranslationTranslateCall<'a> {}
+impl<'a, S> client::CallBuilder for TranslationTranslateCall<'a, S> {}
 
-impl<'a> TranslationTranslateCall<'a> {
+impl<'a, S> TranslationTranslateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1807,7 +1842,7 @@ impl<'a> TranslationTranslateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TranslateTextRequest) -> TranslationTranslateCall<'a> {
+    pub fn request(mut self, new_value: TranslateTextRequest) -> TranslationTranslateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1817,7 +1852,7 @@ impl<'a> TranslationTranslateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TranslationTranslateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TranslationTranslateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1844,7 +1879,7 @@ impl<'a> TranslationTranslateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TranslationTranslateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TranslationTranslateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1864,9 +1899,9 @@ impl<'a> TranslationTranslateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TranslationTranslateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TranslationTranslateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

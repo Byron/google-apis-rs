@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Groupssettings<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Groupssettings<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Groupssettings<> {}
+impl<'a, S> client::Hub for Groupssettings<S> {}
 
-impl<'a, > Groupssettings<> {
+impl<'a, S> Groupssettings<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Groupssettings<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Groupssettings<S> {
         Groupssettings {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/groups/v1/groups/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn groups(&'a self) -> GroupMethods<'a> {
+    pub fn groups(&'a self) -> GroupMethods<'a, S> {
         GroupMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -586,22 +591,22 @@ impl client::ResponseResult for Groups {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.groups();
 /// # }
 /// ```
-pub struct GroupMethods<'a>
-    where  {
+pub struct GroupMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Groupssettings<>,
+    hub: &'a Groupssettings<S>,
 }
 
-impl<'a> client::MethodsBuilder for GroupMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for GroupMethods<'a, S> {}
 
-impl<'a> GroupMethods<'a> {
+impl<'a, S> GroupMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -610,7 +615,7 @@ impl<'a> GroupMethods<'a> {
     /// # Arguments
     ///
     /// * `groupUniqueId` - The group's email address.
-    pub fn get(&self, group_unique_id: &str) -> GroupGetCall<'a> {
+    pub fn get(&self, group_unique_id: &str) -> GroupGetCall<'a, S> {
         GroupGetCall {
             hub: self.hub,
             _group_unique_id: group_unique_id.to_string(),
@@ -628,7 +633,7 @@ impl<'a> GroupMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `groupUniqueId` - The group's email address.
-    pub fn patch(&self, request: Groups, group_unique_id: &str) -> GroupPatchCall<'a> {
+    pub fn patch(&self, request: Groups, group_unique_id: &str) -> GroupPatchCall<'a, S> {
         GroupPatchCall {
             hub: self.hub,
             _request: request,
@@ -647,7 +652,7 @@ impl<'a> GroupMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `groupUniqueId` - The group's email address.
-    pub fn update(&self, request: Groups, group_unique_id: &str) -> GroupUpdateCall<'a> {
+    pub fn update(&self, request: Groups, group_unique_id: &str) -> GroupUpdateCall<'a, S> {
         GroupUpdateCall {
             hub: self.hub,
             _request: request,
@@ -689,7 +694,7 @@ impl<'a> GroupMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -697,19 +702,25 @@ impl<'a> GroupMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupGetCall<'a>
-    where  {
+pub struct GroupGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Groupssettings<>,
+    hub: &'a Groupssettings<S>,
     _group_unique_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupGetCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupGetCall<'a, S> {}
 
-impl<'a> GroupGetCall<'a> {
+impl<'a, S> GroupGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -852,7 +863,7 @@ impl<'a> GroupGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_unique_id(mut self, new_value: &str) -> GroupGetCall<'a> {
+    pub fn group_unique_id(mut self, new_value: &str) -> GroupGetCall<'a, S> {
         self._group_unique_id = new_value.to_string();
         self
     }
@@ -862,7 +873,7 @@ impl<'a> GroupGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -883,7 +894,7 @@ impl<'a> GroupGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -903,9 +914,9 @@ impl<'a> GroupGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -938,7 +949,7 @@ impl<'a> GroupGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -951,10 +962,10 @@ impl<'a> GroupGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupPatchCall<'a>
-    where  {
+pub struct GroupPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Groupssettings<>,
+    hub: &'a Groupssettings<S>,
     _request: Groups,
     _group_unique_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -962,9 +973,15 @@ pub struct GroupPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupPatchCall<'a, S> {}
 
-impl<'a> GroupPatchCall<'a> {
+impl<'a, S> GroupPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1120,7 +1137,7 @@ impl<'a> GroupPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Groups) -> GroupPatchCall<'a> {
+    pub fn request(mut self, new_value: Groups) -> GroupPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1130,7 +1147,7 @@ impl<'a> GroupPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_unique_id(mut self, new_value: &str) -> GroupPatchCall<'a> {
+    pub fn group_unique_id(mut self, new_value: &str) -> GroupPatchCall<'a, S> {
         self._group_unique_id = new_value.to_string();
         self
     }
@@ -1140,7 +1157,7 @@ impl<'a> GroupPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1161,7 +1178,7 @@ impl<'a> GroupPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1181,9 +1198,9 @@ impl<'a> GroupPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1216,7 +1233,7 @@ impl<'a> GroupPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Groupssettings::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1229,10 +1246,10 @@ impl<'a> GroupPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupUpdateCall<'a>
-    where  {
+pub struct GroupUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Groupssettings<>,
+    hub: &'a Groupssettings<S>,
     _request: Groups,
     _group_unique_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1240,9 +1257,15 @@ pub struct GroupUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for GroupUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for GroupUpdateCall<'a, S> {}
 
-impl<'a> GroupUpdateCall<'a> {
+impl<'a, S> GroupUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1398,7 +1421,7 @@ impl<'a> GroupUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Groups) -> GroupUpdateCall<'a> {
+    pub fn request(mut self, new_value: Groups) -> GroupUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1408,7 +1431,7 @@ impl<'a> GroupUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_unique_id(mut self, new_value: &str) -> GroupUpdateCall<'a> {
+    pub fn group_unique_id(mut self, new_value: &str) -> GroupUpdateCall<'a, S> {
         self._group_unique_id = new_value.to_string();
         self
     }
@@ -1418,7 +1441,7 @@ impl<'a> GroupUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1439,7 +1462,7 @@ impl<'a> GroupUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1459,9 +1482,9 @@ impl<'a> GroupUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> GroupUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

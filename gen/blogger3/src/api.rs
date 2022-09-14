@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -111,55 +116,55 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Blogger<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Blogger<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Blogger<> {}
+impl<'a, S> client::Hub for Blogger<S> {}
 
-impl<'a, > Blogger<> {
+impl<'a, S> Blogger<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Blogger<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Blogger<S> {
         Blogger {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://blogger.googleapis.com/".to_string(),
             _root_url: "https://blogger.googleapis.com/".to_string(),
         }
     }
 
-    pub fn blog_user_infos(&'a self) -> BlogUserInfoMethods<'a> {
+    pub fn blog_user_infos(&'a self) -> BlogUserInfoMethods<'a, S> {
         BlogUserInfoMethods { hub: &self }
     }
-    pub fn blogs(&'a self) -> BlogMethods<'a> {
+    pub fn blogs(&'a self) -> BlogMethods<'a, S> {
         BlogMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a> {
+    pub fn comments(&'a self) -> CommentMethods<'a, S> {
         CommentMethods { hub: &self }
     }
-    pub fn page_views(&'a self) -> PageViewMethods<'a> {
+    pub fn page_views(&'a self) -> PageViewMethods<'a, S> {
         PageViewMethods { hub: &self }
     }
-    pub fn pages(&'a self) -> PageMethods<'a> {
+    pub fn pages(&'a self) -> PageMethods<'a, S> {
         PageMethods { hub: &self }
     }
-    pub fn post_user_infos(&'a self) -> PostUserInfoMethods<'a> {
+    pub fn post_user_infos(&'a self) -> PostUserInfoMethods<'a, S> {
         PostUserInfoMethods { hub: &self }
     }
-    pub fn posts(&'a self) -> PostMethods<'a> {
+    pub fn posts(&'a self) -> PostMethods<'a, S> {
         PostMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a> {
+    pub fn users(&'a self) -> UserMethods<'a, S> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1049,22 +1054,22 @@ impl client::Part for UserLocale {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.blog_user_infos();
 /// # }
 /// ```
-pub struct BlogUserInfoMethods<'a>
-    where  {
+pub struct BlogUserInfoMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for BlogUserInfoMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BlogUserInfoMethods<'a, S> {}
 
-impl<'a> BlogUserInfoMethods<'a> {
+impl<'a, S> BlogUserInfoMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1074,7 +1079,7 @@ impl<'a> BlogUserInfoMethods<'a> {
     ///
     /// * `userId` - No description provided.
     /// * `blogId` - No description provided.
-    pub fn get(&self, user_id: &str, blog_id: &str) -> BlogUserInfoGetCall<'a> {
+    pub fn get(&self, user_id: &str, blog_id: &str) -> BlogUserInfoGetCall<'a, S> {
         BlogUserInfoGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1110,22 +1115,22 @@ impl<'a> BlogUserInfoMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `get_by_url(...)` and `list_by_user(...)`
 /// // to build up your call.
 /// let rb = hub.blogs();
 /// # }
 /// ```
-pub struct BlogMethods<'a>
-    where  {
+pub struct BlogMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for BlogMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BlogMethods<'a, S> {}
 
-impl<'a> BlogMethods<'a> {
+impl<'a, S> BlogMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1134,7 +1139,7 @@ impl<'a> BlogMethods<'a> {
     /// # Arguments
     ///
     /// * `blogId` - No description provided.
-    pub fn get(&self, blog_id: &str) -> BlogGetCall<'a> {
+    pub fn get(&self, blog_id: &str) -> BlogGetCall<'a, S> {
         BlogGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1153,7 +1158,7 @@ impl<'a> BlogMethods<'a> {
     /// # Arguments
     ///
     /// * `url` - No description provided.
-    pub fn get_by_url(&self, url: &str) -> BlogGetByUrlCall<'a> {
+    pub fn get_by_url(&self, url: &str) -> BlogGetByUrlCall<'a, S> {
         BlogGetByUrlCall {
             hub: self.hub,
             _url: url.to_string(),
@@ -1171,7 +1176,7 @@ impl<'a> BlogMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - No description provided.
-    pub fn list_by_user(&self, user_id: &str) -> BlogListByUserCall<'a> {
+    pub fn list_by_user(&self, user_id: &str) -> BlogListByUserCall<'a, S> {
         BlogListByUserCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1209,22 +1214,22 @@ impl<'a> BlogMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `approve(...)`, `delete(...)`, `get(...)`, `list(...)`, `list_by_blog(...)`, `mark_as_spam(...)` and `remove_content(...)`
 /// // to build up your call.
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a>
-    where  {
+pub struct CommentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for CommentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CommentMethods<'a, S> {}
 
-impl<'a> CommentMethods<'a> {
+impl<'a, S> CommentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1235,7 +1240,7 @@ impl<'a> CommentMethods<'a> {
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
     /// * `commentId` - No description provided.
-    pub fn approve(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentApproveCall<'a> {
+    pub fn approve(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentApproveCall<'a, S> {
         CommentApproveCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1256,7 +1261,7 @@ impl<'a> CommentMethods<'a> {
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
     /// * `commentId` - No description provided.
-    pub fn delete(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentDeleteCall<'a> {
+    pub fn delete(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentDeleteCall<'a, S> {
         CommentDeleteCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1277,7 +1282,7 @@ impl<'a> CommentMethods<'a> {
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
     /// * `commentId` - No description provided.
-    pub fn get(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentGetCall<'a> {
+    pub fn get(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentGetCall<'a, S> {
         CommentGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1298,7 +1303,7 @@ impl<'a> CommentMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn list(&self, blog_id: &str, post_id: &str) -> CommentListCall<'a> {
+    pub fn list(&self, blog_id: &str, post_id: &str) -> CommentListCall<'a, S> {
         CommentListCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1323,7 +1328,7 @@ impl<'a> CommentMethods<'a> {
     /// # Arguments
     ///
     /// * `blogId` - No description provided.
-    pub fn list_by_blog(&self, blog_id: &str) -> CommentListByBlogCall<'a> {
+    pub fn list_by_blog(&self, blog_id: &str) -> CommentListByBlogCall<'a, S> {
         CommentListByBlogCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1348,7 +1353,7 @@ impl<'a> CommentMethods<'a> {
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
     /// * `commentId` - No description provided.
-    pub fn mark_as_spam(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentMarkAsSpamCall<'a> {
+    pub fn mark_as_spam(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentMarkAsSpamCall<'a, S> {
         CommentMarkAsSpamCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1369,7 +1374,7 @@ impl<'a> CommentMethods<'a> {
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
     /// * `commentId` - No description provided.
-    pub fn remove_content(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentRemoveContentCall<'a> {
+    pub fn remove_content(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentRemoveContentCall<'a, S> {
         CommentRemoveContentCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1405,22 +1410,22 @@ impl<'a> CommentMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.page_views();
 /// # }
 /// ```
-pub struct PageViewMethods<'a>
-    where  {
+pub struct PageViewMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for PageViewMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PageViewMethods<'a, S> {}
 
-impl<'a> PageViewMethods<'a> {
+impl<'a, S> PageViewMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1429,7 +1434,7 @@ impl<'a> PageViewMethods<'a> {
     /// # Arguments
     ///
     /// * `blogId` - No description provided.
-    pub fn get(&self, blog_id: &str) -> PageViewGetCall<'a> {
+    pub fn get(&self, blog_id: &str) -> PageViewGetCall<'a, S> {
         PageViewGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1464,22 +1469,22 @@ impl<'a> PageViewMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)`, `publish(...)`, `revert(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.pages();
 /// # }
 /// ```
-pub struct PageMethods<'a>
-    where  {
+pub struct PageMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for PageMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PageMethods<'a, S> {}
 
-impl<'a> PageMethods<'a> {
+impl<'a, S> PageMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1489,7 +1494,7 @@ impl<'a> PageMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `pageId` - No description provided.
-    pub fn delete(&self, blog_id: &str, page_id: &str) -> PageDeleteCall<'a> {
+    pub fn delete(&self, blog_id: &str, page_id: &str) -> PageDeleteCall<'a, S> {
         PageDeleteCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1508,7 +1513,7 @@ impl<'a> PageMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `pageId` - No description provided.
-    pub fn get(&self, blog_id: &str, page_id: &str) -> PageGetCall<'a> {
+    pub fn get(&self, blog_id: &str, page_id: &str) -> PageGetCall<'a, S> {
         PageGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1528,7 +1533,7 @@ impl<'a> PageMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `blogId` - No description provided.
-    pub fn insert(&self, request: Page, blog_id: &str) -> PageInsertCall<'a> {
+    pub fn insert(&self, request: Page, blog_id: &str) -> PageInsertCall<'a, S> {
         PageInsertCall {
             hub: self.hub,
             _request: request,
@@ -1547,7 +1552,7 @@ impl<'a> PageMethods<'a> {
     /// # Arguments
     ///
     /// * `blogId` - No description provided.
-    pub fn list(&self, blog_id: &str) -> PageListCall<'a> {
+    pub fn list(&self, blog_id: &str) -> PageListCall<'a, S> {
         PageListCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1571,7 +1576,7 @@ impl<'a> PageMethods<'a> {
     /// * `request` - No description provided.
     /// * `blogId` - No description provided.
     /// * `pageId` - No description provided.
-    pub fn patch(&self, request: Page, blog_id: &str, page_id: &str) -> PagePatchCall<'a> {
+    pub fn patch(&self, request: Page, blog_id: &str, page_id: &str) -> PagePatchCall<'a, S> {
         PagePatchCall {
             hub: self.hub,
             _request: request,
@@ -1593,7 +1598,7 @@ impl<'a> PageMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `pageId` - No description provided.
-    pub fn publish(&self, blog_id: &str, page_id: &str) -> PagePublishCall<'a> {
+    pub fn publish(&self, blog_id: &str, page_id: &str) -> PagePublishCall<'a, S> {
         PagePublishCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1612,7 +1617,7 @@ impl<'a> PageMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `pageId` - No description provided.
-    pub fn revert(&self, blog_id: &str, page_id: &str) -> PageRevertCall<'a> {
+    pub fn revert(&self, blog_id: &str, page_id: &str) -> PageRevertCall<'a, S> {
         PageRevertCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1632,7 +1637,7 @@ impl<'a> PageMethods<'a> {
     /// * `request` - No description provided.
     /// * `blogId` - No description provided.
     /// * `pageId` - No description provided.
-    pub fn update(&self, request: Page, blog_id: &str, page_id: &str) -> PageUpdateCall<'a> {
+    pub fn update(&self, request: Page, blog_id: &str, page_id: &str) -> PageUpdateCall<'a, S> {
         PageUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1670,22 +1675,22 @@ impl<'a> PageMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.post_user_infos();
 /// # }
 /// ```
-pub struct PostUserInfoMethods<'a>
-    where  {
+pub struct PostUserInfoMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for PostUserInfoMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PostUserInfoMethods<'a, S> {}
 
-impl<'a> PostUserInfoMethods<'a> {
+impl<'a, S> PostUserInfoMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1696,7 +1701,7 @@ impl<'a> PostUserInfoMethods<'a> {
     /// * `userId` - No description provided.
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn get(&self, user_id: &str, blog_id: &str, post_id: &str) -> PostUserInfoGetCall<'a> {
+    pub fn get(&self, user_id: &str, blog_id: &str, post_id: &str) -> PostUserInfoGetCall<'a, S> {
         PostUserInfoGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1717,7 +1722,7 @@ impl<'a> PostUserInfoMethods<'a> {
     ///
     /// * `userId` - No description provided.
     /// * `blogId` - No description provided.
-    pub fn list(&self, user_id: &str, blog_id: &str) -> PostUserInfoListCall<'a> {
+    pub fn list(&self, user_id: &str, blog_id: &str) -> PostUserInfoListCall<'a, S> {
         PostUserInfoListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1761,22 +1766,22 @@ impl<'a> PostUserInfoMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_by_path(...)`, `insert(...)`, `list(...)`, `patch(...)`, `publish(...)`, `revert(...)`, `search(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.posts();
 /// # }
 /// ```
-pub struct PostMethods<'a>
-    where  {
+pub struct PostMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for PostMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PostMethods<'a, S> {}
 
-impl<'a> PostMethods<'a> {
+impl<'a, S> PostMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1786,7 +1791,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn delete(&self, blog_id: &str, post_id: &str) -> PostDeleteCall<'a> {
+    pub fn delete(&self, blog_id: &str, post_id: &str) -> PostDeleteCall<'a, S> {
         PostDeleteCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1805,7 +1810,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn get(&self, blog_id: &str, post_id: &str) -> PostGetCall<'a> {
+    pub fn get(&self, blog_id: &str, post_id: &str) -> PostGetCall<'a, S> {
         PostGetCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1828,7 +1833,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `path` - No description provided.
-    pub fn get_by_path(&self, blog_id: &str, path: &str) -> PostGetByPathCall<'a> {
+    pub fn get_by_path(&self, blog_id: &str, path: &str) -> PostGetByPathCall<'a, S> {
         PostGetByPathCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1849,7 +1854,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `blogId` - No description provided.
-    pub fn insert(&self, request: Post, blog_id: &str) -> PostInsertCall<'a> {
+    pub fn insert(&self, request: Post, blog_id: &str) -> PostInsertCall<'a, S> {
         PostInsertCall {
             hub: self.hub,
             _request: request,
@@ -1870,7 +1875,7 @@ impl<'a> PostMethods<'a> {
     /// # Arguments
     ///
     /// * `blogId` - No description provided.
-    pub fn list(&self, blog_id: &str) -> PostListCall<'a> {
+    pub fn list(&self, blog_id: &str) -> PostListCall<'a, S> {
         PostListCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1899,7 +1904,7 @@ impl<'a> PostMethods<'a> {
     /// * `request` - No description provided.
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn patch(&self, request: Post, blog_id: &str, post_id: &str) -> PostPatchCall<'a> {
+    pub fn patch(&self, request: Post, blog_id: &str, post_id: &str) -> PostPatchCall<'a, S> {
         PostPatchCall {
             hub: self.hub,
             _request: request,
@@ -1924,7 +1929,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn publish(&self, blog_id: &str, post_id: &str) -> PostPublishCall<'a> {
+    pub fn publish(&self, blog_id: &str, post_id: &str) -> PostPublishCall<'a, S> {
         PostPublishCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1944,7 +1949,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn revert(&self, blog_id: &str, post_id: &str) -> PostRevertCall<'a> {
+    pub fn revert(&self, blog_id: &str, post_id: &str) -> PostRevertCall<'a, S> {
         PostRevertCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1963,7 +1968,7 @@ impl<'a> PostMethods<'a> {
     ///
     /// * `blogId` - No description provided.
     /// * `q` - No description provided.
-    pub fn search(&self, blog_id: &str, q: &str) -> PostSearchCall<'a> {
+    pub fn search(&self, blog_id: &str, q: &str) -> PostSearchCall<'a, S> {
         PostSearchCall {
             hub: self.hub,
             _blog_id: blog_id.to_string(),
@@ -1985,7 +1990,7 @@ impl<'a> PostMethods<'a> {
     /// * `request` - No description provided.
     /// * `blogId` - No description provided.
     /// * `postId` - No description provided.
-    pub fn update(&self, request: Post, blog_id: &str, post_id: &str) -> PostUpdateCall<'a> {
+    pub fn update(&self, request: Post, blog_id: &str, post_id: &str) -> PostUpdateCall<'a, S> {
         PostUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2026,22 +2031,22 @@ impl<'a> PostMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a>
-    where  {
+pub struct UserMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
 }
 
-impl<'a> client::MethodsBuilder for UserMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UserMethods<'a, S> {}
 
-impl<'a> UserMethods<'a> {
+impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2050,7 +2055,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - No description provided.
-    pub fn get(&self, user_id: &str) -> UserGetCall<'a> {
+    pub fn get(&self, user_id: &str) -> UserGetCall<'a, S> {
         UserGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2091,7 +2096,7 @@ impl<'a> UserMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2100,10 +2105,10 @@ impl<'a> UserMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlogUserInfoGetCall<'a>
-    where  {
+pub struct BlogUserInfoGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _user_id: String,
     _blog_id: String,
     _max_posts: Option<u32>,
@@ -2112,9 +2117,15 @@ pub struct BlogUserInfoGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlogUserInfoGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BlogUserInfoGetCall<'a, S> {}
 
-impl<'a> BlogUserInfoGetCall<'a> {
+impl<'a, S> BlogUserInfoGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2260,7 +2271,7 @@ impl<'a> BlogUserInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2269,13 +2280,13 @@ impl<'a> BlogUserInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *max posts* query property to the given value.
-    pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a> {
+    pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a, S> {
         self._max_posts = Some(new_value);
         self
     }
@@ -2285,7 +2296,7 @@ impl<'a> BlogUserInfoGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogUserInfoGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogUserInfoGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2310,7 +2321,7 @@ impl<'a> BlogUserInfoGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlogUserInfoGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogUserInfoGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2330,9 +2341,9 @@ impl<'a> BlogUserInfoGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlogUserInfoGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlogUserInfoGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2364,7 +2375,7 @@ impl<'a> BlogUserInfoGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2374,10 +2385,10 @@ impl<'a> BlogUserInfoGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlogGetCall<'a>
-    where  {
+pub struct BlogGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _view: Option<String>,
     _max_posts: Option<u32>,
@@ -2386,9 +2397,15 @@ pub struct BlogGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlogGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BlogGetCall<'a, S> {}
 
-impl<'a> BlogGetCall<'a> {
+impl<'a, S> BlogGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2536,19 +2553,19 @@ impl<'a> BlogGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> BlogGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> BlogGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BlogGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max posts* query property to the given value.
-    pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a> {
+    pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a, S> {
         self._max_posts = Some(new_value);
         self
     }
@@ -2558,7 +2575,7 @@ impl<'a> BlogGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2583,7 +2600,7 @@ impl<'a> BlogGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlogGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2603,9 +2620,9 @@ impl<'a> BlogGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlogGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlogGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2637,7 +2654,7 @@ impl<'a> BlogGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2646,10 +2663,10 @@ impl<'a> BlogGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlogGetByUrlCall<'a>
-    where  {
+pub struct BlogGetByUrlCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _url: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2657,9 +2674,15 @@ pub struct BlogGetByUrlCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlogGetByUrlCall<'a> {}
+impl<'a, S> client::CallBuilder for BlogGetByUrlCall<'a, S> {}
 
-impl<'a> BlogGetByUrlCall<'a> {
+impl<'a, S> BlogGetByUrlCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2783,13 +2806,13 @@ impl<'a> BlogGetByUrlCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn url(mut self, new_value: &str) -> BlogGetByUrlCall<'a> {
+    pub fn url(mut self, new_value: &str) -> BlogGetByUrlCall<'a, S> {
         self._url = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a> {
+    pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -2799,7 +2822,7 @@ impl<'a> BlogGetByUrlCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogGetByUrlCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogGetByUrlCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2824,7 +2847,7 @@ impl<'a> BlogGetByUrlCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlogGetByUrlCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogGetByUrlCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2844,9 +2867,9 @@ impl<'a> BlogGetByUrlCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlogGetByUrlCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlogGetByUrlCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2878,7 +2901,7 @@ impl<'a> BlogGetByUrlCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2890,10 +2913,10 @@ impl<'a> BlogGetByUrlCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlogListByUserCall<'a>
-    where  {
+pub struct BlogListByUserCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _user_id: String,
     _view: Option<String>,
     _status: Vec<String>,
@@ -2904,9 +2927,15 @@ pub struct BlogListByUserCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BlogListByUserCall<'a> {}
+impl<'a, S> client::CallBuilder for BlogListByUserCall<'a, S> {}
 
-impl<'a> BlogListByUserCall<'a> {
+impl<'a, S> BlogListByUserCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3064,13 +3093,13 @@ impl<'a> BlogListByUserCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BlogListByUserCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a> {
+    pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -3078,20 +3107,20 @@ impl<'a> BlogListByUserCall<'a> {
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a> {
+    pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
         self._status.push(new_value.to_string());
         self
     }
     ///
     /// Append the given value to the *role* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a> {
+    pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a, S> {
         self._role.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *fetch user info* query property to the given value.
-    pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a> {
+    pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a, S> {
         self._fetch_user_info = Some(new_value);
         self
     }
@@ -3101,7 +3130,7 @@ impl<'a> BlogListByUserCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogListByUserCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlogListByUserCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3126,7 +3155,7 @@ impl<'a> BlogListByUserCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlogListByUserCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BlogListByUserCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3146,9 +3175,9 @@ impl<'a> BlogListByUserCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlogListByUserCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BlogListByUserCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3180,7 +3209,7 @@ impl<'a> BlogListByUserCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3188,10 +3217,10 @@ impl<'a> BlogListByUserCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentApproveCall<'a>
-    where  {
+pub struct CommentApproveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -3200,9 +3229,15 @@ pub struct CommentApproveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentApproveCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentApproveCall<'a, S> {}
 
-impl<'a> CommentApproveCall<'a> {
+impl<'a, S> CommentApproveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3346,7 +3381,7 @@ impl<'a> CommentApproveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentApproveCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentApproveCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -3355,7 +3390,7 @@ impl<'a> CommentApproveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> CommentApproveCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> CommentApproveCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -3364,7 +3399,7 @@ impl<'a> CommentApproveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentApproveCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentApproveCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -3374,7 +3409,7 @@ impl<'a> CommentApproveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentApproveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentApproveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3399,7 +3434,7 @@ impl<'a> CommentApproveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentApproveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentApproveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3419,9 +3454,9 @@ impl<'a> CommentApproveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentApproveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentApproveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3453,7 +3488,7 @@ impl<'a> CommentApproveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3461,10 +3496,10 @@ impl<'a> CommentApproveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a>
-    where  {
+pub struct CommentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -3473,9 +3508,15 @@ pub struct CommentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentDeleteCall<'a, S> {}
 
-impl<'a> CommentDeleteCall<'a> {
+impl<'a, S> CommentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3608,7 +3649,7 @@ impl<'a> CommentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentDeleteCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -3617,7 +3658,7 @@ impl<'a> CommentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> CommentDeleteCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -3626,7 +3667,7 @@ impl<'a> CommentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -3636,7 +3677,7 @@ impl<'a> CommentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3661,7 +3702,7 @@ impl<'a> CommentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3681,9 +3722,9 @@ impl<'a> CommentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3715,7 +3756,7 @@ impl<'a> CommentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3724,10 +3765,10 @@ impl<'a> CommentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentGetCall<'a>
-    where  {
+pub struct CommentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -3737,9 +3778,15 @@ pub struct CommentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentGetCall<'a, S> {}
 
-impl<'a> CommentGetCall<'a> {
+impl<'a, S> CommentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3886,7 +3933,7 @@ impl<'a> CommentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -3895,7 +3942,7 @@ impl<'a> CommentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> CommentGetCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> CommentGetCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -3904,13 +3951,13 @@ impl<'a> CommentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CommentGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -3920,7 +3967,7 @@ impl<'a> CommentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3945,7 +3992,7 @@ impl<'a> CommentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3965,9 +4012,9 @@ impl<'a> CommentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3999,7 +4046,7 @@ impl<'a> CommentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4014,10 +4061,10 @@ impl<'a> CommentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListCall<'a>
-    where  {
+pub struct CommentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _view: Option<String>,
@@ -4032,9 +4079,15 @@ pub struct CommentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentListCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentListCall<'a, S> {}
 
-impl<'a> CommentListCall<'a> {
+impl<'a, S> CommentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4198,7 +4251,7 @@ impl<'a> CommentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -4207,49 +4260,49 @@ impl<'a> CommentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn status(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._status = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *start date* query property to the given value.
-    pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._start_date = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch bodies* query property to the given value.
-    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a, S> {
         self._fetch_bodies = Some(new_value);
         self
     }
     ///
     /// Sets the *end date* query property to the given value.
-    pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a, S> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -4259,7 +4312,7 @@ impl<'a> CommentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4284,7 +4337,7 @@ impl<'a> CommentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4304,9 +4357,9 @@ impl<'a> CommentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4338,7 +4391,7 @@ impl<'a> CommentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4352,10 +4405,10 @@ impl<'a> CommentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListByBlogCall<'a>
-    where  {
+pub struct CommentListByBlogCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _status: Vec<String>,
     _start_date: Option<String>,
@@ -4368,9 +4421,15 @@ pub struct CommentListByBlogCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentListByBlogCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentListByBlogCall<'a, S> {}
 
-impl<'a> CommentListByBlogCall<'a> {
+impl<'a, S> CommentListByBlogCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4532,44 +4591,44 @@ impl<'a> CommentListByBlogCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentListByBlogCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentListByBlogCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> CommentListByBlogCall<'a> {
+    pub fn add_status(mut self, new_value: &str) -> CommentListByBlogCall<'a, S> {
         self._status.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *start date* query property to the given value.
-    pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, S> {
         self._start_date = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch bodies* query property to the given value.
-    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a, S> {
         self._fetch_bodies = Some(new_value);
         self
     }
     ///
     /// Sets the *end date* query property to the given value.
-    pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, S> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -4579,7 +4638,7 @@ impl<'a> CommentListByBlogCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListByBlogCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListByBlogCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4604,7 +4663,7 @@ impl<'a> CommentListByBlogCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListByBlogCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListByBlogCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4624,9 +4683,9 @@ impl<'a> CommentListByBlogCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListByBlogCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentListByBlogCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4658,7 +4717,7 @@ impl<'a> CommentListByBlogCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4666,10 +4725,10 @@ impl<'a> CommentListByBlogCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentMarkAsSpamCall<'a>
-    where  {
+pub struct CommentMarkAsSpamCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -4678,9 +4737,15 @@ pub struct CommentMarkAsSpamCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentMarkAsSpamCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentMarkAsSpamCall<'a, S> {}
 
-impl<'a> CommentMarkAsSpamCall<'a> {
+impl<'a, S> CommentMarkAsSpamCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4824,7 +4889,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -4833,7 +4898,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -4842,7 +4907,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -4852,7 +4917,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentMarkAsSpamCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentMarkAsSpamCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4877,7 +4942,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4897,9 +4962,9 @@ impl<'a> CommentMarkAsSpamCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentMarkAsSpamCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentMarkAsSpamCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4931,7 +4996,7 @@ impl<'a> CommentMarkAsSpamCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4939,10 +5004,10 @@ impl<'a> CommentMarkAsSpamCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentRemoveContentCall<'a>
-    where  {
+pub struct CommentRemoveContentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _comment_id: String,
@@ -4951,9 +5016,15 @@ pub struct CommentRemoveContentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CommentRemoveContentCall<'a> {}
+impl<'a, S> client::CallBuilder for CommentRemoveContentCall<'a, S> {}
 
-impl<'a> CommentRemoveContentCall<'a> {
+impl<'a, S> CommentRemoveContentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5097,7 +5168,7 @@ impl<'a> CommentRemoveContentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5106,7 +5177,7 @@ impl<'a> CommentRemoveContentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -5115,7 +5186,7 @@ impl<'a> CommentRemoveContentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, S> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -5125,7 +5196,7 @@ impl<'a> CommentRemoveContentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentRemoveContentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentRemoveContentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5150,7 +5221,7 @@ impl<'a> CommentRemoveContentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentRemoveContentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentRemoveContentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5170,9 +5241,9 @@ impl<'a> CommentRemoveContentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentRemoveContentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CommentRemoveContentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5204,7 +5275,7 @@ impl<'a> CommentRemoveContentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5213,10 +5284,10 @@ impl<'a> CommentRemoveContentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageViewGetCall<'a>
-    where  {
+pub struct PageViewGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _range: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5224,9 +5295,15 @@ pub struct PageViewGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageViewGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PageViewGetCall<'a, S> {}
 
-impl<'a> PageViewGetCall<'a> {
+impl<'a, S> PageViewGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5373,14 +5450,14 @@ impl<'a> PageViewGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageViewGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageViewGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Append the given value to the *range* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_range(mut self, new_value: &str) -> PageViewGetCall<'a> {
+    pub fn add_range(mut self, new_value: &str) -> PageViewGetCall<'a, S> {
         self._range.push(new_value.to_string());
         self
     }
@@ -5390,7 +5467,7 @@ impl<'a> PageViewGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageViewGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageViewGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5415,7 +5492,7 @@ impl<'a> PageViewGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageViewGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageViewGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5435,9 +5512,9 @@ impl<'a> PageViewGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageViewGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageViewGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5469,7 +5546,7 @@ impl<'a> PageViewGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5477,10 +5554,10 @@ impl<'a> PageViewGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageDeleteCall<'a>
-    where  {
+pub struct PageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _page_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5488,9 +5565,15 @@ pub struct PageDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PageDeleteCall<'a, S> {}
 
-impl<'a> PageDeleteCall<'a> {
+impl<'a, S> PageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5622,7 +5705,7 @@ impl<'a> PageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageDeleteCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageDeleteCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5631,7 +5714,7 @@ impl<'a> PageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> PageDeleteCall<'a> {
+    pub fn page_id(mut self, new_value: &str) -> PageDeleteCall<'a, S> {
         self._page_id = new_value.to_string();
         self
     }
@@ -5641,7 +5724,7 @@ impl<'a> PageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5666,7 +5749,7 @@ impl<'a> PageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5686,9 +5769,9 @@ impl<'a> PageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5720,7 +5803,7 @@ impl<'a> PageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5729,10 +5812,10 @@ impl<'a> PageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageGetCall<'a>
-    where  {
+pub struct PageGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _page_id: String,
     _view: Option<String>,
@@ -5741,9 +5824,15 @@ pub struct PageGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PageGetCall<'a, S> {}
 
-impl<'a> PageGetCall<'a> {
+impl<'a, S> PageGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5889,7 +5978,7 @@ impl<'a> PageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -5898,13 +5987,13 @@ impl<'a> PageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> PageGetCall<'a> {
+    pub fn page_id(mut self, new_value: &str) -> PageGetCall<'a, S> {
         self._page_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PageGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> PageGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -5914,7 +6003,7 @@ impl<'a> PageGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5939,7 +6028,7 @@ impl<'a> PageGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5959,9 +6048,9 @@ impl<'a> PageGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5994,7 +6083,7 @@ impl<'a> PageGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6008,10 +6097,10 @@ impl<'a> PageGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageInsertCall<'a>
-    where  {
+pub struct PageInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _request: Page,
     _blog_id: String,
     _is_draft: Option<bool>,
@@ -6020,9 +6109,15 @@ pub struct PageInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for PageInsertCall<'a, S> {}
 
-impl<'a> PageInsertCall<'a> {
+impl<'a, S> PageInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6181,7 +6276,7 @@ impl<'a> PageInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Page) -> PageInsertCall<'a> {
+    pub fn request(mut self, new_value: Page) -> PageInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6190,13 +6285,13 @@ impl<'a> PageInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageInsertCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageInsertCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *is draft* query property to the given value.
-    pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a> {
+    pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a, S> {
         self._is_draft = Some(new_value);
         self
     }
@@ -6206,7 +6301,7 @@ impl<'a> PageInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6231,7 +6326,7 @@ impl<'a> PageInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6251,9 +6346,9 @@ impl<'a> PageInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6285,7 +6380,7 @@ impl<'a> PageInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6298,10 +6393,10 @@ impl<'a> PageInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageListCall<'a>
-    where  {
+pub struct PageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _view: Option<String>,
     _status: Vec<String>,
@@ -6313,9 +6408,15 @@ pub struct PageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageListCall<'a> {}
+impl<'a, S> client::CallBuilder for PageListCall<'a, S> {}
 
-impl<'a> PageListCall<'a> {
+impl<'a, S> PageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6474,38 +6575,38 @@ impl<'a> PageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn add_status(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._status.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PageListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PageListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch bodies* query property to the given value.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a, S> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -6515,7 +6616,7 @@ impl<'a> PageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6540,7 +6641,7 @@ impl<'a> PageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6560,9 +6661,9 @@ impl<'a> PageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6595,7 +6696,7 @@ impl<'a> PageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6610,10 +6711,10 @@ impl<'a> PageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PagePatchCall<'a>
-    where  {
+pub struct PagePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _request: Page,
     _blog_id: String,
     _page_id: String,
@@ -6624,9 +6725,15 @@ pub struct PagePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PagePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PagePatchCall<'a, S> {}
 
-impl<'a> PagePatchCall<'a> {
+impl<'a, S> PagePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6789,7 +6896,7 @@ impl<'a> PagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Page) -> PagePatchCall<'a> {
+    pub fn request(mut self, new_value: Page) -> PagePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6798,7 +6905,7 @@ impl<'a> PagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PagePatchCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PagePatchCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -6807,19 +6914,19 @@ impl<'a> PagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> PagePatchCall<'a> {
+    pub fn page_id(mut self, new_value: &str) -> PagePatchCall<'a, S> {
         self._page_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *revert* query property to the given value.
-    pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a> {
+    pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a, S> {
         self._revert = Some(new_value);
         self
     }
     ///
     /// Sets the *publish* query property to the given value.
-    pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a> {
+    pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a, S> {
         self._publish = Some(new_value);
         self
     }
@@ -6829,7 +6936,7 @@ impl<'a> PagePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6854,7 +6961,7 @@ impl<'a> PagePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PagePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PagePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6874,9 +6981,9 @@ impl<'a> PagePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PagePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PagePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6908,7 +7015,7 @@ impl<'a> PagePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6916,10 +7023,10 @@ impl<'a> PagePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PagePublishCall<'a>
-    where  {
+pub struct PagePublishCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _page_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6927,9 +7034,15 @@ pub struct PagePublishCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PagePublishCall<'a> {}
+impl<'a, S> client::CallBuilder for PagePublishCall<'a, S> {}
 
-impl<'a> PagePublishCall<'a> {
+impl<'a, S> PagePublishCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7072,7 +7185,7 @@ impl<'a> PagePublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PagePublishCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PagePublishCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7081,7 +7194,7 @@ impl<'a> PagePublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> PagePublishCall<'a> {
+    pub fn page_id(mut self, new_value: &str) -> PagePublishCall<'a, S> {
         self._page_id = new_value.to_string();
         self
     }
@@ -7091,7 +7204,7 @@ impl<'a> PagePublishCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagePublishCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagePublishCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7116,7 +7229,7 @@ impl<'a> PagePublishCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PagePublishCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PagePublishCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7136,9 +7249,9 @@ impl<'a> PagePublishCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PagePublishCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PagePublishCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7170,7 +7283,7 @@ impl<'a> PagePublishCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7178,10 +7291,10 @@ impl<'a> PagePublishCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageRevertCall<'a>
-    where  {
+pub struct PageRevertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _page_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7189,9 +7302,15 @@ pub struct PageRevertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageRevertCall<'a> {}
+impl<'a, S> client::CallBuilder for PageRevertCall<'a, S> {}
 
-impl<'a> PageRevertCall<'a> {
+impl<'a, S> PageRevertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7334,7 +7453,7 @@ impl<'a> PageRevertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageRevertCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageRevertCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7343,7 +7462,7 @@ impl<'a> PageRevertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> PageRevertCall<'a> {
+    pub fn page_id(mut self, new_value: &str) -> PageRevertCall<'a, S> {
         self._page_id = new_value.to_string();
         self
     }
@@ -7353,7 +7472,7 @@ impl<'a> PageRevertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageRevertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageRevertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7378,7 +7497,7 @@ impl<'a> PageRevertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageRevertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageRevertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7398,9 +7517,9 @@ impl<'a> PageRevertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageRevertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageRevertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7433,7 +7552,7 @@ impl<'a> PageRevertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7448,10 +7567,10 @@ impl<'a> PageRevertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PageUpdateCall<'a>
-    where  {
+pub struct PageUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _request: Page,
     _blog_id: String,
     _page_id: String,
@@ -7462,9 +7581,15 @@ pub struct PageUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PageUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PageUpdateCall<'a, S> {}
 
-impl<'a> PageUpdateCall<'a> {
+impl<'a, S> PageUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7627,7 +7752,7 @@ impl<'a> PageUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Page) -> PageUpdateCall<'a> {
+    pub fn request(mut self, new_value: Page) -> PageUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7636,7 +7761,7 @@ impl<'a> PageUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PageUpdateCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PageUpdateCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7645,19 +7770,19 @@ impl<'a> PageUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_id(mut self, new_value: &str) -> PageUpdateCall<'a> {
+    pub fn page_id(mut self, new_value: &str) -> PageUpdateCall<'a, S> {
         self._page_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *revert* query property to the given value.
-    pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a> {
+    pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a, S> {
         self._revert = Some(new_value);
         self
     }
     ///
     /// Sets the *publish* query property to the given value.
-    pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a> {
+    pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a, S> {
         self._publish = Some(new_value);
         self
     }
@@ -7667,7 +7792,7 @@ impl<'a> PageUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PageUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7692,7 +7817,7 @@ impl<'a> PageUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PageUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7712,9 +7837,9 @@ impl<'a> PageUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PageUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PageUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7746,7 +7871,7 @@ impl<'a> PageUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7755,10 +7880,10 @@ impl<'a> PageUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostUserInfoGetCall<'a>
-    where  {
+pub struct PostUserInfoGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _user_id: String,
     _blog_id: String,
     _post_id: String,
@@ -7768,9 +7893,15 @@ pub struct PostUserInfoGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostUserInfoGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PostUserInfoGetCall<'a, S> {}
 
-impl<'a> PostUserInfoGetCall<'a> {
+impl<'a, S> PostUserInfoGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7917,7 +8048,7 @@ impl<'a> PostUserInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -7926,7 +8057,7 @@ impl<'a> PostUserInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -7935,13 +8066,13 @@ impl<'a> PostUserInfoGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *max comments* query property to the given value.
-    pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a> {
+    pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a, S> {
         self._max_comments = Some(new_value);
         self
     }
@@ -7951,7 +8082,7 @@ impl<'a> PostUserInfoGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostUserInfoGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostUserInfoGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7976,7 +8107,7 @@ impl<'a> PostUserInfoGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7996,9 +8127,9 @@ impl<'a> PostUserInfoGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostUserInfoGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostUserInfoGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8030,7 +8161,7 @@ impl<'a> PostUserInfoGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8047,10 +8178,10 @@ impl<'a> PostUserInfoGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostUserInfoListCall<'a>
-    where  {
+pub struct PostUserInfoListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _user_id: String,
     _blog_id: String,
     _view: Option<String>,
@@ -8067,9 +8198,15 @@ pub struct PostUserInfoListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostUserInfoListCall<'a> {}
+impl<'a, S> client::CallBuilder for PostUserInfoListCall<'a, S> {}
 
-impl<'a> PostUserInfoListCall<'a> {
+impl<'a, S> PostUserInfoListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8241,7 +8378,7 @@ impl<'a> PostUserInfoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -8250,62 +8387,62 @@ impl<'a> PostUserInfoListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn add_status(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._status.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *start date* query property to the given value.
-    pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._start_date = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *labels* query property to the given value.
-    pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._labels = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *fetch bodies* query property to the given value.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a, S> {
         self._fetch_bodies = Some(new_value);
         self
     }
     ///
     /// Sets the *end date* query property to the given value.
-    pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, S> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -8315,7 +8452,7 @@ impl<'a> PostUserInfoListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostUserInfoListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostUserInfoListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8340,7 +8477,7 @@ impl<'a> PostUserInfoListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostUserInfoListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8360,9 +8497,9 @@ impl<'a> PostUserInfoListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostUserInfoListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostUserInfoListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8394,7 +8531,7 @@ impl<'a> PostUserInfoListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8402,10 +8539,10 @@ impl<'a> PostUserInfoListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostDeleteCall<'a>
-    where  {
+pub struct PostDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8413,9 +8550,15 @@ pub struct PostDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for PostDeleteCall<'a, S> {}
 
-impl<'a> PostDeleteCall<'a> {
+impl<'a, S> PostDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8547,7 +8690,7 @@ impl<'a> PostDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostDeleteCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostDeleteCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -8556,7 +8699,7 @@ impl<'a> PostDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostDeleteCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostDeleteCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -8566,7 +8709,7 @@ impl<'a> PostDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8591,7 +8734,7 @@ impl<'a> PostDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8611,9 +8754,9 @@ impl<'a> PostDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8645,7 +8788,7 @@ impl<'a> PostDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8657,10 +8800,10 @@ impl<'a> PostDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostGetCall<'a>
-    where  {
+pub struct PostGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _view: Option<String>,
@@ -8672,9 +8815,15 @@ pub struct PostGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PostGetCall<'a, S> {}
 
-impl<'a> PostGetCall<'a> {
+impl<'a, S> PostGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8829,7 +8978,7 @@ impl<'a> PostGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostGetCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostGetCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -8838,31 +8987,31 @@ impl<'a> PostGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostGetCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostGetCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> PostGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max comments* query property to the given value.
-    pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a> {
+    pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a, S> {
         self._max_comments = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch images* query property to the given value.
-    pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a, S> {
         self._fetch_images = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch body* query property to the given value.
-    pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a, S> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -8872,7 +9021,7 @@ impl<'a> PostGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8897,7 +9046,7 @@ impl<'a> PostGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8917,9 +9066,9 @@ impl<'a> PostGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8951,7 +9100,7 @@ impl<'a> PostGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8961,10 +9110,10 @@ impl<'a> PostGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostGetByPathCall<'a>
-    where  {
+pub struct PostGetByPathCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _path: String,
     _view: Option<String>,
@@ -8974,9 +9123,15 @@ pub struct PostGetByPathCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostGetByPathCall<'a> {}
+impl<'a, S> client::CallBuilder for PostGetByPathCall<'a, S> {}
 
-impl<'a> PostGetByPathCall<'a> {
+impl<'a, S> PostGetByPathCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9125,7 +9280,7 @@ impl<'a> PostGetByPathCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostGetByPathCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostGetByPathCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -9134,19 +9289,19 @@ impl<'a> PostGetByPathCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn path(mut self, new_value: &str) -> PostGetByPathCall<'a> {
+    pub fn path(mut self, new_value: &str) -> PostGetByPathCall<'a, S> {
         self._path = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a> {
+    pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max comments* query property to the given value.
-    pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a> {
+    pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a, S> {
         self._max_comments = Some(new_value);
         self
     }
@@ -9156,7 +9311,7 @@ impl<'a> PostGetByPathCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostGetByPathCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostGetByPathCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9181,7 +9336,7 @@ impl<'a> PostGetByPathCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostGetByPathCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostGetByPathCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9201,9 +9356,9 @@ impl<'a> PostGetByPathCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostGetByPathCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostGetByPathCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9236,7 +9391,7 @@ impl<'a> PostGetByPathCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9252,10 +9407,10 @@ impl<'a> PostGetByPathCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostInsertCall<'a>
-    where  {
+pub struct PostInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _request: Post,
     _blog_id: String,
     _is_draft: Option<bool>,
@@ -9266,9 +9421,15 @@ pub struct PostInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for PostInsertCall<'a, S> {}
 
-impl<'a> PostInsertCall<'a> {
+impl<'a, S> PostInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9433,7 +9594,7 @@ impl<'a> PostInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Post) -> PostInsertCall<'a> {
+    pub fn request(mut self, new_value: Post) -> PostInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9442,25 +9603,25 @@ impl<'a> PostInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostInsertCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostInsertCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *is draft* query property to the given value.
-    pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a> {
+    pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a, S> {
         self._is_draft = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch images* query property to the given value.
-    pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a, S> {
         self._fetch_images = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch body* query property to the given value.
-    pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a, S> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -9470,7 +9631,7 @@ impl<'a> PostInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9495,7 +9656,7 @@ impl<'a> PostInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9515,9 +9676,9 @@ impl<'a> PostInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9549,7 +9710,7 @@ impl<'a> PostInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9567,10 +9728,10 @@ impl<'a> PostInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostListCall<'a>
-    where  {
+pub struct PostListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _view: Option<String>,
     _status: Vec<String>,
@@ -9587,9 +9748,15 @@ pub struct PostListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostListCall<'a> {}
+impl<'a, S> client::CallBuilder for PostListCall<'a, S> {}
 
-impl<'a> PostListCall<'a> {
+impl<'a, S> PostListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9763,68 +9930,68 @@ impl<'a> PostListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     ///
     /// Append the given value to the *status* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_status(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn add_status(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._status.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *start date* query property to the given value.
-    pub fn start_date(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn start_date(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._start_date = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PostListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> PostListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *labels* query property to the given value.
-    pub fn labels(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn labels(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._labels = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *fetch images* query property to the given value.
-    pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a, S> {
         self._fetch_images = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch bodies* query property to the given value.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a, S> {
         self._fetch_bodies = Some(new_value);
         self
     }
     ///
     /// Sets the *end date* query property to the given value.
-    pub fn end_date(mut self, new_value: &str) -> PostListCall<'a> {
+    pub fn end_date(mut self, new_value: &str) -> PostListCall<'a, S> {
         self._end_date = Some(new_value.to_string());
         self
     }
@@ -9834,7 +10001,7 @@ impl<'a> PostListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9859,7 +10026,7 @@ impl<'a> PostListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9879,9 +10046,9 @@ impl<'a> PostListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9914,7 +10081,7 @@ impl<'a> PostListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9932,10 +10099,10 @@ impl<'a> PostListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostPatchCall<'a>
-    where  {
+pub struct PostPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _request: Post,
     _blog_id: String,
     _post_id: String,
@@ -9949,9 +10116,15 @@ pub struct PostPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for PostPatchCall<'a, S> {}
 
-impl<'a> PostPatchCall<'a> {
+impl<'a, S> PostPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10123,7 +10296,7 @@ impl<'a> PostPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Post) -> PostPatchCall<'a> {
+    pub fn request(mut self, new_value: Post) -> PostPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10132,7 +10305,7 @@ impl<'a> PostPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostPatchCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostPatchCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10141,37 +10314,37 @@ impl<'a> PostPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostPatchCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostPatchCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *revert* query property to the given value.
-    pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a> {
+    pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a, S> {
         self._revert = Some(new_value);
         self
     }
     ///
     /// Sets the *publish* query property to the given value.
-    pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a> {
+    pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a, S> {
         self._publish = Some(new_value);
         self
     }
     ///
     /// Sets the *max comments* query property to the given value.
-    pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a> {
+    pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a, S> {
         self._max_comments = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch images* query property to the given value.
-    pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a, S> {
         self._fetch_images = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch body* query property to the given value.
-    pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a, S> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -10181,7 +10354,7 @@ impl<'a> PostPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10206,7 +10379,7 @@ impl<'a> PostPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10226,9 +10399,9 @@ impl<'a> PostPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10260,7 +10433,7 @@ impl<'a> PostPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10269,10 +10442,10 @@ impl<'a> PostPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostPublishCall<'a>
-    where  {
+pub struct PostPublishCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _publish_date: Option<String>,
@@ -10281,9 +10454,15 @@ pub struct PostPublishCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostPublishCall<'a> {}
+impl<'a, S> client::CallBuilder for PostPublishCall<'a, S> {}
 
-impl<'a> PostPublishCall<'a> {
+impl<'a, S> PostPublishCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10429,7 +10608,7 @@ impl<'a> PostPublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostPublishCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostPublishCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10438,13 +10617,13 @@ impl<'a> PostPublishCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostPublishCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostPublishCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *publish date* query property to the given value.
-    pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a> {
+    pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a, S> {
         self._publish_date = Some(new_value.to_string());
         self
     }
@@ -10454,7 +10633,7 @@ impl<'a> PostPublishCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostPublishCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostPublishCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10479,7 +10658,7 @@ impl<'a> PostPublishCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostPublishCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostPublishCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10499,9 +10678,9 @@ impl<'a> PostPublishCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostPublishCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostPublishCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10533,7 +10712,7 @@ impl<'a> PostPublishCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10541,10 +10720,10 @@ impl<'a> PostPublishCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostRevertCall<'a>
-    where  {
+pub struct PostRevertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _post_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10552,9 +10731,15 @@ pub struct PostRevertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostRevertCall<'a> {}
+impl<'a, S> client::CallBuilder for PostRevertCall<'a, S> {}
 
-impl<'a> PostRevertCall<'a> {
+impl<'a, S> PostRevertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10697,7 +10882,7 @@ impl<'a> PostRevertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostRevertCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostRevertCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10706,7 +10891,7 @@ impl<'a> PostRevertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostRevertCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostRevertCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
@@ -10716,7 +10901,7 @@ impl<'a> PostRevertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostRevertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostRevertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10741,7 +10926,7 @@ impl<'a> PostRevertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostRevertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostRevertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10761,9 +10946,9 @@ impl<'a> PostRevertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostRevertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostRevertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10795,7 +10980,7 @@ impl<'a> PostRevertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10805,10 +10990,10 @@ impl<'a> PostRevertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostSearchCall<'a>
-    where  {
+pub struct PostSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _blog_id: String,
     _q: String,
     _order_by: Option<String>,
@@ -10818,9 +11003,15 @@ pub struct PostSearchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for PostSearchCall<'a, S> {}
 
-impl<'a> PostSearchCall<'a> {
+impl<'a, S> PostSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10969,7 +11160,7 @@ impl<'a> PostSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostSearchCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostSearchCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -10978,19 +11169,19 @@ impl<'a> PostSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn q(mut self, new_value: &str) -> PostSearchCall<'a> {
+    pub fn q(mut self, new_value: &str) -> PostSearchCall<'a, S> {
         self._q = new_value.to_string();
         self
     }
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *fetch bodies* query property to the given value.
-    pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a> {
+    pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a, S> {
         self._fetch_bodies = Some(new_value);
         self
     }
@@ -11000,7 +11191,7 @@ impl<'a> PostSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11025,7 +11216,7 @@ impl<'a> PostSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11045,9 +11236,9 @@ impl<'a> PostSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11080,7 +11271,7 @@ impl<'a> PostSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11098,10 +11289,10 @@ impl<'a> PostSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PostUpdateCall<'a>
-    where  {
+pub struct PostUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _request: Post,
     _blog_id: String,
     _post_id: String,
@@ -11115,9 +11306,15 @@ pub struct PostUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PostUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for PostUpdateCall<'a, S> {}
 
-impl<'a> PostUpdateCall<'a> {
+impl<'a, S> PostUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11289,7 +11486,7 @@ impl<'a> PostUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Post) -> PostUpdateCall<'a> {
+    pub fn request(mut self, new_value: Post) -> PostUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11298,7 +11495,7 @@ impl<'a> PostUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn blog_id(mut self, new_value: &str) -> PostUpdateCall<'a> {
+    pub fn blog_id(mut self, new_value: &str) -> PostUpdateCall<'a, S> {
         self._blog_id = new_value.to_string();
         self
     }
@@ -11307,37 +11504,37 @@ impl<'a> PostUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn post_id(mut self, new_value: &str) -> PostUpdateCall<'a> {
+    pub fn post_id(mut self, new_value: &str) -> PostUpdateCall<'a, S> {
         self._post_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *revert* query property to the given value.
-    pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a> {
+    pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a, S> {
         self._revert = Some(new_value);
         self
     }
     ///
     /// Sets the *publish* query property to the given value.
-    pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a> {
+    pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a, S> {
         self._publish = Some(new_value);
         self
     }
     ///
     /// Sets the *max comments* query property to the given value.
-    pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a> {
+    pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a, S> {
         self._max_comments = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch images* query property to the given value.
-    pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a> {
+    pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a, S> {
         self._fetch_images = Some(new_value);
         self
     }
     ///
     /// Sets the *fetch body* query property to the given value.
-    pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a> {
+    pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a, S> {
         self._fetch_body = Some(new_value);
         self
     }
@@ -11347,7 +11544,7 @@ impl<'a> PostUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PostUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11372,7 +11569,7 @@ impl<'a> PostUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PostUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PostUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11392,9 +11589,9 @@ impl<'a> PostUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PostUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PostUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11426,7 +11623,7 @@ impl<'a> PostUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Blogger::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11434,19 +11631,25 @@ impl<'a> PostUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserGetCall<'a>
-    where  {
+pub struct UserGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Blogger<>,
+    hub: &'a Blogger<S>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserGetCall<'a, S> {}
 
-impl<'a> UserGetCall<'a> {
+impl<'a, S> UserGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11588,7 +11791,7 @@ impl<'a> UserGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -11598,7 +11801,7 @@ impl<'a> UserGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11623,7 +11826,7 @@ impl<'a> UserGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11643,9 +11846,9 @@ impl<'a> UserGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

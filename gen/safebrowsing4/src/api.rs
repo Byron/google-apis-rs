@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -77,52 +82,52 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Safebrowsing<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Safebrowsing<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Safebrowsing<> {}
+impl<'a, S> client::Hub for Safebrowsing<S> {}
 
-impl<'a, > Safebrowsing<> {
+impl<'a, S> Safebrowsing<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Safebrowsing<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Safebrowsing<S> {
         Safebrowsing {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://safebrowsing.googleapis.com/".to_string(),
             _root_url: "https://safebrowsing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn encoded_full_hashes(&'a self) -> EncodedFullHasheMethods<'a> {
+    pub fn encoded_full_hashes(&'a self) -> EncodedFullHasheMethods<'a, S> {
         EncodedFullHasheMethods { hub: &self }
     }
-    pub fn encoded_updates(&'a self) -> EncodedUpdateMethods<'a> {
+    pub fn encoded_updates(&'a self) -> EncodedUpdateMethods<'a, S> {
         EncodedUpdateMethods { hub: &self }
     }
-    pub fn full_hashes(&'a self) -> FullHasheMethods<'a> {
+    pub fn full_hashes(&'a self) -> FullHasheMethods<'a, S> {
         FullHasheMethods { hub: &self }
     }
-    pub fn threat_hits(&'a self) -> ThreatHitMethods<'a> {
+    pub fn threat_hits(&'a self) -> ThreatHitMethods<'a, S> {
         ThreatHitMethods { hub: &self }
     }
-    pub fn threat_list_updates(&'a self) -> ThreatListUpdateMethods<'a> {
+    pub fn threat_list_updates(&'a self) -> ThreatListUpdateMethods<'a, S> {
         ThreatListUpdateMethods { hub: &self }
     }
-    pub fn threat_lists(&'a self) -> ThreatListMethods<'a> {
+    pub fn threat_lists(&'a self) -> ThreatListMethods<'a, S> {
         ThreatListMethods { hub: &self }
     }
-    pub fn threat_matches(&'a self) -> ThreatMatcheMethods<'a> {
+    pub fn threat_matches(&'a self) -> ThreatMatcheMethods<'a, S> {
         ThreatMatcheMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -723,22 +728,22 @@ impl client::Part for GoogleSecuritySafebrowsingV4ThreatMatch {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.encoded_full_hashes();
 /// # }
 /// ```
-pub struct EncodedFullHasheMethods<'a>
-    where  {
+pub struct EncodedFullHasheMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for EncodedFullHasheMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EncodedFullHasheMethods<'a, S> {}
 
-impl<'a> EncodedFullHasheMethods<'a> {
+impl<'a, S> EncodedFullHasheMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -747,7 +752,7 @@ impl<'a> EncodedFullHasheMethods<'a> {
     /// # Arguments
     ///
     /// * `encodedRequest` - A serialized FindFullHashesRequest proto.
-    pub fn get(&self, encoded_request: &str) -> EncodedFullHasheGetCall<'a> {
+    pub fn get(&self, encoded_request: &str) -> EncodedFullHasheGetCall<'a, S> {
         EncodedFullHasheGetCall {
             hub: self.hub,
             _encoded_request: encoded_request.to_string(),
@@ -782,22 +787,22 @@ impl<'a> EncodedFullHasheMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.encoded_updates();
 /// # }
 /// ```
-pub struct EncodedUpdateMethods<'a>
-    where  {
+pub struct EncodedUpdateMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for EncodedUpdateMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EncodedUpdateMethods<'a, S> {}
 
-impl<'a> EncodedUpdateMethods<'a> {
+impl<'a, S> EncodedUpdateMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -806,7 +811,7 @@ impl<'a> EncodedUpdateMethods<'a> {
     /// # Arguments
     ///
     /// * `encodedRequest` - A serialized FetchThreatListUpdatesRequest proto.
-    pub fn get(&self, encoded_request: &str) -> EncodedUpdateGetCall<'a> {
+    pub fn get(&self, encoded_request: &str) -> EncodedUpdateGetCall<'a, S> {
         EncodedUpdateGetCall {
             hub: self.hub,
             _encoded_request: encoded_request.to_string(),
@@ -841,22 +846,22 @@ impl<'a> EncodedUpdateMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `find(...)`
 /// // to build up your call.
 /// let rb = hub.full_hashes();
 /// # }
 /// ```
-pub struct FullHasheMethods<'a>
-    where  {
+pub struct FullHasheMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for FullHasheMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FullHasheMethods<'a, S> {}
 
-impl<'a> FullHasheMethods<'a> {
+impl<'a, S> FullHasheMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -865,7 +870,7 @@ impl<'a> FullHasheMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHasheFindCall<'a> {
+    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHasheFindCall<'a, S> {
         FullHasheFindCall {
             hub: self.hub,
             _request: request,
@@ -898,22 +903,22 @@ impl<'a> FullHasheMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`
 /// // to build up your call.
 /// let rb = hub.threat_hits();
 /// # }
 /// ```
-pub struct ThreatHitMethods<'a>
-    where  {
+pub struct ThreatHitMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThreatHitMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThreatHitMethods<'a, S> {}
 
-impl<'a> ThreatHitMethods<'a> {
+impl<'a, S> ThreatHitMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -922,7 +927,7 @@ impl<'a> ThreatHitMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: GoogleSecuritySafebrowsingV4ThreatHit) -> ThreatHitCreateCall<'a> {
+    pub fn create(&self, request: GoogleSecuritySafebrowsingV4ThreatHit) -> ThreatHitCreateCall<'a, S> {
         ThreatHitCreateCall {
             hub: self.hub,
             _request: request,
@@ -955,22 +960,22 @@ impl<'a> ThreatHitMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `fetch(...)`
 /// // to build up your call.
 /// let rb = hub.threat_list_updates();
 /// # }
 /// ```
-pub struct ThreatListUpdateMethods<'a>
-    where  {
+pub struct ThreatListUpdateMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThreatListUpdateMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThreatListUpdateMethods<'a, S> {}
 
-impl<'a> ThreatListUpdateMethods<'a> {
+impl<'a, S> ThreatListUpdateMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -979,7 +984,7 @@ impl<'a> ThreatListUpdateMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn fetch(&self, request: GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest) -> ThreatListUpdateFetchCall<'a> {
+    pub fn fetch(&self, request: GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest) -> ThreatListUpdateFetchCall<'a, S> {
         ThreatListUpdateFetchCall {
             hub: self.hub,
             _request: request,
@@ -1012,27 +1017,27 @@ impl<'a> ThreatListUpdateMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.threat_lists();
 /// # }
 /// ```
-pub struct ThreatListMethods<'a>
-    where  {
+pub struct ThreatListMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThreatListMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThreatListMethods<'a, S> {}
 
-impl<'a> ThreatListMethods<'a> {
+impl<'a, S> ThreatListMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the Safe Browsing threat lists available for download.
-    pub fn list(&self) -> ThreatListListCall<'a> {
+    pub fn list(&self) -> ThreatListListCall<'a, S> {
         ThreatListListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1064,22 +1069,22 @@ impl<'a> ThreatListMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `find(...)`
 /// // to build up your call.
 /// let rb = hub.threat_matches();
 /// # }
 /// ```
-pub struct ThreatMatcheMethods<'a>
-    where  {
+pub struct ThreatMatcheMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
 }
 
-impl<'a> client::MethodsBuilder for ThreatMatcheMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ThreatMatcheMethods<'a, S> {}
 
-impl<'a> ThreatMatcheMethods<'a> {
+impl<'a, S> ThreatMatcheMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1088,7 +1093,7 @@ impl<'a> ThreatMatcheMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatcheFindCall<'a> {
+    pub fn find(&self, request: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatcheFindCall<'a, S> {
         ThreatMatcheFindCall {
             hub: self.hub,
             _request: request,
@@ -1128,7 +1133,7 @@ impl<'a> ThreatMatcheMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1138,10 +1143,10 @@ impl<'a> ThreatMatcheMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EncodedFullHasheGetCall<'a>
-    where  {
+pub struct EncodedFullHasheGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _encoded_request: String,
     _client_version: Option<String>,
     _client_id: Option<String>,
@@ -1149,9 +1154,15 @@ pub struct EncodedFullHasheGetCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for EncodedFullHasheGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EncodedFullHasheGetCall<'a, S> {}
 
-impl<'a> EncodedFullHasheGetCall<'a> {
+impl<'a, S> EncodedFullHasheGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1294,21 +1305,21 @@ impl<'a> EncodedFullHasheGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn encoded_request(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a> {
+    pub fn encoded_request(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a, S> {
         self._encoded_request = new_value.to_string();
         self
     }
     /// The version of the client implementation.
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a> {
+    pub fn client_version(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a, S> {
         self._client_version = Some(new_value.to_string());
         self
     }
     /// A client ID that (hopefully) uniquely identifies the client implementation of the Safe Browsing API.
     ///
     /// Sets the *client id* query property to the given value.
-    pub fn client_id(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a> {
+    pub fn client_id(mut self, new_value: &str) -> EncodedFullHasheGetCall<'a, S> {
         self._client_id = Some(new_value.to_string());
         self
     }
@@ -1318,7 +1329,7 @@ impl<'a> EncodedFullHasheGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedFullHasheGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedFullHasheGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1343,7 +1354,7 @@ impl<'a> EncodedFullHasheGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EncodedFullHasheGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EncodedFullHasheGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1374,7 +1385,7 @@ impl<'a> EncodedFullHasheGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1384,10 +1395,10 @@ impl<'a> EncodedFullHasheGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EncodedUpdateGetCall<'a>
-    where  {
+pub struct EncodedUpdateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _encoded_request: String,
     _client_version: Option<String>,
     _client_id: Option<String>,
@@ -1395,9 +1406,15 @@ pub struct EncodedUpdateGetCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for EncodedUpdateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for EncodedUpdateGetCall<'a, S> {}
 
-impl<'a> EncodedUpdateGetCall<'a> {
+impl<'a, S> EncodedUpdateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1540,21 +1557,21 @@ impl<'a> EncodedUpdateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn encoded_request(mut self, new_value: &str) -> EncodedUpdateGetCall<'a> {
+    pub fn encoded_request(mut self, new_value: &str) -> EncodedUpdateGetCall<'a, S> {
         self._encoded_request = new_value.to_string();
         self
     }
     /// The version of the client implementation.
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> EncodedUpdateGetCall<'a> {
+    pub fn client_version(mut self, new_value: &str) -> EncodedUpdateGetCall<'a, S> {
         self._client_version = Some(new_value.to_string());
         self
     }
     /// A client ID that uniquely identifies the client implementation of the Safe Browsing API.
     ///
     /// Sets the *client id* query property to the given value.
-    pub fn client_id(mut self, new_value: &str) -> EncodedUpdateGetCall<'a> {
+    pub fn client_id(mut self, new_value: &str) -> EncodedUpdateGetCall<'a, S> {
         self._client_id = Some(new_value.to_string());
         self
     }
@@ -1564,7 +1581,7 @@ impl<'a> EncodedUpdateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedUpdateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EncodedUpdateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1589,7 +1606,7 @@ impl<'a> EncodedUpdateGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EncodedUpdateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EncodedUpdateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1621,7 +1638,7 @@ impl<'a> EncodedUpdateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1634,18 +1651,24 @@ impl<'a> EncodedUpdateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FullHasheFindCall<'a>
-    where  {
+pub struct FullHasheFindCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _request: GoogleSecuritySafebrowsingV4FindFullHashesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for FullHasheFindCall<'a> {}
+impl<'a, S> client::CallBuilder for FullHasheFindCall<'a, S> {}
 
-impl<'a> FullHasheFindCall<'a> {
+impl<'a, S> FullHasheFindCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1773,7 +1796,7 @@ impl<'a> FullHasheFindCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHasheFindCall<'a> {
+    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindFullHashesRequest) -> FullHasheFindCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1783,7 +1806,7 @@ impl<'a> FullHasheFindCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FullHasheFindCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FullHasheFindCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1808,7 +1831,7 @@ impl<'a> FullHasheFindCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FullHasheFindCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FullHasheFindCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1840,7 +1863,7 @@ impl<'a> FullHasheFindCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1853,18 +1876,24 @@ impl<'a> FullHasheFindCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatHitCreateCall<'a>
-    where  {
+pub struct ThreatHitCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _request: GoogleSecuritySafebrowsingV4ThreatHit,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThreatHitCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ThreatHitCreateCall<'a, S> {}
 
-impl<'a> ThreatHitCreateCall<'a> {
+impl<'a, S> ThreatHitCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1992,7 +2021,7 @@ impl<'a> ThreatHitCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4ThreatHit) -> ThreatHitCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4ThreatHit) -> ThreatHitCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2002,7 +2031,7 @@ impl<'a> ThreatHitCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatHitCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatHitCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2027,7 +2056,7 @@ impl<'a> ThreatHitCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatHitCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatHitCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2059,7 +2088,7 @@ impl<'a> ThreatHitCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2072,18 +2101,24 @@ impl<'a> ThreatHitCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatListUpdateFetchCall<'a>
-    where  {
+pub struct ThreatListUpdateFetchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _request: GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThreatListUpdateFetchCall<'a> {}
+impl<'a, S> client::CallBuilder for ThreatListUpdateFetchCall<'a, S> {}
 
-impl<'a> ThreatListUpdateFetchCall<'a> {
+impl<'a, S> ThreatListUpdateFetchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2211,7 +2246,7 @@ impl<'a> ThreatListUpdateFetchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest) -> ThreatListUpdateFetchCall<'a> {
+    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FetchThreatListUpdatesRequest) -> ThreatListUpdateFetchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2221,7 +2256,7 @@ impl<'a> ThreatListUpdateFetchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListUpdateFetchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListUpdateFetchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2246,7 +2281,7 @@ impl<'a> ThreatListUpdateFetchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatListUpdateFetchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatListUpdateFetchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2277,7 +2312,7 @@ impl<'a> ThreatListUpdateFetchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2285,17 +2320,23 @@ impl<'a> ThreatListUpdateFetchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatListListCall<'a>
-    where  {
+pub struct ThreatListListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThreatListListCall<'a> {}
+impl<'a, S> client::CallBuilder for ThreatListListCall<'a, S> {}
 
-impl<'a> ThreatListListCall<'a> {
+impl<'a, S> ThreatListListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2410,7 +2451,7 @@ impl<'a> ThreatListListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2435,7 +2476,7 @@ impl<'a> ThreatListListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatListListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatListListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2467,7 +2508,7 @@ impl<'a> ThreatListListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Safebrowsing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2480,18 +2521,24 @@ impl<'a> ThreatListListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatMatcheFindCall<'a>
-    where  {
+pub struct ThreatMatcheFindCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Safebrowsing<>,
+    hub: &'a Safebrowsing<S>,
     _request: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ThreatMatcheFindCall<'a> {}
+impl<'a, S> client::CallBuilder for ThreatMatcheFindCall<'a, S> {}
 
-impl<'a> ThreatMatcheFindCall<'a> {
+impl<'a, S> ThreatMatcheFindCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2619,7 +2666,7 @@ impl<'a> ThreatMatcheFindCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatcheFindCall<'a> {
+    pub fn request(mut self, new_value: GoogleSecuritySafebrowsingV4FindThreatMatchesRequest) -> ThreatMatcheFindCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2629,7 +2676,7 @@ impl<'a> ThreatMatcheFindCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatMatcheFindCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatMatcheFindCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2654,7 +2701,7 @@ impl<'a> ThreatMatcheFindCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatMatcheFindCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatMatcheFindCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

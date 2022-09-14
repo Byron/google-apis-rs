@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -106,34 +111,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Dataproc<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Dataproc<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Dataproc<> {}
+impl<'a, S> client::Hub for Dataproc<S> {}
 
-impl<'a, > Dataproc<> {
+impl<'a, S> Dataproc<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Dataproc<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Dataproc<S> {
         Dataproc {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://dataproc.googleapis.com/".to_string(),
             _root_url: "https://dataproc.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2433,22 +2438,22 @@ impl client::Part for YarnApplication {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_autoscaling_policies_create(...)`, `locations_autoscaling_policies_delete(...)`, `locations_autoscaling_policies_get(...)`, `locations_autoscaling_policies_get_iam_policy(...)`, `locations_autoscaling_policies_list(...)`, `locations_autoscaling_policies_set_iam_policy(...)`, `locations_autoscaling_policies_test_iam_permissions(...)`, `locations_autoscaling_policies_update(...)`, `locations_batches_create(...)`, `locations_batches_delete(...)`, `locations_batches_get(...)`, `locations_batches_list(...)`, `locations_workflow_templates_create(...)`, `locations_workflow_templates_delete(...)`, `locations_workflow_templates_get(...)`, `locations_workflow_templates_get_iam_policy(...)`, `locations_workflow_templates_instantiate(...)`, `locations_workflow_templates_instantiate_inline(...)`, `locations_workflow_templates_list(...)`, `locations_workflow_templates_set_iam_policy(...)`, `locations_workflow_templates_test_iam_permissions(...)`, `locations_workflow_templates_update(...)`, `regions_autoscaling_policies_create(...)`, `regions_autoscaling_policies_delete(...)`, `regions_autoscaling_policies_get(...)`, `regions_autoscaling_policies_get_iam_policy(...)`, `regions_autoscaling_policies_list(...)`, `regions_autoscaling_policies_set_iam_policy(...)`, `regions_autoscaling_policies_test_iam_permissions(...)`, `regions_autoscaling_policies_update(...)`, `regions_clusters_create(...)`, `regions_clusters_delete(...)`, `regions_clusters_diagnose(...)`, `regions_clusters_get(...)`, `regions_clusters_get_iam_policy(...)`, `regions_clusters_inject_credentials(...)`, `regions_clusters_list(...)`, `regions_clusters_patch(...)`, `regions_clusters_repair(...)`, `regions_clusters_set_iam_policy(...)`, `regions_clusters_start(...)`, `regions_clusters_stop(...)`, `regions_clusters_test_iam_permissions(...)`, `regions_jobs_cancel(...)`, `regions_jobs_delete(...)`, `regions_jobs_get(...)`, `regions_jobs_get_iam_policy(...)`, `regions_jobs_list(...)`, `regions_jobs_patch(...)`, `regions_jobs_set_iam_policy(...)`, `regions_jobs_submit(...)`, `regions_jobs_submit_as_operation(...)`, `regions_jobs_test_iam_permissions(...)`, `regions_operations_cancel(...)`, `regions_operations_delete(...)`, `regions_operations_get(...)`, `regions_operations_get_iam_policy(...)`, `regions_operations_list(...)`, `regions_operations_set_iam_policy(...)`, `regions_operations_test_iam_permissions(...)`, `regions_workflow_templates_create(...)`, `regions_workflow_templates_delete(...)`, `regions_workflow_templates_get(...)`, `regions_workflow_templates_get_iam_policy(...)`, `regions_workflow_templates_instantiate(...)`, `regions_workflow_templates_instantiate_inline(...)`, `regions_workflow_templates_list(...)`, `regions_workflow_templates_set_iam_policy(...)`, `regions_workflow_templates_test_iam_permissions(...)` and `regions_workflow_templates_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2458,7 +2463,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.create, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.autoscalingPolicies.create, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn locations_autoscaling_policies_create(&self, request: AutoscalingPolicy, parent: &str) -> ProjectLocationAutoscalingPolicyCreateCall<'a> {
+    pub fn locations_autoscaling_policies_create(&self, request: AutoscalingPolicy, parent: &str) -> ProjectLocationAutoscalingPolicyCreateCall<'a, S> {
         ProjectLocationAutoscalingPolicyCreateCall {
             hub: self.hub,
             _request: request,
@@ -2476,7 +2481,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.delete, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies.delete, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
-    pub fn locations_autoscaling_policies_delete(&self, name: &str) -> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
+    pub fn locations_autoscaling_policies_delete(&self, name: &str) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, S> {
         ProjectLocationAutoscalingPolicyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2493,7 +2498,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.get, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies.get, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
-    pub fn locations_autoscaling_policies_get(&self, name: &str) -> ProjectLocationAutoscalingPolicyGetCall<'a> {
+    pub fn locations_autoscaling_policies_get(&self, name: &str) -> ProjectLocationAutoscalingPolicyGetCall<'a, S> {
         ProjectLocationAutoscalingPolicyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2511,7 +2516,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_autoscaling_policies_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn locations_autoscaling_policies_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S> {
         ProjectLocationAutoscalingPolicyGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2529,7 +2534,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.list, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.autoscalingPolicies.list, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn locations_autoscaling_policies_list(&self, parent: &str) -> ProjectLocationAutoscalingPolicyListCall<'a> {
+    pub fn locations_autoscaling_policies_list(&self, parent: &str) -> ProjectLocationAutoscalingPolicyListCall<'a, S> {
         ProjectLocationAutoscalingPolicyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2549,7 +2554,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_autoscaling_policies_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn locations_autoscaling_policies_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S> {
         ProjectLocationAutoscalingPolicySetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2568,7 +2573,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_autoscaling_policies_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn locations_autoscaling_policies_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S> {
         ProjectLocationAutoscalingPolicyTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -2587,7 +2592,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
-    pub fn locations_autoscaling_policies_update(&self, request: AutoscalingPolicy, name: &str) -> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
+    pub fn locations_autoscaling_policies_update(&self, request: AutoscalingPolicy, name: &str) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, S> {
         ProjectLocationAutoscalingPolicyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2606,7 +2611,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this batch will be created.
-    pub fn locations_batches_create(&self, request: Batch, parent: &str) -> ProjectLocationBatcheCreateCall<'a> {
+    pub fn locations_batches_create(&self, request: Batch, parent: &str) -> ProjectLocationBatcheCreateCall<'a, S> {
         ProjectLocationBatcheCreateCall {
             hub: self.hub,
             _request: request,
@@ -2626,7 +2631,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the batch resource to delete.
-    pub fn locations_batches_delete(&self, name: &str) -> ProjectLocationBatcheDeleteCall<'a> {
+    pub fn locations_batches_delete(&self, name: &str) -> ProjectLocationBatcheDeleteCall<'a, S> {
         ProjectLocationBatcheDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2643,7 +2648,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the batch to retrieve.
-    pub fn locations_batches_get(&self, name: &str) -> ProjectLocationBatcheGetCall<'a> {
+    pub fn locations_batches_get(&self, name: &str) -> ProjectLocationBatcheGetCall<'a, S> {
         ProjectLocationBatcheGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2660,7 +2665,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent, which owns this collection of batches.
-    pub fn locations_batches_list(&self, parent: &str) -> ProjectLocationBatcheListCall<'a> {
+    pub fn locations_batches_list(&self, parent: &str) -> ProjectLocationBatcheListCall<'a, S> {
         ProjectLocationBatcheListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2680,7 +2685,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.create, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.create, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn locations_workflow_templates_create(&self, request: WorkflowTemplate, parent: &str) -> ProjectLocationWorkflowTemplateCreateCall<'a> {
+    pub fn locations_workflow_templates_create(&self, request: WorkflowTemplate, parent: &str) -> ProjectLocationWorkflowTemplateCreateCall<'a, S> {
         ProjectLocationWorkflowTemplateCreateCall {
             hub: self.hub,
             _request: request,
@@ -2698,7 +2703,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.delete, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates.instantiate, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn locations_workflow_templates_delete(&self, name: &str) -> ProjectLocationWorkflowTemplateDeleteCall<'a> {
+    pub fn locations_workflow_templates_delete(&self, name: &str) -> ProjectLocationWorkflowTemplateDeleteCall<'a, S> {
         ProjectLocationWorkflowTemplateDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2716,7 +2721,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.get, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates.get, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn locations_workflow_templates_get(&self, name: &str) -> ProjectLocationWorkflowTemplateGetCall<'a> {
+    pub fn locations_workflow_templates_get(&self, name: &str) -> ProjectLocationWorkflowTemplateGetCall<'a, S> {
         ProjectLocationWorkflowTemplateGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2735,7 +2740,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_workflow_templates_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn locations_workflow_templates_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S> {
         ProjectLocationWorkflowTemplateGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2754,7 +2759,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.instantiate, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates.instantiate, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn locations_workflow_templates_instantiate(&self, request: InstantiateWorkflowTemplateRequest, name: &str) -> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
+    pub fn locations_workflow_templates_instantiate(&self, request: InstantiateWorkflowTemplateRequest, name: &str) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, S> {
         ProjectLocationWorkflowTemplateInstantiateCall {
             hub: self.hub,
             _request: request,
@@ -2773,7 +2778,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates,instantiateinline, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.instantiateinline, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn locations_workflow_templates_instantiate_inline(&self, request: WorkflowTemplate, parent: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn locations_workflow_templates_instantiate_inline(&self, request: WorkflowTemplate, parent: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S> {
         ProjectLocationWorkflowTemplateInstantiateInlineCall {
             hub: self.hub,
             _request: request,
@@ -2792,7 +2797,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates,list, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.list, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn locations_workflow_templates_list(&self, parent: &str) -> ProjectLocationWorkflowTemplateListCall<'a> {
+    pub fn locations_workflow_templates_list(&self, parent: &str) -> ProjectLocationWorkflowTemplateListCall<'a, S> {
         ProjectLocationWorkflowTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2812,7 +2817,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_workflow_templates_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn locations_workflow_templates_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S> {
         ProjectLocationWorkflowTemplateSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2831,7 +2836,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_workflow_templates_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn locations_workflow_templates_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S> {
         ProjectLocationWorkflowTemplateTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -2850,7 +2855,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn locations_workflow_templates_update(&self, request: WorkflowTemplate, name: &str) -> ProjectLocationWorkflowTemplateUpdateCall<'a> {
+    pub fn locations_workflow_templates_update(&self, request: WorkflowTemplate, name: &str) -> ProjectLocationWorkflowTemplateUpdateCall<'a, S> {
         ProjectLocationWorkflowTemplateUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2869,7 +2874,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.create, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.autoscalingPolicies.create, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn regions_autoscaling_policies_create(&self, request: AutoscalingPolicy, parent: &str) -> ProjectRegionAutoscalingPolicyCreateCall<'a> {
+    pub fn regions_autoscaling_policies_create(&self, request: AutoscalingPolicy, parent: &str) -> ProjectRegionAutoscalingPolicyCreateCall<'a, S> {
         ProjectRegionAutoscalingPolicyCreateCall {
             hub: self.hub,
             _request: request,
@@ -2887,7 +2892,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.delete, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies.delete, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
-    pub fn regions_autoscaling_policies_delete(&self, name: &str) -> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
+    pub fn regions_autoscaling_policies_delete(&self, name: &str) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, S> {
         ProjectRegionAutoscalingPolicyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2904,7 +2909,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.get, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies.get, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
-    pub fn regions_autoscaling_policies_get(&self, name: &str) -> ProjectRegionAutoscalingPolicyGetCall<'a> {
+    pub fn regions_autoscaling_policies_get(&self, name: &str) -> ProjectRegionAutoscalingPolicyGetCall<'a, S> {
         ProjectRegionAutoscalingPolicyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2922,7 +2927,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_autoscaling_policies_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn regions_autoscaling_policies_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S> {
         ProjectRegionAutoscalingPolicyGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2940,7 +2945,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The "resource name" of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies.list, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.autoscalingPolicies.list, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn regions_autoscaling_policies_list(&self, parent: &str) -> ProjectRegionAutoscalingPolicyListCall<'a> {
+    pub fn regions_autoscaling_policies_list(&self, parent: &str) -> ProjectRegionAutoscalingPolicyListCall<'a, S> {
         ProjectRegionAutoscalingPolicyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2960,7 +2965,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn regions_autoscaling_policies_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn regions_autoscaling_policies_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S> {
         ProjectRegionAutoscalingPolicySetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2979,7 +2984,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_autoscaling_policies_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn regions_autoscaling_policies_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S> {
         ProjectRegionAutoscalingPolicyTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -2998,7 +3003,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The "resource name" of the autoscaling policy, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.autoscalingPolicies, the resource name of the policy has the following format: projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id} For projects.locations.autoscalingPolicies, the resource name of the policy has the following format: projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}
-    pub fn regions_autoscaling_policies_update(&self, request: AutoscalingPolicy, name: &str) -> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
+    pub fn regions_autoscaling_policies_update(&self, request: AutoscalingPolicy, name: &str) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, S> {
         ProjectRegionAutoscalingPolicyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3018,7 +3023,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
-    pub fn regions_clusters_create(&self, request: Cluster, project_id: &str, region: &str) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn regions_clusters_create(&self, request: Cluster, project_id: &str, region: &str) -> ProjectRegionClusterCreateCall<'a, S> {
         ProjectRegionClusterCreateCall {
             hub: self.hub,
             _request: request,
@@ -3041,7 +3046,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_delete(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn regions_clusters_delete(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDeleteCall<'a, S> {
         ProjectRegionClusterDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3065,7 +3070,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_diagnose(&self, request: DiagnoseClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDiagnoseCall<'a> {
+    pub fn regions_clusters_diagnose(&self, request: DiagnoseClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterDiagnoseCall<'a, S> {
         ProjectRegionClusterDiagnoseCall {
             hub: self.hub,
             _request: request,
@@ -3087,7 +3092,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_get(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterGetCall<'a> {
+    pub fn regions_clusters_get(&self, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterGetCall<'a, S> {
         ProjectRegionClusterGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3107,7 +3112,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_clusters_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionClusterGetIamPolicyCall<'a> {
+    pub fn regions_clusters_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionClusterGetIamPolicyCall<'a, S> {
         ProjectRegionClusterGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3128,7 +3133,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `project` - Required. The ID of the Google Cloud Platform project the cluster belongs to, of the form projects/.
     /// * `region` - Required. The region containing the cluster, of the form regions/.
     /// * `cluster` - Required. The cluster, in the form clusters/.
-    pub fn regions_clusters_inject_credentials(&self, request: InjectCredentialsRequest, project: &str, region: &str, cluster: &str) -> ProjectRegionClusterInjectCredentialCall<'a> {
+    pub fn regions_clusters_inject_credentials(&self, request: InjectCredentialsRequest, project: &str, region: &str, cluster: &str) -> ProjectRegionClusterInjectCredentialCall<'a, S> {
         ProjectRegionClusterInjectCredentialCall {
             hub: self.hub,
             _request: request,
@@ -3149,7 +3154,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
-    pub fn regions_clusters_list(&self, project_id: &str, region: &str) -> ProjectRegionClusterListCall<'a> {
+    pub fn regions_clusters_list(&self, project_id: &str, region: &str) -> ProjectRegionClusterListCall<'a, S> {
         ProjectRegionClusterListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3173,7 +3178,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_patch(&self, request: Cluster, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn regions_clusters_patch(&self, request: Cluster, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         ProjectRegionClusterPatchCall {
             hub: self.hub,
             _request: request,
@@ -3199,7 +3204,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_repair(&self, request: RepairClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterRepairCall<'a> {
+    pub fn regions_clusters_repair(&self, request: RepairClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterRepairCall<'a, S> {
         ProjectRegionClusterRepairCall {
             hub: self.hub,
             _request: request,
@@ -3220,7 +3225,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn regions_clusters_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionClusterSetIamPolicyCall<'a> {
+    pub fn regions_clusters_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionClusterSetIamPolicyCall<'a, S> {
         ProjectRegionClusterSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3241,7 +3246,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_start(&self, request: StartClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterStartCall<'a> {
+    pub fn regions_clusters_start(&self, request: StartClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterStartCall<'a, S> {
         ProjectRegionClusterStartCall {
             hub: self.hub,
             _request: request,
@@ -3264,7 +3269,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project the cluster belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `clusterName` - Required. The cluster name.
-    pub fn regions_clusters_stop(&self, request: StopClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterStopCall<'a> {
+    pub fn regions_clusters_stop(&self, request: StopClusterRequest, project_id: &str, region: &str, cluster_name: &str) -> ProjectRegionClusterStopCall<'a, S> {
         ProjectRegionClusterStopCall {
             hub: self.hub,
             _request: request,
@@ -3285,7 +3290,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_clusters_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionClusterTestIamPermissionCall<'a> {
+    pub fn regions_clusters_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionClusterTestIamPermissionCall<'a, S> {
         ProjectRegionClusterTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -3306,7 +3311,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
-    pub fn regions_jobs_cancel(&self, request: CancelJobRequest, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobCancelCall<'a> {
+    pub fn regions_jobs_cancel(&self, request: CancelJobRequest, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobCancelCall<'a, S> {
         ProjectRegionJobCancelCall {
             hub: self.hub,
             _request: request,
@@ -3328,7 +3333,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
-    pub fn regions_jobs_delete(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobDeleteCall<'a> {
+    pub fn regions_jobs_delete(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobDeleteCall<'a, S> {
         ProjectRegionJobDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3349,7 +3354,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
-    pub fn regions_jobs_get(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobGetCall<'a> {
+    pub fn regions_jobs_get(&self, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobGetCall<'a, S> {
         ProjectRegionJobGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3369,7 +3374,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_jobs_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionJobGetIamPolicyCall<'a> {
+    pub fn regions_jobs_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionJobGetIamPolicyCall<'a, S> {
         ProjectRegionJobGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3388,7 +3393,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
-    pub fn regions_jobs_list(&self, project_id: &str, region: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn regions_jobs_list(&self, project_id: &str, region: &str) -> ProjectRegionJobListCall<'a, S> {
         ProjectRegionJobListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -3414,7 +3419,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
     /// * `jobId` - Required. The job ID.
-    pub fn regions_jobs_patch(&self, request: Job, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobPatchCall<'a> {
+    pub fn regions_jobs_patch(&self, request: Job, project_id: &str, region: &str, job_id: &str) -> ProjectRegionJobPatchCall<'a, S> {
         ProjectRegionJobPatchCall {
             hub: self.hub,
             _request: request,
@@ -3436,7 +3441,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn regions_jobs_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionJobSetIamPolicyCall<'a> {
+    pub fn regions_jobs_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionJobSetIamPolicyCall<'a, S> {
         ProjectRegionJobSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3456,7 +3461,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
-    pub fn regions_jobs_submit(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitCall<'a> {
+    pub fn regions_jobs_submit(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitCall<'a, S> {
         ProjectRegionJobSubmitCall {
             hub: self.hub,
             _request: request,
@@ -3477,7 +3482,7 @@ impl<'a> ProjectMethods<'a> {
     /// * `request` - No description provided.
     /// * `projectId` - Required. The ID of the Google Cloud Platform project that the job belongs to.
     /// * `region` - Required. The Dataproc region in which to handle the request.
-    pub fn regions_jobs_submit_as_operation(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitAsOperationCall<'a> {
+    pub fn regions_jobs_submit_as_operation(&self, request: SubmitJobRequest, project_id: &str, region: &str) -> ProjectRegionJobSubmitAsOperationCall<'a, S> {
         ProjectRegionJobSubmitAsOperationCall {
             hub: self.hub,
             _request: request,
@@ -3497,7 +3502,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_jobs_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionJobTestIamPermissionCall<'a> {
+    pub fn regions_jobs_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionJobTestIamPermissionCall<'a, S> {
         ProjectRegionJobTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -3515,7 +3520,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn regions_operations_cancel(&self, name: &str) -> ProjectRegionOperationCancelCall<'a> {
+    pub fn regions_operations_cancel(&self, name: &str) -> ProjectRegionOperationCancelCall<'a, S> {
         ProjectRegionOperationCancelCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3532,7 +3537,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn regions_operations_delete(&self, name: &str) -> ProjectRegionOperationDeleteCall<'a> {
+    pub fn regions_operations_delete(&self, name: &str) -> ProjectRegionOperationDeleteCall<'a, S> {
         ProjectRegionOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3549,7 +3554,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn regions_operations_get(&self, name: &str) -> ProjectRegionOperationGetCall<'a> {
+    pub fn regions_operations_get(&self, name: &str) -> ProjectRegionOperationGetCall<'a, S> {
         ProjectRegionOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3567,7 +3572,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_operations_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionOperationGetIamPolicyCall<'a> {
+    pub fn regions_operations_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionOperationGetIamPolicyCall<'a, S> {
         ProjectRegionOperationGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3585,7 +3590,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn regions_operations_list(&self, name: &str) -> ProjectRegionOperationListCall<'a> {
+    pub fn regions_operations_list(&self, name: &str) -> ProjectRegionOperationListCall<'a, S> {
         ProjectRegionOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3606,7 +3611,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn regions_operations_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionOperationSetIamPolicyCall<'a> {
+    pub fn regions_operations_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionOperationSetIamPolicyCall<'a, S> {
         ProjectRegionOperationSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3625,7 +3630,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_operations_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionOperationTestIamPermissionCall<'a> {
+    pub fn regions_operations_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionOperationTestIamPermissionCall<'a, S> {
         ProjectRegionOperationTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -3644,7 +3649,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.create, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.create, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn regions_workflow_templates_create(&self, request: WorkflowTemplate, parent: &str) -> ProjectRegionWorkflowTemplateCreateCall<'a> {
+    pub fn regions_workflow_templates_create(&self, request: WorkflowTemplate, parent: &str) -> ProjectRegionWorkflowTemplateCreateCall<'a, S> {
         ProjectRegionWorkflowTemplateCreateCall {
             hub: self.hub,
             _request: request,
@@ -3662,7 +3667,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.delete, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates.instantiate, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn regions_workflow_templates_delete(&self, name: &str) -> ProjectRegionWorkflowTemplateDeleteCall<'a> {
+    pub fn regions_workflow_templates_delete(&self, name: &str) -> ProjectRegionWorkflowTemplateDeleteCall<'a, S> {
         ProjectRegionWorkflowTemplateDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3680,7 +3685,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.get, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates.get, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn regions_workflow_templates_get(&self, name: &str) -> ProjectRegionWorkflowTemplateGetCall<'a> {
+    pub fn regions_workflow_templates_get(&self, name: &str) -> ProjectRegionWorkflowTemplateGetCall<'a, S> {
         ProjectRegionWorkflowTemplateGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3699,7 +3704,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_workflow_templates_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn regions_workflow_templates_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S> {
         ProjectRegionWorkflowTemplateGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3718,7 +3723,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates.instantiate, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates.instantiate, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn regions_workflow_templates_instantiate(&self, request: InstantiateWorkflowTemplateRequest, name: &str) -> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
+    pub fn regions_workflow_templates_instantiate(&self, request: InstantiateWorkflowTemplateRequest, name: &str) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, S> {
         ProjectRegionWorkflowTemplateInstantiateCall {
             hub: self.hub,
             _request: request,
@@ -3737,7 +3742,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates,instantiateinline, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.instantiateinline, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn regions_workflow_templates_instantiate_inline(&self, request: WorkflowTemplate, parent: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn regions_workflow_templates_instantiate_inline(&self, request: WorkflowTemplate, parent: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S> {
         ProjectRegionWorkflowTemplateInstantiateInlineCall {
             hub: self.hub,
             _request: request,
@@ -3756,7 +3761,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the region or location, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates,list, the resource name of the region has the following format: projects/{project_id}/regions/{region} For projects.locations.workflowTemplates.list, the resource name of the location has the following format: projects/{project_id}/locations/{location}
-    pub fn regions_workflow_templates_list(&self, parent: &str) -> ProjectRegionWorkflowTemplateListCall<'a> {
+    pub fn regions_workflow_templates_list(&self, parent: &str) -> ProjectRegionWorkflowTemplateListCall<'a, S> {
         ProjectRegionWorkflowTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3776,7 +3781,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn regions_workflow_templates_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn regions_workflow_templates_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S> {
         ProjectRegionWorkflowTemplateSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -3795,7 +3800,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn regions_workflow_templates_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn regions_workflow_templates_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S> {
         ProjectRegionWorkflowTemplateTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -3814,7 +3819,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the workflow template, as described in https://cloud.google.com/apis/design/resource_names. For projects.regions.workflowTemplates, the resource name of the template has the following format: projects/{project_id}/regions/{region}/workflowTemplates/{template_id} For projects.locations.workflowTemplates, the resource name of the template has the following format: projects/{project_id}/locations/{location}/workflowTemplates/{template_id}
-    pub fn regions_workflow_templates_update(&self, request: WorkflowTemplate, name: &str) -> ProjectRegionWorkflowTemplateUpdateCall<'a> {
+    pub fn regions_workflow_templates_update(&self, request: WorkflowTemplate, name: &str) -> ProjectRegionWorkflowTemplateUpdateCall<'a, S> {
         ProjectRegionWorkflowTemplateUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3857,7 +3862,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3870,10 +3875,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyCreateCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: AutoscalingPolicy,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3881,9 +3886,15 @@ pub struct ProjectLocationAutoscalingPolicyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4043,7 +4054,7 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectLocationAutoscalingPolicyCreateCall<'a> {
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectLocationAutoscalingPolicyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4053,7 +4064,7 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4063,7 +4074,7 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4088,7 +4099,7 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4108,9 +4119,9 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4142,7 +4153,7 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4150,19 +4161,25 @@ impl<'a> ProjectLocationAutoscalingPolicyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4309,7 +4326,7 @@ impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4319,7 +4336,7 @@ impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4344,7 +4361,7 @@ impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4364,9 +4381,9 @@ impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4398,7 +4415,7 @@ impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4406,19 +4423,25 @@ impl<'a> ProjectLocationAutoscalingPolicyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyGetCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4565,7 +4588,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4575,7 +4598,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4600,7 +4623,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4620,9 +4643,9 @@ impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4655,7 +4678,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4668,10 +4691,10 @@ impl<'a> ProjectLocationAutoscalingPolicyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4679,9 +4702,15 @@ pub struct ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4841,7 +4870,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4851,7 +4880,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -4861,7 +4890,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4886,7 +4915,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4906,9 +4935,9 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4940,7 +4969,7 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4950,10 +4979,10 @@ impl<'a> ProjectLocationAutoscalingPolicyGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyListCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4962,9 +4991,15 @@ pub struct ProjectLocationAutoscalingPolicyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyListCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5117,21 +5152,21 @@ impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return in each response. Must be less than or equal to 1000. Defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAutoscalingPolicyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAutoscalingPolicyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5141,7 +5176,7 @@ impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5166,7 +5201,7 @@ impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5186,9 +5221,9 @@ impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5221,7 +5256,7 @@ impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5234,10 +5269,10 @@ impl<'a> ProjectLocationAutoscalingPolicyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicySetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5245,9 +5280,15 @@ pub struct ProjectLocationAutoscalingPolicySetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5407,7 +5448,7 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5417,7 +5458,7 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -5427,7 +5468,7 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5452,7 +5493,7 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5472,9 +5513,9 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5507,7 +5548,7 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5520,10 +5561,10 @@ impl<'a> ProjectLocationAutoscalingPolicySetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5531,9 +5572,15 @@ pub struct ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5693,7 +5740,7 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5703,7 +5750,7 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -5713,7 +5760,7 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5738,7 +5785,7 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5758,9 +5805,9 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5793,7 +5840,7 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5806,10 +5853,10 @@ impl<'a> ProjectLocationAutoscalingPolicyTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAutoscalingPolicyUpdateCall<'a>
-    where  {
+pub struct ProjectLocationAutoscalingPolicyUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: AutoscalingPolicy,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5817,9 +5864,15 @@ pub struct ProjectLocationAutoscalingPolicyUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAutoscalingPolicyUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAutoscalingPolicyUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
+impl<'a, S> ProjectLocationAutoscalingPolicyUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5979,7 +6032,7 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5989,7 +6042,7 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5999,7 +6052,7 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6024,7 +6077,7 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6044,9 +6097,9 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAutoscalingPolicyUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6079,7 +6132,7 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6094,10 +6147,10 @@ impl<'a> ProjectLocationAutoscalingPolicyUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationBatcheCreateCall<'a>
-    where  {
+pub struct ProjectLocationBatcheCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: Batch,
     _parent: String,
     _request_id: Option<String>,
@@ -6107,9 +6160,15 @@ pub struct ProjectLocationBatcheCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationBatcheCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationBatcheCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationBatcheCreateCall<'a> {
+impl<'a, S> ProjectLocationBatcheCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6275,7 +6334,7 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Batch) -> ProjectLocationBatcheCreateCall<'a> {
+    pub fn request(mut self, new_value: Batch) -> ProjectLocationBatcheCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6285,21 +6344,21 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationBatcheCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationBatcheCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A unique ID used to identify the request. If the service receives two CreateBatchRequest (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.CreateBatchRequest)s with the same request_id, the second request is ignored and the Operation that corresponds to the first Batch created and stored in the backend is returned.Recommendation: Set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The value must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectLocationBatcheCreateCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationBatcheCreateCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
     /// Optional. The ID to use for the batch, which will become the final component of the batch's resource name.This value must be 4-63 characters. Valid characters are /[a-z][0-9]-/.
     ///
     /// Sets the *batch id* query property to the given value.
-    pub fn batch_id(mut self, new_value: &str) -> ProjectLocationBatcheCreateCall<'a> {
+    pub fn batch_id(mut self, new_value: &str) -> ProjectLocationBatcheCreateCall<'a, S> {
         self._batch_id = Some(new_value.to_string());
         self
     }
@@ -6309,7 +6368,7 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6334,7 +6393,7 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6354,9 +6413,9 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationBatcheCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationBatcheCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6388,7 +6447,7 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6396,19 +6455,25 @@ impl<'a> ProjectLocationBatcheCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationBatcheDeleteCall<'a>
-    where  {
+pub struct ProjectLocationBatcheDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationBatcheDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationBatcheDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationBatcheDeleteCall<'a> {
+impl<'a, S> ProjectLocationBatcheDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6555,7 +6620,7 @@ impl<'a> ProjectLocationBatcheDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationBatcheDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationBatcheDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6565,7 +6630,7 @@ impl<'a> ProjectLocationBatcheDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6590,7 +6655,7 @@ impl<'a> ProjectLocationBatcheDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6610,9 +6675,9 @@ impl<'a> ProjectLocationBatcheDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationBatcheDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationBatcheDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6644,7 +6709,7 @@ impl<'a> ProjectLocationBatcheDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6652,19 +6717,25 @@ impl<'a> ProjectLocationBatcheDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationBatcheGetCall<'a>
-    where  {
+pub struct ProjectLocationBatcheGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationBatcheGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationBatcheGetCall<'a, S> {}
 
-impl<'a> ProjectLocationBatcheGetCall<'a> {
+impl<'a, S> ProjectLocationBatcheGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6811,7 +6882,7 @@ impl<'a> ProjectLocationBatcheGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationBatcheGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationBatcheGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6821,7 +6892,7 @@ impl<'a> ProjectLocationBatcheGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6846,7 +6917,7 @@ impl<'a> ProjectLocationBatcheGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6866,9 +6937,9 @@ impl<'a> ProjectLocationBatcheGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationBatcheGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationBatcheGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6900,7 +6971,7 @@ impl<'a> ProjectLocationBatcheGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6910,10 +6981,10 @@ impl<'a> ProjectLocationBatcheGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationBatcheListCall<'a>
-    where  {
+pub struct ProjectLocationBatcheListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6922,9 +6993,15 @@ pub struct ProjectLocationBatcheListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationBatcheListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationBatcheListCall<'a, S> {}
 
-impl<'a> ProjectLocationBatcheListCall<'a> {
+impl<'a, S> ProjectLocationBatcheListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7077,21 +7154,21 @@ impl<'a> ProjectLocationBatcheListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationBatcheListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationBatcheListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token received from a previous ListBatches call. Provide this token to retrieve the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationBatcheListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationBatcheListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of batches to return in each response. The service may return fewer than this value. The default page size is 20; the maximum page size is 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationBatcheListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationBatcheListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7101,7 +7178,7 @@ impl<'a> ProjectLocationBatcheListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationBatcheListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7126,7 +7203,7 @@ impl<'a> ProjectLocationBatcheListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBatcheListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7146,9 +7223,9 @@ impl<'a> ProjectLocationBatcheListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationBatcheListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationBatcheListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7181,7 +7258,7 @@ impl<'a> ProjectLocationBatcheListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7194,10 +7271,10 @@ impl<'a> ProjectLocationBatcheListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateCreateCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: WorkflowTemplate,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7205,9 +7282,15 @@ pub struct ProjectLocationWorkflowTemplateCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7367,7 +7450,7 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectLocationWorkflowTemplateCreateCall<'a> {
+    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectLocationWorkflowTemplateCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7377,7 +7460,7 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -7387,7 +7470,7 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7412,7 +7495,7 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7432,9 +7515,9 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7466,7 +7549,7 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7475,10 +7558,10 @@ impl<'a> ProjectLocationWorkflowTemplateCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateDeleteCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7486,9 +7569,15 @@ pub struct ProjectLocationWorkflowTemplateDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7638,14 +7727,14 @@ impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The version of workflow template to delete. If specified, will only delete the template if the current server version matches specified version.
     ///
     /// Sets the *version* query property to the given value.
-    pub fn version(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateDeleteCall<'a> {
+    pub fn version(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateDeleteCall<'a, S> {
         self._version = Some(new_value);
         self
     }
@@ -7655,7 +7744,7 @@ impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7680,7 +7769,7 @@ impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7700,9 +7789,9 @@ impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7734,7 +7823,7 @@ impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7743,10 +7832,10 @@ impl<'a> ProjectLocationWorkflowTemplateDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateGetCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7754,9 +7843,15 @@ pub struct ProjectLocationWorkflowTemplateGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateGetCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7906,14 +8001,14 @@ impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The version of workflow template to retrieve. Only previously instantiated versions can be retrieved.If unspecified, retrieves the current version.
     ///
     /// Sets the *version* query property to the given value.
-    pub fn version(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateGetCall<'a> {
+    pub fn version(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateGetCall<'a, S> {
         self._version = Some(new_value);
         self
     }
@@ -7923,7 +8018,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7948,7 +8043,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7968,9 +8063,9 @@ impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8003,7 +8098,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8016,10 +8111,10 @@ impl<'a> ProjectLocationWorkflowTemplateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8027,9 +8122,15 @@ pub struct ProjectLocationWorkflowTemplateGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8189,7 +8290,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8199,7 +8300,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -8209,7 +8310,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8234,7 +8335,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8254,9 +8355,9 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8289,7 +8390,7 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8302,10 +8403,10 @@ impl<'a> ProjectLocationWorkflowTemplateGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateInstantiateCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateInstantiateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: InstantiateWorkflowTemplateRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8313,9 +8414,15 @@ pub struct ProjectLocationWorkflowTemplateInstantiateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateInstantiateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateInstantiateCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateInstantiateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8475,7 +8582,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InstantiateWorkflowTemplateRequest) -> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
+    pub fn request(mut self, new_value: InstantiateWorkflowTemplateRequest) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8485,7 +8592,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8495,7 +8602,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8520,7 +8627,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateInstantiateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8540,9 +8647,9 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateInstantiateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateInstantiateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8575,7 +8682,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8589,10 +8696,10 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateInstantiateInlineCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: WorkflowTemplate,
     _parent: String,
     _request_id: Option<String>,
@@ -8601,9 +8708,15 @@ pub struct ProjectLocationWorkflowTemplateInstantiateInlineCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8766,7 +8879,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8776,14 +8889,14 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A tag that prevents multiple concurrent workflow instances with the same tag from running. This mitigates risk of concurrent instances started due to retries.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The tag must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
@@ -8793,7 +8906,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8818,7 +8931,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8838,9 +8951,9 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8872,7 +8985,7 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8882,10 +8995,10 @@ impl<'a> ProjectLocationWorkflowTemplateInstantiateInlineCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateListCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8894,9 +9007,15 @@ pub struct ProjectLocationWorkflowTemplateListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateListCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9049,21 +9168,21 @@ impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return in each response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWorkflowTemplateListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -9073,7 +9192,7 @@ impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9098,7 +9217,7 @@ impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9118,9 +9237,9 @@ impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9153,7 +9272,7 @@ impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9166,10 +9285,10 @@ impl<'a> ProjectLocationWorkflowTemplateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9177,9 +9296,15 @@ pub struct ProjectLocationWorkflowTemplateSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9339,7 +9464,7 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9349,7 +9474,7 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -9359,7 +9484,7 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9384,7 +9509,7 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9404,9 +9529,9 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9439,7 +9564,7 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9452,10 +9577,10 @@ impl<'a> ProjectLocationWorkflowTemplateSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9463,9 +9588,15 @@ pub struct ProjectLocationWorkflowTemplateTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9625,7 +9756,7 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9635,7 +9766,7 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -9645,7 +9776,7 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9670,7 +9801,7 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9690,9 +9821,9 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9725,7 +9856,7 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9738,10 +9869,10 @@ impl<'a> ProjectLocationWorkflowTemplateTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowTemplateUpdateCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowTemplateUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: WorkflowTemplate,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9749,9 +9880,15 @@ pub struct ProjectLocationWorkflowTemplateUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowTemplateUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowTemplateUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
+impl<'a, S> ProjectLocationWorkflowTemplateUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9911,7 +10048,7 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectLocationWorkflowTemplateUpdateCall<'a> {
+    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectLocationWorkflowTemplateUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9921,7 +10058,7 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowTemplateUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9931,7 +10068,7 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowTemplateUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9956,7 +10093,7 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowTemplateUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9976,9 +10113,9 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowTemplateUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowTemplateUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10011,7 +10148,7 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10024,10 +10161,10 @@ impl<'a> ProjectLocationWorkflowTemplateUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyCreateCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: AutoscalingPolicy,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10035,9 +10172,15 @@ pub struct ProjectRegionAutoscalingPolicyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyCreateCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10197,7 +10340,7 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectRegionAutoscalingPolicyCreateCall<'a> {
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectRegionAutoscalingPolicyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10207,7 +10350,7 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -10217,7 +10360,7 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10242,7 +10385,7 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10262,9 +10405,9 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10296,7 +10439,7 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10304,19 +10447,25 @@ impl<'a> ProjectRegionAutoscalingPolicyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyDeleteCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyDeleteCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10463,7 +10612,7 @@ impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10473,7 +10622,7 @@ impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10498,7 +10647,7 @@ impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10518,9 +10667,9 @@ impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10552,7 +10701,7 @@ impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10560,19 +10709,25 @@ impl<'a> ProjectRegionAutoscalingPolicyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyGetCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyGetCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10719,7 +10874,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10729,7 +10884,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10754,7 +10909,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10774,9 +10929,9 @@ impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10809,7 +10964,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10822,10 +10977,10 @@ impl<'a> ProjectRegionAutoscalingPolicyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10833,9 +10988,15 @@ pub struct ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10995,7 +11156,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11005,7 +11166,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -11015,7 +11176,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11040,7 +11201,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11060,9 +11221,9 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11094,7 +11255,7 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11104,10 +11265,10 @@ impl<'a> ProjectRegionAutoscalingPolicyGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyListCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11116,9 +11277,15 @@ pub struct ProjectRegionAutoscalingPolicyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyListCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11271,21 +11438,21 @@ impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return in each response. Must be less than or equal to 1000. Defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRegionAutoscalingPolicyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRegionAutoscalingPolicyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -11295,7 +11462,7 @@ impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11320,7 +11487,7 @@ impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11340,9 +11507,9 @@ impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11375,7 +11542,7 @@ impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11388,10 +11555,10 @@ impl<'a> ProjectRegionAutoscalingPolicyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicySetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11399,9 +11566,15 @@ pub struct ProjectRegionAutoscalingPolicySetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11561,7 +11734,7 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11571,7 +11744,7 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -11581,7 +11754,7 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11606,7 +11779,7 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11626,9 +11799,9 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11661,7 +11834,7 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11674,10 +11847,10 @@ impl<'a> ProjectRegionAutoscalingPolicySetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11685,9 +11858,15 @@ pub struct ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11847,7 +12026,7 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11857,7 +12036,7 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -11867,7 +12046,7 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11892,7 +12071,7 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11912,9 +12091,9 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11947,7 +12126,7 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11960,10 +12139,10 @@ impl<'a> ProjectRegionAutoscalingPolicyTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionAutoscalingPolicyUpdateCall<'a>
-    where  {
+pub struct ProjectRegionAutoscalingPolicyUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: AutoscalingPolicy,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11971,9 +12150,15 @@ pub struct ProjectRegionAutoscalingPolicyUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionAutoscalingPolicyUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionAutoscalingPolicyUpdateCall<'a, S> {}
 
-impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
+impl<'a, S> ProjectRegionAutoscalingPolicyUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12133,7 +12318,7 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
+    pub fn request(mut self, new_value: AutoscalingPolicy) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12143,7 +12328,7 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -12153,7 +12338,7 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12178,7 +12363,7 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12198,9 +12383,9 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionAutoscalingPolicyUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12233,7 +12418,7 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12248,10 +12433,10 @@ impl<'a> ProjectRegionAutoscalingPolicyUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterCreateCall<'a>
-    where  {
+pub struct ProjectRegionClusterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: Cluster,
     _project_id: String,
     _region: String,
@@ -12262,9 +12447,15 @@ pub struct ProjectRegionClusterCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterCreateCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterCreateCall<'a> {
+impl<'a, S> ProjectRegionClusterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12427,7 +12618,7 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Cluster) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn request(mut self, new_value: Cluster) -> ProjectRegionClusterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12437,7 +12628,7 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -12447,21 +12638,21 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
     /// Optional. A unique ID used to identify the request. If the server receives two CreateClusterRequest (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.CreateClusterRequest)s with the same id, then the second request will be ignored and the first google.longrunning.Operation created and stored in the backend is returned.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
     /// Optional. Failure action when primary worker creation fails.
     ///
     /// Sets the *action on failed primary workers* query property to the given value.
-    pub fn action_on_failed_primary_workers(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn action_on_failed_primary_workers(mut self, new_value: &str) -> ProjectRegionClusterCreateCall<'a, S> {
         self._action_on_failed_primary_workers = Some(new_value.to_string());
         self
     }
@@ -12471,7 +12662,7 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12496,7 +12687,7 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12516,9 +12707,9 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12550,7 +12741,7 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12560,10 +12751,10 @@ impl<'a> ProjectRegionClusterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterDeleteCall<'a>
-    where  {
+pub struct ProjectRegionClusterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _project_id: String,
     _region: String,
     _cluster_name: String,
@@ -12574,9 +12765,15 @@ pub struct ProjectRegionClusterDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterDeleteCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterDeleteCall<'a> {
+impl<'a, S> ProjectRegionClusterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12727,7 +12924,7 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -12737,7 +12934,7 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -12747,21 +12944,21 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
     /// Optional. A unique ID used to identify the request. If the server receives two DeleteClusterRequest (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.DeleteClusterRequest)s with the same id, then the second request will be ignored and the first google.longrunning.Operation created and stored in the backend is returned.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
     /// Optional. Specifying the cluster_uuid means the RPC should fail (with error NOT_FOUND) if cluster with specified UUID does not exist.
     ///
     /// Sets the *cluster uuid* query property to the given value.
-    pub fn cluster_uuid(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn cluster_uuid(mut self, new_value: &str) -> ProjectRegionClusterDeleteCall<'a, S> {
         self._cluster_uuid = Some(new_value.to_string());
         self
     }
@@ -12771,7 +12968,7 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12796,7 +12993,7 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12816,9 +13013,9 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12851,7 +13048,7 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12864,10 +13061,10 @@ impl<'a> ProjectRegionClusterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterDiagnoseCall<'a>
-    where  {
+pub struct ProjectRegionClusterDiagnoseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: DiagnoseClusterRequest,
     _project_id: String,
     _region: String,
@@ -12877,9 +13074,15 @@ pub struct ProjectRegionClusterDiagnoseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterDiagnoseCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterDiagnoseCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
+impl<'a, S> ProjectRegionClusterDiagnoseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13037,7 +13240,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DiagnoseClusterRequest) -> ProjectRegionClusterDiagnoseCall<'a> {
+    pub fn request(mut self, new_value: DiagnoseClusterRequest) -> ProjectRegionClusterDiagnoseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13047,7 +13250,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterDiagnoseCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterDiagnoseCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -13057,7 +13260,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterDiagnoseCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterDiagnoseCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -13067,7 +13270,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterDiagnoseCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterDiagnoseCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
@@ -13077,7 +13280,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterDiagnoseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterDiagnoseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13102,7 +13305,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterDiagnoseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterDiagnoseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13122,9 +13325,9 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterDiagnoseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterDiagnoseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13156,7 +13359,7 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13164,10 +13367,10 @@ impl<'a> ProjectRegionClusterDiagnoseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterGetCall<'a>
-    where  {
+pub struct ProjectRegionClusterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _project_id: String,
     _region: String,
     _cluster_name: String,
@@ -13176,9 +13379,15 @@ pub struct ProjectRegionClusterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterGetCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterGetCall<'a> {
+impl<'a, S> ProjectRegionClusterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13323,7 +13532,7 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -13333,7 +13542,7 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterGetCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterGetCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -13343,7 +13552,7 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterGetCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterGetCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
@@ -13353,7 +13562,7 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13378,7 +13587,7 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13398,9 +13607,9 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13433,7 +13642,7 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13446,10 +13655,10 @@ impl<'a> ProjectRegionClusterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionClusterGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13457,9 +13666,15 @@ pub struct ProjectRegionClusterGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionClusterGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13619,7 +13834,7 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionClusterGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionClusterGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13629,7 +13844,7 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionClusterGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionClusterGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -13639,7 +13854,7 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13664,7 +13879,7 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13684,9 +13899,9 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13719,7 +13934,7 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13732,10 +13947,10 @@ impl<'a> ProjectRegionClusterGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterInjectCredentialCall<'a>
-    where  {
+pub struct ProjectRegionClusterInjectCredentialCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: InjectCredentialsRequest,
     _project: String,
     _region: String,
@@ -13745,9 +13960,15 @@ pub struct ProjectRegionClusterInjectCredentialCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterInjectCredentialCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterInjectCredentialCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
+impl<'a, S> ProjectRegionClusterInjectCredentialCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13909,7 +14130,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InjectCredentialsRequest) -> ProjectRegionClusterInjectCredentialCall<'a> {
+    pub fn request(mut self, new_value: InjectCredentialsRequest) -> ProjectRegionClusterInjectCredentialCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13919,7 +14140,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectRegionClusterInjectCredentialCall<'a> {
+    pub fn project(mut self, new_value: &str) -> ProjectRegionClusterInjectCredentialCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -13929,7 +14150,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterInjectCredentialCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterInjectCredentialCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -13939,7 +14160,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster(mut self, new_value: &str) -> ProjectRegionClusterInjectCredentialCall<'a> {
+    pub fn cluster(mut self, new_value: &str) -> ProjectRegionClusterInjectCredentialCall<'a, S> {
         self._cluster = new_value.to_string();
         self
     }
@@ -13949,7 +14170,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterInjectCredentialCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterInjectCredentialCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13974,7 +14195,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterInjectCredentialCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterInjectCredentialCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13994,9 +14215,9 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterInjectCredentialCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterInjectCredentialCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14028,7 +14249,7 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14039,10 +14260,10 @@ impl<'a> ProjectRegionClusterInjectCredentialCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterListCall<'a>
-    where  {
+pub struct ProjectRegionClusterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _project_id: String,
     _region: String,
     _page_token: Option<String>,
@@ -14053,9 +14274,15 @@ pub struct ProjectRegionClusterListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterListCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterListCall<'a> {
+impl<'a, S> ProjectRegionClusterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14208,7 +14435,7 @@ impl<'a> ProjectRegionClusterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14218,28 +14445,28 @@ impl<'a> ProjectRegionClusterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
     /// Optional. The standard List page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The standard List page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRegionClusterListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRegionClusterListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. A filter constraining the clusters to list. Filters are case-sensitive and have the following syntax:field = value AND field = value ...where field is one of status.state, clusterName, or labels.[KEY], and [KEY] is a label key. value can be * to match all values. status.state can be one of the following: ACTIVE, INACTIVE, CREATING, RUNNING, ERROR, DELETING, or UPDATING. ACTIVE contains the CREATING, UPDATING, and RUNNING states. INACTIVE contains the DELETING and ERROR states. clusterName is the name of the cluster provided at creation time. Only the logical AND operator is supported; space-separated items are treated as having an implicit AND operator.Example filter:status.state = ACTIVE AND clusterName = mycluster AND labels.env = staging AND labels.starred = *
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectRegionClusterListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -14249,7 +14476,7 @@ impl<'a> ProjectRegionClusterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14274,7 +14501,7 @@ impl<'a> ProjectRegionClusterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14294,9 +14521,9 @@ impl<'a> ProjectRegionClusterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14329,7 +14556,7 @@ impl<'a> ProjectRegionClusterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14345,10 +14572,10 @@ impl<'a> ProjectRegionClusterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterPatchCall<'a>
-    where  {
+pub struct ProjectRegionClusterPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: Cluster,
     _project_id: String,
     _region: String,
@@ -14361,9 +14588,15 @@ pub struct ProjectRegionClusterPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterPatchCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterPatchCall<'a> {
+impl<'a, S> ProjectRegionClusterPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14530,7 +14763,7 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Cluster) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn request(mut self, new_value: Cluster) -> ProjectRegionClusterPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14540,7 +14773,7 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14550,7 +14783,7 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -14560,28 +14793,28 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
     /// Required. Specifies the path, relative to Cluster, of the field to update. For example, to change the number of workers in a cluster to 5, the update_mask parameter would be specified as config.worker_config.num_instances, and the PATCH request body would specify the new value, as follows: { "config":{ "workerConfig":{ "numInstances":"5" } } } Similarly, to change the number of preemptible workers in a cluster to 5, the update_mask parameter would be config.secondary_worker_config.num_instances, and the PATCH request body would be set as follows: { "config":{ "secondaryWorkerConfig":{ "numInstances":"5" } } } *Note:* Currently, only the following fields can be updated: *Mask* *Purpose* *labels* Update labels *config.worker_config.num_instances* Resize primary worker group *config.secondary_worker_config.num_instances* Resize secondary worker group config.autoscaling_config.policy_uri Use, stop using, or change autoscaling policies 
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. A unique ID used to identify the request. If the server receives two UpdateClusterRequest (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.UpdateClusterRequest)s with the same id, then the second request will be ignored and the first google.longrunning.Operation created and stored in the backend is returned.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
     /// Optional. Timeout for graceful YARN decomissioning. Graceful decommissioning allows removing nodes from the cluster without interrupting jobs in progress. Timeout specifies how long to wait for jobs in progress to finish before forcefully removing nodes (and potentially interrupting jobs). Default timeout is 0 (for forceful decommission), and the maximum allowed timeout is 1 day. (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)).Only supported on Dataproc image versions 1.2 and higher.
     ///
     /// Sets the *graceful decommission timeout* query property to the given value.
-    pub fn graceful_decommission_timeout(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn graceful_decommission_timeout(mut self, new_value: &str) -> ProjectRegionClusterPatchCall<'a, S> {
         self._graceful_decommission_timeout = Some(new_value.to_string());
         self
     }
@@ -14591,7 +14824,7 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14616,7 +14849,7 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14636,9 +14869,9 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14671,7 +14904,7 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14684,10 +14917,10 @@ impl<'a> ProjectRegionClusterPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterRepairCall<'a>
-    where  {
+pub struct ProjectRegionClusterRepairCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: RepairClusterRequest,
     _project_id: String,
     _region: String,
@@ -14697,9 +14930,15 @@ pub struct ProjectRegionClusterRepairCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterRepairCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterRepairCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterRepairCall<'a> {
+impl<'a, S> ProjectRegionClusterRepairCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14857,7 +15096,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RepairClusterRequest) -> ProjectRegionClusterRepairCall<'a> {
+    pub fn request(mut self, new_value: RepairClusterRequest) -> ProjectRegionClusterRepairCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14867,7 +15106,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterRepairCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterRepairCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -14877,7 +15116,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterRepairCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterRepairCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -14887,7 +15126,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterRepairCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterRepairCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
@@ -14897,7 +15136,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterRepairCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterRepairCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14922,7 +15161,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterRepairCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterRepairCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14942,9 +15181,9 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterRepairCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterRepairCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14977,7 +15216,7 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14990,10 +15229,10 @@ impl<'a> ProjectRegionClusterRepairCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionClusterSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15001,9 +15240,15 @@ pub struct ProjectRegionClusterSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionClusterSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15163,7 +15408,7 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionClusterSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionClusterSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15173,7 +15418,7 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionClusterSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionClusterSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -15183,7 +15428,7 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15208,7 +15453,7 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15228,9 +15473,9 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15263,7 +15508,7 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15276,10 +15521,10 @@ impl<'a> ProjectRegionClusterSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterStartCall<'a>
-    where  {
+pub struct ProjectRegionClusterStartCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: StartClusterRequest,
     _project_id: String,
     _region: String,
@@ -15289,9 +15534,15 @@ pub struct ProjectRegionClusterStartCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterStartCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterStartCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterStartCall<'a> {
+impl<'a, S> ProjectRegionClusterStartCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15449,7 +15700,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StartClusterRequest) -> ProjectRegionClusterStartCall<'a> {
+    pub fn request(mut self, new_value: StartClusterRequest) -> ProjectRegionClusterStartCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15459,7 +15710,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterStartCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterStartCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15469,7 +15720,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterStartCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterStartCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -15479,7 +15730,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterStartCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterStartCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
@@ -15489,7 +15740,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterStartCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterStartCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15514,7 +15765,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterStartCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterStartCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15534,9 +15785,9 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterStartCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterStartCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15569,7 +15820,7 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15582,10 +15833,10 @@ impl<'a> ProjectRegionClusterStartCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterStopCall<'a>
-    where  {
+pub struct ProjectRegionClusterStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: StopClusterRequest,
     _project_id: String,
     _region: String,
@@ -15595,9 +15846,15 @@ pub struct ProjectRegionClusterStopCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterStopCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterStopCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterStopCall<'a> {
+impl<'a, S> ProjectRegionClusterStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15755,7 +16012,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: StopClusterRequest) -> ProjectRegionClusterStopCall<'a> {
+    pub fn request(mut self, new_value: StopClusterRequest) -> ProjectRegionClusterStopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -15765,7 +16022,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterStopCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionClusterStopCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -15775,7 +16032,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterStopCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionClusterStopCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -15785,7 +16042,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterStopCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionClusterStopCall<'a, S> {
         self._cluster_name = new_value.to_string();
         self
     }
@@ -15795,7 +16052,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15820,7 +16077,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15840,9 +16097,9 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15875,7 +16132,7 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15888,10 +16145,10 @@ impl<'a> ProjectRegionClusterStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionClusterTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectRegionClusterTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15899,9 +16156,15 @@ pub struct ProjectRegionClusterTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionClusterTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionClusterTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
+impl<'a, S> ProjectRegionClusterTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16061,7 +16324,7 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionClusterTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionClusterTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16071,7 +16334,7 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionClusterTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionClusterTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -16081,7 +16344,7 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionClusterTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16106,7 +16369,7 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionClusterTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16126,9 +16389,9 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionClusterTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionClusterTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16161,7 +16424,7 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16174,10 +16437,10 @@ impl<'a> ProjectRegionClusterTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobCancelCall<'a>
-    where  {
+pub struct ProjectRegionJobCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: CancelJobRequest,
     _project_id: String,
     _region: String,
@@ -16187,9 +16450,15 @@ pub struct ProjectRegionJobCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobCancelCall<'a, S> {}
 
-impl<'a> ProjectRegionJobCancelCall<'a> {
+impl<'a, S> ProjectRegionJobCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16347,7 +16616,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelJobRequest) -> ProjectRegionJobCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelJobRequest) -> ProjectRegionJobCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16357,7 +16626,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobCancelCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobCancelCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16367,7 +16636,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobCancelCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobCancelCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -16377,7 +16646,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobCancelCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobCancelCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
@@ -16387,7 +16656,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16412,7 +16681,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16432,9 +16701,9 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16466,7 +16735,7 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16474,10 +16743,10 @@ impl<'a> ProjectRegionJobCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobDeleteCall<'a>
-    where  {
+pub struct ProjectRegionJobDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _project_id: String,
     _region: String,
     _job_id: String,
@@ -16486,9 +16755,15 @@ pub struct ProjectRegionJobDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobDeleteCall<'a, S> {}
 
-impl<'a> ProjectRegionJobDeleteCall<'a> {
+impl<'a, S> ProjectRegionJobDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16633,7 +16908,7 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobDeleteCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobDeleteCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16643,7 +16918,7 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobDeleteCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobDeleteCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -16653,7 +16928,7 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobDeleteCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobDeleteCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
@@ -16663,7 +16938,7 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16688,7 +16963,7 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16708,9 +16983,9 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16742,7 +17017,7 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16750,10 +17025,10 @@ impl<'a> ProjectRegionJobDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobGetCall<'a>
-    where  {
+pub struct ProjectRegionJobGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _project_id: String,
     _region: String,
     _job_id: String,
@@ -16762,9 +17037,15 @@ pub struct ProjectRegionJobGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobGetCall<'a, S> {}
 
-impl<'a> ProjectRegionJobGetCall<'a> {
+impl<'a, S> ProjectRegionJobGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16909,7 +17190,7 @@ impl<'a> ProjectRegionJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -16919,7 +17200,7 @@ impl<'a> ProjectRegionJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobGetCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobGetCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -16929,7 +17210,7 @@ impl<'a> ProjectRegionJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobGetCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobGetCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
@@ -16939,7 +17220,7 @@ impl<'a> ProjectRegionJobGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16964,7 +17245,7 @@ impl<'a> ProjectRegionJobGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16984,9 +17265,9 @@ impl<'a> ProjectRegionJobGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17019,7 +17300,7 @@ impl<'a> ProjectRegionJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17032,10 +17313,10 @@ impl<'a> ProjectRegionJobGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionJobGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17043,9 +17324,15 @@ pub struct ProjectRegionJobGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionJobGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17205,7 +17492,7 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionJobGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionJobGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17215,7 +17502,7 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionJobGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionJobGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -17225,7 +17512,7 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17250,7 +17537,7 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17270,9 +17557,9 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17304,7 +17591,7 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17317,10 +17604,10 @@ impl<'a> ProjectRegionJobGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobListCall<'a>
-    where  {
+pub struct ProjectRegionJobListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _project_id: String,
     _region: String,
     _page_token: Option<String>,
@@ -17333,9 +17620,15 @@ pub struct ProjectRegionJobListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobListCall<'a, S> {}
 
-impl<'a> ProjectRegionJobListCall<'a> {
+impl<'a, S> ProjectRegionJobListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17494,7 +17787,7 @@ impl<'a> ProjectRegionJobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -17504,42 +17797,42 @@ impl<'a> ProjectRegionJobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
     /// Optional. The page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of results to return in each response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRegionJobListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRegionJobListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies enumerated categories of jobs to list. (default = match ALL jobs).If filter is provided, jobStateMatcher will be ignored.
     ///
     /// Sets the *job state matcher* query property to the given value.
-    pub fn job_state_matcher(mut self, new_value: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn job_state_matcher(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
         self._job_state_matcher = Some(new_value.to_string());
         self
     }
     /// Optional. A filter constraining the jobs to list. Filters are case-sensitive and have the following syntax:field = value AND field = value ...where field is status.state or labels.[KEY], and [KEY] is a label key. value can be * to match all values. status.state can be either ACTIVE or NON_ACTIVE. Only the logical AND operator is supported; space-separated items are treated as having an implicit AND operator.Example filter:status.state = ACTIVE AND labels.env = staging AND labels.starred = *
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. If set, the returned jobs list includes only jobs that were submitted to the named cluster.
     ///
     /// Sets the *cluster name* query property to the given value.
-    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionJobListCall<'a> {
+    pub fn cluster_name(mut self, new_value: &str) -> ProjectRegionJobListCall<'a, S> {
         self._cluster_name = Some(new_value.to_string());
         self
     }
@@ -17549,7 +17842,7 @@ impl<'a> ProjectRegionJobListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17574,7 +17867,7 @@ impl<'a> ProjectRegionJobListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17594,9 +17887,9 @@ impl<'a> ProjectRegionJobListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17629,7 +17922,7 @@ impl<'a> ProjectRegionJobListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17643,10 +17936,10 @@ impl<'a> ProjectRegionJobListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobPatchCall<'a>
-    where  {
+pub struct ProjectRegionJobPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: Job,
     _project_id: String,
     _region: String,
@@ -17657,9 +17950,15 @@ pub struct ProjectRegionJobPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobPatchCall<'a, S> {}
 
-impl<'a> ProjectRegionJobPatchCall<'a> {
+impl<'a, S> ProjectRegionJobPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17820,7 +18119,7 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Job) -> ProjectRegionJobPatchCall<'a> {
+    pub fn request(mut self, new_value: Job) -> ProjectRegionJobPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17830,7 +18129,7 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -17840,7 +18139,7 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -17850,14 +18149,14 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a> {
+    pub fn job_id(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, S> {
         self._job_id = new_value.to_string();
         self
     }
     /// Required. Specifies the path, relative to Job, of the field to update. For example, to update the labels of a Job the update_mask parameter would be specified as labels, and the PATCH request body would specify the new value. *Note:* Currently, labels is the only field that can be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectRegionJobPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -17867,7 +18166,7 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17892,7 +18191,7 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17912,9 +18211,9 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17947,7 +18246,7 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17960,10 +18259,10 @@ impl<'a> ProjectRegionJobPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionJobSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17971,9 +18270,15 @@ pub struct ProjectRegionJobSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionJobSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18133,7 +18438,7 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionJobSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionJobSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18143,7 +18448,7 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionJobSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionJobSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -18153,7 +18458,7 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18178,7 +18483,7 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18198,9 +18503,9 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18233,7 +18538,7 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18246,10 +18551,10 @@ impl<'a> ProjectRegionJobSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobSubmitCall<'a>
-    where  {
+pub struct ProjectRegionJobSubmitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SubmitJobRequest,
     _project_id: String,
     _region: String,
@@ -18258,9 +18563,15 @@ pub struct ProjectRegionJobSubmitCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobSubmitCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobSubmitCall<'a, S> {}
 
-impl<'a> ProjectRegionJobSubmitCall<'a> {
+impl<'a, S> ProjectRegionJobSubmitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18417,7 +18728,7 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SubmitJobRequest) -> ProjectRegionJobSubmitCall<'a> {
+    pub fn request(mut self, new_value: SubmitJobRequest) -> ProjectRegionJobSubmitCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18427,7 +18738,7 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobSubmitCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobSubmitCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18437,7 +18748,7 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobSubmitCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobSubmitCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -18447,7 +18758,7 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobSubmitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobSubmitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18472,7 +18783,7 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSubmitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSubmitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18492,9 +18803,9 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobSubmitCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobSubmitCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18527,7 +18838,7 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18540,10 +18851,10 @@ impl<'a> ProjectRegionJobSubmitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobSubmitAsOperationCall<'a>
-    where  {
+pub struct ProjectRegionJobSubmitAsOperationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SubmitJobRequest,
     _project_id: String,
     _region: String,
@@ -18552,9 +18863,15 @@ pub struct ProjectRegionJobSubmitAsOperationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobSubmitAsOperationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobSubmitAsOperationCall<'a, S> {}
 
-impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
+impl<'a, S> ProjectRegionJobSubmitAsOperationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18711,7 +19028,7 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SubmitJobRequest) -> ProjectRegionJobSubmitAsOperationCall<'a> {
+    pub fn request(mut self, new_value: SubmitJobRequest) -> ProjectRegionJobSubmitAsOperationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18721,7 +19038,7 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobSubmitAsOperationCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectRegionJobSubmitAsOperationCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -18731,7 +19048,7 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> ProjectRegionJobSubmitAsOperationCall<'a> {
+    pub fn region(mut self, new_value: &str) -> ProjectRegionJobSubmitAsOperationCall<'a, S> {
         self._region = new_value.to_string();
         self
     }
@@ -18741,7 +19058,7 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobSubmitAsOperationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobSubmitAsOperationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18766,7 +19083,7 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSubmitAsOperationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobSubmitAsOperationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18786,9 +19103,9 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobSubmitAsOperationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobSubmitAsOperationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18821,7 +19138,7 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18834,10 +19151,10 @@ impl<'a> ProjectRegionJobSubmitAsOperationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionJobTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectRegionJobTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18845,9 +19162,15 @@ pub struct ProjectRegionJobTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionJobTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionJobTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
+impl<'a, S> ProjectRegionJobTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19007,7 +19330,7 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionJobTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionJobTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19017,7 +19340,7 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionJobTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionJobTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -19027,7 +19350,7 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionJobTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19052,7 +19375,7 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionJobTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19072,9 +19395,9 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionJobTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionJobTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19106,7 +19429,7 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19114,19 +19437,25 @@ impl<'a> ProjectRegionJobTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationCancelCall<'a>
-    where  {
+pub struct ProjectRegionOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationCancelCall<'a> {
+impl<'a, S> ProjectRegionOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19273,7 +19602,7 @@ impl<'a> ProjectRegionOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19283,7 +19612,7 @@ impl<'a> ProjectRegionOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19308,7 +19637,7 @@ impl<'a> ProjectRegionOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19328,9 +19657,9 @@ impl<'a> ProjectRegionOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19362,7 +19691,7 @@ impl<'a> ProjectRegionOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19370,19 +19699,25 @@ impl<'a> ProjectRegionOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationDeleteCall<'a>
-    where  {
+pub struct ProjectRegionOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationDeleteCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationDeleteCall<'a> {
+impl<'a, S> ProjectRegionOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19529,7 +19864,7 @@ impl<'a> ProjectRegionOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19539,7 +19874,7 @@ impl<'a> ProjectRegionOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19564,7 +19899,7 @@ impl<'a> ProjectRegionOperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19584,9 +19919,9 @@ impl<'a> ProjectRegionOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19618,7 +19953,7 @@ impl<'a> ProjectRegionOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19626,19 +19961,25 @@ impl<'a> ProjectRegionOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationGetCall<'a>
-    where  {
+pub struct ProjectRegionOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationGetCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationGetCall<'a> {
+impl<'a, S> ProjectRegionOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19785,7 +20126,7 @@ impl<'a> ProjectRegionOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19795,7 +20136,7 @@ impl<'a> ProjectRegionOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19820,7 +20161,7 @@ impl<'a> ProjectRegionOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19840,9 +20181,9 @@ impl<'a> ProjectRegionOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19875,7 +20216,7 @@ impl<'a> ProjectRegionOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19888,10 +20229,10 @@ impl<'a> ProjectRegionOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionOperationGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19899,9 +20240,15 @@ pub struct ProjectRegionOperationGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionOperationGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20061,7 +20408,7 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionOperationGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionOperationGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20071,7 +20418,7 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionOperationGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionOperationGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -20081,7 +20428,7 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20106,7 +20453,7 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20126,9 +20473,9 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20160,7 +20507,7 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20171,10 +20518,10 @@ impl<'a> ProjectRegionOperationGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationListCall<'a>
-    where  {
+pub struct ProjectRegionOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20184,9 +20531,15 @@ pub struct ProjectRegionOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationListCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationListCall<'a> {
+impl<'a, S> ProjectRegionOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20342,28 +20695,28 @@ impl<'a> ProjectRegionOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRegionOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRegionOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRegionOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRegionOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectRegionOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectRegionOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -20373,7 +20726,7 @@ impl<'a> ProjectRegionOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20398,7 +20751,7 @@ impl<'a> ProjectRegionOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20418,9 +20771,9 @@ impl<'a> ProjectRegionOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20453,7 +20806,7 @@ impl<'a> ProjectRegionOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20466,10 +20819,10 @@ impl<'a> ProjectRegionOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionOperationSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20477,9 +20830,15 @@ pub struct ProjectRegionOperationSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionOperationSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20639,7 +20998,7 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionOperationSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionOperationSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20649,7 +21008,7 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionOperationSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionOperationSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -20659,7 +21018,7 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20684,7 +21043,7 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20704,9 +21063,9 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20739,7 +21098,7 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20752,10 +21111,10 @@ impl<'a> ProjectRegionOperationSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionOperationTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectRegionOperationTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20763,9 +21122,15 @@ pub struct ProjectRegionOperationTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionOperationTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionOperationTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
+impl<'a, S> ProjectRegionOperationTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20925,7 +21290,7 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionOperationTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionOperationTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20935,7 +21300,7 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionOperationTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionOperationTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -20945,7 +21310,7 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionOperationTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20970,7 +21335,7 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionOperationTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20990,9 +21355,9 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionOperationTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionOperationTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21025,7 +21390,7 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21038,10 +21403,10 @@ impl<'a> ProjectRegionOperationTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateCreateCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: WorkflowTemplate,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21049,9 +21414,15 @@ pub struct ProjectRegionWorkflowTemplateCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateCreateCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21211,7 +21582,7 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectRegionWorkflowTemplateCreateCall<'a> {
+    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectRegionWorkflowTemplateCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21221,7 +21592,7 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21231,7 +21602,7 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21256,7 +21627,7 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21276,9 +21647,9 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21310,7 +21681,7 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21319,10 +21690,10 @@ impl<'a> ProjectRegionWorkflowTemplateCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateDeleteCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21330,9 +21701,15 @@ pub struct ProjectRegionWorkflowTemplateDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateDeleteCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21482,14 +21859,14 @@ impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The version of workflow template to delete. If specified, will only delete the template if the current server version matches specified version.
     ///
     /// Sets the *version* query property to the given value.
-    pub fn version(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateDeleteCall<'a> {
+    pub fn version(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateDeleteCall<'a, S> {
         self._version = Some(new_value);
         self
     }
@@ -21499,7 +21876,7 @@ impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21524,7 +21901,7 @@ impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21544,9 +21921,9 @@ impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21578,7 +21955,7 @@ impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21587,10 +21964,10 @@ impl<'a> ProjectRegionWorkflowTemplateDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateGetCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _name: String,
     _version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21598,9 +21975,15 @@ pub struct ProjectRegionWorkflowTemplateGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateGetCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21750,14 +22133,14 @@ impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The version of workflow template to retrieve. Only previously instantiated versions can be retrieved.If unspecified, retrieves the current version.
     ///
     /// Sets the *version* query property to the given value.
-    pub fn version(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateGetCall<'a> {
+    pub fn version(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateGetCall<'a, S> {
         self._version = Some(new_value);
         self
     }
@@ -21767,7 +22150,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21792,7 +22175,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21812,9 +22195,9 @@ impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21847,7 +22230,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21860,10 +22243,10 @@ impl<'a> ProjectRegionWorkflowTemplateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21871,9 +22254,15 @@ pub struct ProjectRegionWorkflowTemplateGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22033,7 +22422,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22043,7 +22432,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -22053,7 +22442,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22078,7 +22467,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22098,9 +22487,9 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22133,7 +22522,7 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22146,10 +22535,10 @@ impl<'a> ProjectRegionWorkflowTemplateGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateInstantiateCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateInstantiateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: InstantiateWorkflowTemplateRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22157,9 +22546,15 @@ pub struct ProjectRegionWorkflowTemplateInstantiateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateInstantiateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateInstantiateCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateInstantiateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22319,7 +22714,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InstantiateWorkflowTemplateRequest) -> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
+    pub fn request(mut self, new_value: InstantiateWorkflowTemplateRequest) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22329,7 +22724,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22339,7 +22734,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22364,7 +22759,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateInstantiateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22384,9 +22779,9 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateInstantiateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateInstantiateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22419,7 +22814,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22433,10 +22828,10 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateInstantiateInlineCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: WorkflowTemplate,
     _parent: String,
     _request_id: Option<String>,
@@ -22445,9 +22840,15 @@ pub struct ProjectRegionWorkflowTemplateInstantiateInlineCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22610,7 +23011,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22620,14 +23021,14 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A tag that prevents multiple concurrent workflow instances with the same tag from running. This mitigates risk of concurrent instances started due to retries.It is recommended to always set this value to a UUID (https://en.wikipedia.org/wiki/Universally_unique_identifier).The tag must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._request_id = Some(new_value.to_string());
         self
     }
@@ -22637,7 +23038,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22662,7 +23063,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22682,9 +23083,9 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22716,7 +23117,7 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22726,10 +23127,10 @@ impl<'a> ProjectRegionWorkflowTemplateInstantiateInlineCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateListCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -22738,9 +23139,15 @@ pub struct ProjectRegionWorkflowTemplateListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateListCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22893,21 +23300,21 @@ impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The page token, returned by a previous call, to request the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return in each response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectRegionWorkflowTemplateListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -22917,7 +23324,7 @@ impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22942,7 +23349,7 @@ impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22962,9 +23369,9 @@ impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22997,7 +23404,7 @@ impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23010,10 +23417,10 @@ impl<'a> ProjectRegionWorkflowTemplateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23021,9 +23428,15 @@ pub struct ProjectRegionWorkflowTemplateSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23183,7 +23596,7 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23193,7 +23606,7 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -23203,7 +23616,7 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23228,7 +23641,7 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23248,9 +23661,9 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23283,7 +23696,7 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23296,10 +23709,10 @@ impl<'a> ProjectRegionWorkflowTemplateSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23307,9 +23720,15 @@ pub struct ProjectRegionWorkflowTemplateTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23469,7 +23888,7 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23479,7 +23898,7 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -23489,7 +23908,7 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23514,7 +23933,7 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23534,9 +23953,9 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23569,7 +23988,7 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dataproc::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23582,10 +24001,10 @@ impl<'a> ProjectRegionWorkflowTemplateTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectRegionWorkflowTemplateUpdateCall<'a>
-    where  {
+pub struct ProjectRegionWorkflowTemplateUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dataproc<>,
+    hub: &'a Dataproc<S>,
     _request: WorkflowTemplate,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23593,9 +24012,15 @@ pub struct ProjectRegionWorkflowTemplateUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectRegionWorkflowTemplateUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectRegionWorkflowTemplateUpdateCall<'a, S> {}
 
-impl<'a> ProjectRegionWorkflowTemplateUpdateCall<'a> {
+impl<'a, S> ProjectRegionWorkflowTemplateUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23755,7 +24180,7 @@ impl<'a> ProjectRegionWorkflowTemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectRegionWorkflowTemplateUpdateCall<'a> {
+    pub fn request(mut self, new_value: WorkflowTemplate) -> ProjectRegionWorkflowTemplateUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23765,7 +24190,7 @@ impl<'a> ProjectRegionWorkflowTemplateUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectRegionWorkflowTemplateUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -23775,7 +24200,7 @@ impl<'a> ProjectRegionWorkflowTemplateUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectRegionWorkflowTemplateUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23800,7 +24225,7 @@ impl<'a> ProjectRegionWorkflowTemplateUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectRegionWorkflowTemplateUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23820,9 +24245,9 @@ impl<'a> ProjectRegionWorkflowTemplateUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectRegionWorkflowTemplateUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectRegionWorkflowTemplateUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

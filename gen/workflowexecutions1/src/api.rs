@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct WorkflowExecutions<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct WorkflowExecutions<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for WorkflowExecutions<> {}
+impl<'a, S> client::Hub for WorkflowExecutions<S> {}
 
-impl<'a, > WorkflowExecutions<> {
+impl<'a, S> WorkflowExecutions<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> WorkflowExecutions<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> WorkflowExecutions<S> {
         WorkflowExecutions {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://workflowexecutions.googleapis.com/".to_string(),
             _root_url: "https://workflowexecutions.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -326,22 +331,22 @@ impl client::Part for StackTraceElement {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_workflows_executions_cancel(...)`, `locations_workflows_executions_create(...)`, `locations_workflows_executions_get(...)` and `locations_workflows_executions_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a WorkflowExecutions<>,
+    hub: &'a WorkflowExecutions<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -351,7 +356,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the execution to be cancelled. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}
-    pub fn locations_workflows_executions_cancel(&self, request: CancelExecutionRequest, name: &str) -> ProjectLocationWorkflowExecutionCancelCall<'a> {
+    pub fn locations_workflows_executions_cancel(&self, request: CancelExecutionRequest, name: &str) -> ProjectLocationWorkflowExecutionCancelCall<'a, S> {
         ProjectLocationWorkflowExecutionCancelCall {
             hub: self.hub,
             _request: request,
@@ -370,7 +375,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Name of the workflow for which an execution should be created. Format: projects/{project}/locations/{location}/workflows/{workflow} The latest revision of the workflow will be used.
-    pub fn locations_workflows_executions_create(&self, request: Execution, parent: &str) -> ProjectLocationWorkflowExecutionCreateCall<'a> {
+    pub fn locations_workflows_executions_create(&self, request: Execution, parent: &str) -> ProjectLocationWorkflowExecutionCreateCall<'a, S> {
         ProjectLocationWorkflowExecutionCreateCall {
             hub: self.hub,
             _request: request,
@@ -388,7 +393,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the execution to be retrieved. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}
-    pub fn locations_workflows_executions_get(&self, name: &str) -> ProjectLocationWorkflowExecutionGetCall<'a> {
+    pub fn locations_workflows_executions_get(&self, name: &str) -> ProjectLocationWorkflowExecutionGetCall<'a, S> {
         ProjectLocationWorkflowExecutionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -406,7 +411,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Name of the workflow for which the executions should be listed. Format: projects/{project}/locations/{location}/workflows/{workflow}
-    pub fn locations_workflows_executions_list(&self, parent: &str) -> ProjectLocationWorkflowExecutionListCall<'a> {
+    pub fn locations_workflows_executions_list(&self, parent: &str) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
         ProjectLocationWorkflowExecutionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -451,7 +456,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -464,10 +469,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowExecutionCancelCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowExecutionCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WorkflowExecutions<>,
+    hub: &'a WorkflowExecutions<S>,
     _request: CancelExecutionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -475,9 +480,15 @@ pub struct ProjectLocationWorkflowExecutionCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowExecutionCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowExecutionCancelCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
+impl<'a, S> ProjectLocationWorkflowExecutionCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -637,7 +648,7 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelExecutionRequest) -> ProjectLocationWorkflowExecutionCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelExecutionRequest) -> ProjectLocationWorkflowExecutionCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -647,7 +658,7 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -657,7 +668,7 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -682,7 +693,7 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -702,9 +713,9 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowExecutionCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowExecutionCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -737,7 +748,7 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -750,10 +761,10 @@ impl<'a> ProjectLocationWorkflowExecutionCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowExecutionCreateCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowExecutionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WorkflowExecutions<>,
+    hub: &'a WorkflowExecutions<S>,
     _request: Execution,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -761,9 +772,15 @@ pub struct ProjectLocationWorkflowExecutionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowExecutionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowExecutionCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
+impl<'a, S> ProjectLocationWorkflowExecutionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -923,7 +940,7 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Execution) -> ProjectLocationWorkflowExecutionCreateCall<'a> {
+    pub fn request(mut self, new_value: Execution) -> ProjectLocationWorkflowExecutionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -933,7 +950,7 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -943,7 +960,7 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -968,7 +985,7 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -988,9 +1005,9 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowExecutionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowExecutionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1022,7 +1039,7 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1031,10 +1048,10 @@ impl<'a> ProjectLocationWorkflowExecutionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowExecutionGetCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowExecutionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WorkflowExecutions<>,
+    hub: &'a WorkflowExecutions<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1042,9 +1059,15 @@ pub struct ProjectLocationWorkflowExecutionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowExecutionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowExecutionGetCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
+impl<'a, S> ProjectLocationWorkflowExecutionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1194,14 +1217,14 @@ impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. A view defining which fields should be filled in the returned execution. The API will default to the FULL view.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -1211,7 +1234,7 @@ impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1236,7 +1259,7 @@ impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1256,9 +1279,9 @@ impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowExecutionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowExecutionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1290,7 +1313,7 @@ impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = WorkflowExecutions::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1301,10 +1324,10 @@ impl<'a> ProjectLocationWorkflowExecutionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationWorkflowExecutionListCall<'a>
-    where  {
+pub struct ProjectLocationWorkflowExecutionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a WorkflowExecutions<>,
+    hub: &'a WorkflowExecutions<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -1314,9 +1337,15 @@ pub struct ProjectLocationWorkflowExecutionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationWorkflowExecutionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationWorkflowExecutionListCall<'a, S> {}
 
-impl<'a> ProjectLocationWorkflowExecutionListCall<'a> {
+impl<'a, S> ProjectLocationWorkflowExecutionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1472,28 +1501,28 @@ impl<'a> ProjectLocationWorkflowExecutionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A view defining which fields should be filled in the returned executions. The API will default to the BASIC view.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// A page token, received from a previous `ListExecutions` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListExecutions` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of executions to return per call. Max supported value depends on the selected Execution view: it's 10000 for BASIC and 100 for FULL. The default value used if the field is not specified is 100, regardless of the selected view. Values greater than the max value will be coerced down to it.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWorkflowExecutionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1503,7 +1532,7 @@ impl<'a> ProjectLocationWorkflowExecutionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationWorkflowExecutionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1528,7 +1557,7 @@ impl<'a> ProjectLocationWorkflowExecutionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkflowExecutionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1548,9 +1577,9 @@ impl<'a> ProjectLocationWorkflowExecutionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationWorkflowExecutionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationWorkflowExecutionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

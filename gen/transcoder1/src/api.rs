@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Transcoder<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Transcoder<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Transcoder<> {}
+impl<'a, S> client::Hub for Transcoder<S> {}
 
-impl<'a, > Transcoder<> {
+impl<'a, S> Transcoder<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Transcoder<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Transcoder<S> {
         Transcoder {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://transcoder.googleapis.com/".to_string(),
             _root_url: "https://transcoder.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1108,22 +1113,22 @@ impl client::Part for Vp9CodecSettings {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_job_templates_create(...)`, `locations_job_templates_delete(...)`, `locations_job_templates_get(...)`, `locations_job_templates_list(...)`, `locations_jobs_create(...)`, `locations_jobs_delete(...)`, `locations_jobs_get(...)` and `locations_jobs_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1133,7 +1138,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent location to create this job template. Format: `projects/{project}/locations/{location}`
-    pub fn locations_job_templates_create(&self, request: JobTemplate, parent: &str) -> ProjectLocationJobTemplateCreateCall<'a> {
+    pub fn locations_job_templates_create(&self, request: JobTemplate, parent: &str) -> ProjectLocationJobTemplateCreateCall<'a, S> {
         ProjectLocationJobTemplateCreateCall {
             hub: self.hub,
             _request: request,
@@ -1152,7 +1157,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the job template to delete. `projects/{project}/locations/{location}/jobTemplates/{job_template}`
-    pub fn locations_job_templates_delete(&self, name: &str) -> ProjectLocationJobTemplateDeleteCall<'a> {
+    pub fn locations_job_templates_delete(&self, name: &str) -> ProjectLocationJobTemplateDeleteCall<'a, S> {
         ProjectLocationJobTemplateDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1170,7 +1175,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the job template to retrieve. Format: `projects/{project}/locations/{location}/jobTemplates/{job_template}`
-    pub fn locations_job_templates_get(&self, name: &str) -> ProjectLocationJobTemplateGetCall<'a> {
+    pub fn locations_job_templates_get(&self, name: &str) -> ProjectLocationJobTemplateGetCall<'a, S> {
         ProjectLocationJobTemplateGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1187,7 +1192,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent location from which to retrieve the collection of job templates. Format: `projects/{project}/locations/{location}`
-    pub fn locations_job_templates_list(&self, parent: &str) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn locations_job_templates_list(&self, parent: &str) -> ProjectLocationJobTemplateListCall<'a, S> {
         ProjectLocationJobTemplateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1209,7 +1214,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent location to create and process this job. Format: `projects/{project}/locations/{location}`
-    pub fn locations_jobs_create(&self, request: Job, parent: &str) -> ProjectLocationJobCreateCall<'a> {
+    pub fn locations_jobs_create(&self, request: Job, parent: &str) -> ProjectLocationJobCreateCall<'a, S> {
         ProjectLocationJobCreateCall {
             hub: self.hub,
             _request: request,
@@ -1227,7 +1232,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the job to delete. Format: `projects/{project}/locations/{location}/jobs/{job}`
-    pub fn locations_jobs_delete(&self, name: &str) -> ProjectLocationJobDeleteCall<'a> {
+    pub fn locations_jobs_delete(&self, name: &str) -> ProjectLocationJobDeleteCall<'a, S> {
         ProjectLocationJobDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1245,7 +1250,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the job to retrieve. Format: `projects/{project}/locations/{location}/jobs/{job}`
-    pub fn locations_jobs_get(&self, name: &str) -> ProjectLocationJobGetCall<'a> {
+    pub fn locations_jobs_get(&self, name: &str) -> ProjectLocationJobGetCall<'a, S> {
         ProjectLocationJobGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1262,7 +1267,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Format: `projects/{project}/locations/{location}`
-    pub fn locations_jobs_list(&self, parent: &str) -> ProjectLocationJobListCall<'a> {
+    pub fn locations_jobs_list(&self, parent: &str) -> ProjectLocationJobListCall<'a, S> {
         ProjectLocationJobListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1308,7 +1313,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1322,10 +1327,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobTemplateCreateCall<'a>
-    where  {
+pub struct ProjectLocationJobTemplateCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _request: JobTemplate,
     _parent: String,
     _job_template_id: Option<String>,
@@ -1334,9 +1339,15 @@ pub struct ProjectLocationJobTemplateCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobTemplateCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobTemplateCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
+impl<'a, S> ProjectLocationJobTemplateCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1499,7 +1510,7 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: JobTemplate) -> ProjectLocationJobTemplateCreateCall<'a> {
+    pub fn request(mut self, new_value: JobTemplate) -> ProjectLocationJobTemplateCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1509,14 +1520,14 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobTemplateCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobTemplateCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID to use for the job template, which will become the final component of the job template's resource name. This value should be 4-63 characters, and valid characters must match the regular expression `a-zA-Z*`.
     ///
     /// Sets the *job template id* query property to the given value.
-    pub fn job_template_id(mut self, new_value: &str) -> ProjectLocationJobTemplateCreateCall<'a> {
+    pub fn job_template_id(mut self, new_value: &str) -> ProjectLocationJobTemplateCreateCall<'a, S> {
         self._job_template_id = Some(new_value.to_string());
         self
     }
@@ -1526,7 +1537,7 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1551,7 +1562,7 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1571,9 +1582,9 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobTemplateCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobTemplateCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1605,7 +1616,7 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1614,10 +1625,10 @@ impl<'a> ProjectLocationJobTemplateCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobTemplateDeleteCall<'a>
-    where  {
+pub struct ProjectLocationJobTemplateDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _name: String,
     _allow_missing: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1625,9 +1636,15 @@ pub struct ProjectLocationJobTemplateDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobTemplateDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobTemplateDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
+impl<'a, S> ProjectLocationJobTemplateDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1777,14 +1794,14 @@ impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobTemplateDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobTemplateDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If set to true, and the job template is not found, the request will succeed but no action will be taken on the server.
     ///
     /// Sets the *allow missing* query property to the given value.
-    pub fn allow_missing(mut self, new_value: bool) -> ProjectLocationJobTemplateDeleteCall<'a> {
+    pub fn allow_missing(mut self, new_value: bool) -> ProjectLocationJobTemplateDeleteCall<'a, S> {
         self._allow_missing = Some(new_value);
         self
     }
@@ -1794,7 +1811,7 @@ impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1819,7 +1836,7 @@ impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1839,9 +1856,9 @@ impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobTemplateDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobTemplateDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1873,7 +1890,7 @@ impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1881,19 +1898,25 @@ impl<'a> ProjectLocationJobTemplateDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobTemplateGetCall<'a>
-    where  {
+pub struct ProjectLocationJobTemplateGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobTemplateGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobTemplateGetCall<'a, S> {}
 
-impl<'a> ProjectLocationJobTemplateGetCall<'a> {
+impl<'a, S> ProjectLocationJobTemplateGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2040,7 +2063,7 @@ impl<'a> ProjectLocationJobTemplateGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobTemplateGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobTemplateGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2050,7 +2073,7 @@ impl<'a> ProjectLocationJobTemplateGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2075,7 +2098,7 @@ impl<'a> ProjectLocationJobTemplateGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2095,9 +2118,9 @@ impl<'a> ProjectLocationJobTemplateGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobTemplateGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobTemplateGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2129,7 +2152,7 @@ impl<'a> ProjectLocationJobTemplateGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2141,10 +2164,10 @@ impl<'a> ProjectLocationJobTemplateGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobTemplateListCall<'a>
-    where  {
+pub struct ProjectLocationJobTemplateListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2155,9 +2178,15 @@ pub struct ProjectLocationJobTemplateListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobTemplateListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobTemplateListCall<'a, S> {}
 
-impl<'a> ProjectLocationJobTemplateListCall<'a> {
+impl<'a, S> ProjectLocationJobTemplateListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2316,35 +2345,35 @@ impl<'a> ProjectLocationJobTemplateListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The `next_page_token` value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationJobTemplateListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// One or more fields to compare and use to sort the output. See https://google.aip.dev/132#ordering.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The filter expression, following the syntax outlined in https://google.aip.dev/160.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationJobTemplateListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2354,7 +2383,7 @@ impl<'a> ProjectLocationJobTemplateListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobTemplateListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2379,7 +2408,7 @@ impl<'a> ProjectLocationJobTemplateListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobTemplateListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2399,9 +2428,9 @@ impl<'a> ProjectLocationJobTemplateListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobTemplateListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobTemplateListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2434,7 +2463,7 @@ impl<'a> ProjectLocationJobTemplateListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2447,10 +2476,10 @@ impl<'a> ProjectLocationJobTemplateListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobCreateCall<'a>
-    where  {
+pub struct ProjectLocationJobCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _request: Job,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2458,9 +2487,15 @@ pub struct ProjectLocationJobCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationJobCreateCall<'a> {
+impl<'a, S> ProjectLocationJobCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2620,7 +2655,7 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Job) -> ProjectLocationJobCreateCall<'a> {
+    pub fn request(mut self, new_value: Job) -> ProjectLocationJobCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2630,7 +2665,7 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2640,7 +2675,7 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2665,7 +2700,7 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2685,9 +2720,9 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2719,7 +2754,7 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2728,10 +2763,10 @@ impl<'a> ProjectLocationJobCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobDeleteCall<'a>
-    where  {
+pub struct ProjectLocationJobDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _name: String,
     _allow_missing: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2739,9 +2774,15 @@ pub struct ProjectLocationJobDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationJobDeleteCall<'a> {
+impl<'a, S> ProjectLocationJobDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2891,14 +2932,14 @@ impl<'a> ProjectLocationJobDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If set to true, and the job is not found, the request will succeed but no action will be taken on the server.
     ///
     /// Sets the *allow missing* query property to the given value.
-    pub fn allow_missing(mut self, new_value: bool) -> ProjectLocationJobDeleteCall<'a> {
+    pub fn allow_missing(mut self, new_value: bool) -> ProjectLocationJobDeleteCall<'a, S> {
         self._allow_missing = Some(new_value);
         self
     }
@@ -2908,7 +2949,7 @@ impl<'a> ProjectLocationJobDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2933,7 +2974,7 @@ impl<'a> ProjectLocationJobDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2953,9 +2994,9 @@ impl<'a> ProjectLocationJobDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2987,7 +3028,7 @@ impl<'a> ProjectLocationJobDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2995,19 +3036,25 @@ impl<'a> ProjectLocationJobDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobGetCall<'a>
-    where  {
+pub struct ProjectLocationJobGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobGetCall<'a, S> {}
 
-impl<'a> ProjectLocationJobGetCall<'a> {
+impl<'a, S> ProjectLocationJobGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3154,7 +3201,7 @@ impl<'a> ProjectLocationJobGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3164,7 +3211,7 @@ impl<'a> ProjectLocationJobGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3189,7 +3236,7 @@ impl<'a> ProjectLocationJobGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3209,9 +3256,9 @@ impl<'a> ProjectLocationJobGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3243,7 +3290,7 @@ impl<'a> ProjectLocationJobGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Transcoder::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3255,10 +3302,10 @@ impl<'a> ProjectLocationJobGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobListCall<'a>
-    where  {
+pub struct ProjectLocationJobListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Transcoder<>,
+    hub: &'a Transcoder<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3269,9 +3316,15 @@ pub struct ProjectLocationJobListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationJobListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationJobListCall<'a, S> {}
 
-impl<'a> ProjectLocationJobListCall<'a> {
+impl<'a, S> ProjectLocationJobListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3430,35 +3483,35 @@ impl<'a> ProjectLocationJobListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The `next_page_token` value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationJobListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationJobListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationJobListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationJobListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// One or more fields to compare and use to sort the output. See https://google.aip.dev/132#ordering.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationJobListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationJobListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The filter expression, following the syntax outlined in https://google.aip.dev/160.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationJobListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationJobListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3468,7 +3521,7 @@ impl<'a> ProjectLocationJobListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3493,7 +3546,7 @@ impl<'a> ProjectLocationJobListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3513,9 +3566,9 @@ impl<'a> ProjectLocationJobListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationJobListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

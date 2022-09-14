@@ -1,5 +1,5 @@
 # DO NOT EDIT !
-# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
 # DO NOT EDIT !
 [package]
 

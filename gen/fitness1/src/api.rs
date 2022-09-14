@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -155,7 +160,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -187,34 +192,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Fitness<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Fitness<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Fitness<> {}
+impl<'a, S> client::Hub for Fitness<S> {}
 
-impl<'a, > Fitness<> {
+impl<'a, S> Fitness<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Fitness<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Fitness<S> {
         Fitness {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://fitness.googleapis.com/fitness/v1/users/".to_string(),
             _root_url: "https://fitness.googleapis.com/".to_string(),
         }
     }
 
-    pub fn users(&'a self) -> UserMethods<'a> {
+    pub fn users(&'a self) -> UserMethods<'a, S> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -783,22 +788,22 @@ impl client::Part for ValueMapValEntry {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `data_sources_create(...)`, `data_sources_data_point_changes_list(...)`, `data_sources_datasets_delete(...)`, `data_sources_datasets_get(...)`, `data_sources_datasets_patch(...)`, `data_sources_delete(...)`, `data_sources_get(...)`, `data_sources_list(...)`, `data_sources_update(...)`, `dataset_aggregate(...)`, `sessions_delete(...)`, `sessions_list(...)` and `sessions_update(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a>
-    where  {
+pub struct UserMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
 }
 
-impl<'a> client::MethodsBuilder for UserMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for UserMethods<'a, S> {}
 
-impl<'a> UserMethods<'a> {
+impl<'a, S> UserMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -808,7 +813,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - List data points for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
-    pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a> {
+    pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a, S> {
         UserDataSourceDataPointChangeListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -830,7 +835,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a> {
+    pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a, S> {
         UserDataSourceDatasetDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -851,7 +856,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a, S> {
         UserDataSourceDatasetGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -875,7 +880,7 @@ impl<'a> UserMethods<'a> {
     /// * `userId` - Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - This field is not used, and can be safely omitted.
-    pub fn data_sources_datasets_patch(&self, request: Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a> {
+    pub fn data_sources_datasets_patch(&self, request: Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a, S> {
         UserDataSourceDatasetPatchCall {
             hub: self.hub,
             _request: request,
@@ -896,7 +901,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn data_sources_create(&self, request: DataSource, user_id: &str) -> UserDataSourceCreateCall<'a> {
+    pub fn data_sources_create(&self, request: DataSource, user_id: &str) -> UserDataSourceCreateCall<'a, S> {
         UserDataSourceCreateCall {
             hub: self.hub,
             _request: request,
@@ -915,7 +920,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to delete.
-    pub fn data_sources_delete(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDeleteCall<'a> {
+    pub fn data_sources_delete(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDeleteCall<'a, S> {
         UserDataSourceDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -934,7 +939,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to retrieve.
-    pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a> {
+    pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a, S> {
         UserDataSourceGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -952,7 +957,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a> {
+    pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a, S> {
         UserDataSourceListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -972,7 +977,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to update.
-    pub fn data_sources_update(&self, request: DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a> {
+    pub fn data_sources_update(&self, request: DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a, S> {
         UserDataSourceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -992,7 +997,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn dataset_aggregate(&self, request: AggregateRequest, user_id: &str) -> UserDatasetAggregateCall<'a> {
+    pub fn dataset_aggregate(&self, request: AggregateRequest, user_id: &str) -> UserDatasetAggregateCall<'a, S> {
         UserDatasetAggregateCall {
             hub: self.hub,
             _request: request,
@@ -1011,7 +1016,7 @@ impl<'a> UserMethods<'a> {
     ///
     /// * `userId` - Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `sessionId` - The ID of the session to be deleted.
-    pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a> {
+    pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a, S> {
         UserSessionDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1029,7 +1034,7 @@ impl<'a> UserMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a> {
+    pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a, S> {
         UserSessionListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1053,7 +1058,7 @@ impl<'a> UserMethods<'a> {
     /// * `request` - No description provided.
     /// * `userId` - Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `sessionId` - The ID of the session to be created.
-    pub fn sessions_update(&self, request: Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a> {
+    pub fn sessions_update(&self, request: Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a, S> {
         UserSessionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1096,7 +1101,7 @@ impl<'a> UserMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1106,10 +1111,10 @@ impl<'a> UserMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDataPointChangeListCall<'a>
-    where  {
+pub struct UserDataSourceDataPointChangeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _data_source_id: String,
     _page_token: Option<String>,
@@ -1119,9 +1124,15 @@ pub struct UserDataSourceDataPointChangeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceDataPointChangeListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceDataPointChangeListCall<'a, S> {}
 
-impl<'a> UserDataSourceDataPointChangeListCall<'a> {
+impl<'a, S> UserDataSourceDataPointChangeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1271,7 +1282,7 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1281,21 +1292,21 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// If specified, no more than this many data point changes will be included in the response.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a> {
+    pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a, S> {
         self._limit = Some(new_value);
         self
     }
@@ -1305,7 +1316,7 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDataPointChangeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDataPointChangeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1330,7 +1341,7 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDataPointChangeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDataPointChangeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1350,9 +1361,9 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDataPointChangeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceDataPointChangeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1384,7 +1395,7 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1392,10 +1403,10 @@ impl<'a> UserDataSourceDataPointChangeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDatasetDeleteCall<'a>
-    where  {
+pub struct UserDataSourceDatasetDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _data_source_id: String,
     _dataset_id: String,
@@ -1404,9 +1415,15 @@ pub struct UserDataSourceDatasetDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceDatasetDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceDatasetDeleteCall<'a, S> {}
 
-impl<'a> UserDataSourceDatasetDeleteCall<'a> {
+impl<'a, S> UserDataSourceDatasetDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1540,7 +1557,7 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1550,7 +1567,7 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1560,7 +1577,7 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1570,7 +1587,7 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1595,7 +1612,7 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1615,9 +1632,9 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceDatasetDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1649,7 +1666,7 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1659,10 +1676,10 @@ impl<'a> UserDataSourceDatasetDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDatasetGetCall<'a>
-    where  {
+pub struct UserDataSourceDatasetGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _data_source_id: String,
     _dataset_id: String,
@@ -1673,9 +1690,15 @@ pub struct UserDataSourceDatasetGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceDatasetGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceDatasetGetCall<'a, S> {}
 
-impl<'a> UserDataSourceDatasetGetCall<'a> {
+impl<'a, S> UserDataSourceDatasetGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1826,7 +1849,7 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1836,7 +1859,7 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1846,21 +1869,21 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// If specified, no more than this many data points will be included in the dataset. If there are more data points in the dataset, nextPageToken will be set in the dataset response. The limit is applied from the end of the time range. That is, if pageToken is absent, the limit most recent data points will be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, S> {
         self._limit = Some(new_value);
         self
     }
@@ -1870,7 +1893,7 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1895,7 +1918,7 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1915,9 +1938,9 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceDatasetGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1950,7 +1973,7 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1963,10 +1986,10 @@ impl<'a> UserDataSourceDatasetGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDatasetPatchCall<'a>
-    where  {
+pub struct UserDataSourceDatasetPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _request: Dataset,
     _user_id: String,
     _data_source_id: String,
@@ -1976,9 +1999,15 @@ pub struct UserDataSourceDatasetPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceDatasetPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceDatasetPatchCall<'a, S> {}
 
-impl<'a> UserDataSourceDatasetPatchCall<'a> {
+impl<'a, S> UserDataSourceDatasetPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2136,7 +2165,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> UserDataSourceDatasetPatchCall<'a> {
+    pub fn request(mut self, new_value: Dataset) -> UserDataSourceDatasetPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2146,7 +2175,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2156,7 +2185,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2166,7 +2195,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, S> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -2176,7 +2205,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2201,7 +2230,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2221,9 +2250,9 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceDatasetPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2256,7 +2285,7 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2269,10 +2298,10 @@ impl<'a> UserDataSourceDatasetPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceCreateCall<'a>
-    where  {
+pub struct UserDataSourceCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _request: DataSource,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2280,9 +2309,15 @@ pub struct UserDataSourceCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceCreateCall<'a, S> {}
 
-impl<'a> UserDataSourceCreateCall<'a> {
+impl<'a, S> UserDataSourceCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2438,7 +2473,7 @@ impl<'a> UserDataSourceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DataSource) -> UserDataSourceCreateCall<'a> {
+    pub fn request(mut self, new_value: DataSource) -> UserDataSourceCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2448,7 +2483,7 @@ impl<'a> UserDataSourceCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2458,7 +2493,7 @@ impl<'a> UserDataSourceCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2483,7 +2518,7 @@ impl<'a> UserDataSourceCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2503,9 +2538,9 @@ impl<'a> UserDataSourceCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2537,7 +2572,7 @@ impl<'a> UserDataSourceCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2545,10 +2580,10 @@ impl<'a> UserDataSourceCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDeleteCall<'a>
-    where  {
+pub struct UserDataSourceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _data_source_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2556,9 +2591,15 @@ pub struct UserDataSourceDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceDeleteCall<'a, S> {}
 
-impl<'a> UserDataSourceDeleteCall<'a> {
+impl<'a, S> UserDataSourceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2702,7 +2743,7 @@ impl<'a> UserDataSourceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2712,7 +2753,7 @@ impl<'a> UserDataSourceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2722,7 +2763,7 @@ impl<'a> UserDataSourceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2747,7 +2788,7 @@ impl<'a> UserDataSourceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2767,9 +2808,9 @@ impl<'a> UserDataSourceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2801,7 +2842,7 @@ impl<'a> UserDataSourceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2809,10 +2850,10 @@ impl<'a> UserDataSourceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceGetCall<'a>
-    where  {
+pub struct UserDataSourceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _data_source_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2820,9 +2861,15 @@ pub struct UserDataSourceGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceGetCall<'a, S> {}
 
-impl<'a> UserDataSourceGetCall<'a> {
+impl<'a, S> UserDataSourceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2966,7 +3013,7 @@ impl<'a> UserDataSourceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2976,7 +3023,7 @@ impl<'a> UserDataSourceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2986,7 +3033,7 @@ impl<'a> UserDataSourceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3011,7 +3058,7 @@ impl<'a> UserDataSourceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3031,9 +3078,9 @@ impl<'a> UserDataSourceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3065,7 +3112,7 @@ impl<'a> UserDataSourceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3074,10 +3121,10 @@ impl<'a> UserDataSourceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceListCall<'a>
-    where  {
+pub struct UserDataSourceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _data_type_name: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3085,9 +3132,15 @@ pub struct UserDataSourceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceListCall<'a, S> {}
 
-impl<'a> UserDataSourceListCall<'a> {
+impl<'a, S> UserDataSourceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3235,7 +3288,7 @@ impl<'a> UserDataSourceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3243,7 +3296,7 @@ impl<'a> UserDataSourceListCall<'a> {
     ///
     /// Append the given value to the *data type name* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a> {
+    pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a, S> {
         self._data_type_name.push(new_value.to_string());
         self
     }
@@ -3253,7 +3306,7 @@ impl<'a> UserDataSourceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3278,7 +3331,7 @@ impl<'a> UserDataSourceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3298,9 +3351,9 @@ impl<'a> UserDataSourceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3333,7 +3386,7 @@ impl<'a> UserDataSourceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3346,10 +3399,10 @@ impl<'a> UserDataSourceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceUpdateCall<'a>
-    where  {
+pub struct UserDataSourceUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _request: DataSource,
     _user_id: String,
     _data_source_id: String,
@@ -3358,9 +3411,15 @@ pub struct UserDataSourceUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDataSourceUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDataSourceUpdateCall<'a, S> {}
 
-impl<'a> UserDataSourceUpdateCall<'a> {
+impl<'a, S> UserDataSourceUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3517,7 +3576,7 @@ impl<'a> UserDataSourceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DataSource) -> UserDataSourceUpdateCall<'a> {
+    pub fn request(mut self, new_value: DataSource) -> UserDataSourceUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3527,7 +3586,7 @@ impl<'a> UserDataSourceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3537,7 +3596,7 @@ impl<'a> UserDataSourceUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, S> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -3547,7 +3606,7 @@ impl<'a> UserDataSourceUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3572,7 +3631,7 @@ impl<'a> UserDataSourceUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3592,9 +3651,9 @@ impl<'a> UserDataSourceUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDataSourceUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3627,7 +3686,7 @@ impl<'a> UserDataSourceUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3640,10 +3699,10 @@ impl<'a> UserDataSourceUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDatasetAggregateCall<'a>
-    where  {
+pub struct UserDatasetAggregateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _request: AggregateRequest,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3651,9 +3710,15 @@ pub struct UserDatasetAggregateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserDatasetAggregateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserDatasetAggregateCall<'a, S> {}
 
-impl<'a> UserDatasetAggregateCall<'a> {
+impl<'a, S> UserDatasetAggregateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3809,7 +3874,7 @@ impl<'a> UserDatasetAggregateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AggregateRequest) -> UserDatasetAggregateCall<'a> {
+    pub fn request(mut self, new_value: AggregateRequest) -> UserDatasetAggregateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3819,7 +3884,7 @@ impl<'a> UserDatasetAggregateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDatasetAggregateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserDatasetAggregateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3829,7 +3894,7 @@ impl<'a> UserDatasetAggregateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDatasetAggregateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDatasetAggregateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3854,7 +3919,7 @@ impl<'a> UserDatasetAggregateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDatasetAggregateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDatasetAggregateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3874,9 +3939,9 @@ impl<'a> UserDatasetAggregateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDatasetAggregateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserDatasetAggregateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3908,7 +3973,7 @@ impl<'a> UserDatasetAggregateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3916,10 +3981,10 @@ impl<'a> UserDatasetAggregateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSessionDeleteCall<'a>
-    where  {
+pub struct UserSessionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _session_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3927,9 +3992,15 @@ pub struct UserSessionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSessionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSessionDeleteCall<'a, S> {}
 
-impl<'a> UserSessionDeleteCall<'a> {
+impl<'a, S> UserSessionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4062,7 +4133,7 @@ impl<'a> UserSessionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4072,7 +4143,7 @@ impl<'a> UserSessionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a> {
+    pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, S> {
         self._session_id = new_value.to_string();
         self
     }
@@ -4082,7 +4153,7 @@ impl<'a> UserSessionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4107,7 +4178,7 @@ impl<'a> UserSessionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4127,9 +4198,9 @@ impl<'a> UserSessionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSessionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4161,7 +4232,7 @@ impl<'a> UserSessionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4174,10 +4245,10 @@ impl<'a> UserSessionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSessionListCall<'a>
-    where  {
+pub struct UserSessionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _user_id: String,
     _start_time: Option<String>,
     _page_token: Option<String>,
@@ -4189,9 +4260,15 @@ pub struct UserSessionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSessionListCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSessionListCall<'a, S> {}
 
-impl<'a> UserSessionListCall<'a> {
+impl<'a, S> UserSessionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4351,35 +4428,35 @@ impl<'a> UserSessionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response. If this time is omitted but endTime is specified, all sessions from the start of time up to endTime will be returned.
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a> {
+    pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, S> {
         self._start_time = Some(new_value.to_string());
         self
     }
     /// The continuation token, which is used for incremental syncing. To get the next batch of changes, set this parameter to the value of nextPageToken from the previous response. The page token is ignored if either start or end time is specified. If none of start time, end time, and the page token is specified, sessions modified in the last 30 days are returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// If true, and if both startTime and endTime are omitted, session deletions will be returned.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a> {
+    pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, S> {
         self._include_deleted = Some(new_value);
         self
     }
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response. If this time is omitted but startTime is specified, all sessions from startTime to the end of time will be returned.
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a> {
+    pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, S> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -4387,7 +4464,7 @@ impl<'a> UserSessionListCall<'a> {
     ///
     /// Append the given value to the *activity type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_activity_type(mut self, new_value: i32) -> UserSessionListCall<'a> {
+    pub fn add_activity_type(mut self, new_value: i32) -> UserSessionListCall<'a, S> {
         self._activity_type.push(new_value);
         self
     }
@@ -4397,7 +4474,7 @@ impl<'a> UserSessionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4422,7 +4499,7 @@ impl<'a> UserSessionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4442,9 +4519,9 @@ impl<'a> UserSessionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSessionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4477,7 +4554,7 @@ impl<'a> UserSessionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Fitness::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4490,10 +4567,10 @@ impl<'a> UserSessionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSessionUpdateCall<'a>
-    where  {
+pub struct UserSessionUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Fitness<>,
+    hub: &'a Fitness<S>,
     _request: Session,
     _user_id: String,
     _session_id: String,
@@ -4502,9 +4579,15 @@ pub struct UserSessionUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for UserSessionUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for UserSessionUpdateCall<'a, S> {}
 
-impl<'a> UserSessionUpdateCall<'a> {
+impl<'a, S> UserSessionUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4661,7 +4744,7 @@ impl<'a> UserSessionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Session) -> UserSessionUpdateCall<'a> {
+    pub fn request(mut self, new_value: Session) -> UserSessionUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4671,7 +4754,7 @@ impl<'a> UserSessionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4681,7 +4764,7 @@ impl<'a> UserSessionUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a> {
+    pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, S> {
         self._session_id = new_value.to_string();
         self
     }
@@ -4691,7 +4774,7 @@ impl<'a> UserSessionUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4716,7 +4799,7 @@ impl<'a> UserSessionUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4736,9 +4819,9 @@ impl<'a> UserSessionUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> UserSessionUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

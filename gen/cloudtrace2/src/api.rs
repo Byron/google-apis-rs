@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -107,34 +112,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudTrace<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudTrace<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudTrace<> {}
+impl<'a, S> client::Hub for CloudTrace<S> {}
 
-impl<'a, > CloudTrace<> {
+impl<'a, S> CloudTrace<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudTrace<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudTrace<S> {
         CloudTrace {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudtrace.googleapis.com/".to_string(),
             _root_url: "https://cloudtrace.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -540,22 +545,22 @@ impl client::Part for TruncatableString {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `traces_batch_write(...)` and `traces_spans_create_span(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -565,7 +570,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the span in the following format: * `projects/[PROJECT_ID]/traces/[TRACE_ID]/spans/[SPAN_ID]` `[TRACE_ID]` is a unique identifier for a trace within a project; it is a 32-character hexadecimal encoding of a 16-byte array. It should not be zero. `[SPAN_ID]` is a unique identifier for a span within a trace; it is a 16-character hexadecimal encoding of an 8-byte array. It should not be zero. .
-    pub fn traces_spans_create_span(&self, request: Span, name: &str) -> ProjectTraceSpanCreateSpanCall<'a> {
+    pub fn traces_spans_create_span(&self, request: Span, name: &str) -> ProjectTraceSpanCreateSpanCall<'a, S> {
         ProjectTraceSpanCreateSpanCall {
             hub: self.hub,
             _request: request,
@@ -584,7 +589,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the project where the spans belong. The format is `projects/[PROJECT_ID]`.
-    pub fn traces_batch_write(&self, request: BatchWriteSpansRequest, name: &str) -> ProjectTraceBatchWriteCall<'a> {
+    pub fn traces_batch_write(&self, request: BatchWriteSpansRequest, name: &str) -> ProjectTraceBatchWriteCall<'a, S> {
         ProjectTraceBatchWriteCall {
             hub: self.hub,
             _request: request,
@@ -627,7 +632,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -640,10 +645,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTraceSpanCreateSpanCall<'a>
-    where  {
+pub struct ProjectTraceSpanCreateSpanCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
     _request: Span,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -651,9 +656,15 @@ pub struct ProjectTraceSpanCreateSpanCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTraceSpanCreateSpanCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTraceSpanCreateSpanCall<'a, S> {}
 
-impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
+impl<'a, S> ProjectTraceSpanCreateSpanCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -813,7 +824,7 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Span) -> ProjectTraceSpanCreateSpanCall<'a> {
+    pub fn request(mut self, new_value: Span) -> ProjectTraceSpanCreateSpanCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -823,7 +834,7 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectTraceSpanCreateSpanCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectTraceSpanCreateSpanCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -833,7 +844,7 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceSpanCreateSpanCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceSpanCreateSpanCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -858,7 +869,7 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceSpanCreateSpanCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceSpanCreateSpanCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -878,9 +889,9 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTraceSpanCreateSpanCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTraceSpanCreateSpanCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -913,7 +924,7 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -926,10 +937,10 @@ impl<'a> ProjectTraceSpanCreateSpanCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTraceBatchWriteCall<'a>
-    where  {
+pub struct ProjectTraceBatchWriteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
     _request: BatchWriteSpansRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -937,9 +948,15 @@ pub struct ProjectTraceBatchWriteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTraceBatchWriteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTraceBatchWriteCall<'a, S> {}
 
-impl<'a> ProjectTraceBatchWriteCall<'a> {
+impl<'a, S> ProjectTraceBatchWriteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1099,7 +1116,7 @@ impl<'a> ProjectTraceBatchWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchWriteSpansRequest) -> ProjectTraceBatchWriteCall<'a> {
+    pub fn request(mut self, new_value: BatchWriteSpansRequest) -> ProjectTraceBatchWriteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1109,7 +1126,7 @@ impl<'a> ProjectTraceBatchWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectTraceBatchWriteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectTraceBatchWriteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1119,7 +1136,7 @@ impl<'a> ProjectTraceBatchWriteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceBatchWriteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceBatchWriteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1144,7 +1161,7 @@ impl<'a> ProjectTraceBatchWriteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceBatchWriteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceBatchWriteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1164,9 +1181,9 @@ impl<'a> ProjectTraceBatchWriteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTraceBatchWriteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTraceBatchWriteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

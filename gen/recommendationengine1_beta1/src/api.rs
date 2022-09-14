@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,34 +108,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct RecommendationsAI<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct RecommendationsAI<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for RecommendationsAI<> {}
+impl<'a, S> client::Hub for RecommendationsAI<S> {}
 
-impl<'a, > RecommendationsAI<> {
+impl<'a, S> RecommendationsAI<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> RecommendationsAI<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> RecommendationsAI<S> {
         RecommendationsAI {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://recommendationengine.googleapis.com/".to_string(),
             _root_url: "https://recommendationengine.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1098,22 +1103,22 @@ impl client::Part for GoogleRpcStatus {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_catalogs_catalog_items_create(...)`, `locations_catalogs_catalog_items_delete(...)`, `locations_catalogs_catalog_items_get(...)`, `locations_catalogs_catalog_items_import(...)`, `locations_catalogs_catalog_items_list(...)`, `locations_catalogs_catalog_items_patch(...)`, `locations_catalogs_event_stores_operations_get(...)`, `locations_catalogs_event_stores_operations_list(...)`, `locations_catalogs_event_stores_placements_predict(...)`, `locations_catalogs_event_stores_prediction_api_key_registrations_create(...)`, `locations_catalogs_event_stores_prediction_api_key_registrations_delete(...)`, `locations_catalogs_event_stores_prediction_api_key_registrations_list(...)`, `locations_catalogs_event_stores_user_events_collect(...)`, `locations_catalogs_event_stores_user_events_import(...)`, `locations_catalogs_event_stores_user_events_list(...)`, `locations_catalogs_event_stores_user_events_purge(...)`, `locations_catalogs_event_stores_user_events_rejoin(...)`, `locations_catalogs_event_stores_user_events_write(...)`, `locations_catalogs_list(...)`, `locations_catalogs_operations_get(...)`, `locations_catalogs_operations_list(...)` and `locations_catalogs_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1123,7 +1128,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent catalog resource name, such as `projects/*/locations/global/catalogs/default_catalog`.
-    pub fn locations_catalogs_catalog_items_create(&self, request: GoogleCloudRecommendationengineV1beta1CatalogItem, parent: &str) -> ProjectLocationCatalogCatalogItemCreateCall<'a> {
+    pub fn locations_catalogs_catalog_items_create(&self, request: GoogleCloudRecommendationengineV1beta1CatalogItem, parent: &str) -> ProjectLocationCatalogCatalogItemCreateCall<'a, S> {
         ProjectLocationCatalogCatalogItemCreateCall {
             hub: self.hub,
             _request: request,
@@ -1141,7 +1146,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Full resource name of catalog item, such as `projects/*/locations/global/catalogs/default_catalog/catalogItems/some_catalog_item_id`.
-    pub fn locations_catalogs_catalog_items_delete(&self, name: &str) -> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
+    pub fn locations_catalogs_catalog_items_delete(&self, name: &str) -> ProjectLocationCatalogCatalogItemDeleteCall<'a, S> {
         ProjectLocationCatalogCatalogItemDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1158,7 +1163,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Full resource name of catalog item, such as `projects/*/locations/global/catalogs/default_catalog/catalogitems/some_catalog_item_id`.
-    pub fn locations_catalogs_catalog_items_get(&self, name: &str) -> ProjectLocationCatalogCatalogItemGetCall<'a> {
+    pub fn locations_catalogs_catalog_items_get(&self, name: &str) -> ProjectLocationCatalogCatalogItemGetCall<'a, S> {
         ProjectLocationCatalogCatalogItemGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1176,7 +1181,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. `projects/1234/locations/global/catalogs/default_catalog` If no updateMask is specified, requires catalogItems.create permission. If updateMask is specified, requires catalogItems.update permission.
-    pub fn locations_catalogs_catalog_items_import(&self, request: GoogleCloudRecommendationengineV1beta1ImportCatalogItemsRequest, parent: &str) -> ProjectLocationCatalogCatalogItemImportCall<'a> {
+    pub fn locations_catalogs_catalog_items_import(&self, request: GoogleCloudRecommendationengineV1beta1ImportCatalogItemsRequest, parent: &str) -> ProjectLocationCatalogCatalogItemImportCall<'a, S> {
         ProjectLocationCatalogCatalogItemImportCall {
             hub: self.hub,
             _request: request,
@@ -1194,7 +1199,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent catalog resource name, such as `projects/*/locations/global/catalogs/default_catalog`.
-    pub fn locations_catalogs_catalog_items_list(&self, parent: &str) -> ProjectLocationCatalogCatalogItemListCall<'a> {
+    pub fn locations_catalogs_catalog_items_list(&self, parent: &str) -> ProjectLocationCatalogCatalogItemListCall<'a, S> {
         ProjectLocationCatalogCatalogItemListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1215,7 +1220,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Full resource name of catalog item, such as `projects/*/locations/global/catalogs/default_catalog/catalogItems/some_catalog_item_id`.
-    pub fn locations_catalogs_catalog_items_patch(&self, request: GoogleCloudRecommendationengineV1beta1CatalogItem, name: &str) -> ProjectLocationCatalogCatalogItemPatchCall<'a> {
+    pub fn locations_catalogs_catalog_items_patch(&self, request: GoogleCloudRecommendationengineV1beta1CatalogItem, name: &str) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S> {
         ProjectLocationCatalogCatalogItemPatchCall {
             hub: self.hub,
             _request: request,
@@ -1234,7 +1239,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_catalogs_event_stores_operations_get(&self, name: &str) -> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
+    pub fn locations_catalogs_event_stores_operations_get(&self, name: &str) -> ProjectLocationCatalogEventStoreOperationGetCall<'a, S> {
         ProjectLocationCatalogEventStoreOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1251,7 +1256,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_catalogs_event_stores_operations_list(&self, name: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+    pub fn locations_catalogs_event_stores_operations_list(&self, name: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S> {
         ProjectLocationCatalogEventStoreOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1272,7 +1277,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Full resource name of the format: `{name=projects/*/locations/global/catalogs/default_catalog/eventStores/default_event_store/placements/*}` The id of the recommendation engine placement. This id is used to identify the set of models that will be used to make the prediction. We currently support three placements with the following IDs by default: * `shopping_cart`: Predicts items frequently bought together with one or more catalog items in the same shopping session. Commonly displayed after `add-to-cart` events, on product detail pages, or on the shopping cart page. * `home_page`: Predicts the next product that a user will most likely engage with or purchase based on the shopping or viewing history of the specified `userId` or `visitorId`. For example - Recommendations for you. * `product_detail`: Predicts the next product that a user will most likely engage with or purchase. The prediction is based on the shopping or viewing history of the specified `userId` or `visitorId` and its relevance to a specified `CatalogItem`. Typically used on product detail pages. For example - More items like this. * `recently_viewed_default`: Returns up to 75 items recently viewed by the specified `userId` or `visitorId`, most recent ones first. Returns nothing if neither of them has viewed any items yet. For example - Recently viewed. The full list of available placements can be seen at https://console.cloud.google.com/recommendation/datafeeds/default_catalog/dashboard
-    pub fn locations_catalogs_event_stores_placements_predict(&self, request: GoogleCloudRecommendationengineV1beta1PredictRequest, name: &str) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
+    pub fn locations_catalogs_event_stores_placements_predict(&self, request: GoogleCloudRecommendationengineV1beta1PredictRequest, name: &str) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S> {
         ProjectLocationCatalogEventStorePlacementPredictCall {
             hub: self.hub,
             _request: request,
@@ -1291,7 +1296,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource path. `projects/*/locations/global/catalogs/default_catalog/eventStores/default_event_store`.
-    pub fn locations_catalogs_event_stores_prediction_api_key_registrations_create(&self, request: GoogleCloudRecommendationengineV1beta1CreatePredictionApiKeyRegistrationRequest, parent: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a> {
+    pub fn locations_catalogs_event_stores_prediction_api_key_registrations_create(&self, request: GoogleCloudRecommendationengineV1beta1CreatePredictionApiKeyRegistrationRequest, parent: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S> {
         ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall {
             hub: self.hub,
             _request: request,
@@ -1309,7 +1314,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The API key to unregister including full resource path. `projects/*/locations/global/catalogs/default_catalog/eventStores/default_event_store/predictionApiKeyRegistrations/`
-    pub fn locations_catalogs_event_stores_prediction_api_key_registrations_delete(&self, name: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a> {
+    pub fn locations_catalogs_event_stores_prediction_api_key_registrations_delete(&self, name: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S> {
         ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1326,7 +1331,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent placement resource name such as `projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store`
-    pub fn locations_catalogs_event_stores_prediction_api_key_registrations_list(&self, parent: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {
+    pub fn locations_catalogs_event_stores_prediction_api_key_registrations_list(&self, parent: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S> {
         ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1345,7 +1350,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent eventStore name, such as `projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store`.
-    pub fn locations_catalogs_event_stores_user_events_collect(&self, parent: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+    pub fn locations_catalogs_event_stores_user_events_collect(&self, parent: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {
         ProjectLocationCatalogEventStoreUserEventCollectCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1366,7 +1371,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. `projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store`
-    pub fn locations_catalogs_event_stores_user_events_import(&self, request: GoogleCloudRecommendationengineV1beta1ImportUserEventsRequest, parent: &str) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
+    pub fn locations_catalogs_event_stores_user_events_import(&self, request: GoogleCloudRecommendationengineV1beta1ImportUserEventsRequest, parent: &str) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S> {
         ProjectLocationCatalogEventStoreUserEventImportCall {
             hub: self.hub,
             _request: request,
@@ -1384,7 +1389,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent eventStore resource name, such as `projects/*/locations/*/catalogs/default_catalog/eventStores/default_event_store`.
-    pub fn locations_catalogs_event_stores_user_events_list(&self, parent: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+    pub fn locations_catalogs_event_stores_user_events_list(&self, parent: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {
         ProjectLocationCatalogEventStoreUserEventListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1405,7 +1410,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the event_store under which the events are created. The format is `projects/${projectId}/locations/global/catalogs/${catalogId}/eventStores/${eventStoreId}`
-    pub fn locations_catalogs_event_stores_user_events_purge(&self, request: GoogleCloudRecommendationengineV1beta1PurgeUserEventsRequest, parent: &str) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
+    pub fn locations_catalogs_event_stores_user_events_purge(&self, request: GoogleCloudRecommendationengineV1beta1PurgeUserEventsRequest, parent: &str) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S> {
         ProjectLocationCatalogEventStoreUserEventPurgeCall {
             hub: self.hub,
             _request: request,
@@ -1424,7 +1429,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Full resource name of user event, such as `projects/*/locations/*/catalogs/default_catalog/eventStores/default_event_store`.
-    pub fn locations_catalogs_event_stores_user_events_rejoin(&self, request: GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest, parent: &str) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
+    pub fn locations_catalogs_event_stores_user_events_rejoin(&self, request: GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest, parent: &str) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S> {
         ProjectLocationCatalogEventStoreUserEventRejoinCall {
             hub: self.hub,
             _request: request,
@@ -1443,7 +1448,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent eventStore resource name, such as "projects/1234/locations/global/catalogs/default_catalog/eventStores/default_event_store".
-    pub fn locations_catalogs_event_stores_user_events_write(&self, request: GoogleCloudRecommendationengineV1beta1UserEvent, parent: &str) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
+    pub fn locations_catalogs_event_stores_user_events_write(&self, request: GoogleCloudRecommendationengineV1beta1UserEvent, parent: &str) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S> {
         ProjectLocationCatalogEventStoreUserEventWriteCall {
             hub: self.hub,
             _request: request,
@@ -1461,7 +1466,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_catalogs_operations_get(&self, name: &str) -> ProjectLocationCatalogOperationGetCall<'a> {
+    pub fn locations_catalogs_operations_get(&self, name: &str) -> ProjectLocationCatalogOperationGetCall<'a, S> {
         ProjectLocationCatalogOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1478,7 +1483,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_catalogs_operations_list(&self, name: &str) -> ProjectLocationCatalogOperationListCall<'a> {
+    pub fn locations_catalogs_operations_list(&self, name: &str) -> ProjectLocationCatalogOperationListCall<'a, S> {
         ProjectLocationCatalogOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1498,7 +1503,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The account resource name with an associated location.
-    pub fn locations_catalogs_list(&self, parent: &str) -> ProjectLocationCatalogListCall<'a> {
+    pub fn locations_catalogs_list(&self, parent: &str) -> ProjectLocationCatalogListCall<'a, S> {
         ProjectLocationCatalogListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1518,7 +1523,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully qualified resource name of the catalog.
-    pub fn locations_catalogs_patch(&self, request: GoogleCloudRecommendationengineV1beta1Catalog, name: &str) -> ProjectLocationCatalogPatchCall<'a> {
+    pub fn locations_catalogs_patch(&self, request: GoogleCloudRecommendationengineV1beta1Catalog, name: &str) -> ProjectLocationCatalogPatchCall<'a, S> {
         ProjectLocationCatalogPatchCall {
             hub: self.hub,
             _request: request,
@@ -1562,7 +1567,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1575,10 +1580,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogCatalogItemCreateCall<'a>
-    where  {
+pub struct ProjectLocationCatalogCatalogItemCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1CatalogItem,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1586,9 +1591,15 @@ pub struct ProjectLocationCatalogCatalogItemCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogCatalogItemCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogCatalogItemCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
+impl<'a, S> ProjectLocationCatalogCatalogItemCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1748,7 +1759,7 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1CatalogItem) -> ProjectLocationCatalogCatalogItemCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1CatalogItem) -> ProjectLocationCatalogCatalogItemCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1758,7 +1769,7 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -1768,7 +1779,7 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1793,7 +1804,7 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1813,9 +1824,9 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1847,7 +1858,7 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1855,19 +1866,25 @@ impl<'a> ProjectLocationCatalogCatalogItemCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogCatalogItemDeleteCall<'a>
-    where  {
+pub struct ProjectLocationCatalogCatalogItemDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogCatalogItemDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogCatalogItemDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
+impl<'a, S> ProjectLocationCatalogCatalogItemDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2014,7 +2031,7 @@ impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2024,7 +2041,7 @@ impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2049,7 +2066,7 @@ impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2069,9 +2086,9 @@ impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2103,7 +2120,7 @@ impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2111,19 +2128,25 @@ impl<'a> ProjectLocationCatalogCatalogItemDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogCatalogItemGetCall<'a>
-    where  {
+pub struct ProjectLocationCatalogCatalogItemGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogCatalogItemGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogCatalogItemGetCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
+impl<'a, S> ProjectLocationCatalogCatalogItemGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2270,7 +2293,7 @@ impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2280,7 +2303,7 @@ impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2305,7 +2328,7 @@ impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2325,9 +2348,9 @@ impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2360,7 +2383,7 @@ impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2373,10 +2396,10 @@ impl<'a> ProjectLocationCatalogCatalogItemGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogCatalogItemImportCall<'a>
-    where  {
+pub struct ProjectLocationCatalogCatalogItemImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1ImportCatalogItemsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2384,9 +2407,15 @@ pub struct ProjectLocationCatalogCatalogItemImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogCatalogItemImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogCatalogItemImportCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
+impl<'a, S> ProjectLocationCatalogCatalogItemImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2546,7 +2575,7 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1ImportCatalogItemsRequest) -> ProjectLocationCatalogCatalogItemImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1ImportCatalogItemsRequest) -> ProjectLocationCatalogCatalogItemImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2556,7 +2585,7 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2566,7 +2595,7 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2591,7 +2620,7 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2611,9 +2640,9 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2645,7 +2674,7 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2656,10 +2685,10 @@ impl<'a> ProjectLocationCatalogCatalogItemImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogCatalogItemListCall<'a>
-    where  {
+pub struct ProjectLocationCatalogCatalogItemListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2669,9 +2698,15 @@ pub struct ProjectLocationCatalogCatalogItemListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogCatalogItemListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogCatalogItemListCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
+impl<'a, S> ProjectLocationCatalogCatalogItemListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2827,28 +2862,28 @@ impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The previous ListCatalogItemsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum number of results to return per page. If zero, the service will choose a reasonable default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogCatalogItemListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogCatalogItemListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Use of this field is not supported by version v1beta1.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2858,7 +2893,7 @@ impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2883,7 +2918,7 @@ impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2903,9 +2938,9 @@ impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2938,7 +2973,7 @@ impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2952,10 +2987,10 @@ impl<'a> ProjectLocationCatalogCatalogItemListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogCatalogItemPatchCall<'a>
-    where  {
+pub struct ProjectLocationCatalogCatalogItemPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1CatalogItem,
     _name: String,
     _update_mask: Option<String>,
@@ -2964,9 +2999,15 @@ pub struct ProjectLocationCatalogCatalogItemPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogCatalogItemPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogCatalogItemPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
+impl<'a, S> ProjectLocationCatalogCatalogItemPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3129,7 +3170,7 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1CatalogItem) -> ProjectLocationCatalogCatalogItemPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1CatalogItem) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3139,14 +3180,14 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Indicates which fields in the provided 'item' to update. If not set, will by default update all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3156,7 +3197,7 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3181,7 +3222,7 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3201,9 +3242,9 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogCatalogItemPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3235,7 +3276,7 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3243,19 +3284,25 @@ impl<'a> ProjectLocationCatalogCatalogItemPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3402,7 +3449,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3412,7 +3459,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3437,7 +3484,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3457,9 +3504,9 @@ impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3491,7 +3538,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3502,10 +3549,10 @@ impl<'a> ProjectLocationCatalogEventStoreOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreOperationListCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3515,9 +3562,15 @@ pub struct ProjectLocationCatalogEventStoreOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3673,28 +3726,28 @@ impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3704,7 +3757,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3729,7 +3782,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3749,9 +3802,9 @@ impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3784,7 +3837,7 @@ impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3797,10 +3850,10 @@ impl<'a> ProjectLocationCatalogEventStoreOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStorePlacementPredictCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStorePlacementPredictCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1PredictRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3808,9 +3861,15 @@ pub struct ProjectLocationCatalogEventStorePlacementPredictCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStorePlacementPredictCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStorePlacementPredictCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3970,7 +4029,7 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1PredictRequest) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1PredictRequest) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3980,7 +4039,7 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3990,7 +4049,7 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4015,7 +4074,7 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4035,9 +4094,9 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStorePlacementPredictCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4070,7 +4129,7 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4083,10 +4142,10 @@ impl<'a> ProjectLocationCatalogEventStorePlacementPredictCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1CreatePredictionApiKeyRegistrationRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4094,9 +4153,15 @@ pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCal
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4256,7 +4321,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1CreatePredictionApiKeyRegistrationRequest) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1CreatePredictionApiKeyRegistrationRequest) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4266,7 +4331,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -4276,7 +4341,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4301,7 +4366,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4321,9 +4386,9 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4355,7 +4420,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4363,19 +4428,25 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationCreateCall<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4522,7 +4593,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4532,7 +4603,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4557,7 +4628,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4577,9 +4648,9 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4611,7 +4682,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4621,10 +4692,10 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationDeleteCall<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4633,9 +4704,15 @@ pub struct ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4788,21 +4865,21 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The previous `ListPredictionApiKeyRegistration.nextPageToken`.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum number of results to return per page. If unset, the service will choose a reasonable default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4812,7 +4889,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4837,7 +4914,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4857,9 +4934,9 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4891,7 +4968,7 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4902,10 +4979,10 @@ impl<'a> ProjectLocationCatalogEventStorePredictionApiKeyRegistrationListCall<'a
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreUserEventCollectCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _parent: String,
     _user_event: Option<String>,
     _uri: Option<String>,
@@ -4915,9 +4992,15 @@ pub struct ProjectLocationCatalogEventStoreUserEventCollectCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5073,28 +5156,28 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. URL encoded UserEvent proto.
     ///
     /// Sets the *user event* query property to the given value.
-    pub fn user_event(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+    pub fn user_event(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {
         self._user_event = Some(new_value.to_string());
         self
     }
     /// Optional. The url including cgi-parameters but excluding the hash fragment. The URL must be truncated to 1.5K bytes to conservatively be under the 2K bytes. This is often more useful than the referer url, because many browsers only send the domain for 3rd party requests.
     ///
     /// Sets the *uri* query property to the given value.
-    pub fn uri(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+    pub fn uri(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {
         self._uri = Some(new_value.to_string());
         self
     }
     /// Optional. The event timestamp in milliseconds. This prevents browser caching of otherwise identical get requests. The name is abbreviated to reduce the payload bytes.
     ///
     /// Sets the *ets* query property to the given value.
-    pub fn ets(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+    pub fn ets(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {
         self._ets = Some(new_value.to_string());
         self
     }
@@ -5104,7 +5187,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5129,7 +5212,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5149,9 +5232,9 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventCollectCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5184,7 +5267,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5197,10 +5280,10 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventCollectCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreUserEventImportCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreUserEventImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1ImportUserEventsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5208,9 +5291,15 @@ pub struct ProjectLocationCatalogEventStoreUserEventImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventImportCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5370,7 +5459,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1ImportUserEventsRequest) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1ImportUserEventsRequest) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5380,7 +5469,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5390,7 +5479,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5415,7 +5504,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5435,9 +5524,9 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5469,7 +5558,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5480,10 +5569,10 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreUserEventListCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreUserEventListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5493,9 +5582,15 @@ pub struct ProjectLocationCatalogEventStoreUserEventListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreUserEventListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5651,28 +5746,28 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The previous ListUserEventsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum number of results to return per page. If zero, the service will choose a reasonable default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filtering expression to specify restrictions over returned events. This is a sequence of terms, where each term applies some kind of a restriction to the returned user events. Use this expression to restrict results to a specific time range, or filter events by eventType. eg: eventTime > "2012-04-23T18:25:43.511Z" eventsMissingCatalogItems eventTime<"2012-04-23T18:25:43.511Z" eventType=search We expect only 3 types of fields: * eventTime: this can be specified a maximum of 2 times, once with a less than operator and once with a greater than operator. The eventTime restrict should result in one contiguous valid eventTime range. * eventType: only 1 eventType restriction can be specified. * eventsMissingCatalogItems: specififying this will restrict results to events for which catalog items were not found in the catalog. The default behavior is to return only those events for which catalog items were found. Some examples of valid filters expressions: * Example 1: eventTime > "2012-04-23T18:25:43.511Z" eventTime < "2012-04-23T18:30:43.511Z" * Example 2: eventTime > "2012-04-23T18:25:43.511Z" eventType = detail-page-view * Example 3: eventsMissingCatalogItems eventType = search eventTime < "2018-04-23T18:30:43.511Z" * Example 4: eventTime > "2012-04-23T18:25:43.511Z" * Example 5: eventType = search * Example 6: eventsMissingCatalogItems
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -5682,7 +5777,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5707,7 +5802,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5727,9 +5822,9 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5762,7 +5857,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5775,10 +5870,10 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreUserEventPurgeCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1PurgeUserEventsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5786,9 +5881,15 @@ pub struct ProjectLocationCatalogEventStoreUserEventPurgeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5948,7 +6049,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1PurgeUserEventsRequest) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1PurgeUserEventsRequest) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5958,7 +6059,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -5968,7 +6069,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5993,7 +6094,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6013,9 +6114,9 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6048,7 +6149,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6061,10 +6162,10 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventPurgeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreUserEventRejoinCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6072,9 +6173,15 @@ pub struct ProjectLocationCatalogEventStoreUserEventRejoinCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6234,7 +6341,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1RejoinUserEventsRequest) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6244,7 +6351,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6254,7 +6361,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6279,7 +6386,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6299,9 +6406,9 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6334,7 +6441,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6347,10 +6454,10 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventRejoinCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogEventStoreUserEventWriteCall<'a>
-    where  {
+pub struct ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1UserEvent,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6358,9 +6465,15 @@ pub struct ProjectLocationCatalogEventStoreUserEventWriteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
+impl<'a, S> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6520,7 +6633,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1UserEvent) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1UserEvent) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6530,7 +6643,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -6540,7 +6653,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6565,7 +6678,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6585,9 +6698,9 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogEventStoreUserEventWriteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6619,7 +6732,7 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6627,19 +6740,25 @@ impl<'a> ProjectLocationCatalogEventStoreUserEventWriteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationCatalogOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
+impl<'a, S> ProjectLocationCatalogOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6786,7 +6905,7 @@ impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6796,7 +6915,7 @@ impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6821,7 +6940,7 @@ impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6841,9 +6960,9 @@ impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6875,7 +6994,7 @@ impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6886,10 +7005,10 @@ impl<'a> ProjectLocationCatalogOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogOperationListCall<'a>
-    where  {
+pub struct ProjectLocationCatalogOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6899,9 +7018,15 @@ pub struct ProjectLocationCatalogOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogOperationListCall<'a> {
+impl<'a, S> ProjectLocationCatalogOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7057,28 +7182,28 @@ impl<'a> ProjectLocationCatalogOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationCatalogOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7088,7 +7213,7 @@ impl<'a> ProjectLocationCatalogOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7113,7 +7238,7 @@ impl<'a> ProjectLocationCatalogOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7133,9 +7258,9 @@ impl<'a> ProjectLocationCatalogOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7167,7 +7292,7 @@ impl<'a> ProjectLocationCatalogOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7177,10 +7302,10 @@ impl<'a> ProjectLocationCatalogOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogListCall<'a>
-    where  {
+pub struct ProjectLocationCatalogListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7189,9 +7314,15 @@ pub struct ProjectLocationCatalogListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogListCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogListCall<'a> {
+impl<'a, S> ProjectLocationCatalogListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7344,21 +7475,21 @@ impl<'a> ProjectLocationCatalogListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCatalogListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListCatalogs` call. Provide this to retrieve the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCatalogListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum number of results to return. If unspecified, defaults to 50. Max allowed value is 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCatalogListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7368,7 +7499,7 @@ impl<'a> ProjectLocationCatalogListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7393,7 +7524,7 @@ impl<'a> ProjectLocationCatalogListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7413,9 +7544,9 @@ impl<'a> ProjectLocationCatalogListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7448,7 +7579,7 @@ impl<'a> ProjectLocationCatalogListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = RecommendationsAI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7462,10 +7593,10 @@ impl<'a> ProjectLocationCatalogListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCatalogPatchCall<'a>
-    where  {
+pub struct ProjectLocationCatalogPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a RecommendationsAI<>,
+    hub: &'a RecommendationsAI<S>,
     _request: GoogleCloudRecommendationengineV1beta1Catalog,
     _name: String,
     _update_mask: Option<String>,
@@ -7474,9 +7605,15 @@ pub struct ProjectLocationCatalogPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCatalogPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCatalogPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationCatalogPatchCall<'a> {
+impl<'a, S> ProjectLocationCatalogPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7639,7 +7776,7 @@ impl<'a> ProjectLocationCatalogPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1Catalog) -> ProjectLocationCatalogPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudRecommendationengineV1beta1Catalog) -> ProjectLocationCatalogPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7649,14 +7786,14 @@ impl<'a> ProjectLocationCatalogPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCatalogPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Indicates which fields in the provided 'catalog' to update. If not set, will only update the catalog_item_level_config field. Currently only fields that can be updated are catalog_item_level_config.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCatalogPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCatalogPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7666,7 +7803,7 @@ impl<'a> ProjectLocationCatalogPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCatalogPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7691,7 +7828,7 @@ impl<'a> ProjectLocationCatalogPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCatalogPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7711,9 +7848,9 @@ impl<'a> ProjectLocationCatalogPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCatalogPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCatalogPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

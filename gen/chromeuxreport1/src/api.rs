@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -49,7 +54,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ChromeUXReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ChromeUXReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -81,34 +86,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ChromeUXReport<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ChromeUXReport<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ChromeUXReport<> {}
+impl<'a, S> client::Hub for ChromeUXReport<S> {}
 
-impl<'a, > ChromeUXReport<> {
+impl<'a, S> ChromeUXReport<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ChromeUXReport<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ChromeUXReport<S> {
         ChromeUXReport {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://chromeuxreport.googleapis.com/".to_string(),
             _root_url: "https://chromeuxreport.googleapis.com/".to_string(),
         }
     }
 
-    pub fn records(&'a self) -> RecordMethods<'a> {
+    pub fn records(&'a self) -> RecordMethods<'a, S> {
         RecordMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -314,22 +319,22 @@ impl client::Part for UrlNormalization {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ChromeUXReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ChromeUXReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `query_record(...)`
 /// // to build up your call.
 /// let rb = hub.records();
 /// # }
 /// ```
-pub struct RecordMethods<'a>
-    where  {
+pub struct RecordMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeUXReport<>,
+    hub: &'a ChromeUXReport<S>,
 }
 
-impl<'a> client::MethodsBuilder for RecordMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for RecordMethods<'a, S> {}
 
-impl<'a> RecordMethods<'a> {
+impl<'a, S> RecordMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -338,7 +343,7 @@ impl<'a> RecordMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn query_record(&self, request: QueryRequest) -> RecordQueryRecordCall<'a> {
+    pub fn query_record(&self, request: QueryRequest) -> RecordQueryRecordCall<'a, S> {
         RecordQueryRecordCall {
             hub: self.hub,
             _request: request,
@@ -379,7 +384,7 @@ impl<'a> RecordMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ChromeUXReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ChromeUXReport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -392,18 +397,24 @@ impl<'a> RecordMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RecordQueryRecordCall<'a>
-    where  {
+pub struct RecordQueryRecordCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ChromeUXReport<>,
+    hub: &'a ChromeUXReport<S>,
     _request: QueryRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for RecordQueryRecordCall<'a> {}
+impl<'a, S> client::CallBuilder for RecordQueryRecordCall<'a, S> {}
 
-impl<'a> RecordQueryRecordCall<'a> {
+impl<'a, S> RecordQueryRecordCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -531,7 +542,7 @@ impl<'a> RecordQueryRecordCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: QueryRequest) -> RecordQueryRecordCall<'a> {
+    pub fn request(mut self, new_value: QueryRequest) -> RecordQueryRecordCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -541,7 +552,7 @@ impl<'a> RecordQueryRecordCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecordQueryRecordCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecordQueryRecordCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -566,7 +577,7 @@ impl<'a> RecordQueryRecordCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RecordQueryRecordCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> RecordQueryRecordCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

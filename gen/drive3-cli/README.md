@@ -1,6 +1,6 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/cli/README.md.mako'
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
 DO NOT EDIT !
 -->
 The `drive3` command-line interface *(CLI)* allows to use most features of the *Google drive* service from the comfort of your terminal.

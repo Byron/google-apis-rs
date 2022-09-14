@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -104,37 +109,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Vault<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Vault<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Vault<> {}
+impl<'a, S> client::Hub for Vault<S> {}
 
-impl<'a, > Vault<> {
+impl<'a, S> Vault<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Vault<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Vault<S> {
         Vault {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://vault.googleapis.com/".to_string(),
             _root_url: "https://vault.googleapis.com/".to_string(),
         }
     }
 
-    pub fn matters(&'a self) -> MatterMethods<'a> {
+    pub fn matters(&'a self) -> MatterMethods<'a, S> {
         MatterMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1343,22 +1348,22 @@ impl client::Part for VoiceOptions {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_permissions(...)`, `close(...)`, `count(...)`, `create(...)`, `delete(...)`, `exports_create(...)`, `exports_delete(...)`, `exports_get(...)`, `exports_list(...)`, `get(...)`, `holds_accounts_create(...)`, `holds_accounts_delete(...)`, `holds_accounts_list(...)`, `holds_add_held_accounts(...)`, `holds_create(...)`, `holds_delete(...)`, `holds_get(...)`, `holds_list(...)`, `holds_remove_held_accounts(...)`, `holds_update(...)`, `list(...)`, `remove_permissions(...)`, `reopen(...)`, `saved_queries_create(...)`, `saved_queries_delete(...)`, `saved_queries_get(...)`, `saved_queries_list(...)`, `undelete(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.matters();
 /// # }
 /// ```
-pub struct MatterMethods<'a>
-    where  {
+pub struct MatterMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
 }
 
-impl<'a> client::MethodsBuilder for MatterMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MatterMethods<'a, S> {}
 
-impl<'a> MatterMethods<'a> {
+impl<'a, S> MatterMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1368,7 +1373,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn exports_create(&self, request: Export, matter_id: &str) -> MatterExportCreateCall<'a> {
+    pub fn exports_create(&self, request: Export, matter_id: &str) -> MatterExportCreateCall<'a, S> {
         MatterExportCreateCall {
             hub: self.hub,
             _request: request,
@@ -1387,7 +1392,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The matter ID.
     /// * `exportId` - The export ID.
-    pub fn exports_delete(&self, matter_id: &str, export_id: &str) -> MatterExportDeleteCall<'a> {
+    pub fn exports_delete(&self, matter_id: &str, export_id: &str) -> MatterExportDeleteCall<'a, S> {
         MatterExportDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1406,7 +1411,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The matter ID.
     /// * `exportId` - The export ID.
-    pub fn exports_get(&self, matter_id: &str, export_id: &str) -> MatterExportGetCall<'a> {
+    pub fn exports_get(&self, matter_id: &str, export_id: &str) -> MatterExportGetCall<'a, S> {
         MatterExportGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1424,7 +1429,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn exports_list(&self, matter_id: &str) -> MatterExportListCall<'a> {
+    pub fn exports_list(&self, matter_id: &str) -> MatterExportListCall<'a, S> {
         MatterExportListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1445,7 +1450,7 @@ impl<'a> MatterMethods<'a> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_accounts_create(&self, request: HeldAccount, matter_id: &str, hold_id: &str) -> MatterHoldAccountCreateCall<'a> {
+    pub fn holds_accounts_create(&self, request: HeldAccount, matter_id: &str, hold_id: &str) -> MatterHoldAccountCreateCall<'a, S> {
         MatterHoldAccountCreateCall {
             hub: self.hub,
             _request: request,
@@ -1466,7 +1471,7 @@ impl<'a> MatterMethods<'a> {
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
     /// * `accountId` - The ID of the account to remove from the hold.
-    pub fn holds_accounts_delete(&self, matter_id: &str, hold_id: &str, account_id: &str) -> MatterHoldAccountDeleteCall<'a> {
+    pub fn holds_accounts_delete(&self, matter_id: &str, hold_id: &str, account_id: &str) -> MatterHoldAccountDeleteCall<'a, S> {
         MatterHoldAccountDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1486,7 +1491,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_accounts_list(&self, matter_id: &str, hold_id: &str) -> MatterHoldAccountListCall<'a> {
+    pub fn holds_accounts_list(&self, matter_id: &str, hold_id: &str) -> MatterHoldAccountListCall<'a, S> {
         MatterHoldAccountListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1506,7 +1511,7 @@ impl<'a> MatterMethods<'a> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_add_held_accounts(&self, request: AddHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldAddHeldAccountCall<'a> {
+    pub fn holds_add_held_accounts(&self, request: AddHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldAddHeldAccountCall<'a, S> {
         MatterHoldAddHeldAccountCall {
             hub: self.hub,
             _request: request,
@@ -1526,7 +1531,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn holds_create(&self, request: Hold, matter_id: &str) -> MatterHoldCreateCall<'a> {
+    pub fn holds_create(&self, request: Hold, matter_id: &str) -> MatterHoldCreateCall<'a, S> {
         MatterHoldCreateCall {
             hub: self.hub,
             _request: request,
@@ -1545,7 +1550,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_delete(&self, matter_id: &str, hold_id: &str) -> MatterHoldDeleteCall<'a> {
+    pub fn holds_delete(&self, matter_id: &str, hold_id: &str) -> MatterHoldDeleteCall<'a, S> {
         MatterHoldDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1564,7 +1569,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_get(&self, matter_id: &str, hold_id: &str) -> MatterHoldGetCall<'a> {
+    pub fn holds_get(&self, matter_id: &str, hold_id: &str) -> MatterHoldGetCall<'a, S> {
         MatterHoldGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1583,7 +1588,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn holds_list(&self, matter_id: &str) -> MatterHoldListCall<'a> {
+    pub fn holds_list(&self, matter_id: &str) -> MatterHoldListCall<'a, S> {
         MatterHoldListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1605,7 +1610,7 @@ impl<'a> MatterMethods<'a> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_remove_held_accounts(&self, request: RemoveHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldRemoveHeldAccountCall<'a> {
+    pub fn holds_remove_held_accounts(&self, request: RemoveHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldRemoveHeldAccountCall<'a, S> {
         MatterHoldRemoveHeldAccountCall {
             hub: self.hub,
             _request: request,
@@ -1626,7 +1631,7 @@ impl<'a> MatterMethods<'a> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The ID of the hold.
-    pub fn holds_update(&self, request: Hold, matter_id: &str, hold_id: &str) -> MatterHoldUpdateCall<'a> {
+    pub fn holds_update(&self, request: Hold, matter_id: &str, hold_id: &str) -> MatterHoldUpdateCall<'a, S> {
         MatterHoldUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1646,7 +1651,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The ID of the matter to create the saved query in.
-    pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a> {
+    pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a, S> {
         MatterSavedQueryCreateCall {
             hub: self.hub,
             _request: request,
@@ -1665,7 +1670,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The ID of the matter to delete the saved query from.
     /// * `savedQueryId` - ID of the saved query to delete.
-    pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a> {
+    pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a, S> {
         MatterSavedQueryDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1684,7 +1689,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `matterId` - The ID of the matter to get the saved query from.
     /// * `savedQueryId` - ID of the saved query to retrieve.
-    pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a> {
+    pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a, S> {
         MatterSavedQueryGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1702,7 +1707,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `matterId` - The ID of the matter to get the saved queries for.
-    pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a> {
+    pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a, S> {
         MatterSavedQueryListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1722,7 +1727,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn add_permissions(&self, request: AddMatterPermissionsRequest, matter_id: &str) -> MatterAddPermissionCall<'a> {
+    pub fn add_permissions(&self, request: AddMatterPermissionsRequest, matter_id: &str) -> MatterAddPermissionCall<'a, S> {
         MatterAddPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1741,7 +1746,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn close(&self, request: CloseMatterRequest, matter_id: &str) -> MatterCloseCall<'a> {
+    pub fn close(&self, request: CloseMatterRequest, matter_id: &str) -> MatterCloseCall<'a, S> {
         MatterCloseCall {
             hub: self.hub,
             _request: request,
@@ -1760,7 +1765,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn count(&self, request: CountArtifactsRequest, matter_id: &str) -> MatterCountCall<'a> {
+    pub fn count(&self, request: CountArtifactsRequest, matter_id: &str) -> MatterCountCall<'a, S> {
         MatterCountCall {
             hub: self.hub,
             _request: request,
@@ -1778,7 +1783,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Matter) -> MatterCreateCall<'a> {
+    pub fn create(&self, request: Matter) -> MatterCreateCall<'a, S> {
         MatterCreateCall {
             hub: self.hub,
             _request: request,
@@ -1795,7 +1800,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID
-    pub fn delete(&self, matter_id: &str) -> MatterDeleteCall<'a> {
+    pub fn delete(&self, matter_id: &str) -> MatterDeleteCall<'a, S> {
         MatterDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1812,7 +1817,7 @@ impl<'a> MatterMethods<'a> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn get(&self, matter_id: &str) -> MatterGetCall<'a> {
+    pub fn get(&self, matter_id: &str) -> MatterGetCall<'a, S> {
         MatterGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1826,7 +1831,7 @@ impl<'a> MatterMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists matters the requestor has access to.
-    pub fn list(&self) -> MatterListCall<'a> {
+    pub fn list(&self) -> MatterListCall<'a, S> {
         MatterListCall {
             hub: self.hub,
             _view: Default::default(),
@@ -1847,7 +1852,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn remove_permissions(&self, request: RemoveMatterPermissionsRequest, matter_id: &str) -> MatterRemovePermissionCall<'a> {
+    pub fn remove_permissions(&self, request: RemoveMatterPermissionsRequest, matter_id: &str) -> MatterRemovePermissionCall<'a, S> {
         MatterRemovePermissionCall {
             hub: self.hub,
             _request: request,
@@ -1866,7 +1871,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn reopen(&self, request: ReopenMatterRequest, matter_id: &str) -> MatterReopenCall<'a> {
+    pub fn reopen(&self, request: ReopenMatterRequest, matter_id: &str) -> MatterReopenCall<'a, S> {
         MatterReopenCall {
             hub: self.hub,
             _request: request,
@@ -1885,7 +1890,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn undelete(&self, request: UndeleteMatterRequest, matter_id: &str) -> MatterUndeleteCall<'a> {
+    pub fn undelete(&self, request: UndeleteMatterRequest, matter_id: &str) -> MatterUndeleteCall<'a, S> {
         MatterUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -1904,7 +1909,7 @@ impl<'a> MatterMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn update(&self, request: Matter, matter_id: &str) -> MatterUpdateCall<'a> {
+    pub fn update(&self, request: Matter, matter_id: &str) -> MatterUpdateCall<'a, S> {
         MatterUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1939,22 +1944,22 @@ impl<'a> MatterMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1964,7 +1969,7 @@ impl<'a> OperationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a> {
+    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a, S> {
         OperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1981,7 +1986,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a> {
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, S> {
         OperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1997,7 +2002,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2014,7 +2019,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn list(&self, name: &str) -> OperationListCall<'a> {
+    pub fn list(&self, name: &str) -> OperationListCall<'a, S> {
         OperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2058,7 +2063,7 @@ impl<'a> OperationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2071,10 +2076,10 @@ impl<'a> OperationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportCreateCall<'a>
-    where  {
+pub struct MatterExportCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: Export,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2082,9 +2087,15 @@ pub struct MatterExportCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterExportCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterExportCreateCall<'a, S> {}
 
-impl<'a> MatterExportCreateCall<'a> {
+impl<'a, S> MatterExportCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2240,7 +2251,7 @@ impl<'a> MatterExportCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Export) -> MatterExportCreateCall<'a> {
+    pub fn request(mut self, new_value: Export) -> MatterExportCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2250,7 +2261,7 @@ impl<'a> MatterExportCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportCreateCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportCreateCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -2260,7 +2271,7 @@ impl<'a> MatterExportCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2285,7 +2296,7 @@ impl<'a> MatterExportCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2305,9 +2316,9 @@ impl<'a> MatterExportCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterExportCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2339,7 +2350,7 @@ impl<'a> MatterExportCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2347,10 +2358,10 @@ impl<'a> MatterExportCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportDeleteCall<'a>
-    where  {
+pub struct MatterExportDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _export_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2358,9 +2369,15 @@ pub struct MatterExportDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterExportDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterExportDeleteCall<'a, S> {}
 
-impl<'a> MatterExportDeleteCall<'a> {
+impl<'a, S> MatterExportDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2504,7 +2521,7 @@ impl<'a> MatterExportDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -2514,7 +2531,7 @@ impl<'a> MatterExportDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn export_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a> {
+    pub fn export_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a, S> {
         self._export_id = new_value.to_string();
         self
     }
@@ -2524,7 +2541,7 @@ impl<'a> MatterExportDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2549,7 +2566,7 @@ impl<'a> MatterExportDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2569,9 +2586,9 @@ impl<'a> MatterExportDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterExportDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2603,7 +2620,7 @@ impl<'a> MatterExportDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2611,10 +2628,10 @@ impl<'a> MatterExportDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportGetCall<'a>
-    where  {
+pub struct MatterExportGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _export_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2622,9 +2639,15 @@ pub struct MatterExportGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterExportGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterExportGetCall<'a, S> {}
 
-impl<'a> MatterExportGetCall<'a> {
+impl<'a, S> MatterExportGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2768,7 +2791,7 @@ impl<'a> MatterExportGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportGetCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportGetCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -2778,7 +2801,7 @@ impl<'a> MatterExportGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn export_id(mut self, new_value: &str) -> MatterExportGetCall<'a> {
+    pub fn export_id(mut self, new_value: &str) -> MatterExportGetCall<'a, S> {
         self._export_id = new_value.to_string();
         self
     }
@@ -2788,7 +2811,7 @@ impl<'a> MatterExportGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2813,7 +2836,7 @@ impl<'a> MatterExportGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2833,9 +2856,9 @@ impl<'a> MatterExportGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterExportGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2867,7 +2890,7 @@ impl<'a> MatterExportGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2877,10 +2900,10 @@ impl<'a> MatterExportGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportListCall<'a>
-    where  {
+pub struct MatterExportListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2889,9 +2912,15 @@ pub struct MatterExportListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterExportListCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterExportListCall<'a, S> {}
 
-impl<'a> MatterExportListCall<'a> {
+impl<'a, S> MatterExportListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3040,21 +3069,21 @@ impl<'a> MatterExportListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportListCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportListCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
     /// The pagination token as returned in the response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterExportListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MatterExportListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The number of exports to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterExportListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> MatterExportListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3064,7 +3093,7 @@ impl<'a> MatterExportListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3089,7 +3118,7 @@ impl<'a> MatterExportListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3109,9 +3138,9 @@ impl<'a> MatterExportListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterExportListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3144,7 +3173,7 @@ impl<'a> MatterExportListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3157,10 +3186,10 @@ impl<'a> MatterExportListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAccountCreateCall<'a>
-    where  {
+pub struct MatterHoldAccountCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: HeldAccount,
     _matter_id: String,
     _hold_id: String,
@@ -3169,9 +3198,15 @@ pub struct MatterHoldAccountCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldAccountCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldAccountCreateCall<'a, S> {}
 
-impl<'a> MatterHoldAccountCreateCall<'a> {
+impl<'a, S> MatterHoldAccountCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3328,7 +3363,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HeldAccount) -> MatterHoldAccountCreateCall<'a> {
+    pub fn request(mut self, new_value: HeldAccount) -> MatterHoldAccountCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3338,7 +3373,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -3348,7 +3383,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -3358,7 +3393,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3383,7 +3418,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3403,9 +3438,9 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldAccountCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3437,7 +3472,7 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3445,10 +3480,10 @@ impl<'a> MatterHoldAccountCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAccountDeleteCall<'a>
-    where  {
+pub struct MatterHoldAccountDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _hold_id: String,
     _account_id: String,
@@ -3457,9 +3492,15 @@ pub struct MatterHoldAccountDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldAccountDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldAccountDeleteCall<'a, S> {}
 
-impl<'a> MatterHoldAccountDeleteCall<'a> {
+impl<'a, S> MatterHoldAccountDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3604,7 +3645,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -3614,7 +3655,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -3624,7 +3665,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a> {
+    pub fn account_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, S> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3634,7 +3675,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3659,7 +3700,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3679,9 +3720,9 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldAccountDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3713,7 +3754,7 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3721,10 +3762,10 @@ impl<'a> MatterHoldAccountDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAccountListCall<'a>
-    where  {
+pub struct MatterHoldAccountListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _hold_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3732,9 +3773,15 @@ pub struct MatterHoldAccountListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldAccountListCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldAccountListCall<'a, S> {}
 
-impl<'a> MatterHoldAccountListCall<'a> {
+impl<'a, S> MatterHoldAccountListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3878,7 +3925,7 @@ impl<'a> MatterHoldAccountListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -3888,7 +3935,7 @@ impl<'a> MatterHoldAccountListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -3898,7 +3945,7 @@ impl<'a> MatterHoldAccountListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3923,7 +3970,7 @@ impl<'a> MatterHoldAccountListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3943,9 +3990,9 @@ impl<'a> MatterHoldAccountListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldAccountListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3978,7 +4025,7 @@ impl<'a> MatterHoldAccountListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3991,10 +4038,10 @@ impl<'a> MatterHoldAccountListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAddHeldAccountCall<'a>
-    where  {
+pub struct MatterHoldAddHeldAccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: AddHeldAccountsRequest,
     _matter_id: String,
     _hold_id: String,
@@ -4003,9 +4050,15 @@ pub struct MatterHoldAddHeldAccountCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldAddHeldAccountCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldAddHeldAccountCall<'a, S> {}
 
-impl<'a> MatterHoldAddHeldAccountCall<'a> {
+impl<'a, S> MatterHoldAddHeldAccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4162,7 +4215,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddHeldAccountsRequest) -> MatterHoldAddHeldAccountCall<'a> {
+    pub fn request(mut self, new_value: AddHeldAccountsRequest) -> MatterHoldAddHeldAccountCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4172,7 +4225,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4182,7 +4235,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -4192,7 +4245,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAddHeldAccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAddHeldAccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4217,7 +4270,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAddHeldAccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAddHeldAccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4237,9 +4290,9 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAddHeldAccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldAddHeldAccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4272,7 +4325,7 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4285,10 +4338,10 @@ impl<'a> MatterHoldAddHeldAccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldCreateCall<'a>
-    where  {
+pub struct MatterHoldCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: Hold,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4296,9 +4349,15 @@ pub struct MatterHoldCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldCreateCall<'a, S> {}
 
-impl<'a> MatterHoldCreateCall<'a> {
+impl<'a, S> MatterHoldCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4454,7 +4513,7 @@ impl<'a> MatterHoldCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Hold) -> MatterHoldCreateCall<'a> {
+    pub fn request(mut self, new_value: Hold) -> MatterHoldCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4464,7 +4523,7 @@ impl<'a> MatterHoldCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldCreateCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldCreateCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4474,7 +4533,7 @@ impl<'a> MatterHoldCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4499,7 +4558,7 @@ impl<'a> MatterHoldCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4519,9 +4578,9 @@ impl<'a> MatterHoldCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4553,7 +4612,7 @@ impl<'a> MatterHoldCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4561,10 +4620,10 @@ impl<'a> MatterHoldCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldDeleteCall<'a>
-    where  {
+pub struct MatterHoldDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _hold_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4572,9 +4631,15 @@ pub struct MatterHoldDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldDeleteCall<'a, S> {}
 
-impl<'a> MatterHoldDeleteCall<'a> {
+impl<'a, S> MatterHoldDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4718,7 +4783,7 @@ impl<'a> MatterHoldDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4728,7 +4793,7 @@ impl<'a> MatterHoldDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -4738,7 +4803,7 @@ impl<'a> MatterHoldDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4763,7 +4828,7 @@ impl<'a> MatterHoldDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4783,9 +4848,9 @@ impl<'a> MatterHoldDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4817,7 +4882,7 @@ impl<'a> MatterHoldDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4826,10 +4891,10 @@ impl<'a> MatterHoldDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldGetCall<'a>
-    where  {
+pub struct MatterHoldGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _hold_id: String,
     _view: Option<String>,
@@ -4838,9 +4903,15 @@ pub struct MatterHoldGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldGetCall<'a, S> {}
 
-impl<'a> MatterHoldGetCall<'a> {
+impl<'a, S> MatterHoldGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4987,7 +5058,7 @@ impl<'a> MatterHoldGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldGetCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4997,14 +5068,14 @@ impl<'a> MatterHoldGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldGetCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
     /// The amount of detail to return for a hold.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> MatterHoldGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -5014,7 +5085,7 @@ impl<'a> MatterHoldGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5039,7 +5110,7 @@ impl<'a> MatterHoldGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5059,9 +5130,9 @@ impl<'a> MatterHoldGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5093,7 +5164,7 @@ impl<'a> MatterHoldGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5104,10 +5175,10 @@ impl<'a> MatterHoldGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldListCall<'a>
-    where  {
+pub struct MatterHoldListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -5117,9 +5188,15 @@ pub struct MatterHoldListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldListCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldListCall<'a, S> {}
 
-impl<'a> MatterHoldListCall<'a> {
+impl<'a, S> MatterHoldListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5271,28 +5348,28 @@ impl<'a> MatterHoldListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldListCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldListCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
     /// The amount of detail to return for a hold.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterHoldListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> MatterHoldListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The pagination token as returned in the response. An empty token means start from the beginning.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterHoldListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MatterHoldListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The number of holds to return in the response, between 0 and 100 inclusive. Leaving this empty, or as 0, is the same as **page_size** = 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterHoldListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> MatterHoldListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5302,7 +5379,7 @@ impl<'a> MatterHoldListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5327,7 +5404,7 @@ impl<'a> MatterHoldListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5347,9 +5424,9 @@ impl<'a> MatterHoldListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5382,7 +5459,7 @@ impl<'a> MatterHoldListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5395,10 +5472,10 @@ impl<'a> MatterHoldListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldRemoveHeldAccountCall<'a>
-    where  {
+pub struct MatterHoldRemoveHeldAccountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: RemoveHeldAccountsRequest,
     _matter_id: String,
     _hold_id: String,
@@ -5407,9 +5484,15 @@ pub struct MatterHoldRemoveHeldAccountCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldRemoveHeldAccountCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldRemoveHeldAccountCall<'a, S> {}
 
-impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
+impl<'a, S> MatterHoldRemoveHeldAccountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5566,7 +5649,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveHeldAccountsRequest) -> MatterHoldRemoveHeldAccountCall<'a> {
+    pub fn request(mut self, new_value: RemoveHeldAccountsRequest) -> MatterHoldRemoveHeldAccountCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5576,7 +5659,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -5586,7 +5669,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -5596,7 +5679,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldRemoveHeldAccountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldRemoveHeldAccountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5621,7 +5704,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldRemoveHeldAccountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldRemoveHeldAccountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5641,9 +5724,9 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldRemoveHeldAccountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldRemoveHeldAccountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5676,7 +5759,7 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5689,10 +5772,10 @@ impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldUpdateCall<'a>
-    where  {
+pub struct MatterHoldUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: Hold,
     _matter_id: String,
     _hold_id: String,
@@ -5701,9 +5784,15 @@ pub struct MatterHoldUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterHoldUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterHoldUpdateCall<'a, S> {}
 
-impl<'a> MatterHoldUpdateCall<'a> {
+impl<'a, S> MatterHoldUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5860,7 +5949,7 @@ impl<'a> MatterHoldUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Hold) -> MatterHoldUpdateCall<'a> {
+    pub fn request(mut self, new_value: Hold) -> MatterHoldUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5870,7 +5959,7 @@ impl<'a> MatterHoldUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -5880,7 +5969,7 @@ impl<'a> MatterHoldUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a, S> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -5890,7 +5979,7 @@ impl<'a> MatterHoldUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5915,7 +6004,7 @@ impl<'a> MatterHoldUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5935,9 +6024,9 @@ impl<'a> MatterHoldUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterHoldUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5970,7 +6059,7 @@ impl<'a> MatterHoldUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5983,10 +6072,10 @@ impl<'a> MatterHoldUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryCreateCall<'a>
-    where  {
+pub struct MatterSavedQueryCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: SavedQuery,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5994,9 +6083,15 @@ pub struct MatterSavedQueryCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterSavedQueryCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterSavedQueryCreateCall<'a, S> {}
 
-impl<'a> MatterSavedQueryCreateCall<'a> {
+impl<'a, S> MatterSavedQueryCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6152,7 +6247,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SavedQuery) -> MatterSavedQueryCreateCall<'a> {
+    pub fn request(mut self, new_value: SavedQuery) -> MatterSavedQueryCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6162,7 +6257,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryCreateCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryCreateCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -6172,7 +6267,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6197,7 +6292,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6217,9 +6312,9 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterSavedQueryCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6251,7 +6346,7 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6259,10 +6354,10 @@ impl<'a> MatterSavedQueryCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryDeleteCall<'a>
-    where  {
+pub struct MatterSavedQueryDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _saved_query_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6270,9 +6365,15 @@ pub struct MatterSavedQueryDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterSavedQueryDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterSavedQueryDeleteCall<'a, S> {}
 
-impl<'a> MatterSavedQueryDeleteCall<'a> {
+impl<'a, S> MatterSavedQueryDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6416,7 +6517,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -6426,7 +6527,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a> {
+    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a, S> {
         self._saved_query_id = new_value.to_string();
         self
     }
@@ -6436,7 +6537,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6461,7 +6562,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6481,9 +6582,9 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterSavedQueryDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6515,7 +6616,7 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6523,10 +6624,10 @@ impl<'a> MatterSavedQueryDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryGetCall<'a>
-    where  {
+pub struct MatterSavedQueryGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _saved_query_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6534,9 +6635,15 @@ pub struct MatterSavedQueryGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterSavedQueryGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterSavedQueryGetCall<'a, S> {}
 
-impl<'a> MatterSavedQueryGetCall<'a> {
+impl<'a, S> MatterSavedQueryGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6680,7 +6787,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -6690,7 +6797,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a> {
+    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a, S> {
         self._saved_query_id = new_value.to_string();
         self
     }
@@ -6700,7 +6807,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6725,7 +6832,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6745,9 +6852,9 @@ impl<'a> MatterSavedQueryGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterSavedQueryGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6779,7 +6886,7 @@ impl<'a> MatterSavedQueryGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6789,10 +6896,10 @@ impl<'a> MatterSavedQueryGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryListCall<'a>
-    where  {
+pub struct MatterSavedQueryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6801,9 +6908,15 @@ pub struct MatterSavedQueryListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterSavedQueryListCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterSavedQueryListCall<'a, S> {}
 
-impl<'a> MatterSavedQueryListCall<'a> {
+impl<'a, S> MatterSavedQueryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6952,21 +7065,21 @@ impl<'a> MatterSavedQueryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryListCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryListCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
     /// The pagination token as returned in the previous response. An empty token means start from the beginning.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterSavedQueryListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MatterSavedQueryListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of saved queries to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterSavedQueryListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> MatterSavedQueryListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6976,7 +7089,7 @@ impl<'a> MatterSavedQueryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7001,7 +7114,7 @@ impl<'a> MatterSavedQueryListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7021,9 +7134,9 @@ impl<'a> MatterSavedQueryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterSavedQueryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7056,7 +7169,7 @@ impl<'a> MatterSavedQueryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7069,10 +7182,10 @@ impl<'a> MatterSavedQueryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterAddPermissionCall<'a>
-    where  {
+pub struct MatterAddPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: AddMatterPermissionsRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7080,9 +7193,15 @@ pub struct MatterAddPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterAddPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterAddPermissionCall<'a, S> {}
 
-impl<'a> MatterAddPermissionCall<'a> {
+impl<'a, S> MatterAddPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7238,7 +7357,7 @@ impl<'a> MatterAddPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddMatterPermissionsRequest) -> MatterAddPermissionCall<'a> {
+    pub fn request(mut self, new_value: AddMatterPermissionsRequest) -> MatterAddPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7248,7 +7367,7 @@ impl<'a> MatterAddPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterAddPermissionCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterAddPermissionCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -7258,7 +7377,7 @@ impl<'a> MatterAddPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterAddPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterAddPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7283,7 +7402,7 @@ impl<'a> MatterAddPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterAddPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterAddPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7303,9 +7422,9 @@ impl<'a> MatterAddPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterAddPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterAddPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7338,7 +7457,7 @@ impl<'a> MatterAddPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7351,10 +7470,10 @@ impl<'a> MatterAddPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterCloseCall<'a>
-    where  {
+pub struct MatterCloseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: CloseMatterRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7362,9 +7481,15 @@ pub struct MatterCloseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterCloseCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterCloseCall<'a, S> {}
 
-impl<'a> MatterCloseCall<'a> {
+impl<'a, S> MatterCloseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7520,7 +7645,7 @@ impl<'a> MatterCloseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloseMatterRequest) -> MatterCloseCall<'a> {
+    pub fn request(mut self, new_value: CloseMatterRequest) -> MatterCloseCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7530,7 +7655,7 @@ impl<'a> MatterCloseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterCloseCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterCloseCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -7540,7 +7665,7 @@ impl<'a> MatterCloseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCloseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCloseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7565,7 +7690,7 @@ impl<'a> MatterCloseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterCloseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterCloseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7585,9 +7710,9 @@ impl<'a> MatterCloseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCloseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterCloseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7620,7 +7745,7 @@ impl<'a> MatterCloseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7633,10 +7758,10 @@ impl<'a> MatterCloseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterCountCall<'a>
-    where  {
+pub struct MatterCountCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: CountArtifactsRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7644,9 +7769,15 @@ pub struct MatterCountCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterCountCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterCountCall<'a, S> {}
 
-impl<'a> MatterCountCall<'a> {
+impl<'a, S> MatterCountCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7802,7 +7933,7 @@ impl<'a> MatterCountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CountArtifactsRequest) -> MatterCountCall<'a> {
+    pub fn request(mut self, new_value: CountArtifactsRequest) -> MatterCountCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7812,7 +7943,7 @@ impl<'a> MatterCountCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterCountCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterCountCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -7822,7 +7953,7 @@ impl<'a> MatterCountCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCountCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCountCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7847,7 +7978,7 @@ impl<'a> MatterCountCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterCountCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterCountCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7867,9 +7998,9 @@ impl<'a> MatterCountCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCountCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterCountCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7902,7 +8033,7 @@ impl<'a> MatterCountCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7915,19 +8046,25 @@ impl<'a> MatterCountCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterCreateCall<'a>
-    where  {
+pub struct MatterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: Matter,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterCreateCall<'a, S> {}
 
-impl<'a> MatterCreateCall<'a> {
+impl<'a, S> MatterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8061,7 +8198,7 @@ impl<'a> MatterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Matter) -> MatterCreateCall<'a> {
+    pub fn request(mut self, new_value: Matter) -> MatterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8071,7 +8208,7 @@ impl<'a> MatterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8096,7 +8233,7 @@ impl<'a> MatterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8116,9 +8253,9 @@ impl<'a> MatterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8150,7 +8287,7 @@ impl<'a> MatterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8158,19 +8295,25 @@ impl<'a> MatterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterDeleteCall<'a>
-    where  {
+pub struct MatterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterDeleteCall<'a, S> {}
 
-impl<'a> MatterDeleteCall<'a> {
+impl<'a, S> MatterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8313,7 +8456,7 @@ impl<'a> MatterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterDeleteCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterDeleteCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -8323,7 +8466,7 @@ impl<'a> MatterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8348,7 +8491,7 @@ impl<'a> MatterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8368,9 +8511,9 @@ impl<'a> MatterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8402,7 +8545,7 @@ impl<'a> MatterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8411,10 +8554,10 @@ impl<'a> MatterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterGetCall<'a>
-    where  {
+pub struct MatterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _matter_id: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8422,9 +8565,15 @@ pub struct MatterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterGetCall<'a, S> {}
 
-impl<'a> MatterGetCall<'a> {
+impl<'a, S> MatterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8570,14 +8719,14 @@ impl<'a> MatterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterGetCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterGetCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
     /// Specifies how much information about the matter to return in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> MatterGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -8587,7 +8736,7 @@ impl<'a> MatterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8612,7 +8761,7 @@ impl<'a> MatterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8632,9 +8781,9 @@ impl<'a> MatterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8666,7 +8815,7 @@ impl<'a> MatterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8678,10 +8827,10 @@ impl<'a> MatterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterListCall<'a>
-    where  {
+pub struct MatterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _view: Option<String>,
     _state: Option<String>,
     _page_token: Option<String>,
@@ -8691,9 +8840,15 @@ pub struct MatterListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterListCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterListCall<'a, S> {}
 
-impl<'a> MatterListCall<'a> {
+impl<'a, S> MatterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8823,28 +8978,28 @@ impl<'a> MatterListCall<'a> {
     /// Specifies how much information about the matter to return in response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> MatterListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// If set, lists only matters with the specified state. The default lists matters of all states.
     ///
     /// Sets the *state* query property to the given value.
-    pub fn state(mut self, new_value: &str) -> MatterListCall<'a> {
+    pub fn state(mut self, new_value: &str) -> MatterListCall<'a, S> {
         self._state = Some(new_value.to_string());
         self
     }
     /// The pagination token as returned in the response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MatterListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The number of matters to return in the response. Default and maximum are 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> MatterListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -8854,7 +9009,7 @@ impl<'a> MatterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8879,7 +9034,7 @@ impl<'a> MatterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8899,9 +9054,9 @@ impl<'a> MatterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8934,7 +9089,7 @@ impl<'a> MatterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8947,10 +9102,10 @@ impl<'a> MatterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterRemovePermissionCall<'a>
-    where  {
+pub struct MatterRemovePermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: RemoveMatterPermissionsRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8958,9 +9113,15 @@ pub struct MatterRemovePermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterRemovePermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterRemovePermissionCall<'a, S> {}
 
-impl<'a> MatterRemovePermissionCall<'a> {
+impl<'a, S> MatterRemovePermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9116,7 +9277,7 @@ impl<'a> MatterRemovePermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveMatterPermissionsRequest) -> MatterRemovePermissionCall<'a> {
+    pub fn request(mut self, new_value: RemoveMatterPermissionsRequest) -> MatterRemovePermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9126,7 +9287,7 @@ impl<'a> MatterRemovePermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterRemovePermissionCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterRemovePermissionCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9136,7 +9297,7 @@ impl<'a> MatterRemovePermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterRemovePermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterRemovePermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9161,7 +9322,7 @@ impl<'a> MatterRemovePermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterRemovePermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterRemovePermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9181,9 +9342,9 @@ impl<'a> MatterRemovePermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterRemovePermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterRemovePermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9216,7 +9377,7 @@ impl<'a> MatterRemovePermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9229,10 +9390,10 @@ impl<'a> MatterRemovePermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterReopenCall<'a>
-    where  {
+pub struct MatterReopenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: ReopenMatterRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9240,9 +9401,15 @@ pub struct MatterReopenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterReopenCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterReopenCall<'a, S> {}
 
-impl<'a> MatterReopenCall<'a> {
+impl<'a, S> MatterReopenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9398,7 +9565,7 @@ impl<'a> MatterReopenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReopenMatterRequest) -> MatterReopenCall<'a> {
+    pub fn request(mut self, new_value: ReopenMatterRequest) -> MatterReopenCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9408,7 +9575,7 @@ impl<'a> MatterReopenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterReopenCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterReopenCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9418,7 +9585,7 @@ impl<'a> MatterReopenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterReopenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterReopenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9443,7 +9610,7 @@ impl<'a> MatterReopenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterReopenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterReopenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9463,9 +9630,9 @@ impl<'a> MatterReopenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterReopenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterReopenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9498,7 +9665,7 @@ impl<'a> MatterReopenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9511,10 +9678,10 @@ impl<'a> MatterReopenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterUndeleteCall<'a>
-    where  {
+pub struct MatterUndeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: UndeleteMatterRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9522,9 +9689,15 @@ pub struct MatterUndeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterUndeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterUndeleteCall<'a, S> {}
 
-impl<'a> MatterUndeleteCall<'a> {
+impl<'a, S> MatterUndeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9680,7 +9853,7 @@ impl<'a> MatterUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteMatterRequest) -> MatterUndeleteCall<'a> {
+    pub fn request(mut self, new_value: UndeleteMatterRequest) -> MatterUndeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9690,7 +9863,7 @@ impl<'a> MatterUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterUndeleteCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterUndeleteCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9700,7 +9873,7 @@ impl<'a> MatterUndeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUndeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUndeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9725,7 +9898,7 @@ impl<'a> MatterUndeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterUndeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterUndeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9745,9 +9918,9 @@ impl<'a> MatterUndeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterUndeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterUndeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9780,7 +9953,7 @@ impl<'a> MatterUndeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9793,10 +9966,10 @@ impl<'a> MatterUndeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterUpdateCall<'a>
-    where  {
+pub struct MatterUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: Matter,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9804,9 +9977,15 @@ pub struct MatterUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MatterUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for MatterUpdateCall<'a, S> {}
 
-impl<'a> MatterUpdateCall<'a> {
+impl<'a, S> MatterUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9962,7 +10141,7 @@ impl<'a> MatterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Matter) -> MatterUpdateCall<'a> {
+    pub fn request(mut self, new_value: Matter) -> MatterUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9972,7 +10151,7 @@ impl<'a> MatterUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterUpdateCall<'a> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterUpdateCall<'a, S> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9982,7 +10161,7 @@ impl<'a> MatterUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10007,7 +10186,7 @@ impl<'a> MatterUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10027,9 +10206,9 @@ impl<'a> MatterUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MatterUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10062,7 +10241,7 @@ impl<'a> MatterUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10075,19 +10254,25 @@ impl<'a> MatterUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationCancelCall<'a>
-    where  {
+pub struct OperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for OperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationCancelCall<'a, S> {}
 
-impl<'a> OperationCancelCall<'a> {
+impl<'a, S> OperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10241,7 +10426,7 @@ impl<'a> OperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10251,7 +10436,7 @@ impl<'a> OperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10261,7 +10446,7 @@ impl<'a> OperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10286,7 +10471,7 @@ impl<'a> OperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10317,7 +10502,7 @@ impl<'a> OperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10325,18 +10510,24 @@ impl<'a> OperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationDeleteCall<'a>
-    where  {
+pub struct OperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for OperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationDeleteCall<'a, S> {}
 
-impl<'a> OperationDeleteCall<'a> {
+impl<'a, S> OperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10477,7 +10668,7 @@ impl<'a> OperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10487,7 +10678,7 @@ impl<'a> OperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10512,7 +10703,7 @@ impl<'a> OperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10543,7 +10734,7 @@ impl<'a> OperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10551,19 +10742,25 @@ impl<'a> OperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10710,7 +10907,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10720,7 +10917,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10745,7 +10942,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10765,9 +10962,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10799,7 +10996,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Vault::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10810,10 +11007,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a>
-    where  {
+pub struct OperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Vault<>,
+    hub: &'a Vault<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10822,9 +11019,15 @@ pub struct OperationListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for OperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationListCall<'a, S> {}
 
-impl<'a> OperationListCall<'a> {
+impl<'a, S> OperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10974,28 +11177,28 @@ impl<'a> OperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11005,7 +11208,7 @@ impl<'a> OperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11030,7 +11233,7 @@ impl<'a> OperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

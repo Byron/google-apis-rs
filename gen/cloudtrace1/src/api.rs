@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -78,7 +83,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -105,34 +110,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudTrace<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudTrace<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudTrace<> {}
+impl<'a, S> client::Hub for CloudTrace<S> {}
 
-impl<'a, > CloudTrace<> {
+impl<'a, S> CloudTrace<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudTrace<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudTrace<S> {
         CloudTrace {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://cloudtrace.googleapis.com/".to_string(),
             _root_url: "https://cloudtrace.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -293,22 +298,22 @@ impl client::RequestValue for Traces {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `patch_traces(...)`, `traces_get(...)` and `traces_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -318,7 +323,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `projectId` - Required. ID of the Cloud project where the trace data is stored.
     /// * `traceId` - Required. ID of the trace to return.
-    pub fn traces_get(&self, project_id: &str, trace_id: &str) -> ProjectTraceGetCall<'a> {
+    pub fn traces_get(&self, project_id: &str, trace_id: &str) -> ProjectTraceGetCall<'a, S> {
         ProjectTraceGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -336,7 +341,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `projectId` - Required. ID of the Cloud project where the trace data is stored.
-    pub fn traces_list(&self, project_id: &str) -> ProjectTraceListCall<'a> {
+    pub fn traces_list(&self, project_id: &str) -> ProjectTraceListCall<'a, S> {
         ProjectTraceListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -361,7 +366,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - Required. ID of the Cloud project where the trace data is stored.
-    pub fn patch_traces(&self, request: Traces, project_id: &str) -> ProjectPatchTraceCall<'a> {
+    pub fn patch_traces(&self, request: Traces, project_id: &str) -> ProjectPatchTraceCall<'a, S> {
         ProjectPatchTraceCall {
             hub: self.hub,
             _request: request,
@@ -403,7 +408,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -411,10 +416,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTraceGetCall<'a>
-    where  {
+pub struct ProjectTraceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
     _project_id: String,
     _trace_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -422,9 +427,15 @@ pub struct ProjectTraceGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTraceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTraceGetCall<'a, S> {}
 
-impl<'a> ProjectTraceGetCall<'a> {
+impl<'a, S> ProjectTraceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -568,7 +579,7 @@ impl<'a> ProjectTraceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTraceGetCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTraceGetCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -578,7 +589,7 @@ impl<'a> ProjectTraceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trace_id(mut self, new_value: &str) -> ProjectTraceGetCall<'a> {
+    pub fn trace_id(mut self, new_value: &str) -> ProjectTraceGetCall<'a, S> {
         self._trace_id = new_value.to_string();
         self
     }
@@ -588,7 +599,7 @@ impl<'a> ProjectTraceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -613,7 +624,7 @@ impl<'a> ProjectTraceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -633,9 +644,9 @@ impl<'a> ProjectTraceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTraceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTraceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -667,7 +678,7 @@ impl<'a> ProjectTraceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -682,10 +693,10 @@ impl<'a> ProjectTraceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTraceListCall<'a>
-    where  {
+pub struct ProjectTraceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
     _project_id: String,
     _view: Option<String>,
     _start_time: Option<String>,
@@ -699,9 +710,15 @@ pub struct ProjectTraceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectTraceListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectTraceListCall<'a, S> {}
 
-impl<'a> ProjectTraceListCall<'a> {
+impl<'a, S> ProjectTraceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -865,56 +882,56 @@ impl<'a> ProjectTraceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
     /// Optional. Type of data returned for traces in the list. Default is `MINIMAL`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Start of the time interval (inclusive) during which the trace data was collected from the application.
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn start_time(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._start_time = Some(new_value.to_string());
         self
     }
     /// Token identifying the page of results to return. If provided, use the value of the `next_page_token` field from a previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Maximum number of traces to return. If not specified or <= 0, the implementation selects a reasonable value. The implementation may return fewer traces than the requested page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectTraceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectTraceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Field used to sort the returned traces. Can be one of the following: * `trace_id` * `name` (`name` field of root span in the trace) * `duration` (difference between `end_time` and `start_time` fields of the root span) * `start` (`start_time` field of the root span) Descending order can be specified by appending `desc` to the sort field (for example, `name desc`). Only one sort field is permitted.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. A filter against labels for the request. By default, searches use prefix matching. To specify exact match, prepend a plus symbol (`+`) to the search term. Multiple terms are ANDed. Syntax: * `root:NAME_PREFIX` or `NAME_PREFIX`: Return traces where any root span starts with `NAME_PREFIX`. * `+root:NAME` or `+NAME`: Return traces where any root span's name is exactly `NAME`. * `span:NAME_PREFIX`: Return traces where any span starts with `NAME_PREFIX`. * `+span:NAME`: Return traces where any span's name is exactly `NAME`. * `latency:DURATION`: Return traces whose overall latency is greater or equal to than `DURATION`. Accepted units are nanoseconds (`ns`), milliseconds (`ms`), and seconds (`s`). Default is `ms`. For example, `latency:24ms` returns traces whose overall latency is greater than or equal to 24 milliseconds. * `label:LABEL_KEY`: Return all traces containing the specified label key (exact match, case-sensitive) regardless of the key:value pair's value (including empty values). * `LABEL_KEY:VALUE_PREFIX`: Return all traces containing the specified label key (exact match, case-sensitive) whose value starts with `VALUE_PREFIX`. Both a key and a value must be specified. * `+LABEL_KEY:VALUE`: Return all traces containing a key:value pair exactly matching the specified text. Both a key and a value must be specified. * `method:VALUE`: Equivalent to `/http/method:VALUE`. * `url:VALUE`: Equivalent to `/http/url:VALUE`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// End of the time interval (inclusive) during which the trace data was collected from the application.
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> ProjectTraceListCall<'a> {
+    pub fn end_time(mut self, new_value: &str) -> ProjectTraceListCall<'a, S> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -924,7 +941,7 @@ impl<'a> ProjectTraceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTraceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -949,7 +966,7 @@ impl<'a> ProjectTraceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -969,9 +986,9 @@ impl<'a> ProjectTraceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTraceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectTraceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1004,7 +1021,7 @@ impl<'a> ProjectTraceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudTrace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1017,10 +1034,10 @@ impl<'a> ProjectTraceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectPatchTraceCall<'a>
-    where  {
+pub struct ProjectPatchTraceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudTrace<>,
+    hub: &'a CloudTrace<S>,
     _request: Traces,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1028,9 +1045,15 @@ pub struct ProjectPatchTraceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectPatchTraceCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectPatchTraceCall<'a, S> {}
 
-impl<'a> ProjectPatchTraceCall<'a> {
+impl<'a, S> ProjectPatchTraceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1186,7 +1209,7 @@ impl<'a> ProjectPatchTraceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Traces) -> ProjectPatchTraceCall<'a> {
+    pub fn request(mut self, new_value: Traces) -> ProjectPatchTraceCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1196,7 +1219,7 @@ impl<'a> ProjectPatchTraceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectPatchTraceCall<'a> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectPatchTraceCall<'a, S> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1206,7 +1229,7 @@ impl<'a> ProjectPatchTraceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectPatchTraceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectPatchTraceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1231,7 +1254,7 @@ impl<'a> ProjectPatchTraceCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectPatchTraceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectPatchTraceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1251,9 +1274,9 @@ impl<'a> ProjectPatchTraceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectPatchTraceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectPatchTraceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

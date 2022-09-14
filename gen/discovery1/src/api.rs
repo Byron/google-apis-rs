@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -75,34 +80,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Discovery<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Discovery<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Discovery<> {}
+impl<'a, S> client::Hub for Discovery<S> {}
 
-impl<'a, > Discovery<> {
+impl<'a, S> Discovery<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Discovery<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Discovery<S> {
         Discovery {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/discovery/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn apis(&'a self) -> ApiMethods<'a> {
+    pub fn apis(&'a self) -> ApiMethods<'a, S> {
         ApiMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -651,22 +656,22 @@ impl client::Part for RestMethodResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_rest(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.apis();
 /// # }
 /// ```
-pub struct ApiMethods<'a>
-    where  {
+pub struct ApiMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Discovery<>,
+    hub: &'a Discovery<S>,
 }
 
-impl<'a> client::MethodsBuilder for ApiMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ApiMethods<'a, S> {}
 
-impl<'a> ApiMethods<'a> {
+impl<'a, S> ApiMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -676,7 +681,7 @@ impl<'a> ApiMethods<'a> {
     ///
     /// * `api` - The name of the API.
     /// * `version` - The version of the API.
-    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a> {
+    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a, S> {
         ApiGetRestCall {
             hub: self.hub,
             _api: api.to_string(),
@@ -689,7 +694,7 @@ impl<'a> ApiMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieve the list of APIs supported at this endpoint.
-    pub fn list(&self) -> ApiListCall<'a> {
+    pub fn list(&self) -> ApiListCall<'a, S> {
         ApiListCall {
             hub: self.hub,
             _preferred: Default::default(),
@@ -730,7 +735,7 @@ impl<'a> ApiMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -738,19 +743,25 @@ impl<'a> ApiMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApiGetRestCall<'a>
-    where  {
+pub struct ApiGetRestCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Discovery<>,
+    hub: &'a Discovery<S>,
     _api: String,
     _version: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ApiGetRestCall<'a> {}
+impl<'a, S> client::CallBuilder for ApiGetRestCall<'a, S> {}
 
-impl<'a> ApiGetRestCall<'a> {
+impl<'a, S> ApiGetRestCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -879,7 +890,7 @@ impl<'a> ApiGetRestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a> {
+    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, S> {
         self._api = new_value.to_string();
         self
     }
@@ -889,7 +900,7 @@ impl<'a> ApiGetRestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a> {
+    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, S> {
         self._version = new_value.to_string();
         self
     }
@@ -899,7 +910,7 @@ impl<'a> ApiGetRestCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiGetRestCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiGetRestCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -920,7 +931,7 @@ impl<'a> ApiGetRestCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -951,7 +962,7 @@ impl<'a> ApiGetRestCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -961,19 +972,25 @@ impl<'a> ApiGetRestCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApiListCall<'a>
-    where  {
+pub struct ApiListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Discovery<>,
+    hub: &'a Discovery<S>,
     _preferred: Option<bool>,
     _name: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for ApiListCall<'a> {}
+impl<'a, S> client::CallBuilder for ApiListCall<'a, S> {}
 
-impl<'a> ApiListCall<'a> {
+impl<'a, S> ApiListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1082,14 +1099,14 @@ impl<'a> ApiListCall<'a> {
     /// Return only the preferred version of an API.
     ///
     /// Sets the *preferred* query property to the given value.
-    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a> {
+    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, S> {
         self._preferred = Some(new_value);
         self
     }
     /// Only include APIs with the given name.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ApiListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ApiListCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -1099,7 +1116,7 @@ impl<'a> ApiListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1120,7 +1137,7 @@ impl<'a> ApiListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

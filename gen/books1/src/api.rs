@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -105,70 +110,70 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Books<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Books<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Books<> {}
+impl<'a, S> client::Hub for Books<S> {}
 
-impl<'a, > Books<> {
+impl<'a, S> Books<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Books<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Books<S> {
         Books {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://books.googleapis.com/".to_string(),
             _root_url: "https://books.googleapis.com/".to_string(),
         }
     }
 
-    pub fn bookshelves(&'a self) -> BookshelveMethods<'a> {
+    pub fn bookshelves(&'a self) -> BookshelveMethods<'a, S> {
         BookshelveMethods { hub: &self }
     }
-    pub fn cloudloading(&'a self) -> CloudloadingMethods<'a> {
+    pub fn cloudloading(&'a self) -> CloudloadingMethods<'a, S> {
         CloudloadingMethods { hub: &self }
     }
-    pub fn dictionary(&'a self) -> DictionaryMethods<'a> {
+    pub fn dictionary(&'a self) -> DictionaryMethods<'a, S> {
         DictionaryMethods { hub: &self }
     }
-    pub fn familysharing(&'a self) -> FamilysharingMethods<'a> {
+    pub fn familysharing(&'a self) -> FamilysharingMethods<'a, S> {
         FamilysharingMethods { hub: &self }
     }
-    pub fn layers(&'a self) -> LayerMethods<'a> {
+    pub fn layers(&'a self) -> LayerMethods<'a, S> {
         LayerMethods { hub: &self }
     }
-    pub fn myconfig(&'a self) -> MyconfigMethods<'a> {
+    pub fn myconfig(&'a self) -> MyconfigMethods<'a, S> {
         MyconfigMethods { hub: &self }
     }
-    pub fn mylibrary(&'a self) -> MylibraryMethods<'a> {
+    pub fn mylibrary(&'a self) -> MylibraryMethods<'a, S> {
         MylibraryMethods { hub: &self }
     }
-    pub fn notification(&'a self) -> NotificationMethods<'a> {
+    pub fn notification(&'a self) -> NotificationMethods<'a, S> {
         NotificationMethods { hub: &self }
     }
-    pub fn onboarding(&'a self) -> OnboardingMethods<'a> {
+    pub fn onboarding(&'a self) -> OnboardingMethods<'a, S> {
         OnboardingMethods { hub: &self }
     }
-    pub fn personalizedstream(&'a self) -> PersonalizedstreamMethods<'a> {
+    pub fn personalizedstream(&'a self) -> PersonalizedstreamMethods<'a, S> {
         PersonalizedstreamMethods { hub: &self }
     }
-    pub fn promooffer(&'a self) -> PromoofferMethods<'a> {
+    pub fn promooffer(&'a self) -> PromoofferMethods<'a, S> {
         PromoofferMethods { hub: &self }
     }
-    pub fn series(&'a self) -> SeryMethods<'a> {
+    pub fn series(&'a self) -> SeryMethods<'a, S> {
         SeryMethods { hub: &self }
     }
-    pub fn volumes(&'a self) -> VolumeMethods<'a> {
+    pub fn volumes(&'a self) -> VolumeMethods<'a, S> {
         VolumeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2942,22 +2947,22 @@ impl client::Part for VolumeseriesinfoVolumeSeriesIssue {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `list(...)` and `volumes_list(...)`
 /// // to build up your call.
 /// let rb = hub.bookshelves();
 /// # }
 /// ```
-pub struct BookshelveMethods<'a>
-    where  {
+pub struct BookshelveMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for BookshelveMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for BookshelveMethods<'a, S> {}
 
-impl<'a> BookshelveMethods<'a> {
+impl<'a, S> BookshelveMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2967,7 +2972,7 @@ impl<'a> BookshelveMethods<'a> {
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelf volumes.
     /// * `shelf` - ID of bookshelf to retrieve volumes.
-    pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelveVolumeListCall<'a> {
+    pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelveVolumeListCall<'a, S> {
         BookshelveVolumeListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2990,7 +2995,7 @@ impl<'a> BookshelveMethods<'a> {
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelves.
     /// * `shelf` - ID of bookshelf to retrieve.
-    pub fn get(&self, user_id: &str, shelf: &str) -> BookshelveGetCall<'a> {
+    pub fn get(&self, user_id: &str, shelf: &str) -> BookshelveGetCall<'a, S> {
         BookshelveGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -3009,7 +3014,7 @@ impl<'a> BookshelveMethods<'a> {
     /// # Arguments
     ///
     /// * `userId` - ID of user for whom to retrieve bookshelves.
-    pub fn list(&self, user_id: &str) -> BookshelveListCall<'a> {
+    pub fn list(&self, user_id: &str) -> BookshelveListCall<'a, S> {
         BookshelveListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -3044,27 +3049,27 @@ impl<'a> BookshelveMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_book(...)`, `delete_book(...)` and `update_book(...)`
 /// // to build up your call.
 /// let rb = hub.cloudloading();
 /// # }
 /// ```
-pub struct CloudloadingMethods<'a>
-    where  {
+pub struct CloudloadingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for CloudloadingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CloudloadingMethods<'a, S> {}
 
-impl<'a> CloudloadingMethods<'a> {
+impl<'a, S> CloudloadingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Add a user-upload volume and triggers processing.
-    pub fn add_book(&self) -> CloudloadingAddBookCall<'a> {
+    pub fn add_book(&self) -> CloudloadingAddBookCall<'a, S> {
         CloudloadingAddBookCall {
             hub: self.hub,
             _upload_client_token: Default::default(),
@@ -3084,7 +3089,7 @@ impl<'a> CloudloadingMethods<'a> {
     /// # Arguments
     ///
     /// * `volumeId` - The id of the book to be removed.
-    pub fn delete_book(&self, volume_id: &str) -> CloudloadingDeleteBookCall<'a> {
+    pub fn delete_book(&self, volume_id: &str) -> CloudloadingDeleteBookCall<'a, S> {
         CloudloadingDeleteBookCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3101,7 +3106,7 @@ impl<'a> CloudloadingMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_book(&self, request: BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a> {
+    pub fn update_book(&self, request: BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, S> {
         CloudloadingUpdateBookCall {
             hub: self.hub,
             _request: request,
@@ -3135,22 +3140,22 @@ impl<'a> CloudloadingMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list_offline_metadata(...)`
 /// // to build up your call.
 /// let rb = hub.dictionary();
 /// # }
 /// ```
-pub struct DictionaryMethods<'a>
-    where  {
+pub struct DictionaryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for DictionaryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for DictionaryMethods<'a, S> {}
 
-impl<'a> DictionaryMethods<'a> {
+impl<'a, S> DictionaryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3159,7 +3164,7 @@ impl<'a> DictionaryMethods<'a> {
     /// # Arguments
     ///
     /// * `cpksver` - The device/version ID from which to request the data.
-    pub fn list_offline_metadata(&self, cpksver: &str) -> DictionaryListOfflineMetadataCall<'a> {
+    pub fn list_offline_metadata(&self, cpksver: &str) -> DictionaryListOfflineMetadataCall<'a, S> {
         DictionaryListOfflineMetadataCall {
             hub: self.hub,
             _cpksver: cpksver.to_string(),
@@ -3193,27 +3198,27 @@ impl<'a> DictionaryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_family_info(...)`, `share(...)` and `unshare(...)`
 /// // to build up your call.
 /// let rb = hub.familysharing();
 /// # }
 /// ```
-pub struct FamilysharingMethods<'a>
-    where  {
+pub struct FamilysharingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for FamilysharingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for FamilysharingMethods<'a, S> {}
 
-impl<'a> FamilysharingMethods<'a> {
+impl<'a, S> FamilysharingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets information regarding the family that the user is part of.
-    pub fn get_family_info(&self) -> FamilysharingGetFamilyInfoCall<'a> {
+    pub fn get_family_info(&self) -> FamilysharingGetFamilyInfoCall<'a, S> {
         FamilysharingGetFamilyInfoCall {
             hub: self.hub,
             _source: Default::default(),
@@ -3226,7 +3231,7 @@ impl<'a> FamilysharingMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Initiates sharing of the content with the user's family. Empty response indicates success.
-    pub fn share(&self) -> FamilysharingShareCall<'a> {
+    pub fn share(&self) -> FamilysharingShareCall<'a, S> {
         FamilysharingShareCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -3241,7 +3246,7 @@ impl<'a> FamilysharingMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Initiates revoking content that has already been shared with the user's family. Empty response indicates success.
-    pub fn unshare(&self) -> FamilysharingUnshareCall<'a> {
+    pub fn unshare(&self) -> FamilysharingUnshareCall<'a, S> {
         FamilysharingUnshareCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -3277,22 +3282,22 @@ impl<'a> FamilysharingMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `annotation_data_get(...)`, `annotation_data_list(...)`, `get(...)`, `list(...)`, `volume_annotations_get(...)` and `volume_annotations_list(...)`
 /// // to build up your call.
 /// let rb = hub.layers();
 /// # }
 /// ```
-pub struct LayerMethods<'a>
-    where  {
+pub struct LayerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for LayerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LayerMethods<'a, S> {}
 
-impl<'a> LayerMethods<'a> {
+impl<'a, S> LayerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3304,7 +3309,7 @@ impl<'a> LayerMethods<'a> {
     /// * `layerId` - The ID for the layer to get the annotations.
     /// * `annotationDataId` - The ID of the annotation data to retrieve.
     /// * `contentVersion` - The content version for the volume you are trying to retrieve.
-    pub fn annotation_data_get(&self, volume_id: &str, layer_id: &str, annotation_data_id: &str, content_version: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn annotation_data_get(&self, volume_id: &str, layer_id: &str, annotation_data_id: &str, content_version: &str) -> LayerAnnotationDataGetCall<'a, S> {
         LayerAnnotationDataGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3332,7 +3337,7 @@ impl<'a> LayerMethods<'a> {
     /// * `volumeId` - The volume to retrieve annotation data for.
     /// * `layerId` - The ID for the layer to get the annotation data.
     /// * `contentVersion` - The content version for the requested volume.
-    pub fn annotation_data_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn annotation_data_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerAnnotationDataListCall<'a, S> {
         LayerAnnotationDataListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3363,7 +3368,7 @@ impl<'a> LayerMethods<'a> {
     /// * `volumeId` - The volume to retrieve annotations for.
     /// * `layerId` - The ID for the layer to get the annotations.
     /// * `annotationId` - The ID of the volume annotation to retrieve.
-    pub fn volume_annotations_get(&self, volume_id: &str, layer_id: &str, annotation_id: &str) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn volume_annotations_get(&self, volume_id: &str, layer_id: &str, annotation_id: &str) -> LayerVolumeAnnotationGetCall<'a, S> {
         LayerVolumeAnnotationGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3386,7 +3391,7 @@ impl<'a> LayerMethods<'a> {
     /// * `volumeId` - The volume to retrieve annotations for.
     /// * `layerId` - The ID for the layer to get the annotations.
     /// * `contentVersion` - The content version for the requested volume.
-    pub fn volume_annotations_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn volume_annotations_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         LayerVolumeAnnotationListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3418,7 +3423,7 @@ impl<'a> LayerMethods<'a> {
     ///
     /// * `volumeId` - The volume to retrieve layers for.
     /// * `summaryId` - The ID for the layer to get the summary for.
-    pub fn get(&self, volume_id: &str, summary_id: &str) -> LayerGetCall<'a> {
+    pub fn get(&self, volume_id: &str, summary_id: &str) -> LayerGetCall<'a, S> {
         LayerGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3438,7 +3443,7 @@ impl<'a> LayerMethods<'a> {
     /// # Arguments
     ///
     /// * `volumeId` - The volume to retrieve layers for.
-    pub fn list(&self, volume_id: &str) -> LayerListCall<'a> {
+    pub fn list(&self, volume_id: &str) -> LayerListCall<'a, S> {
         LayerListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3476,27 +3481,27 @@ impl<'a> LayerMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_user_settings(...)`, `release_download_access(...)`, `request_access(...)`, `sync_volume_licenses(...)` and `update_user_settings(...)`
 /// // to build up your call.
 /// let rb = hub.myconfig();
 /// # }
 /// ```
-pub struct MyconfigMethods<'a>
-    where  {
+pub struct MyconfigMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for MyconfigMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MyconfigMethods<'a, S> {}
 
-impl<'a> MyconfigMethods<'a> {
+impl<'a, S> MyconfigMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the current settings for the user.
-    pub fn get_user_settings(&self) -> MyconfigGetUserSettingCall<'a> {
+    pub fn get_user_settings(&self) -> MyconfigGetUserSettingCall<'a, S> {
         MyconfigGetUserSettingCall {
             hub: self.hub,
             _country: Default::default(),
@@ -3514,7 +3519,7 @@ impl<'a> MyconfigMethods<'a> {
     ///
     /// * `cpksver` - The device/version ID from which to release the restriction.
     /// * `volumeIds` - The volume(s) to release restrictions for.
-    pub fn release_download_access(&self, cpksver: &str, volume_ids: &Vec<String>) -> MyconfigReleaseDownloadAccesCall<'a> {
+    pub fn release_download_access(&self, cpksver: &str, volume_ids: &Vec<String>) -> MyconfigReleaseDownloadAccesCall<'a, S> {
         MyconfigReleaseDownloadAccesCall {
             hub: self.hub,
             _cpksver: cpksver.to_string(),
@@ -3537,7 +3542,7 @@ impl<'a> MyconfigMethods<'a> {
     /// * `nonce` - The client nonce value.
     /// * `source` - String to identify the originator of this request.
     /// * `volumeId` - The volume to request concurrent/download restrictions for.
-    pub fn request_access(&self, cpksver: &str, nonce: &str, source: &str, volume_id: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn request_access(&self, cpksver: &str, nonce: &str, source: &str, volume_id: &str) -> MyconfigRequestAccesCall<'a, S> {
         MyconfigRequestAccesCall {
             hub: self.hub,
             _cpksver: cpksver.to_string(),
@@ -3561,7 +3566,7 @@ impl<'a> MyconfigMethods<'a> {
     /// * `cpksver` - The device/version ID from which to release the restriction.
     /// * `nonce` - The client nonce value.
     /// * `source` - String to identify the originator of this request.
-    pub fn sync_volume_licenses(&self, cpksver: &str, nonce: &str, source: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn sync_volume_licenses(&self, cpksver: &str, nonce: &str, source: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         MyconfigSyncVolumeLicenseCall {
             hub: self.hub,
             _cpksver: cpksver.to_string(),
@@ -3585,7 +3590,7 @@ impl<'a> MyconfigMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_user_settings(&self, request: Usersettings) -> MyconfigUpdateUserSettingCall<'a> {
+    pub fn update_user_settings(&self, request: Usersettings) -> MyconfigUpdateUserSettingCall<'a, S> {
         MyconfigUpdateUserSettingCall {
             hub: self.hub,
             _request: request,
@@ -3619,22 +3624,22 @@ impl<'a> MyconfigMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `annotations_delete(...)`, `annotations_insert(...)`, `annotations_list(...)`, `annotations_summary(...)`, `annotations_update(...)`, `bookshelves_add_volume(...)`, `bookshelves_clear_volumes(...)`, `bookshelves_get(...)`, `bookshelves_list(...)`, `bookshelves_move_volume(...)`, `bookshelves_remove_volume(...)`, `bookshelves_volumes_list(...)`, `readingpositions_get(...)` and `readingpositions_set_position(...)`
 /// // to build up your call.
 /// let rb = hub.mylibrary();
 /// # }
 /// ```
-pub struct MylibraryMethods<'a>
-    where  {
+pub struct MylibraryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for MylibraryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MylibraryMethods<'a, S> {}
 
-impl<'a> MylibraryMethods<'a> {
+impl<'a, S> MylibraryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3643,7 +3648,7 @@ impl<'a> MylibraryMethods<'a> {
     /// # Arguments
     ///
     /// * `annotationId` - The ID for the annotation to delete.
-    pub fn annotations_delete(&self, annotation_id: &str) -> MylibraryAnnotationDeleteCall<'a> {
+    pub fn annotations_delete(&self, annotation_id: &str) -> MylibraryAnnotationDeleteCall<'a, S> {
         MylibraryAnnotationDeleteCall {
             hub: self.hub,
             _annotation_id: annotation_id.to_string(),
@@ -3661,7 +3666,7 @@ impl<'a> MylibraryMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn annotations_insert(&self, request: Annotation) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn annotations_insert(&self, request: Annotation) -> MylibraryAnnotationInsertCall<'a, S> {
         MylibraryAnnotationInsertCall {
             hub: self.hub,
             _request: request,
@@ -3678,7 +3683,7 @@ impl<'a> MylibraryMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of annotations, possibly filtered.
-    pub fn annotations_list(&self) -> MylibraryAnnotationListCall<'a> {
+    pub fn annotations_list(&self) -> MylibraryAnnotationListCall<'a, S> {
         MylibraryAnnotationListCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -3705,7 +3710,7 @@ impl<'a> MylibraryMethods<'a> {
     ///
     /// * `layerIds` - Array of layer IDs to get the summary for.
     /// * `volumeId` - Volume id to get the summary for.
-    pub fn annotations_summary(&self, layer_ids: &Vec<String>, volume_id: &str) -> MylibraryAnnotationSummaryCall<'a> {
+    pub fn annotations_summary(&self, layer_ids: &Vec<String>, volume_id: &str) -> MylibraryAnnotationSummaryCall<'a, S> {
         MylibraryAnnotationSummaryCall {
             hub: self.hub,
             _layer_ids: layer_ids.clone(),
@@ -3724,7 +3729,7 @@ impl<'a> MylibraryMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `annotationId` - The ID for the annotation to update.
-    pub fn annotations_update(&self, request: Annotation, annotation_id: &str) -> MylibraryAnnotationUpdateCall<'a> {
+    pub fn annotations_update(&self, request: Annotation, annotation_id: &str) -> MylibraryAnnotationUpdateCall<'a, S> {
         MylibraryAnnotationUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3743,7 +3748,7 @@ impl<'a> MylibraryMethods<'a> {
     /// # Arguments
     ///
     /// * `shelf` - The bookshelf ID or name retrieve volumes for.
-    pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
         MylibraryBookshelveVolumeListCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3768,7 +3773,7 @@ impl<'a> MylibraryMethods<'a> {
     ///
     /// * `shelf` - ID of bookshelf to which to add a volume.
     /// * `volumeId` - ID of volume to add.
-    pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveAddVolumeCall<'a> {
+    pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
         MylibraryBookshelveAddVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3788,7 +3793,7 @@ impl<'a> MylibraryMethods<'a> {
     /// # Arguments
     ///
     /// * `shelf` - ID of bookshelf from which to remove a volume.
-    pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelveClearVolumeCall<'a> {
+    pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelveClearVolumeCall<'a, S> {
         MylibraryBookshelveClearVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3806,7 +3811,7 @@ impl<'a> MylibraryMethods<'a> {
     /// # Arguments
     ///
     /// * `shelf` - ID of bookshelf to retrieve.
-    pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelveGetCall<'a> {
+    pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelveGetCall<'a, S> {
         MylibraryBookshelveGetCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3820,7 +3825,7 @@ impl<'a> MylibraryMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of bookshelves belonging to the authenticated user.
-    pub fn bookshelves_list(&self) -> MylibraryBookshelveListCall<'a> {
+    pub fn bookshelves_list(&self) -> MylibraryBookshelveListCall<'a, S> {
         MylibraryBookshelveListCall {
             hub: self.hub,
             _source: Default::default(),
@@ -3839,7 +3844,7 @@ impl<'a> MylibraryMethods<'a> {
     /// * `shelf` - ID of bookshelf with the volume.
     /// * `volumeId` - ID of volume to move.
     /// * `volumePosition` - Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
-    pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelveMoveVolumeCall<'a> {
+    pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
         MylibraryBookshelveMoveVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3860,7 +3865,7 @@ impl<'a> MylibraryMethods<'a> {
     ///
     /// * `shelf` - ID of bookshelf from which to remove a volume.
     /// * `volumeId` - ID of volume to remove.
-    pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveRemoveVolumeCall<'a> {
+    pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
         MylibraryBookshelveRemoveVolumeCall {
             hub: self.hub,
             _shelf: shelf.to_string(),
@@ -3880,7 +3885,7 @@ impl<'a> MylibraryMethods<'a> {
     /// # Arguments
     ///
     /// * `volumeId` - ID of volume for which to retrieve a reading position.
-    pub fn readingpositions_get(&self, volume_id: &str) -> MylibraryReadingpositionGetCall<'a> {
+    pub fn readingpositions_get(&self, volume_id: &str) -> MylibraryReadingpositionGetCall<'a, S> {
         MylibraryReadingpositionGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3901,7 +3906,7 @@ impl<'a> MylibraryMethods<'a> {
     /// * `volumeId` - ID of volume for which to update the reading position.
     /// * `position` - Position string for the new volume reading position.
     /// * `timestamp` - RFC 3339 UTC format timestamp associated with this reading position.
-    pub fn readingpositions_set_position(&self, volume_id: &str, position: &str, timestamp: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn readingpositions_set_position(&self, volume_id: &str, position: &str, timestamp: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         MylibraryReadingpositionSetPositionCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -3941,22 +3946,22 @@ impl<'a> MylibraryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.notification();
 /// # }
 /// ```
-pub struct NotificationMethods<'a>
-    where  {
+pub struct NotificationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for NotificationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for NotificationMethods<'a, S> {}
 
-impl<'a> NotificationMethods<'a> {
+impl<'a, S> NotificationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3965,7 +3970,7 @@ impl<'a> NotificationMethods<'a> {
     /// # Arguments
     ///
     /// * `notification_id` - String to identify the notification.
-    pub fn get(&self, notification_id: &str) -> NotificationGetCall<'a> {
+    pub fn get(&self, notification_id: &str) -> NotificationGetCall<'a, S> {
         NotificationGetCall {
             hub: self.hub,
             _notification_id: notification_id.to_string(),
@@ -4001,27 +4006,27 @@ impl<'a> NotificationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list_categories(...)` and `list_category_volumes(...)`
 /// // to build up your call.
 /// let rb = hub.onboarding();
 /// # }
 /// ```
-pub struct OnboardingMethods<'a>
-    where  {
+pub struct OnboardingMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for OnboardingMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OnboardingMethods<'a, S> {}
 
-impl<'a> OnboardingMethods<'a> {
+impl<'a, S> OnboardingMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// List categories for onboarding experience.
-    pub fn list_categories(&self) -> OnboardingListCategoryCall<'a> {
+    pub fn list_categories(&self) -> OnboardingListCategoryCall<'a, S> {
         OnboardingListCategoryCall {
             hub: self.hub,
             _locale: Default::default(),
@@ -4034,7 +4039,7 @@ impl<'a> OnboardingMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List available volumes under categories for onboarding experience.
-    pub fn list_category_volumes(&self) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn list_category_volumes(&self) -> OnboardingListCategoryVolumeCall<'a, S> {
         OnboardingListCategoryVolumeCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -4072,27 +4077,27 @@ impl<'a> OnboardingMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.personalizedstream();
 /// # }
 /// ```
-pub struct PersonalizedstreamMethods<'a>
-    where  {
+pub struct PersonalizedstreamMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for PersonalizedstreamMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PersonalizedstreamMethods<'a, S> {}
 
-impl<'a> PersonalizedstreamMethods<'a> {
+impl<'a, S> PersonalizedstreamMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a stream of personalized book clusters
-    pub fn get(&self) -> PersonalizedstreamGetCall<'a> {
+    pub fn get(&self) -> PersonalizedstreamGetCall<'a, S> {
         PersonalizedstreamGetCall {
             hub: self.hub,
             _source: Default::default(),
@@ -4128,27 +4133,27 @@ impl<'a> PersonalizedstreamMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `accept(...)`, `dismiss(...)` and `get(...)`
 /// // to build up your call.
 /// let rb = hub.promooffer();
 /// # }
 /// ```
-pub struct PromoofferMethods<'a>
-    where  {
+pub struct PromoofferMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for PromoofferMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PromoofferMethods<'a, S> {}
 
-impl<'a> PromoofferMethods<'a> {
+impl<'a, S> PromoofferMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Accepts the promo offer.
-    pub fn accept(&self) -> PromoofferAcceptCall<'a> {
+    pub fn accept(&self) -> PromoofferAcceptCall<'a, S> {
         PromoofferAcceptCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -4168,7 +4173,7 @@ impl<'a> PromoofferMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Marks the promo offer as dismissed.
-    pub fn dismiss(&self) -> PromoofferDismisCall<'a> {
+    pub fn dismiss(&self) -> PromoofferDismisCall<'a, S> {
         PromoofferDismisCall {
             hub: self.hub,
             _serial: Default::default(),
@@ -4187,7 +4192,7 @@ impl<'a> PromoofferMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of promo offers available to the user
-    pub fn get(&self) -> PromoofferGetCall<'a> {
+    pub fn get(&self) -> PromoofferGetCall<'a, S> {
         PromoofferGetCall {
             hub: self.hub,
             _serial: Default::default(),
@@ -4226,22 +4231,22 @@ impl<'a> PromoofferMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `membership_get(...)`
 /// // to build up your call.
 /// let rb = hub.series();
 /// # }
 /// ```
-pub struct SeryMethods<'a>
-    where  {
+pub struct SeryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for SeryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SeryMethods<'a, S> {}
 
-impl<'a> SeryMethods<'a> {
+impl<'a, S> SeryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4250,7 +4255,7 @@ impl<'a> SeryMethods<'a> {
     /// # Arguments
     ///
     /// * `series_id` - String that identifies the series
-    pub fn membership_get(&self, series_id: &str) -> SeryMembershipGetCall<'a> {
+    pub fn membership_get(&self, series_id: &str) -> SeryMembershipGetCall<'a, S> {
         SeryMembershipGetCall {
             hub: self.hub,
             _series_id: series_id.to_string(),
@@ -4269,7 +4274,7 @@ impl<'a> SeryMethods<'a> {
     /// # Arguments
     ///
     /// * `series_id` - String that identifies the series
-    pub fn get(&self, series_id: &Vec<String>) -> SeryGetCall<'a> {
+    pub fn get(&self, series_id: &Vec<String>) -> SeryGetCall<'a, S> {
         SeryGetCall {
             hub: self.hub,
             _series_id: series_id.clone(),
@@ -4303,22 +4308,22 @@ impl<'a> SeryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `associated_list(...)`, `get(...)`, `list(...)`, `mybooks_list(...)`, `recommended_list(...)`, `recommended_rate(...)` and `useruploaded_list(...)`
 /// // to build up your call.
 /// let rb = hub.volumes();
 /// # }
 /// ```
-pub struct VolumeMethods<'a>
-    where  {
+pub struct VolumeMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
 }
 
-impl<'a> client::MethodsBuilder for VolumeMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for VolumeMethods<'a, S> {}
 
-impl<'a> VolumeMethods<'a> {
+impl<'a, S> VolumeMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4327,7 +4332,7 @@ impl<'a> VolumeMethods<'a> {
     /// # Arguments
     ///
     /// * `volumeId` - ID of the source volume.
-    pub fn associated_list(&self, volume_id: &str) -> VolumeAssociatedListCall<'a> {
+    pub fn associated_list(&self, volume_id: &str) -> VolumeAssociatedListCall<'a, S> {
         VolumeAssociatedListCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -4344,7 +4349,7 @@ impl<'a> VolumeMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return a list of books in My Library.
-    pub fn mybooks_list(&self) -> VolumeMybookListCall<'a> {
+    pub fn mybooks_list(&self) -> VolumeMybookListCall<'a, S> {
         VolumeMybookListCall {
             hub: self.hub,
             _start_index: Default::default(),
@@ -4363,7 +4368,7 @@ impl<'a> VolumeMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return a list of recommended books for the current user.
-    pub fn recommended_list(&self) -> VolumeRecommendedListCall<'a> {
+    pub fn recommended_list(&self) -> VolumeRecommendedListCall<'a, S> {
         VolumeRecommendedListCall {
             hub: self.hub,
             _source: Default::default(),
@@ -4383,7 +4388,7 @@ impl<'a> VolumeMethods<'a> {
     ///
     /// * `rating` - Rating to be given to the volume.
     /// * `volumeId` - ID of the source volume.
-    pub fn recommended_rate(&self, rating: &str, volume_id: &str) -> VolumeRecommendedRateCall<'a> {
+    pub fn recommended_rate(&self, rating: &str, volume_id: &str) -> VolumeRecommendedRateCall<'a, S> {
         VolumeRecommendedRateCall {
             hub: self.hub,
             _rating: rating.to_string(),
@@ -4399,7 +4404,7 @@ impl<'a> VolumeMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Return a list of books uploaded by the current user.
-    pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a> {
+    pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a, S> {
         VolumeUseruploadedListCall {
             hub: self.hub,
             _volume_id: Default::default(),
@@ -4421,7 +4426,7 @@ impl<'a> VolumeMethods<'a> {
     /// # Arguments
     ///
     /// * `volumeId` - ID of volume to retrieve.
-    pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a> {
+    pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a, S> {
         VolumeGetCall {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
@@ -4444,7 +4449,7 @@ impl<'a> VolumeMethods<'a> {
     /// # Arguments
     ///
     /// * `q` - Full-text search query string.
-    pub fn list(&self, q: &str) -> VolumeListCall<'a> {
+    pub fn list(&self, q: &str) -> VolumeListCall<'a, S> {
         VolumeListCall {
             hub: self.hub,
             _q: q.to_string(),
@@ -4498,7 +4503,7 @@ impl<'a> VolumeMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4510,10 +4515,10 @@ impl<'a> VolumeMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BookshelveVolumeListCall<'a>
-    where  {
+pub struct BookshelveVolumeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _user_id: String,
     _shelf: String,
     _start_index: Option<u32>,
@@ -4525,9 +4530,15 @@ pub struct BookshelveVolumeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BookshelveVolumeListCall<'a> {}
+impl<'a, S> client::CallBuilder for BookshelveVolumeListCall<'a, S> {}
 
-impl<'a> BookshelveVolumeListCall<'a> {
+impl<'a, S> BookshelveVolumeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4683,7 +4694,7 @@ impl<'a> BookshelveVolumeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4693,35 +4704,35 @@ impl<'a> BookshelveVolumeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// Index of the first element to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to show pre-ordered books. Defaults to false.
     ///
     /// Sets the *show preorders* query property to the given value.
-    pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a> {
+    pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a, S> {
         self._show_preorders = Some(new_value);
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -4731,7 +4742,7 @@ impl<'a> BookshelveVolumeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveVolumeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveVolumeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4756,7 +4767,7 @@ impl<'a> BookshelveVolumeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveVolumeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelveVolumeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4776,9 +4787,9 @@ impl<'a> BookshelveVolumeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BookshelveVolumeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BookshelveVolumeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4810,7 +4821,7 @@ impl<'a> BookshelveVolumeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4819,10 +4830,10 @@ impl<'a> BookshelveVolumeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BookshelveGetCall<'a>
-    where  {
+pub struct BookshelveGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _user_id: String,
     _shelf: String,
     _source: Option<String>,
@@ -4831,9 +4842,15 @@ pub struct BookshelveGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BookshelveGetCall<'a> {}
+impl<'a, S> client::CallBuilder for BookshelveGetCall<'a, S> {}
 
-impl<'a> BookshelveGetCall<'a> {
+impl<'a, S> BookshelveGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4980,7 +4997,7 @@ impl<'a> BookshelveGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4990,14 +5007,14 @@ impl<'a> BookshelveGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -5007,7 +5024,7 @@ impl<'a> BookshelveGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5032,7 +5049,7 @@ impl<'a> BookshelveGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelveGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5052,9 +5069,9 @@ impl<'a> BookshelveGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BookshelveGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BookshelveGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5086,7 +5103,7 @@ impl<'a> BookshelveGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5095,10 +5112,10 @@ impl<'a> BookshelveGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BookshelveListCall<'a>
-    where  {
+pub struct BookshelveListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _user_id: String,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5106,9 +5123,15 @@ pub struct BookshelveListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for BookshelveListCall<'a> {}
+impl<'a, S> client::CallBuilder for BookshelveListCall<'a, S> {}
 
-impl<'a> BookshelveListCall<'a> {
+impl<'a, S> BookshelveListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5254,14 +5277,14 @@ impl<'a> BookshelveListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -5271,7 +5294,7 @@ impl<'a> BookshelveListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BookshelveListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5296,7 +5319,7 @@ impl<'a> BookshelveListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BookshelveListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> BookshelveListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5316,9 +5339,9 @@ impl<'a> BookshelveListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BookshelveListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> BookshelveListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5350,7 +5373,7 @@ impl<'a> BookshelveListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5362,10 +5385,10 @@ impl<'a> BookshelveListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CloudloadingAddBookCall<'a>
-    where  {
+pub struct CloudloadingAddBookCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _upload_client_token: Option<String>,
     _name: Option<String>,
     _mime_type: Option<String>,
@@ -5375,9 +5398,15 @@ pub struct CloudloadingAddBookCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CloudloadingAddBookCall<'a> {}
+impl<'a, S> client::CallBuilder for CloudloadingAddBookCall<'a, S> {}
 
-impl<'a> CloudloadingAddBookCall<'a> {
+impl<'a, S> CloudloadingAddBookCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5507,28 +5536,28 @@ impl<'a> CloudloadingAddBookCall<'a> {
     /// Scotty upload token.
     ///
     /// Sets the *upload_client_token* query property to the given value.
-    pub fn upload_client_token(mut self, new_value: &str) -> CloudloadingAddBookCall<'a> {
+    pub fn upload_client_token(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, S> {
         self._upload_client_token = Some(new_value.to_string());
         self
     }
     /// The document name. It can be set only if the drive_document_id is set.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> CloudloadingAddBookCall<'a> {
+    pub fn name(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, S> {
         self._name = Some(new_value.to_string());
         self
     }
     /// The document MIME type. It can be set only if the drive_document_id is set.
     ///
     /// Sets the *mime_type* query property to the given value.
-    pub fn mime_type(mut self, new_value: &str) -> CloudloadingAddBookCall<'a> {
+    pub fn mime_type(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, S> {
         self._mime_type = Some(new_value.to_string());
         self
     }
     /// A drive document id. The upload_client_token must not be set.
     ///
     /// Sets the *drive_document_id* query property to the given value.
-    pub fn drive_document_id(mut self, new_value: &str) -> CloudloadingAddBookCall<'a> {
+    pub fn drive_document_id(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, S> {
         self._drive_document_id = Some(new_value.to_string());
         self
     }
@@ -5538,7 +5567,7 @@ impl<'a> CloudloadingAddBookCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingAddBookCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingAddBookCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5563,7 +5592,7 @@ impl<'a> CloudloadingAddBookCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingAddBookCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingAddBookCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5583,9 +5612,9 @@ impl<'a> CloudloadingAddBookCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CloudloadingAddBookCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CloudloadingAddBookCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5617,7 +5646,7 @@ impl<'a> CloudloadingAddBookCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5625,19 +5654,25 @@ impl<'a> CloudloadingAddBookCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CloudloadingDeleteBookCall<'a>
-    where  {
+pub struct CloudloadingDeleteBookCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CloudloadingDeleteBookCall<'a> {}
+impl<'a, S> client::CallBuilder for CloudloadingDeleteBookCall<'a, S> {}
 
-impl<'a> CloudloadingDeleteBookCall<'a> {
+impl<'a, S> CloudloadingDeleteBookCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5759,7 +5794,7 @@ impl<'a> CloudloadingDeleteBookCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> CloudloadingDeleteBookCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> CloudloadingDeleteBookCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -5769,7 +5804,7 @@ impl<'a> CloudloadingDeleteBookCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingDeleteBookCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingDeleteBookCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5794,7 +5829,7 @@ impl<'a> CloudloadingDeleteBookCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingDeleteBookCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingDeleteBookCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5814,9 +5849,9 @@ impl<'a> CloudloadingDeleteBookCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CloudloadingDeleteBookCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CloudloadingDeleteBookCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5849,7 +5884,7 @@ impl<'a> CloudloadingDeleteBookCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5862,19 +5897,25 @@ impl<'a> CloudloadingDeleteBookCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CloudloadingUpdateBookCall<'a>
-    where  {
+pub struct CloudloadingUpdateBookCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _request: BooksCloudloadingResource,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CloudloadingUpdateBookCall<'a> {}
+impl<'a, S> client::CallBuilder for CloudloadingUpdateBookCall<'a, S> {}
 
-impl<'a> CloudloadingUpdateBookCall<'a> {
+impl<'a, S> CloudloadingUpdateBookCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6008,7 +6049,7 @@ impl<'a> CloudloadingUpdateBookCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a> {
+    pub fn request(mut self, new_value: BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6018,7 +6059,7 @@ impl<'a> CloudloadingUpdateBookCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingUpdateBookCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CloudloadingUpdateBookCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6043,7 +6084,7 @@ impl<'a> CloudloadingUpdateBookCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingUpdateBookCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CloudloadingUpdateBookCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6063,9 +6104,9 @@ impl<'a> CloudloadingUpdateBookCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CloudloadingUpdateBookCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CloudloadingUpdateBookCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6097,7 +6138,7 @@ impl<'a> CloudloadingUpdateBookCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6105,19 +6146,25 @@ impl<'a> CloudloadingUpdateBookCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DictionaryListOfflineMetadataCall<'a>
-    where  {
+pub struct DictionaryListOfflineMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _cpksver: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for DictionaryListOfflineMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for DictionaryListOfflineMetadataCall<'a, S> {}
 
-impl<'a> DictionaryListOfflineMetadataCall<'a> {
+impl<'a, S> DictionaryListOfflineMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6239,7 +6286,7 @@ impl<'a> DictionaryListOfflineMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cpksver(mut self, new_value: &str) -> DictionaryListOfflineMetadataCall<'a> {
+    pub fn cpksver(mut self, new_value: &str) -> DictionaryListOfflineMetadataCall<'a, S> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -6249,7 +6296,7 @@ impl<'a> DictionaryListOfflineMetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DictionaryListOfflineMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DictionaryListOfflineMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6274,7 +6321,7 @@ impl<'a> DictionaryListOfflineMetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DictionaryListOfflineMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> DictionaryListOfflineMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6294,9 +6341,9 @@ impl<'a> DictionaryListOfflineMetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DictionaryListOfflineMetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> DictionaryListOfflineMetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6328,7 +6375,7 @@ impl<'a> DictionaryListOfflineMetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6337,19 +6384,25 @@ impl<'a> DictionaryListOfflineMetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FamilysharingGetFamilyInfoCall<'a>
-    where  {
+pub struct FamilysharingGetFamilyInfoCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FamilysharingGetFamilyInfoCall<'a> {}
+impl<'a, S> client::CallBuilder for FamilysharingGetFamilyInfoCall<'a, S> {}
 
-impl<'a> FamilysharingGetFamilyInfoCall<'a> {
+impl<'a, S> FamilysharingGetFamilyInfoCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6470,7 +6523,7 @@ impl<'a> FamilysharingGetFamilyInfoCall<'a> {
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> FamilysharingGetFamilyInfoCall<'a> {
+    pub fn source(mut self, new_value: &str) -> FamilysharingGetFamilyInfoCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -6480,7 +6533,7 @@ impl<'a> FamilysharingGetFamilyInfoCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingGetFamilyInfoCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingGetFamilyInfoCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6505,7 +6558,7 @@ impl<'a> FamilysharingGetFamilyInfoCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingGetFamilyInfoCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingGetFamilyInfoCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6525,9 +6578,9 @@ impl<'a> FamilysharingGetFamilyInfoCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FamilysharingGetFamilyInfoCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FamilysharingGetFamilyInfoCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6559,7 +6612,7 @@ impl<'a> FamilysharingGetFamilyInfoCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6570,10 +6623,10 @@ impl<'a> FamilysharingGetFamilyInfoCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FamilysharingShareCall<'a>
-    where  {
+pub struct FamilysharingShareCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: Option<String>,
     _source: Option<String>,
     _doc_id: Option<String>,
@@ -6582,9 +6635,15 @@ pub struct FamilysharingShareCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FamilysharingShareCall<'a> {}
+impl<'a, S> client::CallBuilder for FamilysharingShareCall<'a, S> {}
 
-impl<'a> FamilysharingShareCall<'a> {
+impl<'a, S> FamilysharingShareCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6711,21 +6770,21 @@ impl<'a> FamilysharingShareCall<'a> {
     /// The volume to share.
     ///
     /// Sets the *volume id* query property to the given value.
-    pub fn volume_id(mut self, new_value: &str) -> FamilysharingShareCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> FamilysharingShareCall<'a, S> {
         self._volume_id = Some(new_value.to_string());
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> FamilysharingShareCall<'a> {
+    pub fn source(mut self, new_value: &str) -> FamilysharingShareCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The docid to share.
     ///
     /// Sets the *doc id* query property to the given value.
-    pub fn doc_id(mut self, new_value: &str) -> FamilysharingShareCall<'a> {
+    pub fn doc_id(mut self, new_value: &str) -> FamilysharingShareCall<'a, S> {
         self._doc_id = Some(new_value.to_string());
         self
     }
@@ -6735,7 +6794,7 @@ impl<'a> FamilysharingShareCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingShareCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingShareCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6760,7 +6819,7 @@ impl<'a> FamilysharingShareCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingShareCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingShareCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6780,9 +6839,9 @@ impl<'a> FamilysharingShareCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FamilysharingShareCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FamilysharingShareCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6814,7 +6873,7 @@ impl<'a> FamilysharingShareCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6825,10 +6884,10 @@ impl<'a> FamilysharingShareCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FamilysharingUnshareCall<'a>
-    where  {
+pub struct FamilysharingUnshareCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: Option<String>,
     _source: Option<String>,
     _doc_id: Option<String>,
@@ -6837,9 +6896,15 @@ pub struct FamilysharingUnshareCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for FamilysharingUnshareCall<'a> {}
+impl<'a, S> client::CallBuilder for FamilysharingUnshareCall<'a, S> {}
 
-impl<'a> FamilysharingUnshareCall<'a> {
+impl<'a, S> FamilysharingUnshareCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6966,21 +7031,21 @@ impl<'a> FamilysharingUnshareCall<'a> {
     /// The volume to unshare.
     ///
     /// Sets the *volume id* query property to the given value.
-    pub fn volume_id(mut self, new_value: &str) -> FamilysharingUnshareCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> FamilysharingUnshareCall<'a, S> {
         self._volume_id = Some(new_value.to_string());
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> FamilysharingUnshareCall<'a> {
+    pub fn source(mut self, new_value: &str) -> FamilysharingUnshareCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The docid to unshare.
     ///
     /// Sets the *doc id* query property to the given value.
-    pub fn doc_id(mut self, new_value: &str) -> FamilysharingUnshareCall<'a> {
+    pub fn doc_id(mut self, new_value: &str) -> FamilysharingUnshareCall<'a, S> {
         self._doc_id = Some(new_value.to_string());
         self
     }
@@ -6990,7 +7055,7 @@ impl<'a> FamilysharingUnshareCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingUnshareCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FamilysharingUnshareCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7015,7 +7080,7 @@ impl<'a> FamilysharingUnshareCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingUnshareCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingUnshareCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7035,9 +7100,9 @@ impl<'a> FamilysharingUnshareCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FamilysharingUnshareCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> FamilysharingUnshareCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7069,7 +7134,7 @@ impl<'a> FamilysharingUnshareCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7083,10 +7148,10 @@ impl<'a> FamilysharingUnshareCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LayerAnnotationDataGetCall<'a>
-    where  {
+pub struct LayerAnnotationDataGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _layer_id: String,
     _annotation_data_id: String,
@@ -7102,9 +7167,15 @@ pub struct LayerAnnotationDataGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LayerAnnotationDataGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LayerAnnotationDataGetCall<'a, S> {}
 
-impl<'a> LayerAnnotationDataGetCall<'a> {
+impl<'a, S> LayerAnnotationDataGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7268,7 +7339,7 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -7278,7 +7349,7 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, S> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -7288,7 +7359,7 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, S> {
         self._annotation_data_id = new_value.to_string();
         self
     }
@@ -7298,49 +7369,49 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, S> {
         self._content_version = new_value.to_string();
         self
     }
     /// The requested pixel width for any images. If width is provided height must also be provided.
     ///
     /// Sets the *w* query property to the given value.
-    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a> {
+    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, S> {
         self._w = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The requested scale for the image.
     ///
     /// Sets the *scale* query property to the given value.
-    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a> {
+    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, S> {
         self._scale = Some(new_value);
         self
     }
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// The requested pixel height for any images. If height is provided width must also be provided.
     ///
     /// Sets the *h* query property to the given value.
-    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a> {
+    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, S> {
         self._h = Some(new_value);
         self
     }
     /// For the dictionary layer. Whether or not to allow web definitions.
     ///
     /// Sets the *allow web definitions* query property to the given value.
-    pub fn allow_web_definitions(mut self, new_value: bool) -> LayerAnnotationDataGetCall<'a> {
+    pub fn allow_web_definitions(mut self, new_value: bool) -> LayerAnnotationDataGetCall<'a, S> {
         self._allow_web_definitions = Some(new_value);
         self
     }
@@ -7350,7 +7421,7 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerAnnotationDataGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerAnnotationDataGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7375,7 +7446,7 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7395,9 +7466,9 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LayerAnnotationDataGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LayerAnnotationDataGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7429,7 +7500,7 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7447,10 +7518,10 @@ impl<'a> LayerAnnotationDataGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LayerAnnotationDataListCall<'a>
-    where  {
+pub struct LayerAnnotationDataListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _layer_id: String,
     _content_version: String,
@@ -7469,9 +7540,15 @@ pub struct LayerAnnotationDataListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LayerAnnotationDataListCall<'a> {}
+impl<'a, S> client::CallBuilder for LayerAnnotationDataListCall<'a, S> {}
 
-impl<'a> LayerAnnotationDataListCall<'a> {
+impl<'a, S> LayerAnnotationDataListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7648,7 +7725,7 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -7658,7 +7735,7 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -7668,70 +7745,70 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._content_version = new_value.to_string();
         self
     }
     /// The requested pixel width for any images. If width is provided height must also be provided.
     ///
     /// Sets the *w* query property to the given value.
-    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a> {
+    pub fn w(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, S> {
         self._w = Some(new_value);
         self
     }
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn updated_min(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
     ///
     /// Sets the *updated max* query property to the given value.
-    pub fn updated_max(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn updated_max(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._updated_max = Some(new_value.to_string());
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The requested scale for the image.
     ///
     /// Sets the *scale* query property to the given value.
-    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a> {
+    pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, S> {
         self._scale = Some(new_value);
         self
     }
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LayerAnnotationDataListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LayerAnnotationDataListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// The requested pixel height for any images. If height is provided width must also be provided.
     ///
     /// Sets the *h* query property to the given value.
-    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a> {
+    pub fn h(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, S> {
         self._h = Some(new_value);
         self
     }
@@ -7739,7 +7816,7 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     ///
     /// Append the given value to the *annotation data id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a> {
+    pub fn add_annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, S> {
         self._annotation_data_id.push(new_value.to_string());
         self
     }
@@ -7749,7 +7826,7 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerAnnotationDataListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerAnnotationDataListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7774,7 +7851,7 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7794,9 +7871,9 @@ impl<'a> LayerAnnotationDataListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LayerAnnotationDataListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LayerAnnotationDataListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7828,7 +7905,7 @@ impl<'a> LayerAnnotationDataListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7838,10 +7915,10 @@ impl<'a> LayerAnnotationDataListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LayerVolumeAnnotationGetCall<'a>
-    where  {
+pub struct LayerVolumeAnnotationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _layer_id: String,
     _annotation_id: String,
@@ -7852,9 +7929,15 @@ pub struct LayerVolumeAnnotationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LayerVolumeAnnotationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LayerVolumeAnnotationGetCall<'a, S> {}
 
-impl<'a> LayerVolumeAnnotationGetCall<'a> {
+impl<'a, S> LayerVolumeAnnotationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8005,7 +8088,7 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -8015,7 +8098,7 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, S> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -8025,21 +8108,21 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn annotation_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn annotation_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, S> {
         self._annotation_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -8049,7 +8132,7 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerVolumeAnnotationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerVolumeAnnotationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8074,7 +8157,7 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8094,9 +8177,9 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LayerVolumeAnnotationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LayerVolumeAnnotationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8128,7 +8211,7 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8148,10 +8231,10 @@ impl<'a> LayerVolumeAnnotationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LayerVolumeAnnotationListCall<'a>
-    where  {
+pub struct LayerVolumeAnnotationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _layer_id: String,
     _content_version: String,
@@ -8172,9 +8255,15 @@ pub struct LayerVolumeAnnotationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LayerVolumeAnnotationListCall<'a> {}
+impl<'a, S> client::CallBuilder for LayerVolumeAnnotationListCall<'a, S> {}
 
-impl<'a> LayerVolumeAnnotationListCall<'a> {
+impl<'a, S> LayerVolumeAnnotationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8355,7 +8444,7 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -8365,7 +8454,7 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._layer_id = new_value.to_string();
         self
     }
@@ -8375,91 +8464,91 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn content_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._content_version = new_value.to_string();
         self
     }
     /// The version of the volume annotations that you are requesting.
     ///
     /// Sets the *volume annotations version* query property to the given value.
-    pub fn volume_annotations_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn volume_annotations_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._volume_annotations_version = Some(new_value.to_string());
         self
     }
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn updated_min(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
     ///
     /// Sets the *updated max* query property to the given value.
-    pub fn updated_max(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn updated_max(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._updated_max = Some(new_value.to_string());
         self
     }
     /// The start position to start retrieving data from.
     ///
     /// Sets the *start position* query property to the given value.
-    pub fn start_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn start_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._start_position = Some(new_value.to_string());
         self
     }
     /// The start offset to start retrieving data from.
     ///
     /// Sets the *start offset* query property to the given value.
-    pub fn start_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn start_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._start_offset = Some(new_value.to_string());
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> LayerVolumeAnnotationListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LayerVolumeAnnotationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// The end position to end retrieving data from.
     ///
     /// Sets the *end position* query property to the given value.
-    pub fn end_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn end_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._end_position = Some(new_value.to_string());
         self
     }
     /// The end offset to end retrieving data from.
     ///
     /// Sets the *end offset* query property to the given value.
-    pub fn end_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn end_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, S> {
         self._end_offset = Some(new_value.to_string());
         self
     }
@@ -8469,7 +8558,7 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerVolumeAnnotationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerVolumeAnnotationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8494,7 +8583,7 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8514,9 +8603,9 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LayerVolumeAnnotationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LayerVolumeAnnotationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8548,7 +8637,7 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8558,10 +8647,10 @@ impl<'a> LayerVolumeAnnotationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LayerGetCall<'a>
-    where  {
+pub struct LayerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _summary_id: String,
     _source: Option<String>,
@@ -8571,9 +8660,15 @@ pub struct LayerGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LayerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LayerGetCall<'a, S> {}
 
-impl<'a> LayerGetCall<'a> {
+impl<'a, S> LayerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8723,7 +8818,7 @@ impl<'a> LayerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> LayerGetCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerGetCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -8733,21 +8828,21 @@ impl<'a> LayerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn summary_id(mut self, new_value: &str) -> LayerGetCall<'a> {
+    pub fn summary_id(mut self, new_value: &str) -> LayerGetCall<'a, S> {
         self._summary_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> LayerGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> LayerGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The content version for the requested volume.
     ///
     /// Sets the *content version* query property to the given value.
-    pub fn content_version(mut self, new_value: &str) -> LayerGetCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> LayerGetCall<'a, S> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -8757,7 +8852,7 @@ impl<'a> LayerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8782,7 +8877,7 @@ impl<'a> LayerGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8802,9 +8897,9 @@ impl<'a> LayerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LayerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LayerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8836,7 +8931,7 @@ impl<'a> LayerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8848,10 +8943,10 @@ impl<'a> LayerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LayerListCall<'a>
-    where  {
+pub struct LayerListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _source: Option<String>,
     _page_token: Option<String>,
@@ -8862,9 +8957,15 @@ pub struct LayerListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LayerListCall<'a> {}
+impl<'a, S> client::CallBuilder for LayerListCall<'a, S> {}
 
-impl<'a> LayerListCall<'a> {
+impl<'a, S> LayerListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9019,35 +9120,35 @@ impl<'a> LayerListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> LayerListCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> LayerListCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> LayerListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> LayerListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The content version for the requested volume.
     ///
     /// Sets the *content version* query property to the given value.
-    pub fn content_version(mut self, new_value: &str) -> LayerListCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> LayerListCall<'a, S> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -9057,7 +9158,7 @@ impl<'a> LayerListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LayerListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9082,7 +9183,7 @@ impl<'a> LayerListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9102,9 +9203,9 @@ impl<'a> LayerListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LayerListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LayerListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9136,7 +9237,7 @@ impl<'a> LayerListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9145,19 +9246,25 @@ impl<'a> LayerListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MyconfigGetUserSettingCall<'a>
-    where  {
+pub struct MyconfigGetUserSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _country: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MyconfigGetUserSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for MyconfigGetUserSettingCall<'a, S> {}
 
-impl<'a> MyconfigGetUserSettingCall<'a> {
+impl<'a, S> MyconfigGetUserSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9278,7 +9385,7 @@ impl<'a> MyconfigGetUserSettingCall<'a> {
     /// Unused. Added only to workaround TEX mandatory request template requirement
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> MyconfigGetUserSettingCall<'a> {
+    pub fn country(mut self, new_value: &str) -> MyconfigGetUserSettingCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -9288,7 +9395,7 @@ impl<'a> MyconfigGetUserSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigGetUserSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigGetUserSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9313,7 +9420,7 @@ impl<'a> MyconfigGetUserSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigGetUserSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigGetUserSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9333,9 +9440,9 @@ impl<'a> MyconfigGetUserSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MyconfigGetUserSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigGetUserSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9367,7 +9474,7 @@ impl<'a> MyconfigGetUserSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9377,10 +9484,10 @@ impl<'a> MyconfigGetUserSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MyconfigReleaseDownloadAccesCall<'a>
-    where  {
+pub struct MyconfigReleaseDownloadAccesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _cpksver: String,
     _volume_ids: Vec<String>,
     _source: Option<String>,
@@ -9390,9 +9497,15 @@ pub struct MyconfigReleaseDownloadAccesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MyconfigReleaseDownloadAccesCall<'a> {}
+impl<'a, S> client::CallBuilder for MyconfigReleaseDownloadAccesCall<'a, S> {}
 
-impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
+impl<'a, S> MyconfigReleaseDownloadAccesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9525,7 +9638,7 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cpksver(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a> {
+    pub fn cpksver(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, S> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -9536,21 +9649,21 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a> {
+    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, S> {
         self._volume_ids.push(new_value.to_string());
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -9560,7 +9673,7 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigReleaseDownloadAccesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigReleaseDownloadAccesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9585,7 +9698,7 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigReleaseDownloadAccesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigReleaseDownloadAccesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9605,9 +9718,9 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MyconfigReleaseDownloadAccesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigReleaseDownloadAccesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9639,7 +9752,7 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9649,10 +9762,10 @@ impl<'a> MyconfigReleaseDownloadAccesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MyconfigRequestAccesCall<'a>
-    where  {
+pub struct MyconfigRequestAccesCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _cpksver: String,
     _nonce: String,
     _source: String,
@@ -9664,9 +9777,15 @@ pub struct MyconfigRequestAccesCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MyconfigRequestAccesCall<'a> {}
+impl<'a, S> client::CallBuilder for MyconfigRequestAccesCall<'a, S> {}
 
-impl<'a> MyconfigRequestAccesCall<'a> {
+impl<'a, S> MyconfigRequestAccesCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9797,7 +9916,7 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cpksver(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn cpksver(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -9807,7 +9926,7 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn nonce(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn nonce(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
         self._nonce = new_value.to_string();
         self
     }
@@ -9817,7 +9936,7 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
         self._source = new_value.to_string();
         self
     }
@@ -9827,21 +9946,21 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// The type of access license to request. If not specified, the default is BOTH.
     ///
     /// Sets the *license types* query property to the given value.
-    pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a> {
+    pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, S> {
         self._license_types = Some(new_value.to_string());
         self
     }
@@ -9851,7 +9970,7 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigRequestAccesCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigRequestAccesCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9876,7 +9995,7 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigRequestAccesCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigRequestAccesCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9896,9 +10015,9 @@ impl<'a> MyconfigRequestAccesCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MyconfigRequestAccesCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigRequestAccesCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9930,7 +10049,7 @@ impl<'a> MyconfigRequestAccesCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9943,10 +10062,10 @@ impl<'a> MyconfigRequestAccesCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MyconfigSyncVolumeLicenseCall<'a>
-    where  {
+pub struct MyconfigSyncVolumeLicenseCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _cpksver: String,
     _nonce: String,
     _source: String,
@@ -9960,9 +10079,15 @@ pub struct MyconfigSyncVolumeLicenseCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MyconfigSyncVolumeLicenseCall<'a> {}
+impl<'a, S> client::CallBuilder for MyconfigSyncVolumeLicenseCall<'a, S> {}
 
-impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
+impl<'a, S> MyconfigSyncVolumeLicenseCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10105,7 +10230,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn cpksver(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn cpksver(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._cpksver = new_value.to_string();
         self
     }
@@ -10115,7 +10240,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn nonce(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn nonce(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._nonce = new_value.to_string();
         self
     }
@@ -10125,7 +10250,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn source(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._source = new_value.to_string();
         self
     }
@@ -10133,28 +10258,28 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     ///
     /// Append the given value to the *volume ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._volume_ids.push(new_value.to_string());
         self
     }
     /// Set to true to show pre-ordered books. Defaults to false.
     ///
     /// Sets the *show preorders* query property to the given value.
-    pub fn show_preorders(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn show_preorders(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._show_preorders = Some(new_value);
         self
     }
     /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// Set to true to include non-comics series. Defaults to false.
     ///
     /// Sets the *include non comics series* query property to the given value.
-    pub fn include_non_comics_series(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn include_non_comics_series(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._include_non_comics_series = Some(new_value);
         self
     }
@@ -10162,7 +10287,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     ///
     /// Append the given value to the *features* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._features.push(new_value.to_string());
         self
     }
@@ -10172,7 +10297,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigSyncVolumeLicenseCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigSyncVolumeLicenseCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10197,7 +10322,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigSyncVolumeLicenseCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigSyncVolumeLicenseCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10217,9 +10342,9 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MyconfigSyncVolumeLicenseCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigSyncVolumeLicenseCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10252,7 +10377,7 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10265,19 +10390,25 @@ impl<'a> MyconfigSyncVolumeLicenseCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MyconfigUpdateUserSettingCall<'a>
-    where  {
+pub struct MyconfigUpdateUserSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _request: Usersettings,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MyconfigUpdateUserSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for MyconfigUpdateUserSettingCall<'a, S> {}
 
-impl<'a> MyconfigUpdateUserSettingCall<'a> {
+impl<'a, S> MyconfigUpdateUserSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10411,7 +10542,7 @@ impl<'a> MyconfigUpdateUserSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Usersettings) -> MyconfigUpdateUserSettingCall<'a> {
+    pub fn request(mut self, new_value: Usersettings) -> MyconfigUpdateUserSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10421,7 +10552,7 @@ impl<'a> MyconfigUpdateUserSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigUpdateUserSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MyconfigUpdateUserSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10446,7 +10577,7 @@ impl<'a> MyconfigUpdateUserSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MyconfigUpdateUserSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MyconfigUpdateUserSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10466,9 +10597,9 @@ impl<'a> MyconfigUpdateUserSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MyconfigUpdateUserSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MyconfigUpdateUserSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10500,7 +10631,7 @@ impl<'a> MyconfigUpdateUserSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10509,10 +10640,10 @@ impl<'a> MyconfigUpdateUserSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryAnnotationDeleteCall<'a>
-    where  {
+pub struct MylibraryAnnotationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _annotation_id: String,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10520,9 +10651,15 @@ pub struct MylibraryAnnotationDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryAnnotationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryAnnotationDeleteCall<'a, S> {}
 
-impl<'a> MylibraryAnnotationDeleteCall<'a> {
+impl<'a, S> MylibraryAnnotationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10668,14 +10805,14 @@ impl<'a> MylibraryAnnotationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a> {
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, S> {
         self._annotation_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -10685,7 +10822,7 @@ impl<'a> MylibraryAnnotationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10710,7 +10847,7 @@ impl<'a> MylibraryAnnotationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10730,9 +10867,9 @@ impl<'a> MylibraryAnnotationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryAnnotationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10765,7 +10902,7 @@ impl<'a> MylibraryAnnotationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10782,10 +10919,10 @@ impl<'a> MylibraryAnnotationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryAnnotationInsertCall<'a>
-    where  {
+pub struct MylibraryAnnotationInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _request: Annotation,
     _source: Option<String>,
     _show_only_summary_in_response: Option<bool>,
@@ -10796,9 +10933,15 @@ pub struct MylibraryAnnotationInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryAnnotationInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryAnnotationInsertCall<'a, S> {}
 
-impl<'a> MylibraryAnnotationInsertCall<'a> {
+impl<'a, S> MylibraryAnnotationInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10944,35 +11087,35 @@ impl<'a> MylibraryAnnotationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Annotation) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn request(mut self, new_value: Annotation) -> MylibraryAnnotationInsertCall<'a, S> {
         self._request = new_value;
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Requests that only the summary of the specified layer be provided in the response.
     ///
     /// Sets the *show only summary in response* query property to the given value.
-    pub fn show_only_summary_in_response(mut self, new_value: bool) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn show_only_summary_in_response(mut self, new_value: bool) -> MylibraryAnnotationInsertCall<'a, S> {
         self._show_only_summary_in_response = Some(new_value);
         self
     }
     /// ISO-3166-1 code to override the IP-based location.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn country(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
     /// The ID for the annotation to insert.
     ///
     /// Sets the *annotation id* query property to the given value.
-    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, S> {
         self._annotation_id = Some(new_value.to_string());
         self
     }
@@ -10982,7 +11125,7 @@ impl<'a> MylibraryAnnotationInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11007,7 +11150,7 @@ impl<'a> MylibraryAnnotationInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11027,9 +11170,9 @@ impl<'a> MylibraryAnnotationInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryAnnotationInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11061,7 +11204,7 @@ impl<'a> MylibraryAnnotationInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11079,10 +11222,10 @@ impl<'a> MylibraryAnnotationInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryAnnotationListCall<'a>
-    where  {
+pub struct MylibraryAnnotationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: Option<String>,
     _updated_min: Option<String>,
     _updated_max: Option<String>,
@@ -11098,9 +11241,15 @@ pub struct MylibraryAnnotationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryAnnotationListCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryAnnotationListCall<'a, S> {}
 
-impl<'a> MylibraryAnnotationListCall<'a> {
+impl<'a, S> MylibraryAnnotationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11250,49 +11399,49 @@ impl<'a> MylibraryAnnotationListCall<'a> {
     /// The volume to restrict annotations to.
     ///
     /// Sets the *volume id* query property to the given value.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._volume_id = Some(new_value.to_string());
         self
     }
     /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn updated_min(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
     ///
     /// Sets the *updated max* query property to the given value.
-    pub fn updated_max(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn updated_max(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._updated_max = Some(new_value.to_string());
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> MylibraryAnnotationListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> MylibraryAnnotationListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MylibraryAnnotationListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> MylibraryAnnotationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -11300,21 +11449,21 @@ impl<'a> MylibraryAnnotationListCall<'a> {
     ///
     /// Append the given value to the *layer ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._layer_ids.push(new_value.to_string());
         self
     }
     /// The layer ID to limit annotation by.
     ///
     /// Sets the *layer id* query property to the given value.
-    pub fn layer_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn layer_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._layer_id = Some(new_value.to_string());
         self
     }
     /// The content version for the requested volume.
     ///
     /// Sets the *content version* query property to the given value.
-    pub fn content_version(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, S> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -11324,7 +11473,7 @@ impl<'a> MylibraryAnnotationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11349,7 +11498,7 @@ impl<'a> MylibraryAnnotationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11369,9 +11518,9 @@ impl<'a> MylibraryAnnotationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryAnnotationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11403,7 +11552,7 @@ impl<'a> MylibraryAnnotationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11411,10 +11560,10 @@ impl<'a> MylibraryAnnotationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryAnnotationSummaryCall<'a>
-    where  {
+pub struct MylibraryAnnotationSummaryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _layer_ids: Vec<String>,
     _volume_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11422,9 +11571,15 @@ pub struct MylibraryAnnotationSummaryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryAnnotationSummaryCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryAnnotationSummaryCall<'a, S> {}
 
-impl<'a> MylibraryAnnotationSummaryCall<'a> {
+impl<'a, S> MylibraryAnnotationSummaryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11552,7 +11707,7 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a> {
+    pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, S> {
         self._layer_ids.push(new_value.to_string());
         self
     }
@@ -11562,7 +11717,7 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -11572,7 +11727,7 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationSummaryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationSummaryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11597,7 +11752,7 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationSummaryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationSummaryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11617,9 +11772,9 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryAnnotationSummaryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationSummaryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11652,7 +11807,7 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11666,10 +11821,10 @@ impl<'a> MylibraryAnnotationSummaryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryAnnotationUpdateCall<'a>
-    where  {
+pub struct MylibraryAnnotationUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _request: Annotation,
     _annotation_id: String,
     _source: Option<String>,
@@ -11678,9 +11833,15 @@ pub struct MylibraryAnnotationUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryAnnotationUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryAnnotationUpdateCall<'a, S> {}
 
-impl<'a> MylibraryAnnotationUpdateCall<'a> {
+impl<'a, S> MylibraryAnnotationUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11839,7 +12000,7 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Annotation) -> MylibraryAnnotationUpdateCall<'a> {
+    pub fn request(mut self, new_value: Annotation) -> MylibraryAnnotationUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11849,14 +12010,14 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a> {
+    pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, S> {
         self._annotation_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -11866,7 +12027,7 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryAnnotationUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11891,7 +12052,7 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11911,9 +12072,9 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryAnnotationUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryAnnotationUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11945,7 +12106,7 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11960,10 +12121,10 @@ impl<'a> MylibraryAnnotationUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveVolumeListCall<'a>
-    where  {
+pub struct MylibraryBookshelveVolumeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _shelf: String,
     _start_index: Option<u32>,
     _source: Option<String>,
@@ -11977,9 +12138,15 @@ pub struct MylibraryBookshelveVolumeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveVolumeListCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveVolumeListCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveVolumeListCall<'a> {
+impl<'a, S> MylibraryBookshelveVolumeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12143,56 +12310,56 @@ impl<'a> MylibraryBookshelveVolumeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// Index of the first element to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to show pre-ordered books. Defaults to false.
     ///
     /// Sets the *show preorders* query property to the given value.
-    pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._show_preorders = Some(new_value);
         self
     }
     /// Full-text search query string in this bookshelf.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// ISO-3166-1 code to override the IP-based location.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -12202,7 +12369,7 @@ impl<'a> MylibraryBookshelveVolumeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveVolumeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveVolumeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12227,7 +12394,7 @@ impl<'a> MylibraryBookshelveVolumeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveVolumeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveVolumeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12247,9 +12414,9 @@ impl<'a> MylibraryBookshelveVolumeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveVolumeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveVolumeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12281,7 +12448,7 @@ impl<'a> MylibraryBookshelveVolumeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12291,10 +12458,10 @@ impl<'a> MylibraryBookshelveVolumeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveAddVolumeCall<'a>
-    where  {
+pub struct MylibraryBookshelveAddVolumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _shelf: String,
     _volume_id: String,
     _source: Option<String>,
@@ -12304,9 +12471,15 @@ pub struct MylibraryBookshelveAddVolumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveAddVolumeCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveAddVolumeCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
+impl<'a, S> MylibraryBookshelveAddVolumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12456,7 +12629,7 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
@@ -12466,21 +12639,21 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The reason for which the book is added to the library.
     ///
     /// Sets the *reason* query property to the given value.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a> {
+    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, S> {
         self._reason = Some(new_value.to_string());
         self
     }
@@ -12490,7 +12663,7 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveAddVolumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveAddVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12515,7 +12688,7 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveAddVolumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveAddVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12535,9 +12708,9 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveAddVolumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveAddVolumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12569,7 +12742,7 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12578,10 +12751,10 @@ impl<'a> MylibraryBookshelveAddVolumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveClearVolumeCall<'a>
-    where  {
+pub struct MylibraryBookshelveClearVolumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _shelf: String,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12589,9 +12762,15 @@ pub struct MylibraryBookshelveClearVolumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveClearVolumeCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveClearVolumeCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
+impl<'a, S> MylibraryBookshelveClearVolumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12737,14 +12916,14 @@ impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -12754,7 +12933,7 @@ impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveClearVolumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveClearVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12779,7 +12958,7 @@ impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveClearVolumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveClearVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12799,9 +12978,9 @@ impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveClearVolumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveClearVolumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12833,7 +13012,7 @@ impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12842,10 +13021,10 @@ impl<'a> MylibraryBookshelveClearVolumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveGetCall<'a>
-    where  {
+pub struct MylibraryBookshelveGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _shelf: String,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12853,9 +13032,15 @@ pub struct MylibraryBookshelveGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveGetCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveGetCall<'a> {
+impl<'a, S> MylibraryBookshelveGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13001,14 +13186,14 @@ impl<'a> MylibraryBookshelveGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13018,7 +13203,7 @@ impl<'a> MylibraryBookshelveGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13043,7 +13228,7 @@ impl<'a> MylibraryBookshelveGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13063,9 +13248,9 @@ impl<'a> MylibraryBookshelveGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13097,7 +13282,7 @@ impl<'a> MylibraryBookshelveGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13106,19 +13291,25 @@ impl<'a> MylibraryBookshelveGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveListCall<'a>
-    where  {
+pub struct MylibraryBookshelveListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _source: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveListCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveListCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveListCall<'a> {
+impl<'a, S> MylibraryBookshelveListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13239,7 +13430,7 @@ impl<'a> MylibraryBookshelveListCall<'a> {
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13249,7 +13440,7 @@ impl<'a> MylibraryBookshelveListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13274,7 +13465,7 @@ impl<'a> MylibraryBookshelveListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13294,9 +13485,9 @@ impl<'a> MylibraryBookshelveListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13328,7 +13519,7 @@ impl<'a> MylibraryBookshelveListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13337,10 +13528,10 @@ impl<'a> MylibraryBookshelveListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveMoveVolumeCall<'a>
-    where  {
+pub struct MylibraryBookshelveMoveVolumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _shelf: String,
     _volume_id: String,
     _volume_position: i32,
@@ -13350,9 +13541,15 @@ pub struct MylibraryBookshelveMoveVolumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveMoveVolumeCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveMoveVolumeCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
+impl<'a, S> MylibraryBookshelveMoveVolumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13500,7 +13697,7 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
@@ -13510,7 +13707,7 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -13520,14 +13717,14 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a> {
+    pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
         self._volume_position = new_value;
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -13537,7 +13734,7 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveMoveVolumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveMoveVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13562,7 +13759,7 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveMoveVolumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveMoveVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13582,9 +13779,9 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveMoveVolumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveMoveVolumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13616,7 +13813,7 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13626,10 +13823,10 @@ impl<'a> MylibraryBookshelveMoveVolumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryBookshelveRemoveVolumeCall<'a>
-    where  {
+pub struct MylibraryBookshelveRemoveVolumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _shelf: String,
     _volume_id: String,
     _source: Option<String>,
@@ -13639,9 +13836,15 @@ pub struct MylibraryBookshelveRemoveVolumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryBookshelveRemoveVolumeCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryBookshelveRemoveVolumeCall<'a, S> {}
 
-impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
+impl<'a, S> MylibraryBookshelveRemoveVolumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13791,7 +13994,7 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a> {
+    pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
         self._shelf = new_value.to_string();
         self
     }
@@ -13801,21 +14004,21 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The reason for which the book is removed from the library.
     ///
     /// Sets the *reason* query property to the given value.
-    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a> {
+    pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
         self._reason = Some(new_value.to_string());
         self
     }
@@ -13825,7 +14028,7 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveRemoveVolumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryBookshelveRemoveVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13850,7 +14053,7 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveRemoveVolumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveRemoveVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13870,9 +14073,9 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryBookshelveRemoveVolumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryBookshelveRemoveVolumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13904,7 +14107,7 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13914,10 +14117,10 @@ impl<'a> MylibraryBookshelveRemoveVolumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryReadingpositionGetCall<'a>
-    where  {
+pub struct MylibraryReadingpositionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _source: Option<String>,
     _content_version: Option<String>,
@@ -13926,9 +14129,15 @@ pub struct MylibraryReadingpositionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryReadingpositionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryReadingpositionGetCall<'a, S> {}
 
-impl<'a> MylibraryReadingpositionGetCall<'a> {
+impl<'a, S> MylibraryReadingpositionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14077,21 +14286,21 @@ impl<'a> MylibraryReadingpositionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Volume content version for which this reading position is requested.
     ///
     /// Sets the *content version* query property to the given value.
-    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, S> {
         self._content_version = Some(new_value.to_string());
         self
     }
@@ -14101,7 +14310,7 @@ impl<'a> MylibraryReadingpositionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryReadingpositionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryReadingpositionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14126,7 +14335,7 @@ impl<'a> MylibraryReadingpositionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14146,9 +14355,9 @@ impl<'a> MylibraryReadingpositionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryReadingpositionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryReadingpositionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14180,7 +14389,7 @@ impl<'a> MylibraryReadingpositionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14192,10 +14401,10 @@ impl<'a> MylibraryReadingpositionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MylibraryReadingpositionSetPositionCall<'a>
-    where  {
+pub struct MylibraryReadingpositionSetPositionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _position: String,
     _timestamp: String,
@@ -14208,9 +14417,15 @@ pub struct MylibraryReadingpositionSetPositionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MylibraryReadingpositionSetPositionCall<'a> {}
+impl<'a, S> client::CallBuilder for MylibraryReadingpositionSetPositionCall<'a, S> {}
 
-impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
+impl<'a, S> MylibraryReadingpositionSetPositionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14367,7 +14582,7 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
@@ -14377,7 +14592,7 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn position(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn position(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._position = new_value.to_string();
         self
     }
@@ -14387,35 +14602,35 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn timestamp(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn timestamp(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._timestamp = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Random persistent device cookie optional on set position.
     ///
     /// Sets the *device cookie* query property to the given value.
-    pub fn device_cookie(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn device_cookie(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._device_cookie = Some(new_value.to_string());
         self
     }
     /// Volume content version for which this reading position applies.
     ///
     /// Sets the *content version* query property to the given value.
-    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._content_version = Some(new_value.to_string());
         self
     }
     /// Action that caused this reading position to be set.
     ///
     /// Sets the *action* query property to the given value.
-    pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._action = Some(new_value.to_string());
         self
     }
@@ -14425,7 +14640,7 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryReadingpositionSetPositionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MylibraryReadingpositionSetPositionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14450,7 +14665,7 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionSetPositionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionSetPositionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14470,9 +14685,9 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MylibraryReadingpositionSetPositionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MylibraryReadingpositionSetPositionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14504,7 +14719,7 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14514,10 +14729,10 @@ impl<'a> MylibraryReadingpositionSetPositionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NotificationGetCall<'a>
-    where  {
+pub struct NotificationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _notification_id: String,
     _source: Option<String>,
     _locale: Option<String>,
@@ -14526,9 +14741,15 @@ pub struct NotificationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for NotificationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for NotificationGetCall<'a, S> {}
 
-impl<'a> NotificationGetCall<'a> {
+impl<'a, S> NotificationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14656,21 +14877,21 @@ impl<'a> NotificationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn notification_id(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn notification_id(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._notification_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating notification title and body.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> NotificationGetCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> NotificationGetCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -14680,7 +14901,7 @@ impl<'a> NotificationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NotificationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14705,7 +14926,7 @@ impl<'a> NotificationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14725,9 +14946,9 @@ impl<'a> NotificationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> NotificationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14759,7 +14980,7 @@ impl<'a> NotificationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14768,19 +14989,25 @@ impl<'a> NotificationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OnboardingListCategoryCall<'a>
-    where  {
+pub struct OnboardingListCategoryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _locale: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OnboardingListCategoryCall<'a> {}
+impl<'a, S> client::CallBuilder for OnboardingListCategoryCall<'a, S> {}
 
-impl<'a> OnboardingListCategoryCall<'a> {
+impl<'a, S> OnboardingListCategoryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14901,7 +15128,7 @@ impl<'a> OnboardingListCategoryCall<'a> {
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -14911,7 +15138,7 @@ impl<'a> OnboardingListCategoryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OnboardingListCategoryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OnboardingListCategoryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14936,7 +15163,7 @@ impl<'a> OnboardingListCategoryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14956,9 +15183,9 @@ impl<'a> OnboardingListCategoryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OnboardingListCategoryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OnboardingListCategoryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14990,7 +15217,7 @@ impl<'a> OnboardingListCategoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15003,10 +15230,10 @@ impl<'a> OnboardingListCategoryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OnboardingListCategoryVolumeCall<'a>
-    where  {
+pub struct OnboardingListCategoryVolumeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _page_token: Option<String>,
     _page_size: Option<u32>,
     _max_allowed_maturity_rating: Option<String>,
@@ -15017,9 +15244,15 @@ pub struct OnboardingListCategoryVolumeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OnboardingListCategoryVolumeCall<'a> {}
+impl<'a, S> client::CallBuilder for OnboardingListCategoryVolumeCall<'a, S> {}
 
-impl<'a> OnboardingListCategoryVolumeCall<'a> {
+impl<'a, S> OnboardingListCategoryVolumeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15154,28 +15387,28 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Number of maximum results per page to be included in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: u32) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn page_size(mut self, new_value: u32) -> OnboardingListCategoryVolumeCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The maximum allowed maturity rating of returned volumes. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, S> {
         self._max_allowed_maturity_rating = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -15183,7 +15416,7 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
     ///
     /// Append the given value to the *category id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_category_id(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn add_category_id(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, S> {
         self._category_id.push(new_value.to_string());
         self
     }
@@ -15193,7 +15426,7 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OnboardingListCategoryVolumeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OnboardingListCategoryVolumeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15218,7 +15451,7 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryVolumeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryVolumeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15238,9 +15471,9 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OnboardingListCategoryVolumeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OnboardingListCategoryVolumeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15272,7 +15505,7 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15283,10 +15516,10 @@ impl<'a> OnboardingListCategoryVolumeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PersonalizedstreamGetCall<'a>
-    where  {
+pub struct PersonalizedstreamGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _source: Option<String>,
     _max_allowed_maturity_rating: Option<String>,
     _locale: Option<String>,
@@ -15295,9 +15528,15 @@ pub struct PersonalizedstreamGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PersonalizedstreamGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PersonalizedstreamGetCall<'a, S> {}
 
-impl<'a> PersonalizedstreamGetCall<'a> {
+impl<'a, S> PersonalizedstreamGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15424,21 +15663,21 @@ impl<'a> PersonalizedstreamGetCall<'a> {
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a> {
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a, S> {
         self._max_allowed_maturity_rating = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> PersonalizedstreamGetCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -15448,7 +15687,7 @@ impl<'a> PersonalizedstreamGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PersonalizedstreamGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PersonalizedstreamGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15473,7 +15712,7 @@ impl<'a> PersonalizedstreamGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PersonalizedstreamGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PersonalizedstreamGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15493,9 +15732,9 @@ impl<'a> PersonalizedstreamGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PersonalizedstreamGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PersonalizedstreamGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15527,7 +15766,7 @@ impl<'a> PersonalizedstreamGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15543,10 +15782,10 @@ impl<'a> PersonalizedstreamGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PromoofferAcceptCall<'a>
-    where  {
+pub struct PromoofferAcceptCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: Option<String>,
     _serial: Option<String>,
     _product: Option<String>,
@@ -15560,9 +15799,15 @@ pub struct PromoofferAcceptCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PromoofferAcceptCall<'a> {}
+impl<'a, S> client::CallBuilder for PromoofferAcceptCall<'a, S> {}
 
-impl<'a> PromoofferAcceptCall<'a> {
+impl<'a, S> PromoofferAcceptCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15704,55 +15949,55 @@ impl<'a> PromoofferAcceptCall<'a> {
     /// Volume id to exercise the offer
     ///
     /// Sets the *volume id* query property to the given value.
-    pub fn volume_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._volume_id = Some(new_value.to_string());
         self
     }
     /// device serial
     ///
     /// Sets the *serial* query property to the given value.
-    pub fn serial(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn serial(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._serial = Some(new_value.to_string());
         self
     }
     /// device product
     ///
     /// Sets the *product* query property to the given value.
-    pub fn product(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn product(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._product = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *offer id* query property to the given value.
-    pub fn offer_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn offer_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._offer_id = Some(new_value.to_string());
         self
     }
     /// device model
     ///
     /// Sets the *model* query property to the given value.
-    pub fn model(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn model(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._model = Some(new_value.to_string());
         self
     }
     /// device manufacturer
     ///
     /// Sets the *manufacturer* query property to the given value.
-    pub fn manufacturer(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn manufacturer(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
     /// device device
     ///
     /// Sets the *device* query property to the given value.
-    pub fn device(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn device(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._device = Some(new_value.to_string());
         self
     }
     /// device android_id
     ///
     /// Sets the *android id* query property to the given value.
-    pub fn android_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a> {
+    pub fn android_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, S> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -15762,7 +16007,7 @@ impl<'a> PromoofferAcceptCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferAcceptCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferAcceptCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15787,7 +16032,7 @@ impl<'a> PromoofferAcceptCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PromoofferAcceptCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PromoofferAcceptCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15807,9 +16052,9 @@ impl<'a> PromoofferAcceptCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PromoofferAcceptCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PromoofferAcceptCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15841,7 +16086,7 @@ impl<'a> PromoofferAcceptCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15856,10 +16101,10 @@ impl<'a> PromoofferAcceptCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PromoofferDismisCall<'a>
-    where  {
+pub struct PromoofferDismisCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _serial: Option<String>,
     _product: Option<String>,
     _offer_id: Option<String>,
@@ -15872,9 +16117,15 @@ pub struct PromoofferDismisCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PromoofferDismisCall<'a> {}
+impl<'a, S> client::CallBuilder for PromoofferDismisCall<'a, S> {}
 
-impl<'a> PromoofferDismisCall<'a> {
+impl<'a, S> PromoofferDismisCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16013,49 +16264,49 @@ impl<'a> PromoofferDismisCall<'a> {
     /// device serial
     ///
     /// Sets the *serial* query property to the given value.
-    pub fn serial(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn serial(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._serial = Some(new_value.to_string());
         self
     }
     /// device product
     ///
     /// Sets the *product* query property to the given value.
-    pub fn product(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn product(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._product = Some(new_value.to_string());
         self
     }
     /// Offer to dimiss
     ///
     /// Sets the *offer id* query property to the given value.
-    pub fn offer_id(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn offer_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._offer_id = Some(new_value.to_string());
         self
     }
     /// device model
     ///
     /// Sets the *model* query property to the given value.
-    pub fn model(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn model(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._model = Some(new_value.to_string());
         self
     }
     /// device manufacturer
     ///
     /// Sets the *manufacturer* query property to the given value.
-    pub fn manufacturer(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn manufacturer(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
     /// device device
     ///
     /// Sets the *device* query property to the given value.
-    pub fn device(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn device(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._device = Some(new_value.to_string());
         self
     }
     /// device android_id
     ///
     /// Sets the *android id* query property to the given value.
-    pub fn android_id(mut self, new_value: &str) -> PromoofferDismisCall<'a> {
+    pub fn android_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, S> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -16065,7 +16316,7 @@ impl<'a> PromoofferDismisCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferDismisCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferDismisCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16090,7 +16341,7 @@ impl<'a> PromoofferDismisCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PromoofferDismisCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PromoofferDismisCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16110,9 +16361,9 @@ impl<'a> PromoofferDismisCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PromoofferDismisCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PromoofferDismisCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16144,7 +16395,7 @@ impl<'a> PromoofferDismisCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16158,10 +16409,10 @@ impl<'a> PromoofferDismisCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PromoofferGetCall<'a>
-    where  {
+pub struct PromoofferGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _serial: Option<String>,
     _product: Option<String>,
     _model: Option<String>,
@@ -16173,9 +16424,15 @@ pub struct PromoofferGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PromoofferGetCall<'a> {}
+impl<'a, S> client::CallBuilder for PromoofferGetCall<'a, S> {}
 
-impl<'a> PromoofferGetCall<'a> {
+impl<'a, S> PromoofferGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16311,42 +16568,42 @@ impl<'a> PromoofferGetCall<'a> {
     /// device serial
     ///
     /// Sets the *serial* query property to the given value.
-    pub fn serial(mut self, new_value: &str) -> PromoofferGetCall<'a> {
+    pub fn serial(mut self, new_value: &str) -> PromoofferGetCall<'a, S> {
         self._serial = Some(new_value.to_string());
         self
     }
     /// device product
     ///
     /// Sets the *product* query property to the given value.
-    pub fn product(mut self, new_value: &str) -> PromoofferGetCall<'a> {
+    pub fn product(mut self, new_value: &str) -> PromoofferGetCall<'a, S> {
         self._product = Some(new_value.to_string());
         self
     }
     /// device model
     ///
     /// Sets the *model* query property to the given value.
-    pub fn model(mut self, new_value: &str) -> PromoofferGetCall<'a> {
+    pub fn model(mut self, new_value: &str) -> PromoofferGetCall<'a, S> {
         self._model = Some(new_value.to_string());
         self
     }
     /// device manufacturer
     ///
     /// Sets the *manufacturer* query property to the given value.
-    pub fn manufacturer(mut self, new_value: &str) -> PromoofferGetCall<'a> {
+    pub fn manufacturer(mut self, new_value: &str) -> PromoofferGetCall<'a, S> {
         self._manufacturer = Some(new_value.to_string());
         self
     }
     /// device device
     ///
     /// Sets the *device* query property to the given value.
-    pub fn device(mut self, new_value: &str) -> PromoofferGetCall<'a> {
+    pub fn device(mut self, new_value: &str) -> PromoofferGetCall<'a, S> {
         self._device = Some(new_value.to_string());
         self
     }
     /// device android_id
     ///
     /// Sets the *android id* query property to the given value.
-    pub fn android_id(mut self, new_value: &str) -> PromoofferGetCall<'a> {
+    pub fn android_id(mut self, new_value: &str) -> PromoofferGetCall<'a, S> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -16356,7 +16613,7 @@ impl<'a> PromoofferGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PromoofferGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16381,7 +16638,7 @@ impl<'a> PromoofferGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PromoofferGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PromoofferGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16401,9 +16658,9 @@ impl<'a> PromoofferGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PromoofferGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PromoofferGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16435,7 +16692,7 @@ impl<'a> PromoofferGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16445,10 +16702,10 @@ impl<'a> PromoofferGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SeryMembershipGetCall<'a>
-    where  {
+pub struct SeryMembershipGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _series_id: String,
     _page_token: Option<String>,
     _page_size: Option<u32>,
@@ -16457,9 +16714,15 @@ pub struct SeryMembershipGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SeryMembershipGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SeryMembershipGetCall<'a, S> {}
 
-impl<'a> SeryMembershipGetCall<'a> {
+impl<'a, S> SeryMembershipGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16587,21 +16850,21 @@ impl<'a> SeryMembershipGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn series_id(mut self, new_value: &str) -> SeryMembershipGetCall<'a> {
+    pub fn series_id(mut self, new_value: &str) -> SeryMembershipGetCall<'a, S> {
         self._series_id = new_value.to_string();
         self
     }
     /// The value of the nextToken from the previous page.
     ///
     /// Sets the *page_token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SeryMembershipGetCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SeryMembershipGetCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Number of maximum results per page to be included in the response.
     ///
     /// Sets the *page_size* query property to the given value.
-    pub fn page_size(mut self, new_value: u32) -> SeryMembershipGetCall<'a> {
+    pub fn page_size(mut self, new_value: u32) -> SeryMembershipGetCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -16611,7 +16874,7 @@ impl<'a> SeryMembershipGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeryMembershipGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeryMembershipGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16636,7 +16899,7 @@ impl<'a> SeryMembershipGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SeryMembershipGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SeryMembershipGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16656,9 +16919,9 @@ impl<'a> SeryMembershipGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SeryMembershipGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SeryMembershipGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16690,7 +16953,7 @@ impl<'a> SeryMembershipGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16698,19 +16961,25 @@ impl<'a> SeryMembershipGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SeryGetCall<'a>
-    where  {
+pub struct SeryGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _series_id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SeryGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SeryGetCall<'a, S> {}
 
-impl<'a> SeryGetCall<'a> {
+impl<'a, S> SeryGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16837,7 +17106,7 @@ impl<'a> SeryGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_series_id(mut self, new_value: &str) -> SeryGetCall<'a> {
+    pub fn add_series_id(mut self, new_value: &str) -> SeryGetCall<'a, S> {
         self._series_id.push(new_value.to_string());
         self
     }
@@ -16847,7 +17116,7 @@ impl<'a> SeryGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeryGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SeryGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16872,7 +17141,7 @@ impl<'a> SeryGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SeryGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SeryGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16892,9 +17161,9 @@ impl<'a> SeryGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SeryGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SeryGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16926,7 +17195,7 @@ impl<'a> SeryGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16938,10 +17207,10 @@ impl<'a> SeryGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeAssociatedListCall<'a>
-    where  {
+pub struct VolumeAssociatedListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _source: Option<String>,
     _max_allowed_maturity_rating: Option<String>,
@@ -16952,9 +17221,15 @@ pub struct VolumeAssociatedListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeAssociatedListCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeAssociatedListCall<'a, S> {}
 
-impl<'a> VolumeAssociatedListCall<'a> {
+impl<'a, S> VolumeAssociatedListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17109,35 +17384,35 @@ impl<'a> VolumeAssociatedListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeAssociatedListCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeAssociatedListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeAssociatedListCall<'a> {
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
         self._max_allowed_maturity_rating = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VolumeAssociatedListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// Association type.
     ///
     /// Sets the *association* query property to the given value.
-    pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a> {
+    pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, S> {
         self._association = Some(new_value.to_string());
         self
     }
@@ -17147,7 +17422,7 @@ impl<'a> VolumeAssociatedListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeAssociatedListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeAssociatedListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17172,7 +17447,7 @@ impl<'a> VolumeAssociatedListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeAssociatedListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeAssociatedListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17192,9 +17467,9 @@ impl<'a> VolumeAssociatedListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeAssociatedListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeAssociatedListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17226,7 +17501,7 @@ impl<'a> VolumeAssociatedListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17241,10 +17516,10 @@ impl<'a> VolumeAssociatedListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeMybookListCall<'a>
-    where  {
+pub struct VolumeMybookListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _start_index: Option<u32>,
     _source: Option<String>,
     _processing_state: Vec<String>,
@@ -17257,9 +17532,15 @@ pub struct VolumeMybookListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeMybookListCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeMybookListCall<'a, S> {}
 
-impl<'a> VolumeMybookListCall<'a> {
+impl<'a, S> VolumeMybookListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17402,14 +17683,14 @@ impl<'a> VolumeMybookListCall<'a> {
     /// Index of the first result to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> VolumeMybookListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> VolumeMybookListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeMybookListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -17417,28 +17698,28 @@ impl<'a> VolumeMybookListCall<'a> {
     ///
     /// Append the given value to the *processing state* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a> {
+    pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
         self._processing_state.push(new_value.to_string());
         self
     }
     /// Maximum number of results to return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> VolumeMybookListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> VolumeMybookListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex:'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VolumeMybookListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
     /// ISO-3166-1 code to override the IP-based location.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> VolumeMybookListCall<'a> {
+    pub fn country(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -17446,7 +17727,7 @@ impl<'a> VolumeMybookListCall<'a> {
     ///
     /// Append the given value to the *acquire method* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a> {
+    pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a, S> {
         self._acquire_method.push(new_value.to_string());
         self
     }
@@ -17456,7 +17737,7 @@ impl<'a> VolumeMybookListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeMybookListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeMybookListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17481,7 +17762,7 @@ impl<'a> VolumeMybookListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeMybookListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeMybookListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17501,9 +17782,9 @@ impl<'a> VolumeMybookListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeMybookListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeMybookListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17535,7 +17816,7 @@ impl<'a> VolumeMybookListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17546,10 +17827,10 @@ impl<'a> VolumeMybookListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeRecommendedListCall<'a>
-    where  {
+pub struct VolumeRecommendedListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _source: Option<String>,
     _max_allowed_maturity_rating: Option<String>,
     _locale: Option<String>,
@@ -17558,9 +17839,15 @@ pub struct VolumeRecommendedListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeRecommendedListCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeRecommendedListCall<'a, S> {}
 
-impl<'a> VolumeRecommendedListCall<'a> {
+impl<'a, S> VolumeRecommendedListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17687,21 +17974,21 @@ impl<'a> VolumeRecommendedListCall<'a> {
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeRecommendedListCall<'a> {
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, S> {
         self._max_allowed_maturity_rating = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -17711,7 +17998,7 @@ impl<'a> VolumeRecommendedListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeRecommendedListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeRecommendedListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17736,7 +18023,7 @@ impl<'a> VolumeRecommendedListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17756,9 +18043,9 @@ impl<'a> VolumeRecommendedListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeRecommendedListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeRecommendedListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17790,7 +18077,7 @@ impl<'a> VolumeRecommendedListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17800,10 +18087,10 @@ impl<'a> VolumeRecommendedListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeRecommendedRateCall<'a>
-    where  {
+pub struct VolumeRecommendedRateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _rating: String,
     _volume_id: String,
     _source: Option<String>,
@@ -17813,9 +18100,15 @@ pub struct VolumeRecommendedRateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeRecommendedRateCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeRecommendedRateCall<'a, S> {}
 
-impl<'a> VolumeRecommendedRateCall<'a> {
+impl<'a, S> VolumeRecommendedRateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17944,7 +18237,7 @@ impl<'a> VolumeRecommendedRateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a> {
+    pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, S> {
         self._rating = new_value.to_string();
         self
     }
@@ -17954,21 +18247,21 @@ impl<'a> VolumeRecommendedRateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -17978,7 +18271,7 @@ impl<'a> VolumeRecommendedRateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeRecommendedRateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeRecommendedRateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18003,7 +18296,7 @@ impl<'a> VolumeRecommendedRateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedRateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedRateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18023,9 +18316,9 @@ impl<'a> VolumeRecommendedRateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeRecommendedRateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeRecommendedRateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18057,7 +18350,7 @@ impl<'a> VolumeRecommendedRateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18071,10 +18364,10 @@ impl<'a> VolumeRecommendedRateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeUseruploadedListCall<'a>
-    where  {
+pub struct VolumeUseruploadedListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: Vec<String>,
     _start_index: Option<u32>,
     _source: Option<String>,
@@ -18086,9 +18379,15 @@ pub struct VolumeUseruploadedListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeUseruploadedListCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeUseruploadedListCall<'a, S> {}
 
-impl<'a> VolumeUseruploadedListCall<'a> {
+impl<'a, S> VolumeUseruploadedListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18229,21 +18528,21 @@ impl<'a> VolumeUseruploadedListCall<'a> {
     ///
     /// Append the given value to the *volume id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a> {
+    pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, S> {
         self._volume_id.push(new_value.to_string());
         self
     }
     /// Index of the first result to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
@@ -18251,21 +18550,21 @@ impl<'a> VolumeUseruploadedListCall<'a> {
     ///
     /// Append the given value to the *processing state* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a> {
+    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, S> {
         self._processing_state.push(new_value.to_string());
         self
     }
     /// Maximum number of results to return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a> {
+    pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, S> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -18275,7 +18574,7 @@ impl<'a> VolumeUseruploadedListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeUseruploadedListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeUseruploadedListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18300,7 +18599,7 @@ impl<'a> VolumeUseruploadedListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeUseruploadedListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeUseruploadedListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18320,9 +18619,9 @@ impl<'a> VolumeUseruploadedListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeUseruploadedListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeUseruploadedListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18354,7 +18653,7 @@ impl<'a> VolumeUseruploadedListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18368,10 +18667,10 @@ impl<'a> VolumeUseruploadedListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeGetCall<'a>
-    where  {
+pub struct VolumeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _volume_id: String,
     _user_library_consistent_read: Option<bool>,
     _source: Option<String>,
@@ -18384,9 +18683,15 @@ pub struct VolumeGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeGetCall<'a, S> {}
 
-impl<'a> VolumeGetCall<'a> {
+impl<'a, S> VolumeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18547,48 +18852,48 @@ impl<'a> VolumeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a> {
+    pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, S> {
         self._volume_id = new_value.to_string();
         self
     }
     ///
     /// Sets the *user_library_consistent_read* query property to the given value.
-    pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a> {
+    pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a, S> {
         self._user_library_consistent_read = Some(new_value);
         self
     }
     /// string to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Brand results for partner ID.
     ///
     /// Sets the *partner* query property to the given value.
-    pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a> {
+    pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, S> {
         self._partner = Some(new_value.to_string());
         self
     }
     /// Set to true to include non-comics series. Defaults to false.
     ///
     /// Sets the *include non comics series* query property to the given value.
-    pub fn include_non_comics_series(mut self, new_value: bool) -> VolumeGetCall<'a> {
+    pub fn include_non_comics_series(mut self, new_value: bool) -> VolumeGetCall<'a, S> {
         self._include_non_comics_series = Some(new_value);
         self
     }
     /// ISO-3166-1 code to override the IP-based location.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a> {
+    pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, S> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -18598,7 +18903,7 @@ impl<'a> VolumeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18623,7 +18928,7 @@ impl<'a> VolumeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18643,9 +18948,9 @@ impl<'a> VolumeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18677,7 +18982,7 @@ impl<'a> VolumeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Books::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18698,10 +19003,10 @@ impl<'a> VolumeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VolumeListCall<'a>
-    where  {
+pub struct VolumeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Books<>,
+    hub: &'a Books<S>,
     _q: String,
     _start_index: Option<u32>,
     _source: Option<String>,
@@ -18721,9 +19026,15 @@ pub struct VolumeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for VolumeListCall<'a> {}
+impl<'a, S> client::CallBuilder for VolumeListCall<'a, S> {}
 
-impl<'a> VolumeListCall<'a> {
+impl<'a, S> VolumeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18884,98 +19195,98 @@ impl<'a> VolumeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn q(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn q(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._q = new_value.to_string();
         self
     }
     /// Index of the first result to return (starts at 0)
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> VolumeListCall<'a> {
+    pub fn start_index(mut self, new_value: u32) -> VolumeListCall<'a, S> {
         self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn source(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._source = Some(new_value.to_string());
         self
     }
     /// Set to true to show books available for preorder. Defaults to false.
     ///
     /// Sets the *show preorders* query property to the given value.
-    pub fn show_preorders(mut self, new_value: bool) -> VolumeListCall<'a> {
+    pub fn show_preorders(mut self, new_value: bool) -> VolumeListCall<'a, S> {
         self._show_preorders = Some(new_value);
         self
     }
     /// Restrict information returned to a set of selected fields.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._projection = Some(new_value.to_string());
         self
     }
     /// Restrict to books or magazines.
     ///
     /// Sets the *print type* query property to the given value.
-    pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._print_type = Some(new_value.to_string());
         self
     }
     /// Restrict and brand results for partner ID.
     ///
     /// Sets the *partner* query property to the given value.
-    pub fn partner(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn partner(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._partner = Some(new_value.to_string());
         self
     }
     /// Sort search results.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> VolumeListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> VolumeListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
     ///
     /// Sets the *max allowed maturity rating* query property to the given value.
-    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._max_allowed_maturity_rating = Some(new_value.to_string());
         self
     }
     /// Restrict search to this user's library.
     ///
     /// Sets the *library restrict* query property to the given value.
-    pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._library_restrict = Some(new_value.to_string());
         self
     }
     /// Restrict results to books with this language code.
     ///
     /// Sets the *lang restrict* query property to the given value.
-    pub fn lang_restrict(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn lang_restrict(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._lang_restrict = Some(new_value.to_string());
         self
     }
     /// Filter search results.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Restrict to volumes by download availability.
     ///
     /// Sets the *download* query property to the given value.
-    pub fn download(mut self, new_value: &str) -> VolumeListCall<'a> {
+    pub fn download(mut self, new_value: &str) -> VolumeListCall<'a, S> {
         self._download = Some(new_value.to_string());
         self
     }
@@ -18985,7 +19296,7 @@ impl<'a> VolumeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VolumeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19010,7 +19321,7 @@ impl<'a> VolumeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19030,9 +19341,9 @@ impl<'a> VolumeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> VolumeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

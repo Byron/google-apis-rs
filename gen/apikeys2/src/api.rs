@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -108,40 +113,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct ApiKeysService<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct ApiKeysService<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for ApiKeysService<> {}
+impl<'a, S> client::Hub for ApiKeysService<S> {}
 
-impl<'a, > ApiKeysService<> {
+impl<'a, S> ApiKeysService<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ApiKeysService<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> ApiKeysService<S> {
         ApiKeysService {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://apikeys.googleapis.com/".to_string(),
             _root_url: "https://apikeys.googleapis.com/".to_string(),
         }
     }
 
-    pub fn keys(&'a self) -> KeyMethods<'a> {
+    pub fn keys(&'a self) -> KeyMethods<'a, S> {
         KeyMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a> {
+    pub fn operations(&'a self) -> OperationMethods<'a, S> {
         OperationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -494,27 +499,27 @@ impl client::RequestValue for V2UndeleteKeyRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `lookup_key(...)`
 /// // to build up your call.
 /// let rb = hub.keys();
 /// # }
 /// ```
-pub struct KeyMethods<'a>
-    where  {
+pub struct KeyMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
 }
 
-impl<'a> client::MethodsBuilder for KeyMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for KeyMethods<'a, S> {}
 
-impl<'a> KeyMethods<'a> {
+impl<'a, S> KeyMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Find the parent project and resource name of the API key that matches the key string in the request. If the API key has been purged, resource name will not be set. The service account must have the `apikeys.keys.lookup` permission on the parent project.
-    pub fn lookup_key(&self) -> KeyLookupKeyCall<'a> {
+    pub fn lookup_key(&self) -> KeyLookupKeyCall<'a, S> {
         KeyLookupKeyCall {
             hub: self.hub,
             _key_string: Default::default(),
@@ -548,22 +553,22 @@ impl<'a> KeyMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a>
-    where  {
+pub struct OperationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
 }
 
-impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for OperationMethods<'a, S> {}
 
-impl<'a> OperationMethods<'a> {
+impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -572,7 +577,7 @@ impl<'a> OperationMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, S> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -606,22 +611,22 @@ impl<'a> OperationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_keys_clone(...)`, `locations_keys_create(...)`, `locations_keys_delete(...)`, `locations_keys_get(...)`, `locations_keys_get_key_string(...)`, `locations_keys_list(...)`, `locations_keys_patch(...)` and `locations_keys_undelete(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -631,7 +636,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the API key to be cloned in the same project.
-    pub fn locations_keys_clone(&self, request: V2CloneKeyRequest, name: &str) -> ProjectLocationKeyCloneCall<'a> {
+    pub fn locations_keys_clone(&self, request: V2CloneKeyRequest, name: &str) -> ProjectLocationKeyCloneCall<'a, S> {
         ProjectLocationKeyCloneCall {
             hub: self.hub,
             _request: request,
@@ -650,7 +655,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The project in which the API key is created.
-    pub fn locations_keys_create(&self, request: V2Key, parent: &str) -> ProjectLocationKeyCreateCall<'a> {
+    pub fn locations_keys_create(&self, request: V2Key, parent: &str) -> ProjectLocationKeyCreateCall<'a, S> {
         ProjectLocationKeyCreateCall {
             hub: self.hub,
             _request: request,
@@ -669,7 +674,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the API key to be deleted.
-    pub fn locations_keys_delete(&self, name: &str) -> ProjectLocationKeyDeleteCall<'a> {
+    pub fn locations_keys_delete(&self, name: &str) -> ProjectLocationKeyDeleteCall<'a, S> {
         ProjectLocationKeyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -687,7 +692,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the API key to get.
-    pub fn locations_keys_get(&self, name: &str) -> ProjectLocationKeyGetCall<'a> {
+    pub fn locations_keys_get(&self, name: &str) -> ProjectLocationKeyGetCall<'a, S> {
         ProjectLocationKeyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -704,7 +709,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the API key to be retrieved.
-    pub fn locations_keys_get_key_string(&self, name: &str) -> ProjectLocationKeyGetKeyStringCall<'a> {
+    pub fn locations_keys_get_key_string(&self, name: &str) -> ProjectLocationKeyGetKeyStringCall<'a, S> {
         ProjectLocationKeyGetKeyStringCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -721,7 +726,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Lists all API keys associated with this project.
-    pub fn locations_keys_list(&self, parent: &str) -> ProjectLocationKeyListCall<'a> {
+    pub fn locations_keys_list(&self, parent: &str) -> ProjectLocationKeyListCall<'a, S> {
         ProjectLocationKeyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -743,7 +748,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the key. The `name` has the form: `projects//locations/global/keys/`. For example: `projects/123456867718/locations/global/keys/b7ff1f9f-8275-410a-94dd-3855ee9b5dd2` NOTE: Key is a global resource; hence the only supported value for location is `global`.
-    pub fn locations_keys_patch(&self, request: V2Key, name: &str) -> ProjectLocationKeyPatchCall<'a> {
+    pub fn locations_keys_patch(&self, request: V2Key, name: &str) -> ProjectLocationKeyPatchCall<'a, S> {
         ProjectLocationKeyPatchCall {
             hub: self.hub,
             _request: request,
@@ -763,7 +768,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the API key to be undeleted.
-    pub fn locations_keys_undelete(&self, request: V2UndeleteKeyRequest, name: &str) -> ProjectLocationKeyUndeleteCall<'a> {
+    pub fn locations_keys_undelete(&self, request: V2UndeleteKeyRequest, name: &str) -> ProjectLocationKeyUndeleteCall<'a, S> {
         ProjectLocationKeyUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -805,7 +810,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -814,19 +819,25 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct KeyLookupKeyCall<'a>
-    where  {
+pub struct KeyLookupKeyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _key_string: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for KeyLookupKeyCall<'a> {}
+impl<'a, S> client::CallBuilder for KeyLookupKeyCall<'a, S> {}
 
-impl<'a> KeyLookupKeyCall<'a> {
+impl<'a, S> KeyLookupKeyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -947,7 +958,7 @@ impl<'a> KeyLookupKeyCall<'a> {
     /// Required. Finds the project that owns the key string value.
     ///
     /// Sets the *key string* query property to the given value.
-    pub fn key_string(mut self, new_value: &str) -> KeyLookupKeyCall<'a> {
+    pub fn key_string(mut self, new_value: &str) -> KeyLookupKeyCall<'a, S> {
         self._key_string = Some(new_value.to_string());
         self
     }
@@ -957,7 +968,7 @@ impl<'a> KeyLookupKeyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> KeyLookupKeyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> KeyLookupKeyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -982,7 +993,7 @@ impl<'a> KeyLookupKeyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> KeyLookupKeyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> KeyLookupKeyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1002,9 +1013,9 @@ impl<'a> KeyLookupKeyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> KeyLookupKeyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> KeyLookupKeyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1036,7 +1047,7 @@ impl<'a> KeyLookupKeyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1044,19 +1055,25 @@ impl<'a> KeyLookupKeyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a>
-    where  {
+pub struct OperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for OperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for OperationGetCall<'a, S> {}
 
-impl<'a> OperationGetCall<'a> {
+impl<'a, S> OperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1203,7 +1220,7 @@ impl<'a> OperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1213,7 +1230,7 @@ impl<'a> OperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1238,7 +1255,7 @@ impl<'a> OperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1258,9 +1275,9 @@ impl<'a> OperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> OperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1293,7 +1310,7 @@ impl<'a> OperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1306,10 +1323,10 @@ impl<'a> OperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyCloneCall<'a>
-    where  {
+pub struct ProjectLocationKeyCloneCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _request: V2CloneKeyRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1317,9 +1334,15 @@ pub struct ProjectLocationKeyCloneCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyCloneCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyCloneCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyCloneCall<'a> {
+impl<'a, S> ProjectLocationKeyCloneCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1479,7 +1502,7 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: V2CloneKeyRequest) -> ProjectLocationKeyCloneCall<'a> {
+    pub fn request(mut self, new_value: V2CloneKeyRequest) -> ProjectLocationKeyCloneCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1489,7 +1512,7 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyCloneCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyCloneCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1499,7 +1522,7 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyCloneCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyCloneCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1524,7 +1547,7 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyCloneCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyCloneCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1544,9 +1567,9 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyCloneCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyCloneCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1579,7 +1602,7 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1593,10 +1616,10 @@ impl<'a> ProjectLocationKeyCloneCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyCreateCall<'a>
-    where  {
+pub struct ProjectLocationKeyCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _request: V2Key,
     _parent: String,
     _key_id: Option<String>,
@@ -1605,9 +1628,15 @@ pub struct ProjectLocationKeyCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyCreateCall<'a> {
+impl<'a, S> ProjectLocationKeyCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1770,7 +1799,7 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: V2Key) -> ProjectLocationKeyCreateCall<'a> {
+    pub fn request(mut self, new_value: V2Key) -> ProjectLocationKeyCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1780,14 +1809,14 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// User specified key id (optional). If specified, it will become the final component of the key resource name. The id must be unique within the project, must conform with RFC-1034, is restricted to lower-cased letters, and has a maximum length of 63 characters. In another word, the id must match the regular expression: `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`. The id must NOT be a UUID-like string.
     ///
     /// Sets the *key id* query property to the given value.
-    pub fn key_id(mut self, new_value: &str) -> ProjectLocationKeyCreateCall<'a> {
+    pub fn key_id(mut self, new_value: &str) -> ProjectLocationKeyCreateCall<'a, S> {
         self._key_id = Some(new_value.to_string());
         self
     }
@@ -1797,7 +1826,7 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1822,7 +1851,7 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1842,9 +1871,9 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1876,7 +1905,7 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1885,10 +1914,10 @@ impl<'a> ProjectLocationKeyCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyDeleteCall<'a>
-    where  {
+pub struct ProjectLocationKeyDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _name: String,
     _etag: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1896,9 +1925,15 @@ pub struct ProjectLocationKeyDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyDeleteCall<'a> {
+impl<'a, S> ProjectLocationKeyDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2048,14 +2083,14 @@ impl<'a> ProjectLocationKeyDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The etag known to the client for the expected state of the key. This is to be used for optimistic concurrency.
     ///
     /// Sets the *etag* query property to the given value.
-    pub fn etag(mut self, new_value: &str) -> ProjectLocationKeyDeleteCall<'a> {
+    pub fn etag(mut self, new_value: &str) -> ProjectLocationKeyDeleteCall<'a, S> {
         self._etag = Some(new_value.to_string());
         self
     }
@@ -2065,7 +2100,7 @@ impl<'a> ProjectLocationKeyDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2090,7 +2125,7 @@ impl<'a> ProjectLocationKeyDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2110,9 +2145,9 @@ impl<'a> ProjectLocationKeyDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2144,7 +2179,7 @@ impl<'a> ProjectLocationKeyDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2152,19 +2187,25 @@ impl<'a> ProjectLocationKeyDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyGetCall<'a>
-    where  {
+pub struct ProjectLocationKeyGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyGetCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyGetCall<'a> {
+impl<'a, S> ProjectLocationKeyGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2311,7 +2352,7 @@ impl<'a> ProjectLocationKeyGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2321,7 +2362,7 @@ impl<'a> ProjectLocationKeyGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2346,7 +2387,7 @@ impl<'a> ProjectLocationKeyGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2366,9 +2407,9 @@ impl<'a> ProjectLocationKeyGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2400,7 +2441,7 @@ impl<'a> ProjectLocationKeyGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2408,19 +2449,25 @@ impl<'a> ProjectLocationKeyGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyGetKeyStringCall<'a>
-    where  {
+pub struct ProjectLocationKeyGetKeyStringCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyGetKeyStringCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyGetKeyStringCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
+impl<'a, S> ProjectLocationKeyGetKeyStringCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2567,7 +2614,7 @@ impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyGetKeyStringCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyGetKeyStringCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2577,7 +2624,7 @@ impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyGetKeyStringCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyGetKeyStringCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2602,7 +2649,7 @@ impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyGetKeyStringCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyGetKeyStringCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2622,9 +2669,9 @@ impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyGetKeyStringCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyGetKeyStringCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2656,7 +2703,7 @@ impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2668,10 +2715,10 @@ impl<'a> ProjectLocationKeyGetKeyStringCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyListCall<'a>
-    where  {
+pub struct ProjectLocationKeyListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _parent: String,
     _show_deleted: Option<bool>,
     _page_token: Option<String>,
@@ -2682,9 +2729,15 @@ pub struct ProjectLocationKeyListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyListCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyListCall<'a> {
+impl<'a, S> ProjectLocationKeyListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2843,35 +2896,35 @@ impl<'a> ProjectLocationKeyListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Indicate that keys are marked as deleted within 30 days should also be returned. Normally only active keys are returned.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> ProjectLocationKeyListCall<'a> {
+    pub fn show_deleted(mut self, new_value: bool) -> ProjectLocationKeyListCall<'a, S> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Optional. Requests a specific page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Specifies the maximum number of results to be returned at a time.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Deprecated: Use `show_deleted` instead. Only list keys that conform to the specified filter. The allowed filter strings are `state:ACTIVE` and `state:DELETED`. By default, ListKeys returns only active keys.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationKeyListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2881,7 +2934,7 @@ impl<'a> ProjectLocationKeyListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2906,7 +2959,7 @@ impl<'a> ProjectLocationKeyListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2926,9 +2979,9 @@ impl<'a> ProjectLocationKeyListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2961,7 +3014,7 @@ impl<'a> ProjectLocationKeyListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2975,10 +3028,10 @@ impl<'a> ProjectLocationKeyListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyPatchCall<'a>
-    where  {
+pub struct ProjectLocationKeyPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _request: V2Key,
     _name: String,
     _update_mask: Option<String>,
@@ -2987,9 +3040,15 @@ pub struct ProjectLocationKeyPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyPatchCall<'a> {
+impl<'a, S> ProjectLocationKeyPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3152,7 +3211,7 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: V2Key) -> ProjectLocationKeyPatchCall<'a> {
+    pub fn request(mut self, new_value: V2Key) -> ProjectLocationKeyPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3162,14 +3221,14 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The field mask specifies which fields to be updated as part of this request. All other fields are ignored. Mutable fields are: `display_name` and `restrictions`. If an update mask is not provided, the service treats it as an implied mask equivalent to all allowed fields that are set on the wire. If the field mask has a special value "*", the service treats it equivalent to replace all allowed mutable fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3179,7 +3238,7 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3204,7 +3263,7 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3224,9 +3283,9 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3259,7 +3318,7 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = ApiKeysService::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3272,10 +3331,10 @@ impl<'a> ProjectLocationKeyPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyUndeleteCall<'a>
-    where  {
+pub struct ProjectLocationKeyUndeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a ApiKeysService<>,
+    hub: &'a ApiKeysService<S>,
     _request: V2UndeleteKeyRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3283,9 +3342,15 @@ pub struct ProjectLocationKeyUndeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationKeyUndeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationKeyUndeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationKeyUndeleteCall<'a> {
+impl<'a, S> ProjectLocationKeyUndeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3445,7 +3510,7 @@ impl<'a> ProjectLocationKeyUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: V2UndeleteKeyRequest) -> ProjectLocationKeyUndeleteCall<'a> {
+    pub fn request(mut self, new_value: V2UndeleteKeyRequest) -> ProjectLocationKeyUndeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3455,7 +3520,7 @@ impl<'a> ProjectLocationKeyUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyUndeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyUndeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3465,7 +3530,7 @@ impl<'a> ProjectLocationKeyUndeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyUndeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyUndeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3490,7 +3555,7 @@ impl<'a> ProjectLocationKeyUndeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyUndeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyUndeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3510,9 +3575,9 @@ impl<'a> ProjectLocationKeyUndeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyUndeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationKeyUndeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

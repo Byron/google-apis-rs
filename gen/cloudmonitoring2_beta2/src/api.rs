@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -110,40 +115,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudMonitoring<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct CloudMonitoring<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for CloudMonitoring<> {}
+impl<'a, S> client::Hub for CloudMonitoring<S> {}
 
-impl<'a, > CloudMonitoring<> {
+impl<'a, S> CloudMonitoring<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudMonitoring<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> CloudMonitoring<S> {
         CloudMonitoring {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn metric_descriptors(&'a self) -> MetricDescriptorMethods<'a> {
+    pub fn metric_descriptors(&'a self) -> MetricDescriptorMethods<'a, S> {
         MetricDescriptorMethods { hub: &self }
     }
-    pub fn timeseries(&'a self) -> TimeseryMethods<'a> {
+    pub fn timeseries(&'a self) -> TimeseryMethods<'a, S> {
         TimeseryMethods { hub: &self }
     }
-    pub fn timeseries_descriptors(&'a self) -> TimeseriesDescriptorMethods<'a> {
+    pub fn timeseries_descriptors(&'a self) -> TimeseriesDescriptorMethods<'a, S> {
         TimeseriesDescriptorMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -602,22 +607,22 @@ impl client::ResponseResult for WriteTimeseriesResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.metric_descriptors();
 /// # }
 /// ```
-pub struct MetricDescriptorMethods<'a>
-    where  {
+pub struct MetricDescriptorMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
 }
 
-impl<'a> client::MethodsBuilder for MetricDescriptorMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MetricDescriptorMethods<'a, S> {}
 
-impl<'a> MetricDescriptorMethods<'a> {
+impl<'a, S> MetricDescriptorMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -627,7 +632,7 @@ impl<'a> MetricDescriptorMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn create(&self, request: MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a> {
+    pub fn create(&self, request: MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, S> {
         MetricDescriptorCreateCall {
             hub: self.hub,
             _request: request,
@@ -646,7 +651,7 @@ impl<'a> MetricDescriptorMethods<'a> {
     ///
     /// * `project` - The project ID to which the metric belongs.
     /// * `metric` - Name of the metric.
-    pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a> {
+    pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a, S> {
         MetricDescriptorDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -665,7 +670,7 @@ impl<'a> MetricDescriptorMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn list(&self, request: ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a> {
+    pub fn list(&self, request: ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, S> {
         MetricDescriptorListCall {
             hub: self.hub,
             _request: request,
@@ -703,22 +708,22 @@ impl<'a> MetricDescriptorMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `write(...)`
 /// // to build up your call.
 /// let rb = hub.timeseries();
 /// # }
 /// ```
-pub struct TimeseryMethods<'a>
-    where  {
+pub struct TimeseryMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
 }
 
-impl<'a> client::MethodsBuilder for TimeseryMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TimeseryMethods<'a, S> {}
 
-impl<'a> TimeseryMethods<'a> {
+impl<'a, S> TimeseryMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -730,7 +735,7 @@ impl<'a> TimeseryMethods<'a> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a> {
+    pub fn list(&self, request: ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, S> {
         TimeseryListCall {
             hub: self.hub,
             _request: request,
@@ -758,7 +763,7 @@ impl<'a> TimeseryMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project ID. The value can be the numeric project ID or string-based project name.
-    pub fn write(&self, request: WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a> {
+    pub fn write(&self, request: WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, S> {
         TimeseryWriteCall {
             hub: self.hub,
             _request: request,
@@ -793,22 +798,22 @@ impl<'a> TimeseryMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
 /// let rb = hub.timeseries_descriptors();
 /// # }
 /// ```
-pub struct TimeseriesDescriptorMethods<'a>
-    where  {
+pub struct TimeseriesDescriptorMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
 }
 
-impl<'a> client::MethodsBuilder for TimeseriesDescriptorMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for TimeseriesDescriptorMethods<'a, S> {}
 
-impl<'a> TimeseriesDescriptorMethods<'a> {
+impl<'a, S> TimeseriesDescriptorMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -820,7 +825,7 @@ impl<'a> TimeseriesDescriptorMethods<'a> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn list(&self, request: ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, S> {
         TimeseriesDescriptorListCall {
             hub: self.hub,
             _request: request,
@@ -872,7 +877,7 @@ impl<'a> TimeseriesDescriptorMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -885,10 +890,10 @@ impl<'a> TimeseriesDescriptorMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetricDescriptorCreateCall<'a>
-    where  {
+pub struct MetricDescriptorCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
     _request: MetricDescriptor,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -896,9 +901,15 @@ pub struct MetricDescriptorCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MetricDescriptorCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MetricDescriptorCreateCall<'a, S> {}
 
-impl<'a> MetricDescriptorCreateCall<'a> {
+impl<'a, S> MetricDescriptorCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1054,7 +1065,7 @@ impl<'a> MetricDescriptorCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MetricDescriptor) -> MetricDescriptorCreateCall<'a> {
+    pub fn request(mut self, new_value: MetricDescriptor) -> MetricDescriptorCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1064,7 +1075,7 @@ impl<'a> MetricDescriptorCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1074,7 +1085,7 @@ impl<'a> MetricDescriptorCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1095,7 +1106,7 @@ impl<'a> MetricDescriptorCreateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1115,9 +1126,9 @@ impl<'a> MetricDescriptorCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MetricDescriptorCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1149,7 +1160,7 @@ impl<'a> MetricDescriptorCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1157,10 +1168,10 @@ impl<'a> MetricDescriptorCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetricDescriptorDeleteCall<'a>
-    where  {
+pub struct MetricDescriptorDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
     _project: String,
     _metric: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1168,9 +1179,15 @@ pub struct MetricDescriptorDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MetricDescriptorDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for MetricDescriptorDeleteCall<'a, S> {}
 
-impl<'a> MetricDescriptorDeleteCall<'a> {
+impl<'a, S> MetricDescriptorDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1314,7 +1331,7 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1324,7 +1341,7 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a> {
+    pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, S> {
         self._metric = new_value.to_string();
         self
     }
@@ -1334,7 +1351,7 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1355,7 +1372,7 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1375,9 +1392,9 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1410,7 +1427,7 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1426,10 +1443,10 @@ impl<'a> MetricDescriptorDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetricDescriptorListCall<'a>
-    where  {
+pub struct MetricDescriptorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
     _request: ListMetricDescriptorsRequest,
     _project: String,
     _query: Option<String>,
@@ -1440,9 +1457,15 @@ pub struct MetricDescriptorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MetricDescriptorListCall<'a> {}
+impl<'a, S> client::CallBuilder for MetricDescriptorListCall<'a, S> {}
 
-impl<'a> MetricDescriptorListCall<'a> {
+impl<'a, S> MetricDescriptorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1607,7 +1630,7 @@ impl<'a> MetricDescriptorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a> {
+    pub fn request(mut self, new_value: ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1617,28 +1640,28 @@ impl<'a> MetricDescriptorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
     /// The query used to search against existing metrics. Separate keywords with a space; the service joins all keywords with AND, meaning that all keywords must match for a metric to be returned. If this field is omitted, all metrics are returned. If an empty string is passed with this field, no metrics are returned.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a> {
+    pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of metric descriptors per page. Used for pagination. If not specified, count = 100.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a> {
+    pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a, S> {
         self._count = Some(new_value);
         self
     }
@@ -1648,7 +1671,7 @@ impl<'a> MetricDescriptorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1669,7 +1692,7 @@ impl<'a> MetricDescriptorListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1689,9 +1712,9 @@ impl<'a> MetricDescriptorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MetricDescriptorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1724,7 +1747,7 @@ impl<'a> MetricDescriptorListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1744,10 +1767,10 @@ impl<'a> MetricDescriptorListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimeseryListCall<'a>
-    where  {
+pub struct TimeseryListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
     _request: ListTimeseriesRequest,
     _project: String,
     _metric: String,
@@ -1764,9 +1787,15 @@ pub struct TimeseryListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimeseryListCall<'a> {}
+impl<'a, S> client::CallBuilder for TimeseryListCall<'a, S> {}
 
-impl<'a> TimeseryListCall<'a> {
+impl<'a, S> TimeseryListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1947,7 +1976,7 @@ impl<'a> TimeseryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListTimeseriesRequest) -> TimeseryListCall<'a> {
+    pub fn request(mut self, new_value: ListTimeseriesRequest) -> TimeseryListCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1957,7 +1986,7 @@ impl<'a> TimeseryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -1967,7 +1996,7 @@ impl<'a> TimeseryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._metric = new_value.to_string();
         self
     }
@@ -1977,7 +2006,7 @@ impl<'a> TimeseryListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._youngest = new_value.to_string();
         self
     }
@@ -1988,7 +2017,7 @@ impl<'a> TimeseryListCall<'a> {
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     ///
     /// Sets the *window* query property to the given value.
-    pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._window = Some(new_value.to_string());
         self
     }
@@ -2002,21 +2031,21 @@ impl<'a> TimeseryListCall<'a> {
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
     ///
     /// Sets the *timespan* query property to the given value.
-    pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._timespan = Some(new_value.to_string());
         self
     }
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
     ///
     /// Sets the *oldest* query property to the given value.
-    pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._oldest = Some(new_value.to_string());
         self
     }
@@ -2029,21 +2058,21 @@ impl<'a> TimeseryListCall<'a> {
     ///
     /// Append the given value to the *labels* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._labels.push(new_value.to_string());
         self
     }
     /// Maximum number of data points per page, which is used for pagination of results.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a> {
+    pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a, S> {
         self._count = Some(new_value);
         self
     }
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     ///
     /// Sets the *aggregator* query property to the given value.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a> {
+    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, S> {
         self._aggregator = Some(new_value.to_string());
         self
     }
@@ -2053,7 +2082,7 @@ impl<'a> TimeseryListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2074,7 +2103,7 @@ impl<'a> TimeseryListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2094,9 +2123,9 @@ impl<'a> TimeseryListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseryListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimeseryListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2129,7 +2158,7 @@ impl<'a> TimeseryListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2142,10 +2171,10 @@ impl<'a> TimeseryListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimeseryWriteCall<'a>
-    where  {
+pub struct TimeseryWriteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
     _request: WriteTimeseriesRequest,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2153,9 +2182,15 @@ pub struct TimeseryWriteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimeseryWriteCall<'a> {}
+impl<'a, S> client::CallBuilder for TimeseryWriteCall<'a, S> {}
 
-impl<'a> TimeseryWriteCall<'a> {
+impl<'a, S> TimeseryWriteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2311,7 +2346,7 @@ impl<'a> TimeseryWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WriteTimeseriesRequest) -> TimeseryWriteCall<'a> {
+    pub fn request(mut self, new_value: WriteTimeseriesRequest) -> TimeseryWriteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2321,7 +2356,7 @@ impl<'a> TimeseryWriteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2331,7 +2366,7 @@ impl<'a> TimeseryWriteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryWriteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryWriteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2352,7 +2387,7 @@ impl<'a> TimeseryWriteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2372,9 +2407,9 @@ impl<'a> TimeseryWriteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseryWriteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimeseryWriteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2407,7 +2442,7 @@ impl<'a> TimeseryWriteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = CloudMonitoring::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2427,10 +2462,10 @@ impl<'a> TimeseryWriteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimeseriesDescriptorListCall<'a>
-    where  {
+pub struct TimeseriesDescriptorListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a CloudMonitoring<>,
+    hub: &'a CloudMonitoring<S>,
     _request: ListTimeseriesDescriptorsRequest,
     _project: String,
     _metric: String,
@@ -2447,9 +2482,15 @@ pub struct TimeseriesDescriptorListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for TimeseriesDescriptorListCall<'a> {}
+impl<'a, S> client::CallBuilder for TimeseriesDescriptorListCall<'a, S> {}
 
-impl<'a> TimeseriesDescriptorListCall<'a> {
+impl<'a, S> TimeseriesDescriptorListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2630,7 +2671,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a> {
+    pub fn request(mut self, new_value: ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2640,7 +2681,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._project = new_value.to_string();
         self
     }
@@ -2650,7 +2691,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._metric = new_value.to_string();
         self
     }
@@ -2660,7 +2701,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._youngest = new_value.to_string();
         self
     }
@@ -2671,7 +2712,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     ///
     /// Sets the *window* query property to the given value.
-    pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._window = Some(new_value.to_string());
         self
     }
@@ -2685,21 +2726,21 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
     ///
     /// Sets the *timespan* query property to the given value.
-    pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._timespan = Some(new_value.to_string());
         self
     }
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
     ///
     /// Sets the *oldest* query property to the given value.
-    pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._oldest = Some(new_value.to_string());
         self
     }
@@ -2712,21 +2753,21 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     ///
     /// Append the given value to the *labels* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._labels.push(new_value.to_string());
         self
     }
     /// Maximum number of time series descriptors per page. Used for pagination. If not specified, count = 100.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a> {
+    pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a, S> {
         self._count = Some(new_value);
         self
     }
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     ///
     /// Sets the *aggregator* query property to the given value.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
+    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, S> {
         self._aggregator = Some(new_value.to_string());
         self
     }
@@ -2736,7 +2777,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseriesDescriptorListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseriesDescriptorListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2757,7 +2798,7 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2777,9 +2818,9 @@ impl<'a> TimeseriesDescriptorListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

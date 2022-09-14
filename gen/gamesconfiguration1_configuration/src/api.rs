@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -99,40 +104,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct GamesConfiguration<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct GamesConfiguration<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for GamesConfiguration<> {}
+impl<'a, S> client::Hub for GamesConfiguration<S> {}
 
-impl<'a, > GamesConfiguration<> {
+impl<'a, S> GamesConfiguration<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GamesConfiguration<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> GamesConfiguration<S> {
         GamesConfiguration {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://gamesconfiguration.googleapis.com/".to_string(),
             _root_url: "https://gamesconfiguration.googleapis.com/".to_string(),
         }
     }
 
-    pub fn achievement_configurations(&'a self) -> AchievementConfigurationMethods<'a> {
+    pub fn achievement_configurations(&'a self) -> AchievementConfigurationMethods<'a, S> {
         AchievementConfigurationMethods { hub: &self }
     }
-    pub fn image_configurations(&'a self) -> ImageConfigurationMethods<'a> {
+    pub fn image_configurations(&'a self) -> ImageConfigurationMethods<'a, S> {
         ImageConfigurationMethods { hub: &self }
     }
-    pub fn leaderboard_configurations(&'a self) -> LeaderboardConfigurationMethods<'a> {
+    pub fn leaderboard_configurations(&'a self) -> LeaderboardConfigurationMethods<'a, S> {
         LeaderboardConfigurationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -468,22 +473,22 @@ impl client::Part for LocalizedStringBundle {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.achievement_configurations();
 /// # }
 /// ```
-pub struct AchievementConfigurationMethods<'a>
-    where  {
+pub struct AchievementConfigurationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
 }
 
-impl<'a> client::MethodsBuilder for AchievementConfigurationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AchievementConfigurationMethods<'a, S> {}
 
-impl<'a> AchievementConfigurationMethods<'a> {
+impl<'a, S> AchievementConfigurationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -492,7 +497,7 @@ impl<'a> AchievementConfigurationMethods<'a> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn delete(&self, achievement_id: &str) -> AchievementConfigurationDeleteCall<'a> {
+    pub fn delete(&self, achievement_id: &str) -> AchievementConfigurationDeleteCall<'a, S> {
         AchievementConfigurationDeleteCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -509,7 +514,7 @@ impl<'a> AchievementConfigurationMethods<'a> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn get(&self, achievement_id: &str) -> AchievementConfigurationGetCall<'a> {
+    pub fn get(&self, achievement_id: &str) -> AchievementConfigurationGetCall<'a, S> {
         AchievementConfigurationGetCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -527,7 +532,7 @@ impl<'a> AchievementConfigurationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn insert(&self, request: AchievementConfiguration, application_id: &str) -> AchievementConfigurationInsertCall<'a> {
+    pub fn insert(&self, request: AchievementConfiguration, application_id: &str) -> AchievementConfigurationInsertCall<'a, S> {
         AchievementConfigurationInsertCall {
             hub: self.hub,
             _request: request,
@@ -545,7 +550,7 @@ impl<'a> AchievementConfigurationMethods<'a> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list(&self, application_id: &str) -> AchievementConfigurationListCall<'a> {
+    pub fn list(&self, application_id: &str) -> AchievementConfigurationListCall<'a, S> {
         AchievementConfigurationListCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -565,7 +570,7 @@ impl<'a> AchievementConfigurationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn update(&self, request: AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationUpdateCall<'a> {
+    pub fn update(&self, request: AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationUpdateCall<'a, S> {
         AchievementConfigurationUpdateCall {
             hub: self.hub,
             _request: request,
@@ -600,22 +605,22 @@ impl<'a> AchievementConfigurationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `upload(...)`
 /// // to build up your call.
 /// let rb = hub.image_configurations();
 /// # }
 /// ```
-pub struct ImageConfigurationMethods<'a>
-    where  {
+pub struct ImageConfigurationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
 }
 
-impl<'a> client::MethodsBuilder for ImageConfigurationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ImageConfigurationMethods<'a, S> {}
 
-impl<'a> ImageConfigurationMethods<'a> {
+impl<'a, S> ImageConfigurationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -625,7 +630,7 @@ impl<'a> ImageConfigurationMethods<'a> {
     ///
     /// * `resourceId` - The ID of the resource used by this method.
     /// * `imageType` - Selects which image in a resource for this method.
-    pub fn upload(&self, resource_id: &str, image_type: &str) -> ImageConfigurationUploadCall<'a> {
+    pub fn upload(&self, resource_id: &str, image_type: &str) -> ImageConfigurationUploadCall<'a, S> {
         ImageConfigurationUploadCall {
             hub: self.hub,
             _resource_id: resource_id.to_string(),
@@ -660,22 +665,22 @@ impl<'a> ImageConfigurationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.leaderboard_configurations();
 /// # }
 /// ```
-pub struct LeaderboardConfigurationMethods<'a>
-    where  {
+pub struct LeaderboardConfigurationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
 }
 
-impl<'a> client::MethodsBuilder for LeaderboardConfigurationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LeaderboardConfigurationMethods<'a, S> {}
 
-impl<'a> LeaderboardConfigurationMethods<'a> {
+impl<'a, S> LeaderboardConfigurationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -684,7 +689,7 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a> {
+    pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a, S> {
         LeaderboardConfigurationDeleteCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -701,7 +706,7 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a> {
+    pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a, S> {
         LeaderboardConfigurationGetCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -719,7 +724,7 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn insert(&self, request: LeaderboardConfiguration, application_id: &str) -> LeaderboardConfigurationInsertCall<'a> {
+    pub fn insert(&self, request: LeaderboardConfiguration, application_id: &str) -> LeaderboardConfigurationInsertCall<'a, S> {
         LeaderboardConfigurationInsertCall {
             hub: self.hub,
             _request: request,
@@ -737,7 +742,7 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list(&self, application_id: &str) -> LeaderboardConfigurationListCall<'a> {
+    pub fn list(&self, application_id: &str) -> LeaderboardConfigurationListCall<'a, S> {
         LeaderboardConfigurationListCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -757,7 +762,7 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn update(&self, request: LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationUpdateCall<'a> {
+    pub fn update(&self, request: LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationUpdateCall<'a, S> {
         LeaderboardConfigurationUpdateCall {
             hub: self.hub,
             _request: request,
@@ -799,7 +804,7 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -807,19 +812,25 @@ impl<'a> LeaderboardConfigurationMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementConfigurationDeleteCall<'a>
-    where  {
+pub struct AchievementConfigurationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementConfigurationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementConfigurationDeleteCall<'a, S> {}
 
-impl<'a> AchievementConfigurationDeleteCall<'a> {
+impl<'a, S> AchievementConfigurationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -951,7 +962,7 @@ impl<'a> AchievementConfigurationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationDeleteCall<'a> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationDeleteCall<'a, S> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -961,7 +972,7 @@ impl<'a> AchievementConfigurationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -986,7 +997,7 @@ impl<'a> AchievementConfigurationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1006,9 +1017,9 @@ impl<'a> AchievementConfigurationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementConfigurationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1040,7 +1051,7 @@ impl<'a> AchievementConfigurationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1048,19 +1059,25 @@ impl<'a> AchievementConfigurationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementConfigurationGetCall<'a>
-    where  {
+pub struct AchievementConfigurationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementConfigurationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementConfigurationGetCall<'a, S> {}
 
-impl<'a> AchievementConfigurationGetCall<'a> {
+impl<'a, S> AchievementConfigurationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1203,7 +1220,7 @@ impl<'a> AchievementConfigurationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationGetCall<'a> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationGetCall<'a, S> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1213,7 +1230,7 @@ impl<'a> AchievementConfigurationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1238,7 +1255,7 @@ impl<'a> AchievementConfigurationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1258,9 +1275,9 @@ impl<'a> AchievementConfigurationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementConfigurationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1293,7 +1310,7 @@ impl<'a> AchievementConfigurationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1306,10 +1323,10 @@ impl<'a> AchievementConfigurationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementConfigurationInsertCall<'a>
-    where  {
+pub struct AchievementConfigurationInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _request: AchievementConfiguration,
     _application_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1317,9 +1334,15 @@ pub struct AchievementConfigurationInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementConfigurationInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementConfigurationInsertCall<'a, S> {}
 
-impl<'a> AchievementConfigurationInsertCall<'a> {
+impl<'a, S> AchievementConfigurationInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1475,7 +1498,7 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementConfiguration) -> AchievementConfigurationInsertCall<'a> {
+    pub fn request(mut self, new_value: AchievementConfiguration) -> AchievementConfigurationInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1485,7 +1508,7 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationInsertCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationInsertCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
@@ -1495,7 +1518,7 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1520,7 +1543,7 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1540,9 +1563,9 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementConfigurationInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1574,7 +1597,7 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1584,10 +1607,10 @@ impl<'a> AchievementConfigurationInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementConfigurationListCall<'a>
-    where  {
+pub struct AchievementConfigurationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -1596,9 +1619,15 @@ pub struct AchievementConfigurationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementConfigurationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementConfigurationListCall<'a, S> {}
 
-impl<'a> AchievementConfigurationListCall<'a> {
+impl<'a, S> AchievementConfigurationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1747,21 +1776,21 @@ impl<'a> AchievementConfigurationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationListCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AchievementConfigurationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -1771,7 +1800,7 @@ impl<'a> AchievementConfigurationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1796,7 +1825,7 @@ impl<'a> AchievementConfigurationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1816,9 +1845,9 @@ impl<'a> AchievementConfigurationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementConfigurationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1851,7 +1880,7 @@ impl<'a> AchievementConfigurationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1864,10 +1893,10 @@ impl<'a> AchievementConfigurationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementConfigurationUpdateCall<'a>
-    where  {
+pub struct AchievementConfigurationUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _request: AchievementConfiguration,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1875,9 +1904,15 @@ pub struct AchievementConfigurationUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementConfigurationUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementConfigurationUpdateCall<'a, S> {}
 
-impl<'a> AchievementConfigurationUpdateCall<'a> {
+impl<'a, S> AchievementConfigurationUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2033,7 +2068,7 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementConfiguration) -> AchievementConfigurationUpdateCall<'a> {
+    pub fn request(mut self, new_value: AchievementConfiguration) -> AchievementConfigurationUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2043,7 +2078,7 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationUpdateCall<'a> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationUpdateCall<'a, S> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -2053,7 +2088,7 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementConfigurationUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2078,7 +2113,7 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementConfigurationUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2098,9 +2133,9 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementConfigurationUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementConfigurationUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2133,7 +2168,7 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -2141,10 +2176,10 @@ impl<'a> AchievementConfigurationUpdateCall<'a> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ImageConfigurationUploadCall<'a>
-    where  {
+pub struct ImageConfigurationUploadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _resource_id: String,
     _image_type: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2152,9 +2187,15 @@ pub struct ImageConfigurationUploadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ImageConfigurationUploadCall<'a> {}
+impl<'a, S> client::CallBuilder for ImageConfigurationUploadCall<'a, S> {}
 
-impl<'a> ImageConfigurationUploadCall<'a> {
+impl<'a, S> ImageConfigurationUploadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2327,7 +2368,7 @@ impl<'a> ImageConfigurationUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_id(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a> {
+    pub fn resource_id(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, S> {
         self._resource_id = new_value.to_string();
         self
     }
@@ -2337,7 +2378,7 @@ impl<'a> ImageConfigurationUploadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn image_type(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a> {
+    pub fn image_type(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, S> {
         self._image_type = new_value.to_string();
         self
     }
@@ -2347,7 +2388,7 @@ impl<'a> ImageConfigurationUploadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ImageConfigurationUploadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ImageConfigurationUploadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2372,7 +2413,7 @@ impl<'a> ImageConfigurationUploadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ImageConfigurationUploadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ImageConfigurationUploadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2392,9 +2433,9 @@ impl<'a> ImageConfigurationUploadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ImageConfigurationUploadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ImageConfigurationUploadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2426,7 +2467,7 @@ impl<'a> ImageConfigurationUploadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2434,19 +2475,25 @@ impl<'a> ImageConfigurationUploadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardConfigurationDeleteCall<'a>
-    where  {
+pub struct LeaderboardConfigurationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LeaderboardConfigurationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LeaderboardConfigurationDeleteCall<'a, S> {}
 
-impl<'a> LeaderboardConfigurationDeleteCall<'a> {
+impl<'a, S> LeaderboardConfigurationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2578,7 +2625,7 @@ impl<'a> LeaderboardConfigurationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a, S> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -2588,7 +2635,7 @@ impl<'a> LeaderboardConfigurationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2613,7 +2660,7 @@ impl<'a> LeaderboardConfigurationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2633,9 +2680,9 @@ impl<'a> LeaderboardConfigurationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LeaderboardConfigurationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2667,7 +2714,7 @@ impl<'a> LeaderboardConfigurationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2675,19 +2722,25 @@ impl<'a> LeaderboardConfigurationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardConfigurationGetCall<'a>
-    where  {
+pub struct LeaderboardConfigurationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LeaderboardConfigurationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LeaderboardConfigurationGetCall<'a, S> {}
 
-impl<'a> LeaderboardConfigurationGetCall<'a> {
+impl<'a, S> LeaderboardConfigurationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2830,7 +2883,7 @@ impl<'a> LeaderboardConfigurationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a, S> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -2840,7 +2893,7 @@ impl<'a> LeaderboardConfigurationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2865,7 +2918,7 @@ impl<'a> LeaderboardConfigurationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2885,9 +2938,9 @@ impl<'a> LeaderboardConfigurationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LeaderboardConfigurationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2920,7 +2973,7 @@ impl<'a> LeaderboardConfigurationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2933,10 +2986,10 @@ impl<'a> LeaderboardConfigurationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardConfigurationInsertCall<'a>
-    where  {
+pub struct LeaderboardConfigurationInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _request: LeaderboardConfiguration,
     _application_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2944,9 +2997,15 @@ pub struct LeaderboardConfigurationInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LeaderboardConfigurationInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LeaderboardConfigurationInsertCall<'a, S> {}
 
-impl<'a> LeaderboardConfigurationInsertCall<'a> {
+impl<'a, S> LeaderboardConfigurationInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3102,7 +3161,7 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LeaderboardConfiguration) -> LeaderboardConfigurationInsertCall<'a> {
+    pub fn request(mut self, new_value: LeaderboardConfiguration) -> LeaderboardConfigurationInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3112,7 +3171,7 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationInsertCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationInsertCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
@@ -3122,7 +3181,7 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3147,7 +3206,7 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3167,9 +3226,9 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LeaderboardConfigurationInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3201,7 +3260,7 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3211,10 +3270,10 @@ impl<'a> LeaderboardConfigurationInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardConfigurationListCall<'a>
-    where  {
+pub struct LeaderboardConfigurationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -3223,9 +3282,15 @@ pub struct LeaderboardConfigurationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LeaderboardConfigurationListCall<'a> {}
+impl<'a, S> client::CallBuilder for LeaderboardConfigurationListCall<'a, S> {}
 
-impl<'a> LeaderboardConfigurationListCall<'a> {
+impl<'a, S> LeaderboardConfigurationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3374,21 +3439,21 @@ impl<'a> LeaderboardConfigurationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -3398,7 +3463,7 @@ impl<'a> LeaderboardConfigurationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3423,7 +3488,7 @@ impl<'a> LeaderboardConfigurationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3443,9 +3508,9 @@ impl<'a> LeaderboardConfigurationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LeaderboardConfigurationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3478,7 +3543,7 @@ impl<'a> LeaderboardConfigurationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesConfiguration::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3491,10 +3556,10 @@ impl<'a> LeaderboardConfigurationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardConfigurationUpdateCall<'a>
-    where  {
+pub struct LeaderboardConfigurationUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesConfiguration<>,
+    hub: &'a GamesConfiguration<S>,
     _request: LeaderboardConfiguration,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3502,9 +3567,15 @@ pub struct LeaderboardConfigurationUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LeaderboardConfigurationUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for LeaderboardConfigurationUpdateCall<'a, S> {}
 
-impl<'a> LeaderboardConfigurationUpdateCall<'a> {
+impl<'a, S> LeaderboardConfigurationUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3660,7 +3731,7 @@ impl<'a> LeaderboardConfigurationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LeaderboardConfiguration) -> LeaderboardConfigurationUpdateCall<'a> {
+    pub fn request(mut self, new_value: LeaderboardConfiguration) -> LeaderboardConfigurationUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3670,7 +3741,7 @@ impl<'a> LeaderboardConfigurationUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationUpdateCall<'a> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationUpdateCall<'a, S> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -3680,7 +3751,7 @@ impl<'a> LeaderboardConfigurationUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardConfigurationUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3705,7 +3776,7 @@ impl<'a> LeaderboardConfigurationUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardConfigurationUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3725,9 +3796,9 @@ impl<'a> LeaderboardConfigurationUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardConfigurationUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LeaderboardConfigurationUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

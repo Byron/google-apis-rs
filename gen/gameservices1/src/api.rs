@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -71,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -104,34 +109,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct GameServices<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct GameServices<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for GameServices<> {}
+impl<'a, S> client::Hub for GameServices<S> {}
 
-impl<'a, > GameServices<> {
+impl<'a, S> GameServices<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GameServices<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> GameServices<S> {
         GameServices {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://gameservices.googleapis.com/".to_string(),
             _root_url: "https://gameservices.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1420,22 +1425,22 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_game_server_deployments_configs_create(...)`, `locations_game_server_deployments_configs_delete(...)`, `locations_game_server_deployments_configs_get(...)`, `locations_game_server_deployments_configs_list(...)`, `locations_game_server_deployments_create(...)`, `locations_game_server_deployments_delete(...)`, `locations_game_server_deployments_fetch_deployment_state(...)`, `locations_game_server_deployments_get(...)`, `locations_game_server_deployments_get_iam_policy(...)`, `locations_game_server_deployments_get_rollout(...)`, `locations_game_server_deployments_list(...)`, `locations_game_server_deployments_patch(...)`, `locations_game_server_deployments_preview_rollout(...)`, `locations_game_server_deployments_set_iam_policy(...)`, `locations_game_server_deployments_test_iam_permissions(...)`, `locations_game_server_deployments_update_rollout(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_realms_create(...)`, `locations_realms_delete(...)`, `locations_realms_game_server_clusters_create(...)`, `locations_realms_game_server_clusters_delete(...)`, `locations_realms_game_server_clusters_get(...)`, `locations_realms_game_server_clusters_list(...)`, `locations_realms_game_server_clusters_patch(...)`, `locations_realms_game_server_clusters_preview_create(...)`, `locations_realms_game_server_clusters_preview_delete(...)`, `locations_realms_game_server_clusters_preview_update(...)`, `locations_realms_get(...)`, `locations_realms_list(...)`, `locations_realms_patch(...)` and `locations_realms_preview_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1445,7 +1450,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/`.
-    pub fn locations_game_server_deployments_configs_create(&self, request: GameServerConfig, parent: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
+    pub fn locations_game_server_deployments_configs_create(&self, request: GameServerConfig, parent: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S> {
         ProjectLocationGameServerDeploymentConfigCreateCall {
             hub: self.hub,
             _request: request,
@@ -1464,7 +1469,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server config to delete, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/configs/{configId}`.
-    pub fn locations_game_server_deployments_configs_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
+    pub fn locations_game_server_deployments_configs_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S> {
         ProjectLocationGameServerDeploymentConfigDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1481,7 +1486,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server config to retrieve, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/configs/{configId}`.
-    pub fn locations_game_server_deployments_configs_get(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
+    pub fn locations_game_server_deployments_configs_get(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, S> {
         ProjectLocationGameServerDeploymentConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1498,7 +1503,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/configs/*`.
-    pub fn locations_game_server_deployments_configs_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn locations_game_server_deployments_configs_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         ProjectLocationGameServerDeploymentConfigListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1520,7 +1525,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}`.
-    pub fn locations_game_server_deployments_create(&self, request: GameServerDeployment, parent: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
+    pub fn locations_game_server_deployments_create(&self, request: GameServerDeployment, parent: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a, S> {
         ProjectLocationGameServerDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1539,7 +1544,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server deployment to delete, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}`.
-    pub fn locations_game_server_deployments_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a> {
+    pub fn locations_game_server_deployments_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a, S> {
         ProjectLocationGameServerDeploymentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1557,7 +1562,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the game server deployment, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}`.
-    pub fn locations_game_server_deployments_fetch_deployment_state(&self, request: FetchDeploymentStateRequest, name: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
+    pub fn locations_game_server_deployments_fetch_deployment_state(&self, request: FetchDeploymentStateRequest, name: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S> {
         ProjectLocationGameServerDeploymentFetchDeploymentStateCall {
             hub: self.hub,
             _request: request,
@@ -1575,7 +1580,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server deployment to retrieve, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}`.
-    pub fn locations_game_server_deployments_get(&self, name: &str) -> ProjectLocationGameServerDeploymentGetCall<'a> {
+    pub fn locations_game_server_deployments_get(&self, name: &str) -> ProjectLocationGameServerDeploymentGetCall<'a, S> {
         ProjectLocationGameServerDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1592,7 +1597,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_game_server_deployments_get_iam_policy(&self, resource: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
+    pub fn locations_game_server_deployments_get_iam_policy(&self, resource: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S> {
         ProjectLocationGameServerDeploymentGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1610,7 +1615,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server deployment rollout to retrieve, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/rollout`.
-    pub fn locations_game_server_deployments_get_rollout(&self, name: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
+    pub fn locations_game_server_deployments_get_rollout(&self, name: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, S> {
         ProjectLocationGameServerDeploymentGetRolloutCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1627,7 +1632,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}`.
-    pub fn locations_game_server_deployments_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn locations_game_server_deployments_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         ProjectLocationGameServerDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1649,7 +1654,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the game server deployment, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}`. For example, `projects/my-project/locations/global/gameServerDeployments/my-deployment`.
-    pub fn locations_game_server_deployments_patch(&self, request: GameServerDeployment, name: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
+    pub fn locations_game_server_deployments_patch(&self, request: GameServerDeployment, name: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a, S> {
         ProjectLocationGameServerDeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -1669,7 +1674,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the game server deployment rollout, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/rollout`. For example, `projects/my-project/locations/global/gameServerDeployments/my-deployment/rollout`.
-    pub fn locations_game_server_deployments_preview_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+    pub fn locations_game_server_deployments_preview_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {
         ProjectLocationGameServerDeploymentPreviewRolloutCall {
             hub: self.hub,
             _request: request,
@@ -1690,7 +1695,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_game_server_deployments_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
+    pub fn locations_game_server_deployments_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S> {
         ProjectLocationGameServerDeploymentSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1709,7 +1714,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_game_server_deployments_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
+    pub fn locations_game_server_deployments_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S> {
         ProjectLocationGameServerDeploymentTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1728,7 +1733,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the game server deployment rollout, in the following form: `projects/{project}/locations/{locationId}/gameServerDeployments/{deploymentId}/rollout`. For example, `projects/my-project/locations/global/gameServerDeployments/my-deployment/rollout`.
-    pub fn locations_game_server_deployments_update_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
+    pub fn locations_game_server_deployments_update_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S> {
         ProjectLocationGameServerDeploymentUpdateRolloutCall {
             hub: self.hub,
             _request: request,
@@ -1748,7 +1753,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a, S> {
         ProjectLocationOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1766,7 +1771,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn locations_operations_delete(&self, name: &str) -> ProjectLocationOperationDeleteCall<'a> {
+    pub fn locations_operations_delete(&self, name: &str) -> ProjectLocationOperationDeleteCall<'a, S> {
         ProjectLocationOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1783,7 +1788,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, S> {
         ProjectLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1800,7 +1805,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_operations_list(&self, name: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn locations_operations_list(&self, name: &str) -> ProjectLocationOperationListCall<'a, S> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1821,7 +1826,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`.
-    pub fn locations_realms_game_server_clusters_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
+    pub fn locations_realms_game_server_clusters_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S> {
         ProjectLocationRealmGameServerClusterCreateCall {
             hub: self.hub,
             _request: request,
@@ -1840,7 +1845,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server cluster to delete, in the following form: `projects/{project}/locations/{locationId}/gameServerClusters/{gameServerClusterId}`.
-    pub fn locations_realms_game_server_clusters_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
+    pub fn locations_realms_game_server_clusters_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, S> {
         ProjectLocationRealmGameServerClusterDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1857,7 +1862,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server cluster to retrieve, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}/gameServerClusters/{gameServerClusterId}`.
-    pub fn locations_realms_game_server_clusters_get(&self, name: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
+    pub fn locations_realms_game_server_clusters_get(&self, name: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a, S> {
         ProjectLocationRealmGameServerClusterGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1875,7 +1880,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`.
-    pub fn locations_realms_game_server_clusters_list(&self, parent: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn locations_realms_game_server_clusters_list(&self, parent: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         ProjectLocationRealmGameServerClusterListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1898,7 +1903,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the game server cluster, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}/gameServerClusters/{gameServerClusterId}`. For example, `projects/my-project/locations/global/realms/zanzibar/gameServerClusters/my-gke-cluster`.
-    pub fn locations_realms_game_server_clusters_patch(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
+    pub fn locations_realms_game_server_clusters_patch(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S> {
         ProjectLocationRealmGameServerClusterPatchCall {
             hub: self.hub,
             _request: request,
@@ -1918,7 +1923,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`.
-    pub fn locations_realms_game_server_clusters_preview_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn locations_realms_game_server_clusters_preview_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         ProjectLocationRealmGameServerClusterPreviewCreateCall {
             hub: self.hub,
             _request: request,
@@ -1939,7 +1944,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server cluster to delete, in the following form: `projects/{project}/locations/{locationId}/gameServerClusters/{gameServerClusterId}`.
-    pub fn locations_realms_game_server_clusters_preview_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
+    pub fn locations_realms_game_server_clusters_preview_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S> {
         ProjectLocationRealmGameServerClusterPreviewDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1958,7 +1963,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the game server cluster, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}/gameServerClusters/{gameServerClusterId}`. For example, `projects/my-project/locations/global/realms/zanzibar/gameServerClusters/my-gke-cluster`.
-    pub fn locations_realms_game_server_clusters_preview_update(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+    pub fn locations_realms_game_server_clusters_preview_update(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {
         ProjectLocationRealmGameServerClusterPreviewUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1979,7 +1984,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}`.
-    pub fn locations_realms_create(&self, request: Realm, parent: &str) -> ProjectLocationRealmCreateCall<'a> {
+    pub fn locations_realms_create(&self, request: Realm, parent: &str) -> ProjectLocationRealmCreateCall<'a, S> {
         ProjectLocationRealmCreateCall {
             hub: self.hub,
             _request: request,
@@ -1998,7 +2003,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the realm to delete, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`.
-    pub fn locations_realms_delete(&self, name: &str) -> ProjectLocationRealmDeleteCall<'a> {
+    pub fn locations_realms_delete(&self, name: &str) -> ProjectLocationRealmDeleteCall<'a, S> {
         ProjectLocationRealmDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2015,7 +2020,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the realm to retrieve, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`.
-    pub fn locations_realms_get(&self, name: &str) -> ProjectLocationRealmGetCall<'a> {
+    pub fn locations_realms_get(&self, name: &str) -> ProjectLocationRealmGetCall<'a, S> {
         ProjectLocationRealmGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2032,7 +2037,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{locationId}`.
-    pub fn locations_realms_list(&self, parent: &str) -> ProjectLocationRealmListCall<'a> {
+    pub fn locations_realms_list(&self, parent: &str) -> ProjectLocationRealmListCall<'a, S> {
         ProjectLocationRealmListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2054,7 +2059,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the realm, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`. For example, `projects/my-project/locations/global/realms/my-realm`.
-    pub fn locations_realms_patch(&self, request: Realm, name: &str) -> ProjectLocationRealmPatchCall<'a> {
+    pub fn locations_realms_patch(&self, request: Realm, name: &str) -> ProjectLocationRealmPatchCall<'a, S> {
         ProjectLocationRealmPatchCall {
             hub: self.hub,
             _request: request,
@@ -2074,7 +2079,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the realm, in the following form: `projects/{project}/locations/{locationId}/realms/{realmId}`. For example, `projects/my-project/locations/global/realms/my-realm`.
-    pub fn locations_realms_preview_update(&self, request: Realm, name: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
+    pub fn locations_realms_preview_update(&self, request: Realm, name: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, S> {
         ProjectLocationRealmPreviewUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2094,7 +2099,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, S> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2111,7 +2116,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, S> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2157,7 +2162,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2171,10 +2176,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigCreateCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentConfigCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerConfig,
     _parent: String,
     _config_id: Option<String>,
@@ -2183,9 +2188,15 @@ pub struct ProjectLocationGameServerDeploymentConfigCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentConfigCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2348,7 +2359,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerConfig) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
+    pub fn request(mut self, new_value: GameServerConfig) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2358,14 +2369,14 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the game server config resource to create.
     ///
     /// Sets the *config id* query property to the given value.
-    pub fn config_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
+    pub fn config_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S> {
         self._config_id = Some(new_value.to_string());
         self
     }
@@ -2375,7 +2386,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2400,7 +2411,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2420,9 +2431,9 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2454,7 +2465,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2462,19 +2473,25 @@ impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigDeleteCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2621,7 +2638,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2631,7 +2648,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2656,7 +2673,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2676,9 +2693,9 @@ impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2710,7 +2727,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2718,19 +2735,25 @@ impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigGetCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentConfigGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentConfigGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentConfigGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2877,7 +2900,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2887,7 +2910,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2912,7 +2935,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2932,9 +2955,9 @@ impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2966,7 +2989,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2978,10 +3001,10 @@ impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigListCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentConfigListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2992,9 +3015,15 @@ pub struct ProjectLocationGameServerDeploymentConfigListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentConfigListCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentConfigListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3153,35 +3182,35 @@ impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, the server picks an appropriate default. The server may return fewer items than requested. A caller should only rely on response's next_page_token to determine if there are more GameServerConfigs left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following [Cloud API syntax](https://cloud.google.com/apis/design/design_patterns#sorting_order).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results (see [Filtering](https://google.aip.dev/160)).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3191,7 +3220,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3216,7 +3245,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3236,9 +3265,9 @@ impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3271,7 +3300,7 @@ impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3285,10 +3314,10 @@ impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentCreateCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerDeployment,
     _parent: String,
     _deployment_id: Option<String>,
@@ -3297,9 +3326,15 @@ pub struct ProjectLocationGameServerDeploymentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3462,7 +3497,7 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
+    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3472,14 +3507,14 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the game server deployment resource to create.
     ///
     /// Sets the *deployment id* query property to the given value.
-    pub fn deployment_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
+    pub fn deployment_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a, S> {
         self._deployment_id = Some(new_value.to_string());
         self
     }
@@ -3489,7 +3524,7 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3514,7 +3549,7 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3534,9 +3569,9 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3568,7 +3603,7 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3576,19 +3611,25 @@ impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3735,7 +3776,7 @@ impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3745,7 +3786,7 @@ impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3770,7 +3811,7 @@ impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3790,9 +3831,9 @@ impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3825,7 +3866,7 @@ impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3838,10 +3879,10 @@ impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: FetchDeploymentStateRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3849,9 +3890,15 @@ pub struct ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4011,7 +4058,7 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FetchDeploymentStateRequest) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
+    pub fn request(mut self, new_value: FetchDeploymentStateRequest) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4021,7 +4068,7 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4031,7 +4078,7 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4056,7 +4103,7 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4076,9 +4123,9 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4110,7 +4157,7 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4118,19 +4165,25 @@ impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentGetCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4277,7 +4330,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4287,7 +4340,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4312,7 +4365,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4332,9 +4385,9 @@ impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4366,7 +4419,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4375,10 +4428,10 @@ impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4386,9 +4439,15 @@ pub struct ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4538,14 +4597,14 @@ impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -4555,7 +4614,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4580,7 +4639,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4600,9 +4659,9 @@ impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4634,7 +4693,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4642,19 +4701,25 @@ impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentGetRolloutCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentGetRolloutCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentGetRolloutCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentGetRolloutCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentGetRolloutCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4801,7 +4866,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4811,7 +4876,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4836,7 +4901,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4856,9 +4921,9 @@ impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4890,7 +4955,7 @@ impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4902,10 +4967,10 @@ impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentListCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4916,9 +4981,15 @@ pub struct ProjectLocationGameServerDeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentListCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5077,35 +5148,35 @@ impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, the server picks an appropriate default. The server may return fewer items than requested. A caller should only rely on the response's next_page_token to determine if there are more GameServerDeployments left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following [Cloud API syntax](https://cloud.google.com/apis/design/design_patterns#sorting_order).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results (see [Filtering](https://google.aip.dev/160)).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -5115,7 +5186,7 @@ impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5140,7 +5211,7 @@ impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5160,9 +5231,9 @@ impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5195,7 +5266,7 @@ impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5209,10 +5280,10 @@ impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentPatchCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerDeployment,
     _name: String,
     _update_mask: Option<String>,
@@ -5221,9 +5292,15 @@ pub struct ProjectLocationGameServerDeploymentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5386,7 +5463,7 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
+    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5396,14 +5473,14 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask to apply to the resource. At least one path must be supplied in this field. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5413,7 +5490,7 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5438,7 +5515,7 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5458,9 +5535,9 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5493,7 +5570,7 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5508,10 +5585,10 @@ impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerDeploymentRollout,
     _name: String,
     _update_mask: Option<String>,
@@ -5521,9 +5598,15 @@ pub struct ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5689,7 +5772,7 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5699,21 +5782,21 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask to apply to the resource. At least one path must be supplied in this field. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview. Defaults to the immediately after the proposed rollout completes.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -5723,7 +5806,7 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5748,7 +5831,7 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5768,9 +5851,9 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5803,7 +5886,7 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5816,10 +5899,10 @@ impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5827,9 +5910,15 @@ pub struct ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5989,7 +6078,7 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5999,7 +6088,7 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -6009,7 +6098,7 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6034,7 +6123,7 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6054,9 +6143,9 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6089,7 +6178,7 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6102,10 +6191,10 @@ impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6113,9 +6202,15 @@ pub struct ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6275,7 +6370,7 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6285,7 +6380,7 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S> {
         self._resource = new_value.to_string();
         self
     }
@@ -6295,7 +6390,7 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6320,7 +6415,7 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6340,9 +6435,9 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6375,7 +6470,7 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6389,10 +6484,10 @@ impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
-    where  {
+pub struct ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerDeploymentRollout,
     _name: String,
     _update_mask: Option<String>,
@@ -6401,9 +6496,15 @@ pub struct ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S> {}
 
-impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
+impl<'a, S> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6566,7 +6667,7 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
+    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6576,14 +6677,14 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask to apply to the resource. At least one path must be supplied in this field. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6593,7 +6694,7 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6618,7 +6719,7 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6638,9 +6739,9 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6673,7 +6774,7 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6686,10 +6787,10 @@ impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationCancelCall<'a>
-    where  {
+pub struct ProjectLocationOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6697,9 +6798,15 @@ pub struct ProjectLocationOperationCancelCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationCancelCall<'a> {
+impl<'a, S> ProjectLocationOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6859,7 +6966,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6869,7 +6976,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -6879,7 +6986,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6904,7 +7011,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6924,9 +7031,9 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6958,7 +7065,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6966,19 +7073,25 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationDeleteCall<'a>
-    where  {
+pub struct ProjectLocationOperationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationDeleteCall<'a> {
+impl<'a, S> ProjectLocationOperationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7125,7 +7238,7 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7135,7 +7248,7 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7160,7 +7273,7 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7180,9 +7293,9 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7214,7 +7327,7 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7222,19 +7335,25 @@ impl<'a> ProjectLocationOperationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationGetCall<'a> {
+impl<'a, S> ProjectLocationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7381,7 +7500,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -7391,7 +7510,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7416,7 +7535,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7436,9 +7555,9 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7470,7 +7589,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7481,10 +7600,10 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationListCall<'a>
-    where  {
+pub struct ProjectLocationOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7494,9 +7613,15 @@ pub struct ProjectLocationOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationListCall<'a> {
+impl<'a, S> ProjectLocationOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7652,28 +7777,28 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7683,7 +7808,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7708,7 +7833,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7728,9 +7853,9 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7763,7 +7888,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7777,10 +7902,10 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterCreateCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerCluster,
     _parent: String,
     _game_server_cluster_id: Option<String>,
@@ -7789,9 +7914,15 @@ pub struct ProjectLocationRealmGameServerClusterCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7954,7 +8085,7 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7964,14 +8095,14 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the game server cluster resource to create.
     ///
     /// Sets the *game server cluster id* query property to the given value.
-    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
+    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S> {
         self._game_server_cluster_id = Some(new_value.to_string());
         self
     }
@@ -7981,7 +8112,7 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8006,7 +8137,7 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8026,9 +8157,9 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8060,7 +8191,7 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8068,19 +8199,25 @@ impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterDeleteCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8227,7 +8364,7 @@ impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8237,7 +8374,7 @@ impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8262,7 +8399,7 @@ impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8282,9 +8419,9 @@ impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8316,7 +8453,7 @@ impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8325,10 +8462,10 @@ impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterGetCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8336,9 +8473,15 @@ pub struct ProjectLocationRealmGameServerClusterGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterGetCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8488,14 +8631,14 @@ impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. View for the returned GameServerCluster objects. When `FULL` is specified, the `cluster_state` field is also returned in the GameServerCluster object, which includes the state of the referenced Kubernetes cluster such as versions and provider info. The default/unset value is `GAME_SERVER_CLUSTER_VIEW_UNSPECIFIED`, the same as `BASIC`, which does not return the `cluster_state` field.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -8505,7 +8648,7 @@ impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8530,7 +8673,7 @@ impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8550,9 +8693,9 @@ impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8584,7 +8727,7 @@ impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8597,10 +8740,10 @@ impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterListCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -8612,9 +8755,15 @@ pub struct ProjectLocationRealmGameServerClusterListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterListCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8776,42 +8925,42 @@ impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. View for the returned GameServerCluster objects. When `FULL` is specified, the `cluster_state` field is also returned in the GameServerCluster object, which includes the state of the referenced Kubernetes cluster such as versions and provider info. The default/unset value is `GAME_SERVER_CLUSTER_VIEW_UNSPECIFIED`, the same as `BASIC`, which does not return the `cluster_state` field.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Optional. The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, the server picks an appropriate default. The server may return fewer items than requested. A caller should only rely on response's next_page_token to determine if there are more GameServerClusters left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following [Cloud API syntax](https://cloud.google.com/apis/design/design_patterns#sorting_order).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results (see [Filtering](https://google.aip.dev/160)).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8821,7 +8970,7 @@ impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8846,7 +8995,7 @@ impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8866,9 +9015,9 @@ impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8901,7 +9050,7 @@ impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8915,10 +9064,10 @@ impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPatchCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerCluster,
     _name: String,
     _update_mask: Option<String>,
@@ -8927,9 +9076,15 @@ pub struct ProjectLocationRealmGameServerClusterPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9092,7 +9247,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9102,14 +9257,14 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask to apply to the resource. At least one path must be supplied in this field. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9119,7 +9274,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9144,7 +9299,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9164,9 +9319,9 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9199,7 +9354,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9215,10 +9370,10 @@ impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerCluster,
     _parent: String,
     _view: Option<String>,
@@ -9229,9 +9384,15 @@ pub struct ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9400,7 +9561,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9410,28 +9571,28 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. This field is deprecated. Preview will always return KubernetesClusterState.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         self._preview_time = Some(new_value.to_string());
         self
     }
     /// Required. The ID of the game server cluster resource to create.
     ///
     /// Sets the *game server cluster id* query property to the given value.
-    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         self._game_server_cluster_id = Some(new_value.to_string());
         self
     }
@@ -9441,7 +9602,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9466,7 +9627,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9486,9 +9647,9 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9520,7 +9681,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9529,10 +9690,10 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _preview_time: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9540,9 +9701,15 @@ pub struct ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9692,14 +9859,14 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -9709,7 +9876,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9734,7 +9901,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9754,9 +9921,9 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9789,7 +9956,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9804,10 +9971,10 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
-    where  {
+pub struct ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: GameServerCluster,
     _name: String,
     _update_mask: Option<String>,
@@ -9817,9 +9984,15 @@ pub struct ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+impl<'a, S> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9985,7 +10158,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9995,21 +10168,21 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -10019,7 +10192,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10044,7 +10217,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10064,9 +10237,9 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10099,7 +10272,7 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10113,10 +10286,10 @@ impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmCreateCall<'a>
-    where  {
+pub struct ProjectLocationRealmCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: Realm,
     _parent: String,
     _realm_id: Option<String>,
@@ -10125,9 +10298,15 @@ pub struct ProjectLocationRealmCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmCreateCall<'a> {
+impl<'a, S> ProjectLocationRealmCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10290,7 +10469,7 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmCreateCall<'a> {
+    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10300,14 +10479,14 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the realm resource to create.
     ///
     /// Sets the *realm id* query property to the given value.
-    pub fn realm_id(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a> {
+    pub fn realm_id(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a, S> {
         self._realm_id = Some(new_value.to_string());
         self
     }
@@ -10317,7 +10496,7 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10342,7 +10521,7 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10362,9 +10541,9 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10396,7 +10575,7 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10404,19 +10583,25 @@ impl<'a> ProjectLocationRealmCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmDeleteCall<'a>
-    where  {
+pub struct ProjectLocationRealmDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmDeleteCall<'a> {
+impl<'a, S> ProjectLocationRealmDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10563,7 +10748,7 @@ impl<'a> ProjectLocationRealmDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10573,7 +10758,7 @@ impl<'a> ProjectLocationRealmDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10598,7 +10783,7 @@ impl<'a> ProjectLocationRealmDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10618,9 +10803,9 @@ impl<'a> ProjectLocationRealmDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10652,7 +10837,7 @@ impl<'a> ProjectLocationRealmDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10660,19 +10845,25 @@ impl<'a> ProjectLocationRealmDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGetCall<'a>
-    where  {
+pub struct ProjectLocationRealmGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmGetCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmGetCall<'a> {
+impl<'a, S> ProjectLocationRealmGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10819,7 +11010,7 @@ impl<'a> ProjectLocationRealmGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10829,7 +11020,7 @@ impl<'a> ProjectLocationRealmGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10854,7 +11045,7 @@ impl<'a> ProjectLocationRealmGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10874,9 +11065,9 @@ impl<'a> ProjectLocationRealmGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10908,7 +11099,7 @@ impl<'a> ProjectLocationRealmGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10920,10 +11111,10 @@ impl<'a> ProjectLocationRealmGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmListCall<'a>
-    where  {
+pub struct ProjectLocationRealmListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10934,9 +11125,15 @@ pub struct ProjectLocationRealmListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmListCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmListCall<'a> {
+impl<'a, S> ProjectLocationRealmListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11095,35 +11292,35 @@ impl<'a> ProjectLocationRealmListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, the server picks an appropriate default. The server may return fewer items than requested. A caller should only rely on the response's next_page_token to determine if there are more realms left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following [Cloud API syntax](https://cloud.google.com/apis/design/design_patterns#sorting_order).
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results (see [Filtering](https://google.aip.dev/160)).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11133,7 +11330,7 @@ impl<'a> ProjectLocationRealmListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11158,7 +11355,7 @@ impl<'a> ProjectLocationRealmListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11178,9 +11375,9 @@ impl<'a> ProjectLocationRealmListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11213,7 +11410,7 @@ impl<'a> ProjectLocationRealmListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11227,10 +11424,10 @@ impl<'a> ProjectLocationRealmListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmPatchCall<'a>
-    where  {
+pub struct ProjectLocationRealmPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: Realm,
     _name: String,
     _update_mask: Option<String>,
@@ -11239,9 +11436,15 @@ pub struct ProjectLocationRealmPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmPatchCall<'a> {
+impl<'a, S> ProjectLocationRealmPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11404,7 +11607,7 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPatchCall<'a> {
+    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11414,14 +11617,14 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask to apply to the resource. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11431,7 +11634,7 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11456,7 +11659,7 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11476,9 +11679,9 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11511,7 +11714,7 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11526,10 +11729,10 @@ impl<'a> ProjectLocationRealmPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmPreviewUpdateCall<'a>
-    where  {
+pub struct ProjectLocationRealmPreviewUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _request: Realm,
     _name: String,
     _update_mask: Option<String>,
@@ -11539,9 +11742,15 @@ pub struct ProjectLocationRealmPreviewUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationRealmPreviewUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationRealmPreviewUpdateCall<'a, S> {}
 
-impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
+impl<'a, S> ProjectLocationRealmPreviewUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11707,7 +11916,7 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPreviewUpdateCall<'a> {
+    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPreviewUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11717,21 +11926,21 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask to apply to the resource. For more information, see the [`FieldMask` definition](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask).
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, S> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -11741,7 +11950,7 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPreviewUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPreviewUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11766,7 +11975,7 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPreviewUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPreviewUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11786,9 +11995,9 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmPreviewUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationRealmPreviewUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11820,7 +12029,7 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11828,19 +12037,25 @@ impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a>
-    where  {
+pub struct ProjectLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGetCall<'a> {
+impl<'a, S> ProjectLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11987,7 +12202,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11997,7 +12212,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12022,7 +12237,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12042,9 +12257,9 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12076,7 +12291,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GameServices::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12088,10 +12303,10 @@ impl<'a> ProjectLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a>
-    where  {
+pub struct ProjectLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GameServices<>,
+    hub: &'a GameServices<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12102,9 +12317,15 @@ pub struct ProjectLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationListCall<'a, S> {}
 
-impl<'a> ProjectLocationListCall<'a> {
+impl<'a, S> ProjectLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12263,35 +12484,35 @@ impl<'a> ProjectLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service selects a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// If true, the returned list will include locations which are not yet revealed.
     ///
     /// Sets the *include unrevealed locations* query property to the given value.
-    pub fn include_unrevealed_locations(mut self, new_value: bool) -> ProjectLocationListCall<'a> {
+    pub fn include_unrevealed_locations(mut self, new_value: bool) -> ProjectLocationListCall<'a, S> {
         self._include_unrevealed_locations = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12301,7 +12522,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12326,7 +12547,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12346,9 +12567,9 @@ impl<'a> ProjectLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

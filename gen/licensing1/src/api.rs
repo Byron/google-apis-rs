@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -99,34 +104,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Licensing<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Licensing<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Licensing<> {}
+impl<'a, S> client::Hub for Licensing<S> {}
 
-impl<'a, > Licensing<> {
+impl<'a, S> Licensing<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Licensing<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Licensing<S> {
         Licensing {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://licensing.googleapis.com/".to_string(),
             _root_url: "https://licensing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn license_assignments(&'a self) -> LicenseAssignmentMethods<'a> {
+    pub fn license_assignments(&'a self) -> LicenseAssignmentMethods<'a, S> {
         LicenseAssignmentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -286,22 +291,22 @@ impl client::ResponseResult for LicenseAssignmentList {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list_for_product(...)`, `list_for_product_and_sku(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.license_assignments();
 /// # }
 /// ```
-pub struct LicenseAssignmentMethods<'a>
-    where  {
+pub struct LicenseAssignmentMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
 }
 
-impl<'a> client::MethodsBuilder for LicenseAssignmentMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for LicenseAssignmentMethods<'a, S> {}
 
-impl<'a> LicenseAssignmentMethods<'a> {
+impl<'a, S> LicenseAssignmentMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -312,7 +317,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a> {
+    pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a, S> {
         LicenseAssignmentDeleteCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -333,7 +338,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a> {
+    pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a, S> {
         LicenseAssignmentGetCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -354,7 +359,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     /// * `request` - No description provided.
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
-    pub fn insert(&self, request: LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a> {
+    pub fn insert(&self, request: LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, S> {
         LicenseAssignmentInsertCall {
             hub: self.hub,
             _request: request,
@@ -374,7 +379,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     ///
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `customerId` - Customer's `customerId`. A previous version of this API accepted the primary domain name as a value for this field. If the customer is suspended, the server returns an error.
-    pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a> {
+    pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a, S> {
         LicenseAssignmentListForProductCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -396,7 +401,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `customerId` - Customer's `customerId`. A previous version of this API accepted the primary domain name as a value for this field. If the customer is suspended, the server returns an error.
-    pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         LicenseAssignmentListForProductAndSkuCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -420,7 +425,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn patch(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a> {
+    pub fn patch(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, S> {
         LicenseAssignmentPatchCall {
             hub: self.hub,
             _request: request,
@@ -443,7 +448,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn update(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a> {
+    pub fn update(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, S> {
         LicenseAssignmentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -487,7 +492,7 @@ impl<'a> LicenseAssignmentMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -495,10 +500,10 @@ impl<'a> LicenseAssignmentMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentDeleteCall<'a>
-    where  {
+pub struct LicenseAssignmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _product_id: String,
     _sku_id: String,
     _user_id: String,
@@ -507,9 +512,15 @@ pub struct LicenseAssignmentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentDeleteCall<'a, S> {}
 
-impl<'a> LicenseAssignmentDeleteCall<'a> {
+impl<'a, S> LicenseAssignmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -654,7 +665,7 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -664,7 +675,7 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, S> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -674,7 +685,7 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -684,7 +695,7 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -709,7 +720,7 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -729,9 +740,9 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -763,7 +774,7 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -771,10 +782,10 @@ impl<'a> LicenseAssignmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentGetCall<'a>
-    where  {
+pub struct LicenseAssignmentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _product_id: String,
     _sku_id: String,
     _user_id: String,
@@ -783,9 +794,15 @@ pub struct LicenseAssignmentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentGetCall<'a, S> {}
 
-impl<'a> LicenseAssignmentGetCall<'a> {
+impl<'a, S> LicenseAssignmentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -930,7 +947,7 @@ impl<'a> LicenseAssignmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -940,7 +957,7 @@ impl<'a> LicenseAssignmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, S> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -950,7 +967,7 @@ impl<'a> LicenseAssignmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -960,7 +977,7 @@ impl<'a> LicenseAssignmentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -985,7 +1002,7 @@ impl<'a> LicenseAssignmentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1005,9 +1022,9 @@ impl<'a> LicenseAssignmentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1040,7 +1057,7 @@ impl<'a> LicenseAssignmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1053,10 +1070,10 @@ impl<'a> LicenseAssignmentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentInsertCall<'a>
-    where  {
+pub struct LicenseAssignmentInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _request: LicenseAssignmentInsert,
     _product_id: String,
     _sku_id: String,
@@ -1065,9 +1082,15 @@ pub struct LicenseAssignmentInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentInsertCall<'a, S> {}
 
-impl<'a> LicenseAssignmentInsertCall<'a> {
+impl<'a, S> LicenseAssignmentInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1224,7 +1247,7 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a> {
+    pub fn request(mut self, new_value: LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1234,7 +1257,7 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1244,7 +1267,7 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, S> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1254,7 +1277,7 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1279,7 +1302,7 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1299,9 +1322,9 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1333,7 +1356,7 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1343,10 +1366,10 @@ impl<'a> LicenseAssignmentInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentListForProductCall<'a>
-    where  {
+pub struct LicenseAssignmentListForProductCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _product_id: String,
     _customer_id: String,
     _page_token: Option<String>,
@@ -1356,9 +1379,15 @@ pub struct LicenseAssignmentListForProductCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentListForProductCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentListForProductCall<'a, S> {}
 
-impl<'a> LicenseAssignmentListForProductCall<'a> {
+impl<'a, S> LicenseAssignmentListForProductCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1508,7 +1537,7 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1518,21 +1547,21 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
     /// Token to fetch the next page of data. The `maxResults` query string is related to the `pageToken` since `maxResults` determines how many entries are returned on each page. This is an optional query string. If not specified, the server returns the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The `maxResults` query string determines how many entries are returned on each page of a large response. This is an optional parameter. The value must be a positive number.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -1542,7 +1571,7 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1567,7 +1596,7 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1587,9 +1616,9 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1621,7 +1650,7 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1631,10 +1660,10 @@ impl<'a> LicenseAssignmentListForProductCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentListForProductAndSkuCall<'a>
-    where  {
+pub struct LicenseAssignmentListForProductAndSkuCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _product_id: String,
     _sku_id: String,
     _customer_id: String,
@@ -1645,9 +1674,15 @@ pub struct LicenseAssignmentListForProductAndSkuCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentListForProductAndSkuCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentListForProductAndSkuCall<'a, S> {}
 
-impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
+impl<'a, S> LicenseAssignmentListForProductAndSkuCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1798,7 +1833,7 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1808,7 +1843,7 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1818,21 +1853,21 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
     /// Token to fetch the next page of data. The `maxResults` query string is related to the `pageToken` since `maxResults` determines how many entries are returned on each page. This is an optional query string. If not specified, the server returns the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The `maxResults` query string determines how many entries are returned on each page of a large response. This is an optional parameter. The value must be a positive number.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -1842,7 +1877,7 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1867,7 +1902,7 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1887,9 +1922,9 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1922,7 +1957,7 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1935,10 +1970,10 @@ impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentPatchCall<'a>
-    where  {
+pub struct LicenseAssignmentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _request: LicenseAssignment,
     _product_id: String,
     _sku_id: String,
@@ -1948,9 +1983,15 @@ pub struct LicenseAssignmentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentPatchCall<'a, S> {}
 
-impl<'a> LicenseAssignmentPatchCall<'a> {
+impl<'a, S> LicenseAssignmentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2108,7 +2149,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentPatchCall<'a> {
+    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2118,7 +2159,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2128,7 +2169,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, S> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -2138,7 +2179,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2148,7 +2189,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2173,7 +2214,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2193,9 +2234,9 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2228,7 +2269,7 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Licensing::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2241,10 +2282,10 @@ impl<'a> LicenseAssignmentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentUpdateCall<'a>
-    where  {
+pub struct LicenseAssignmentUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Licensing<>,
+    hub: &'a Licensing<S>,
     _request: LicenseAssignment,
     _product_id: String,
     _sku_id: String,
@@ -2254,9 +2295,15 @@ pub struct LicenseAssignmentUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for LicenseAssignmentUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for LicenseAssignmentUpdateCall<'a, S> {}
 
-impl<'a> LicenseAssignmentUpdateCall<'a> {
+impl<'a, S> LicenseAssignmentUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2414,7 +2461,7 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentUpdateCall<'a> {
+    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2424,7 +2471,7 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, S> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2434,7 +2481,7 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, S> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -2444,7 +2491,7 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, S> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2454,7 +2501,7 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2479,7 +2526,7 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2499,9 +2546,9 @@ impl<'a> LicenseAssignmentUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

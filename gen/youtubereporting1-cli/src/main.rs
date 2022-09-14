@@ -1,5 +1,5 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/cli/main.rs.mako'
+// This file was generated automatically from 'src/generator/templates/cli/main.rs.mako'
 // DO NOT EDIT !
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
@@ -21,25 +21,36 @@ use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, pars
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
+use std::error::Error as StdError;
 use std::str::FromStr;
 
 use serde_json as json;
 use clap::ArgMatches;
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 
 enum DoitError {
     IoError(String, io::Error),
     ApiError(Error),
 }
 
-struct Engine<'n> {
+struct Engine<'n, S> {
     opt: ArgMatches<'n>,
-    hub: api::YouTubeReporting,
+    hub: api::YouTubeReporting<S>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n> Engine<'n> {
+impl<'n, S> Engine<'n, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
     async fn _jobs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -635,7 +646,7 @@ impl<'n> Engine<'n> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    async fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>, connector: S) -> Result<Engine<'n, S>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
@@ -649,18 +660,14 @@ impl<'n> Engine<'n> {
             }
         };
 
-        let auth = oauth2::InstalledFlowAuthenticator::builder(
+        let client = hyper::Client::builder().build(connector);
+
+        let auth = oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            client.clone(),
         ).persist_tokens_to_disk(format!("{}/youtubereporting1", config_dir)).build().await.unwrap();
 
-        let client = hyper::Client::builder().build(
-            hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
-                .https_or_http()
-                .enable_http1()
-                .enable_http2()
-                .build()
-	);
         let engine = Engine {
             opt: opt,
             hub: api::YouTubeReporting::new(client, auth),
@@ -878,7 +885,7 @@ async fn main() {
     
     let mut app = App::new("youtubereporting1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("3.1.0+20220305")
+           .version("4.0.1+20220305")
            .about("Schedules reporting jobs containing your YouTube Analytics data and downloads the resulting bulk data reports in the form of CSV files.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtubereporting1_cli")
            .arg(Arg::with_name("url")
@@ -940,8 +947,14 @@ async fn main() {
            
         let matches = app.get_matches();
 
-    let debug = matches.is_present("debug");
-    match Engine::new(matches).await {
+    let debug = matches.is_present("adebug");
+    let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .https_or_http()
+        .enable_http1()
+        .enable_http2()
+        .build();
+
+    match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();

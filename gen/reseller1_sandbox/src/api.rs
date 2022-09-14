@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -74,7 +79,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -106,37 +111,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Reseller<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Reseller<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Reseller<> {}
+impl<'a, S> client::Hub for Reseller<S> {}
 
-impl<'a, > Reseller<> {
+impl<'a, S> Reseller<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Reseller<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Reseller<S> {
         Reseller {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://www.googleapis.com/apps/reseller/v1sandbox/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a> {
+    pub fn customers(&'a self) -> CustomerMethods<'a, S> {
         CustomerMethods { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a> {
+    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, S> {
         SubscriptionMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -526,22 +531,22 @@ impl client::Part for SubscriptionTrialSettings {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `insert(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a>
-    where  {
+pub struct CustomerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
 }
 
-impl<'a> client::MethodsBuilder for CustomerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for CustomerMethods<'a, S> {}
 
-impl<'a> CustomerMethods<'a> {
+impl<'a, S> CustomerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -550,7 +555,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `customerId` - Id of the Customer
-    pub fn get(&self, customer_id: &str) -> CustomerGetCall<'a> {
+    pub fn get(&self, customer_id: &str) -> CustomerGetCall<'a, S> {
         CustomerGetCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -567,7 +572,7 @@ impl<'a> CustomerMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Customer) -> CustomerInsertCall<'a> {
+    pub fn insert(&self, request: Customer) -> CustomerInsertCall<'a, S> {
         CustomerInsertCall {
             hub: self.hub,
             _request: request,
@@ -586,7 +591,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
-    pub fn patch(&self, request: Customer, customer_id: &str) -> CustomerPatchCall<'a> {
+    pub fn patch(&self, request: Customer, customer_id: &str) -> CustomerPatchCall<'a, S> {
         CustomerPatchCall {
             hub: self.hub,
             _request: request,
@@ -605,7 +610,7 @@ impl<'a> CustomerMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
-    pub fn update(&self, request: Customer, customer_id: &str) -> CustomerUpdateCall<'a> {
+    pub fn update(&self, request: Customer, customer_id: &str) -> CustomerUpdateCall<'a, S> {
         CustomerUpdateCall {
             hub: self.hub,
             _request: request,
@@ -640,22 +645,22 @@ impl<'a> CustomerMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `activate(...)`, `change_plan(...)`, `change_renewal_settings(...)`, `change_seats(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `start_paid_service(...)` and `suspend(...)`
 /// // to build up your call.
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionMethods<'a>
-    where  {
+pub struct SubscriptionMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
 }
 
-impl<'a> client::MethodsBuilder for SubscriptionMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SubscriptionMethods<'a, S> {}
 
-impl<'a> SubscriptionMethods<'a> {
+impl<'a, S> SubscriptionMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -665,7 +670,7 @@ impl<'a> SubscriptionMethods<'a> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn activate(&self, customer_id: &str, subscription_id: &str) -> SubscriptionActivateCall<'a> {
+    pub fn activate(&self, customer_id: &str, subscription_id: &str) -> SubscriptionActivateCall<'a, S> {
         SubscriptionActivateCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -685,7 +690,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn change_plan(&self, request: ChangePlanRequest, customer_id: &str, subscription_id: &str) -> SubscriptionChangePlanCall<'a> {
+    pub fn change_plan(&self, request: ChangePlanRequest, customer_id: &str, subscription_id: &str) -> SubscriptionChangePlanCall<'a, S> {
         SubscriptionChangePlanCall {
             hub: self.hub,
             _request: request,
@@ -706,7 +711,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn change_renewal_settings(&self, request: RenewalSettings, customer_id: &str, subscription_id: &str) -> SubscriptionChangeRenewalSettingCall<'a> {
+    pub fn change_renewal_settings(&self, request: RenewalSettings, customer_id: &str, subscription_id: &str) -> SubscriptionChangeRenewalSettingCall<'a, S> {
         SubscriptionChangeRenewalSettingCall {
             hub: self.hub,
             _request: request,
@@ -727,7 +732,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn change_seats(&self, request: Seats, customer_id: &str, subscription_id: &str) -> SubscriptionChangeSeatCall<'a> {
+    pub fn change_seats(&self, request: Seats, customer_id: &str, subscription_id: &str) -> SubscriptionChangeSeatCall<'a, S> {
         SubscriptionChangeSeatCall {
             hub: self.hub,
             _request: request,
@@ -748,7 +753,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     /// * `deletionType` - Whether the subscription is to be fully cancelled or downgraded
-    pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &str) -> SubscriptionDeleteCall<'a, S> {
         SubscriptionDeleteCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -768,7 +773,7 @@ impl<'a> SubscriptionMethods<'a> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn get(&self, customer_id: &str, subscription_id: &str) -> SubscriptionGetCall<'a> {
+    pub fn get(&self, customer_id: &str, subscription_id: &str) -> SubscriptionGetCall<'a, S> {
         SubscriptionGetCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -787,7 +792,7 @@ impl<'a> SubscriptionMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Id of the Customer
-    pub fn insert(&self, request: Subscription, customer_id: &str) -> SubscriptionInsertCall<'a> {
+    pub fn insert(&self, request: Subscription, customer_id: &str) -> SubscriptionInsertCall<'a, S> {
         SubscriptionInsertCall {
             hub: self.hub,
             _request: request,
@@ -802,7 +807,7 @@ impl<'a> SubscriptionMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists subscriptions of a reseller, optionally filtered by a customer name prefix.
-    pub fn list(&self) -> SubscriptionListCall<'a> {
+    pub fn list(&self) -> SubscriptionListCall<'a, S> {
         SubscriptionListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -824,7 +829,7 @@ impl<'a> SubscriptionMethods<'a> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn start_paid_service(&self, customer_id: &str, subscription_id: &str) -> SubscriptionStartPaidServiceCall<'a> {
+    pub fn start_paid_service(&self, customer_id: &str, subscription_id: &str) -> SubscriptionStartPaidServiceCall<'a, S> {
         SubscriptionStartPaidServiceCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -843,7 +848,7 @@ impl<'a> SubscriptionMethods<'a> {
     ///
     /// * `customerId` - Id of the Customer
     /// * `subscriptionId` - Id of the subscription, which is unique for a customer
-    pub fn suspend(&self, customer_id: &str, subscription_id: &str) -> SubscriptionSuspendCall<'a> {
+    pub fn suspend(&self, customer_id: &str, subscription_id: &str) -> SubscriptionSuspendCall<'a, S> {
         SubscriptionSuspendCall {
             hub: self.hub,
             _customer_id: customer_id.to_string(),
@@ -885,7 +890,7 @@ impl<'a> SubscriptionMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -893,19 +898,25 @@ impl<'a> SubscriptionMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerGetCall<'a>
-    where  {
+pub struct CustomerGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _customer_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerGetCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerGetCall<'a, S> {}
 
-impl<'a> CustomerGetCall<'a> {
+impl<'a, S> CustomerGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1048,7 +1059,7 @@ impl<'a> CustomerGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1058,7 +1069,7 @@ impl<'a> CustomerGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1079,7 +1090,7 @@ impl<'a> CustomerGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1099,9 +1110,9 @@ impl<'a> CustomerGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1134,7 +1145,7 @@ impl<'a> CustomerGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1148,10 +1159,10 @@ impl<'a> CustomerGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerInsertCall<'a>
-    where  {
+pub struct CustomerInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: Customer,
     _customer_auth_token: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1159,9 +1170,15 @@ pub struct CustomerInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerInsertCall<'a, S> {}
 
-impl<'a> CustomerInsertCall<'a> {
+impl<'a, S> CustomerInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1298,14 +1315,14 @@ impl<'a> CustomerInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Customer) -> CustomerInsertCall<'a> {
+    pub fn request(mut self, new_value: Customer) -> CustomerInsertCall<'a, S> {
         self._request = new_value;
         self
     }
     /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://admin.google.com/TransferToken. Optional.
     ///
     /// Sets the *customer auth token* query property to the given value.
-    pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a> {
+    pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a, S> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
@@ -1315,7 +1332,7 @@ impl<'a> CustomerInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1336,7 +1353,7 @@ impl<'a> CustomerInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1356,9 +1373,9 @@ impl<'a> CustomerInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1391,7 +1408,7 @@ impl<'a> CustomerInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1404,10 +1421,10 @@ impl<'a> CustomerInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPatchCall<'a>
-    where  {
+pub struct CustomerPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: Customer,
     _customer_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1415,9 +1432,15 @@ pub struct CustomerPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerPatchCall<'a, S> {}
 
-impl<'a> CustomerPatchCall<'a> {
+impl<'a, S> CustomerPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1573,7 +1596,7 @@ impl<'a> CustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Customer) -> CustomerPatchCall<'a> {
+    pub fn request(mut self, new_value: Customer) -> CustomerPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1583,7 +1606,7 @@ impl<'a> CustomerPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1593,7 +1616,7 @@ impl<'a> CustomerPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1614,7 +1637,7 @@ impl<'a> CustomerPatchCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1634,9 +1657,9 @@ impl<'a> CustomerPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1669,7 +1692,7 @@ impl<'a> CustomerPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1682,10 +1705,10 @@ impl<'a> CustomerPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerUpdateCall<'a>
-    where  {
+pub struct CustomerUpdateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: Customer,
     _customer_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1693,9 +1716,15 @@ pub struct CustomerUpdateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for CustomerUpdateCall<'a> {}
+impl<'a, S> client::CallBuilder for CustomerUpdateCall<'a, S> {}
 
-impl<'a> CustomerUpdateCall<'a> {
+impl<'a, S> CustomerUpdateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1851,7 +1880,7 @@ impl<'a> CustomerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Customer) -> CustomerUpdateCall<'a> {
+    pub fn request(mut self, new_value: Customer) -> CustomerUpdateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1861,7 +1890,7 @@ impl<'a> CustomerUpdateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -1871,7 +1900,7 @@ impl<'a> CustomerUpdateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerUpdateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerUpdateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1892,7 +1921,7 @@ impl<'a> CustomerUpdateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerUpdateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerUpdateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1912,9 +1941,9 @@ impl<'a> CustomerUpdateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerUpdateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> CustomerUpdateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1946,7 +1975,7 @@ impl<'a> CustomerUpdateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1954,10 +1983,10 @@ impl<'a> CustomerUpdateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionActivateCall<'a>
-    where  {
+pub struct SubscriptionActivateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1965,9 +1994,15 @@ pub struct SubscriptionActivateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionActivateCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionActivateCall<'a, S> {}
 
-impl<'a> SubscriptionActivateCall<'a> {
+impl<'a, S> SubscriptionActivateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2111,7 +2146,7 @@ impl<'a> SubscriptionActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2121,7 +2156,7 @@ impl<'a> SubscriptionActivateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -2131,7 +2166,7 @@ impl<'a> SubscriptionActivateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionActivateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionActivateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2152,7 +2187,7 @@ impl<'a> SubscriptionActivateCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionActivateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionActivateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2172,9 +2207,9 @@ impl<'a> SubscriptionActivateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionActivateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionActivateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2207,7 +2242,7 @@ impl<'a> SubscriptionActivateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2220,10 +2255,10 @@ impl<'a> SubscriptionActivateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionChangePlanCall<'a>
-    where  {
+pub struct SubscriptionChangePlanCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: ChangePlanRequest,
     _customer_id: String,
     _subscription_id: String,
@@ -2232,9 +2267,15 @@ pub struct SubscriptionChangePlanCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionChangePlanCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionChangePlanCall<'a, S> {}
 
-impl<'a> SubscriptionChangePlanCall<'a> {
+impl<'a, S> SubscriptionChangePlanCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2391,7 +2432,7 @@ impl<'a> SubscriptionChangePlanCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ChangePlanRequest) -> SubscriptionChangePlanCall<'a> {
+    pub fn request(mut self, new_value: ChangePlanRequest) -> SubscriptionChangePlanCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2401,7 +2442,7 @@ impl<'a> SubscriptionChangePlanCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2411,7 +2452,7 @@ impl<'a> SubscriptionChangePlanCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -2421,7 +2462,7 @@ impl<'a> SubscriptionChangePlanCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionChangePlanCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionChangePlanCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2442,7 +2483,7 @@ impl<'a> SubscriptionChangePlanCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangePlanCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangePlanCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2462,9 +2503,9 @@ impl<'a> SubscriptionChangePlanCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionChangePlanCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionChangePlanCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2497,7 +2538,7 @@ impl<'a> SubscriptionChangePlanCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2510,10 +2551,10 @@ impl<'a> SubscriptionChangePlanCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionChangeRenewalSettingCall<'a>
-    where  {
+pub struct SubscriptionChangeRenewalSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: RenewalSettings,
     _customer_id: String,
     _subscription_id: String,
@@ -2522,9 +2563,15 @@ pub struct SubscriptionChangeRenewalSettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionChangeRenewalSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionChangeRenewalSettingCall<'a, S> {}
 
-impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
+impl<'a, S> SubscriptionChangeRenewalSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2681,7 +2728,7 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RenewalSettings) -> SubscriptionChangeRenewalSettingCall<'a> {
+    pub fn request(mut self, new_value: RenewalSettings) -> SubscriptionChangeRenewalSettingCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2691,7 +2738,7 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2701,7 +2748,7 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -2711,7 +2758,7 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionChangeRenewalSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionChangeRenewalSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2732,7 +2779,7 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeRenewalSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeRenewalSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2752,9 +2799,9 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionChangeRenewalSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionChangeRenewalSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2787,7 +2834,7 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2800,10 +2847,10 @@ impl<'a> SubscriptionChangeRenewalSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionChangeSeatCall<'a>
-    where  {
+pub struct SubscriptionChangeSeatCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: Seats,
     _customer_id: String,
     _subscription_id: String,
@@ -2812,9 +2859,15 @@ pub struct SubscriptionChangeSeatCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionChangeSeatCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionChangeSeatCall<'a, S> {}
 
-impl<'a> SubscriptionChangeSeatCall<'a> {
+impl<'a, S> SubscriptionChangeSeatCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2971,7 +3024,7 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Seats) -> SubscriptionChangeSeatCall<'a> {
+    pub fn request(mut self, new_value: Seats) -> SubscriptionChangeSeatCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2981,7 +3034,7 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -2991,7 +3044,7 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3001,7 +3054,7 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionChangeSeatCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionChangeSeatCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3022,7 +3075,7 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeSeatCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionChangeSeatCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3042,9 +3095,9 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionChangeSeatCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionChangeSeatCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3076,7 +3129,7 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3084,10 +3137,10 @@ impl<'a> SubscriptionChangeSeatCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionDeleteCall<'a>
-    where  {
+pub struct SubscriptionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _customer_id: String,
     _subscription_id: String,
     _deletion_type: String,
@@ -3096,9 +3149,15 @@ pub struct SubscriptionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionDeleteCall<'a, S> {}
 
-impl<'a> SubscriptionDeleteCall<'a> {
+impl<'a, S> SubscriptionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3232,7 +3291,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -3242,7 +3301,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3252,7 +3311,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a> {
+    pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, S> {
         self._deletion_type = new_value.to_string();
         self
     }
@@ -3262,7 +3321,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3283,7 +3342,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3303,9 +3362,9 @@ impl<'a> SubscriptionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3337,7 +3396,7 @@ impl<'a> SubscriptionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3345,10 +3404,10 @@ impl<'a> SubscriptionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionGetCall<'a>
-    where  {
+pub struct SubscriptionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3356,9 +3415,15 @@ pub struct SubscriptionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionGetCall<'a, S> {}
 
-impl<'a> SubscriptionGetCall<'a> {
+impl<'a, S> SubscriptionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3502,7 +3567,7 @@ impl<'a> SubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -3512,7 +3577,7 @@ impl<'a> SubscriptionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -3522,7 +3587,7 @@ impl<'a> SubscriptionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3543,7 +3608,7 @@ impl<'a> SubscriptionGetCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3563,9 +3628,9 @@ impl<'a> SubscriptionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3598,7 +3663,7 @@ impl<'a> SubscriptionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3612,10 +3677,10 @@ impl<'a> SubscriptionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionInsertCall<'a>
-    where  {
+pub struct SubscriptionInsertCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _request: Subscription,
     _customer_id: String,
     _customer_auth_token: Option<String>,
@@ -3624,9 +3689,15 @@ pub struct SubscriptionInsertCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionInsertCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionInsertCall<'a, S> {}
 
-impl<'a> SubscriptionInsertCall<'a> {
+impl<'a, S> SubscriptionInsertCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3785,7 +3856,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a> {
+    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3795,14 +3866,14 @@ impl<'a> SubscriptionInsertCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
     /// An auth token needed for transferring a subscription. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken. Optional.
     ///
     /// Sets the *customer auth token* query property to the given value.
-    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionInsertCall<'a> {
+    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionInsertCall<'a, S> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
@@ -3812,7 +3883,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3833,7 +3904,7 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3853,9 +3924,9 @@ impl<'a> SubscriptionInsertCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionInsertCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionInsertCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3887,7 +3958,7 @@ impl<'a> SubscriptionInsertCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3900,10 +3971,10 @@ impl<'a> SubscriptionInsertCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionListCall<'a>
-    where  {
+pub struct SubscriptionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _customer_name_prefix: Option<String>,
@@ -3914,9 +3985,15 @@ pub struct SubscriptionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionListCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionListCall<'a, S> {}
 
-impl<'a> SubscriptionListCall<'a> {
+impl<'a, S> SubscriptionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4049,35 +4126,35 @@ impl<'a> SubscriptionListCall<'a> {
     /// Token to specify next page in the list
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a> {
+    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
     /// Prefix of the customer's domain name by which the subscriptions should be filtered. Optional
     ///
     /// Sets the *customer name prefix* query property to the given value.
-    pub fn customer_name_prefix(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn customer_name_prefix(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._customer_name_prefix = Some(new_value.to_string());
         self
     }
     /// Id of the Customer
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// An auth token needed if the customer is not a resold customer of this reseller. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken.Optional.
     ///
     /// Sets the *customer auth token* query property to the given value.
-    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionListCall<'a> {
+    pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionListCall<'a, S> {
         self._customer_auth_token = Some(new_value.to_string());
         self
     }
@@ -4087,7 +4164,7 @@ impl<'a> SubscriptionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4108,7 +4185,7 @@ impl<'a> SubscriptionListCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4128,9 +4205,9 @@ impl<'a> SubscriptionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4162,7 +4239,7 @@ impl<'a> SubscriptionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4170,10 +4247,10 @@ impl<'a> SubscriptionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionStartPaidServiceCall<'a>
-    where  {
+pub struct SubscriptionStartPaidServiceCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4181,9 +4258,15 @@ pub struct SubscriptionStartPaidServiceCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionStartPaidServiceCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionStartPaidServiceCall<'a, S> {}
 
-impl<'a> SubscriptionStartPaidServiceCall<'a> {
+impl<'a, S> SubscriptionStartPaidServiceCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4327,7 +4410,7 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -4337,7 +4420,7 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -4347,7 +4430,7 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionStartPaidServiceCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionStartPaidServiceCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4368,7 +4451,7 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionStartPaidServiceCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionStartPaidServiceCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4388,9 +4471,9 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionStartPaidServiceCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionStartPaidServiceCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4422,7 +4505,7 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Reseller::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4430,10 +4513,10 @@ impl<'a> SubscriptionStartPaidServiceCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionSuspendCall<'a>
-    where  {
+pub struct SubscriptionSuspendCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Reseller<>,
+    hub: &'a Reseller<S>,
     _customer_id: String,
     _subscription_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4441,9 +4524,15 @@ pub struct SubscriptionSuspendCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SubscriptionSuspendCall<'a> {}
+impl<'a, S> client::CallBuilder for SubscriptionSuspendCall<'a, S> {}
 
-impl<'a> SubscriptionSuspendCall<'a> {
+impl<'a, S> SubscriptionSuspendCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4587,7 +4676,7 @@ impl<'a> SubscriptionSuspendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, S> {
         self._customer_id = new_value.to_string();
         self
     }
@@ -4597,7 +4686,7 @@ impl<'a> SubscriptionSuspendCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a> {
+    pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, S> {
         self._subscription_id = new_value.to_string();
         self
     }
@@ -4607,7 +4696,7 @@ impl<'a> SubscriptionSuspendCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionSuspendCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionSuspendCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4628,7 +4717,7 @@ impl<'a> SubscriptionSuspendCall<'a> {
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionSuspendCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionSuspendCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4648,9 +4737,9 @@ impl<'a> SubscriptionSuspendCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionSuspendCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SubscriptionSuspendCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

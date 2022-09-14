@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -108,34 +113,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Dialogflow<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Dialogflow<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Dialogflow<> {}
+impl<'a, S> client::Hub for Dialogflow<S> {}
 
-impl<'a, > Dialogflow<> {
+impl<'a, S> Dialogflow<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Dialogflow<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Dialogflow<S> {
         Dialogflow {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://dialogflow.googleapis.com/".to_string(),
             _root_url: "https://dialogflow.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3417,22 +3422,22 @@ impl client::Part for GoogleTypeLatLng {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_agents_changelogs_get(...)`, `locations_agents_changelogs_list(...)`, `locations_agents_create(...)`, `locations_agents_delete(...)`, `locations_agents_entity_types_create(...)`, `locations_agents_entity_types_delete(...)`, `locations_agents_entity_types_get(...)`, `locations_agents_entity_types_list(...)`, `locations_agents_entity_types_patch(...)`, `locations_agents_environments_continuous_test_results_list(...)`, `locations_agents_environments_create(...)`, `locations_agents_environments_delete(...)`, `locations_agents_environments_deploy_flow(...)`, `locations_agents_environments_deployments_get(...)`, `locations_agents_environments_deployments_list(...)`, `locations_agents_environments_experiments_create(...)`, `locations_agents_environments_experiments_delete(...)`, `locations_agents_environments_experiments_get(...)`, `locations_agents_environments_experiments_list(...)`, `locations_agents_environments_experiments_patch(...)`, `locations_agents_environments_experiments_start(...)`, `locations_agents_environments_experiments_stop(...)`, `locations_agents_environments_get(...)`, `locations_agents_environments_list(...)`, `locations_agents_environments_lookup_environment_history(...)`, `locations_agents_environments_patch(...)`, `locations_agents_environments_run_continuous_test(...)`, `locations_agents_environments_sessions_detect_intent(...)`, `locations_agents_environments_sessions_entity_types_create(...)`, `locations_agents_environments_sessions_entity_types_delete(...)`, `locations_agents_environments_sessions_entity_types_get(...)`, `locations_agents_environments_sessions_entity_types_list(...)`, `locations_agents_environments_sessions_entity_types_patch(...)`, `locations_agents_environments_sessions_fulfill_intent(...)`, `locations_agents_environments_sessions_match_intent(...)`, `locations_agents_export(...)`, `locations_agents_flows_create(...)`, `locations_agents_flows_delete(...)`, `locations_agents_flows_export(...)`, `locations_agents_flows_get(...)`, `locations_agents_flows_get_validation_result(...)`, `locations_agents_flows_import(...)`, `locations_agents_flows_list(...)`, `locations_agents_flows_pages_create(...)`, `locations_agents_flows_pages_delete(...)`, `locations_agents_flows_pages_get(...)`, `locations_agents_flows_pages_list(...)`, `locations_agents_flows_pages_patch(...)`, `locations_agents_flows_patch(...)`, `locations_agents_flows_train(...)`, `locations_agents_flows_transition_route_groups_create(...)`, `locations_agents_flows_transition_route_groups_delete(...)`, `locations_agents_flows_transition_route_groups_get(...)`, `locations_agents_flows_transition_route_groups_list(...)`, `locations_agents_flows_transition_route_groups_patch(...)`, `locations_agents_flows_validate(...)`, `locations_agents_flows_versions_compare_versions(...)`, `locations_agents_flows_versions_create(...)`, `locations_agents_flows_versions_delete(...)`, `locations_agents_flows_versions_get(...)`, `locations_agents_flows_versions_list(...)`, `locations_agents_flows_versions_load(...)`, `locations_agents_flows_versions_patch(...)`, `locations_agents_get(...)`, `locations_agents_get_validation_result(...)`, `locations_agents_intents_create(...)`, `locations_agents_intents_delete(...)`, `locations_agents_intents_get(...)`, `locations_agents_intents_list(...)`, `locations_agents_intents_patch(...)`, `locations_agents_list(...)`, `locations_agents_patch(...)`, `locations_agents_restore(...)`, `locations_agents_sessions_detect_intent(...)`, `locations_agents_sessions_entity_types_create(...)`, `locations_agents_sessions_entity_types_delete(...)`, `locations_agents_sessions_entity_types_get(...)`, `locations_agents_sessions_entity_types_list(...)`, `locations_agents_sessions_entity_types_patch(...)`, `locations_agents_sessions_fulfill_intent(...)`, `locations_agents_sessions_match_intent(...)`, `locations_agents_test_cases_batch_delete(...)`, `locations_agents_test_cases_batch_run(...)`, `locations_agents_test_cases_calculate_coverage(...)`, `locations_agents_test_cases_create(...)`, `locations_agents_test_cases_export(...)`, `locations_agents_test_cases_get(...)`, `locations_agents_test_cases_import(...)`, `locations_agents_test_cases_list(...)`, `locations_agents_test_cases_patch(...)`, `locations_agents_test_cases_results_get(...)`, `locations_agents_test_cases_results_list(...)`, `locations_agents_test_cases_run(...)`, `locations_agents_validate(...)`, `locations_agents_webhooks_create(...)`, `locations_agents_webhooks_delete(...)`, `locations_agents_webhooks_get(...)`, `locations_agents_webhooks_list(...)`, `locations_agents_webhooks_patch(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_security_settings_create(...)`, `locations_security_settings_delete(...)`, `locations_security_settings_get(...)`, `locations_security_settings_list(...)`, `locations_security_settings_patch(...)`, `operations_cancel(...)`, `operations_get(...)` and `operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3441,7 +3446,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the changelog to get. Format: `projects//locations//agents//changelogs/`.
-    pub fn locations_agents_changelogs_get(&self, name: &str) -> ProjectLocationAgentChangelogGetCall<'a> {
+    pub fn locations_agents_changelogs_get(&self, name: &str) -> ProjectLocationAgentChangelogGetCall<'a, S> {
         ProjectLocationAgentChangelogGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3458,7 +3463,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The agent containing the changelogs. Format: `projects//locations//agents/`.
-    pub fn locations_agents_changelogs_list(&self, parent: &str) -> ProjectLocationAgentChangelogListCall<'a> {
+    pub fn locations_agents_changelogs_list(&self, parent: &str) -> ProjectLocationAgentChangelogListCall<'a, S> {
         ProjectLocationAgentChangelogListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3479,7 +3484,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to create a entity type for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_entity_types_create(&self, request: GoogleCloudDialogflowCxV3EntityType, parent: &str) -> ProjectLocationAgentEntityTypeCreateCall<'a> {
+    pub fn locations_agents_entity_types_create(&self, request: GoogleCloudDialogflowCxV3EntityType, parent: &str) -> ProjectLocationAgentEntityTypeCreateCall<'a, S> {
         ProjectLocationAgentEntityTypeCreateCall {
             hub: self.hub,
             _request: request,
@@ -3498,7 +3503,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the entity type to delete. Format: `projects//locations//agents//entityTypes/`.
-    pub fn locations_agents_entity_types_delete(&self, name: &str) -> ProjectLocationAgentEntityTypeDeleteCall<'a> {
+    pub fn locations_agents_entity_types_delete(&self, name: &str) -> ProjectLocationAgentEntityTypeDeleteCall<'a, S> {
         ProjectLocationAgentEntityTypeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3516,7 +3521,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the entity type. Format: `projects//locations//agents//entityTypes/`.
-    pub fn locations_agents_entity_types_get(&self, name: &str) -> ProjectLocationAgentEntityTypeGetCall<'a> {
+    pub fn locations_agents_entity_types_get(&self, name: &str) -> ProjectLocationAgentEntityTypeGetCall<'a, S> {
         ProjectLocationAgentEntityTypeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3534,7 +3539,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The agent to list all entity types for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_entity_types_list(&self, parent: &str) -> ProjectLocationAgentEntityTypeListCall<'a> {
+    pub fn locations_agents_entity_types_list(&self, parent: &str) -> ProjectLocationAgentEntityTypeListCall<'a, S> {
         ProjectLocationAgentEntityTypeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3555,7 +3560,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the entity type. Required for EntityTypes.UpdateEntityType. Format: `projects//locations//agents//entityTypes/`.
-    pub fn locations_agents_entity_types_patch(&self, request: GoogleCloudDialogflowCxV3EntityType, name: &str) -> ProjectLocationAgentEntityTypePatchCall<'a> {
+    pub fn locations_agents_entity_types_patch(&self, request: GoogleCloudDialogflowCxV3EntityType, name: &str) -> ProjectLocationAgentEntityTypePatchCall<'a, S> {
         ProjectLocationAgentEntityTypePatchCall {
             hub: self.hub,
             _request: request,
@@ -3575,7 +3580,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The environment to list results for. Format: `projects//locations//agents// environments/`.
-    pub fn locations_agents_environments_continuous_test_results_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
+    pub fn locations_agents_environments_continuous_test_results_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S> {
         ProjectLocationAgentEnvironmentContinuousTestResultListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3594,7 +3599,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Deployment. Format: `projects//locations//agents//environments//deployments/`.
-    pub fn locations_agents_environments_deployments_get(&self, name: &str) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
+    pub fn locations_agents_environments_deployments_get(&self, name: &str) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S> {
         ProjectLocationAgentEnvironmentDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3611,7 +3616,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Environment to list all environments for. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_deployments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
+    pub fn locations_agents_environments_deployments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S> {
         ProjectLocationAgentEnvironmentDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3631,7 +3636,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The Agent to create an Environment for. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_experiments_create(&self, request: GoogleCloudDialogflowCxV3Experiment, parent: &str) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
+    pub fn locations_agents_environments_experiments_create(&self, request: GoogleCloudDialogflowCxV3Experiment, parent: &str) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentCreateCall {
             hub: self.hub,
             _request: request,
@@ -3649,7 +3654,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Environment to delete. Format: `projects//locations//agents//environments//experiments/`.
-    pub fn locations_agents_environments_experiments_delete(&self, name: &str) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
+    pub fn locations_agents_environments_experiments_delete(&self, name: &str) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3666,7 +3671,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Environment. Format: `projects//locations//agents//environments//experiments/`.
-    pub fn locations_agents_environments_experiments_get(&self, name: &str) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
+    pub fn locations_agents_environments_experiments_get(&self, name: &str) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3683,7 +3688,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Environment to list all environments for. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_experiments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
+    pub fn locations_agents_environments_experiments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3703,7 +3708,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the experiment. Format: projects//locations//agents//environments//experiments/..
-    pub fn locations_agents_environments_experiments_patch(&self, request: GoogleCloudDialogflowCxV3Experiment, name: &str) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
+    pub fn locations_agents_environments_experiments_patch(&self, request: GoogleCloudDialogflowCxV3Experiment, name: &str) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentPatchCall {
             hub: self.hub,
             _request: request,
@@ -3723,7 +3728,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name of the experiment to start. Format: `projects//locations//agents//environments//experiments/`.
-    pub fn locations_agents_environments_experiments_start(&self, request: GoogleCloudDialogflowCxV3StartExperimentRequest, name: &str) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
+    pub fn locations_agents_environments_experiments_start(&self, request: GoogleCloudDialogflowCxV3StartExperimentRequest, name: &str) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentStartCall {
             hub: self.hub,
             _request: request,
@@ -3742,7 +3747,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Resource name of the experiment to stop. Format: `projects//locations//agents//environments//experiments/`.
-    pub fn locations_agents_environments_experiments_stop(&self, request: GoogleCloudDialogflowCxV3StopExperimentRequest, name: &str) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
+    pub fn locations_agents_environments_experiments_stop(&self, request: GoogleCloudDialogflowCxV3StopExperimentRequest, name: &str) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S> {
         ProjectLocationAgentEnvironmentExperimentStopCall {
             hub: self.hub,
             _request: request,
@@ -3761,7 +3766,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The session to create a session entity type for. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_environments_sessions_entity_types_create(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, parent: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
+    pub fn locations_agents_environments_sessions_entity_types_create(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, parent: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall {
             hub: self.hub,
             _request: request,
@@ -3779,7 +3784,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the session entity type to delete. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_environments_sessions_entity_types_delete(&self, name: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
+    pub fn locations_agents_environments_sessions_entity_types_delete(&self, name: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3796,7 +3801,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the session entity type. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_environments_sessions_entity_types_get(&self, name: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
+    pub fn locations_agents_environments_sessions_entity_types_get(&self, name: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionEntityTypeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3813,7 +3818,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The session to list all session entity types from. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_environments_sessions_entity_types_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
+    pub fn locations_agents_environments_sessions_entity_types_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionEntityTypeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -3833,7 +3838,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The unique identifier of the session entity type. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_environments_sessions_entity_types_patch(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, name: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
+    pub fn locations_agents_environments_sessions_entity_types_patch(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, name: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionEntityTypePatchCall {
             hub: self.hub,
             _request: request,
@@ -3853,7 +3858,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version).
-    pub fn locations_agents_environments_sessions_detect_intent(&self, request: GoogleCloudDialogflowCxV3DetectIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
+    pub fn locations_agents_environments_sessions_detect_intent(&self, request: GoogleCloudDialogflowCxV3DetectIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionDetectIntentCall {
             hub: self.hub,
             _request: request,
@@ -3872,7 +3877,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session).
-    pub fn locations_agents_environments_sessions_fulfill_intent(&self, request: GoogleCloudDialogflowCxV3FulfillIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
+    pub fn locations_agents_environments_sessions_fulfill_intent(&self, request: GoogleCloudDialogflowCxV3FulfillIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionFulfillIntentCall {
             hub: self.hub,
             _request: request,
@@ -3891,7 +3896,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session).
-    pub fn locations_agents_environments_sessions_match_intent(&self, request: GoogleCloudDialogflowCxV3MatchIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
+    pub fn locations_agents_environments_sessions_match_intent(&self, request: GoogleCloudDialogflowCxV3MatchIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S> {
         ProjectLocationAgentEnvironmentSessionMatchIntentCall {
             hub: self.hub,
             _request: request,
@@ -3910,7 +3915,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The Agent to create an Environment for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_environments_create(&self, request: GoogleCloudDialogflowCxV3Environment, parent: &str) -> ProjectLocationAgentEnvironmentCreateCall<'a> {
+    pub fn locations_agents_environments_create(&self, request: GoogleCloudDialogflowCxV3Environment, parent: &str) -> ProjectLocationAgentEnvironmentCreateCall<'a, S> {
         ProjectLocationAgentEnvironmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -3928,7 +3933,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Environment to delete. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_delete(&self, name: &str) -> ProjectLocationAgentEnvironmentDeleteCall<'a> {
+    pub fn locations_agents_environments_delete(&self, name: &str) -> ProjectLocationAgentEnvironmentDeleteCall<'a, S> {
         ProjectLocationAgentEnvironmentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3946,7 +3951,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `environment` - Required. The environment to deploy the flow to. Format: `projects//locations//agents// environments/`.
-    pub fn locations_agents_environments_deploy_flow(&self, request: GoogleCloudDialogflowCxV3DeployFlowRequest, environment: &str) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
+    pub fn locations_agents_environments_deploy_flow(&self, request: GoogleCloudDialogflowCxV3DeployFlowRequest, environment: &str) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S> {
         ProjectLocationAgentEnvironmentDeployFlowCall {
             hub: self.hub,
             _request: request,
@@ -3964,7 +3969,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Environment. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_get(&self, name: &str) -> ProjectLocationAgentEnvironmentGetCall<'a> {
+    pub fn locations_agents_environments_get(&self, name: &str) -> ProjectLocationAgentEnvironmentGetCall<'a, S> {
         ProjectLocationAgentEnvironmentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -3981,7 +3986,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Agent to list all environments for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_environments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentListCall<'a> {
+    pub fn locations_agents_environments_list(&self, parent: &str) -> ProjectLocationAgentEnvironmentListCall<'a, S> {
         ProjectLocationAgentEnvironmentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4000,7 +4005,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the environment to look up the history for. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_lookup_environment_history(&self, name: &str) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
+    pub fn locations_agents_environments_lookup_environment_history(&self, name: &str) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S> {
         ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4020,7 +4025,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the environment. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_patch(&self, request: GoogleCloudDialogflowCxV3Environment, name: &str) -> ProjectLocationAgentEnvironmentPatchCall<'a> {
+    pub fn locations_agents_environments_patch(&self, request: GoogleCloudDialogflowCxV3Environment, name: &str) -> ProjectLocationAgentEnvironmentPatchCall<'a, S> {
         ProjectLocationAgentEnvironmentPatchCall {
             hub: self.hub,
             _request: request,
@@ -4040,7 +4045,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `environment` - Required. Format: `projects//locations//agents//environments/`.
-    pub fn locations_agents_environments_run_continuous_test(&self, request: GoogleCloudDialogflowCxV3RunContinuousTestRequest, environment: &str) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
+    pub fn locations_agents_environments_run_continuous_test(&self, request: GoogleCloudDialogflowCxV3RunContinuousTestRequest, environment: &str) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S> {
         ProjectLocationAgentEnvironmentRunContinuousTestCall {
             hub: self.hub,
             _request: request,
@@ -4059,7 +4064,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The flow to create a page for. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_pages_create(&self, request: GoogleCloudDialogflowCxV3Page, parent: &str) -> ProjectLocationAgentFlowPageCreateCall<'a> {
+    pub fn locations_agents_flows_pages_create(&self, request: GoogleCloudDialogflowCxV3Page, parent: &str) -> ProjectLocationAgentFlowPageCreateCall<'a, S> {
         ProjectLocationAgentFlowPageCreateCall {
             hub: self.hub,
             _request: request,
@@ -4078,7 +4083,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the page to delete. Format: `projects//locations//agents//Flows//pages/`.
-    pub fn locations_agents_flows_pages_delete(&self, name: &str) -> ProjectLocationAgentFlowPageDeleteCall<'a> {
+    pub fn locations_agents_flows_pages_delete(&self, name: &str) -> ProjectLocationAgentFlowPageDeleteCall<'a, S> {
         ProjectLocationAgentFlowPageDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4096,7 +4101,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the page. Format: `projects//locations//agents//flows//pages/`.
-    pub fn locations_agents_flows_pages_get(&self, name: &str) -> ProjectLocationAgentFlowPageGetCall<'a> {
+    pub fn locations_agents_flows_pages_get(&self, name: &str) -> ProjectLocationAgentFlowPageGetCall<'a, S> {
         ProjectLocationAgentFlowPageGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4114,7 +4119,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The flow to list all pages for. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_pages_list(&self, parent: &str) -> ProjectLocationAgentFlowPageListCall<'a> {
+    pub fn locations_agents_flows_pages_list(&self, parent: &str) -> ProjectLocationAgentFlowPageListCall<'a, S> {
         ProjectLocationAgentFlowPageListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4135,7 +4140,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the page. Required for the Pages.UpdatePage method. Pages.CreatePage populates the name automatically. Format: `projects//locations//agents//flows//pages/`.
-    pub fn locations_agents_flows_pages_patch(&self, request: GoogleCloudDialogflowCxV3Page, name: &str) -> ProjectLocationAgentFlowPagePatchCall<'a> {
+    pub fn locations_agents_flows_pages_patch(&self, request: GoogleCloudDialogflowCxV3Page, name: &str) -> ProjectLocationAgentFlowPagePatchCall<'a, S> {
         ProjectLocationAgentFlowPagePatchCall {
             hub: self.hub,
             _request: request,
@@ -4156,7 +4161,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_transition_route_groups_create(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, parent: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
+    pub fn locations_agents_flows_transition_route_groups_create(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, parent: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupCreateCall {
             hub: self.hub,
             _request: request,
@@ -4175,7 +4180,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
-    pub fn locations_agents_flows_transition_route_groups_delete(&self, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
+    pub fn locations_agents_flows_transition_route_groups_delete(&self, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4193,7 +4198,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
-    pub fn locations_agents_flows_transition_route_groups_get(&self, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
+    pub fn locations_agents_flows_transition_route_groups_get(&self, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4211,7 +4216,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_transition_route_groups_list(&self, parent: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+    pub fn locations_agents_flows_transition_route_groups_list(&self, parent: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4232,7 +4237,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
-    pub fn locations_agents_flows_transition_route_groups_patch(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+    pub fn locations_agents_flows_transition_route_groups_patch(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupPatchCall {
             hub: self.hub,
             _request: request,
@@ -4253,7 +4258,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `baseVersion` - Required. Name of the base flow version to compare with the target version. Use version ID `0` to indicate the draft version of the specified flow. Format: `projects//locations//agents/ /flows//versions/`.
-    pub fn locations_agents_flows_versions_compare_versions(&self, request: GoogleCloudDialogflowCxV3CompareVersionsRequest, base_version: &str) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
+    pub fn locations_agents_flows_versions_compare_versions(&self, request: GoogleCloudDialogflowCxV3CompareVersionsRequest, base_version: &str) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S> {
         ProjectLocationAgentFlowVersionCompareVersionCall {
             hub: self.hub,
             _request: request,
@@ -4272,7 +4277,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The Flow to create an Version for. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_versions_create(&self, request: GoogleCloudDialogflowCxV3Version, parent: &str) -> ProjectLocationAgentFlowVersionCreateCall<'a> {
+    pub fn locations_agents_flows_versions_create(&self, request: GoogleCloudDialogflowCxV3Version, parent: &str) -> ProjectLocationAgentFlowVersionCreateCall<'a, S> {
         ProjectLocationAgentFlowVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -4290,7 +4295,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Version to delete. Format: `projects//locations//agents//flows//versions/`.
-    pub fn locations_agents_flows_versions_delete(&self, name: &str) -> ProjectLocationAgentFlowVersionDeleteCall<'a> {
+    pub fn locations_agents_flows_versions_delete(&self, name: &str) -> ProjectLocationAgentFlowVersionDeleteCall<'a, S> {
         ProjectLocationAgentFlowVersionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4307,7 +4312,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Version. Format: `projects//locations//agents//flows//versions/`.
-    pub fn locations_agents_flows_versions_get(&self, name: &str) -> ProjectLocationAgentFlowVersionGetCall<'a> {
+    pub fn locations_agents_flows_versions_get(&self, name: &str) -> ProjectLocationAgentFlowVersionGetCall<'a, S> {
         ProjectLocationAgentFlowVersionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4324,7 +4329,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Flow to list all versions for. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_versions_list(&self, parent: &str) -> ProjectLocationAgentFlowVersionListCall<'a> {
+    pub fn locations_agents_flows_versions_list(&self, parent: &str) -> ProjectLocationAgentFlowVersionListCall<'a, S> {
         ProjectLocationAgentFlowVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4344,7 +4349,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The Version to be loaded to draft flow. Format: `projects//locations//agents//flows//versions/`.
-    pub fn locations_agents_flows_versions_load(&self, request: GoogleCloudDialogflowCxV3LoadVersionRequest, name: &str) -> ProjectLocationAgentFlowVersionLoadCall<'a> {
+    pub fn locations_agents_flows_versions_load(&self, request: GoogleCloudDialogflowCxV3LoadVersionRequest, name: &str) -> ProjectLocationAgentFlowVersionLoadCall<'a, S> {
         ProjectLocationAgentFlowVersionLoadCall {
             hub: self.hub,
             _request: request,
@@ -4363,7 +4368,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Format: projects//locations//agents//flows//versions/. Version ID is a self-increasing number generated by Dialogflow upon version creation.
-    pub fn locations_agents_flows_versions_patch(&self, request: GoogleCloudDialogflowCxV3Version, name: &str) -> ProjectLocationAgentFlowVersionPatchCall<'a> {
+    pub fn locations_agents_flows_versions_patch(&self, request: GoogleCloudDialogflowCxV3Version, name: &str) -> ProjectLocationAgentFlowVersionPatchCall<'a, S> {
         ProjectLocationAgentFlowVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -4383,7 +4388,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to create a flow for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_flows_create(&self, request: GoogleCloudDialogflowCxV3Flow, parent: &str) -> ProjectLocationAgentFlowCreateCall<'a> {
+    pub fn locations_agents_flows_create(&self, request: GoogleCloudDialogflowCxV3Flow, parent: &str) -> ProjectLocationAgentFlowCreateCall<'a, S> {
         ProjectLocationAgentFlowCreateCall {
             hub: self.hub,
             _request: request,
@@ -4402,7 +4407,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the flow to delete. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_delete(&self, name: &str) -> ProjectLocationAgentFlowDeleteCall<'a> {
+    pub fn locations_agents_flows_delete(&self, name: &str) -> ProjectLocationAgentFlowDeleteCall<'a, S> {
         ProjectLocationAgentFlowDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4421,7 +4426,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the flow to export. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_export(&self, request: GoogleCloudDialogflowCxV3ExportFlowRequest, name: &str) -> ProjectLocationAgentFlowExportCall<'a> {
+    pub fn locations_agents_flows_export(&self, request: GoogleCloudDialogflowCxV3ExportFlowRequest, name: &str) -> ProjectLocationAgentFlowExportCall<'a, S> {
         ProjectLocationAgentFlowExportCall {
             hub: self.hub,
             _request: request,
@@ -4439,7 +4444,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the flow to get. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_get(&self, name: &str) -> ProjectLocationAgentFlowGetCall<'a> {
+    pub fn locations_agents_flows_get(&self, name: &str) -> ProjectLocationAgentFlowGetCall<'a, S> {
         ProjectLocationAgentFlowGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4457,7 +4462,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The flow name. Format: `projects//locations//agents//flows//validationResult`.
-    pub fn locations_agents_flows_get_validation_result(&self, name: &str) -> ProjectLocationAgentFlowGetValidationResultCall<'a> {
+    pub fn locations_agents_flows_get_validation_result(&self, name: &str) -> ProjectLocationAgentFlowGetValidationResultCall<'a, S> {
         ProjectLocationAgentFlowGetValidationResultCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4476,7 +4481,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to import the flow into. Format: `projects//locations//agents/`.
-    pub fn locations_agents_flows_import(&self, request: GoogleCloudDialogflowCxV3ImportFlowRequest, parent: &str) -> ProjectLocationAgentFlowImportCall<'a> {
+    pub fn locations_agents_flows_import(&self, request: GoogleCloudDialogflowCxV3ImportFlowRequest, parent: &str) -> ProjectLocationAgentFlowImportCall<'a, S> {
         ProjectLocationAgentFlowImportCall {
             hub: self.hub,
             _request: request,
@@ -4494,7 +4499,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The agent containing the flows. Format: `projects//locations//agents/`.
-    pub fn locations_agents_flows_list(&self, parent: &str) -> ProjectLocationAgentFlowListCall<'a> {
+    pub fn locations_agents_flows_list(&self, parent: &str) -> ProjectLocationAgentFlowListCall<'a, S> {
         ProjectLocationAgentFlowListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4515,7 +4520,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the flow. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_patch(&self, request: GoogleCloudDialogflowCxV3Flow, name: &str) -> ProjectLocationAgentFlowPatchCall<'a> {
+    pub fn locations_agents_flows_patch(&self, request: GoogleCloudDialogflowCxV3Flow, name: &str) -> ProjectLocationAgentFlowPatchCall<'a, S> {
         ProjectLocationAgentFlowPatchCall {
             hub: self.hub,
             _request: request,
@@ -4536,7 +4541,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The flow to train. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_train(&self, request: GoogleCloudDialogflowCxV3TrainFlowRequest, name: &str) -> ProjectLocationAgentFlowTrainCall<'a> {
+    pub fn locations_agents_flows_train(&self, request: GoogleCloudDialogflowCxV3TrainFlowRequest, name: &str) -> ProjectLocationAgentFlowTrainCall<'a, S> {
         ProjectLocationAgentFlowTrainCall {
             hub: self.hub,
             _request: request,
@@ -4555,7 +4560,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The flow to validate. Format: `projects//locations//agents//flows/`.
-    pub fn locations_agents_flows_validate(&self, request: GoogleCloudDialogflowCxV3ValidateFlowRequest, name: &str) -> ProjectLocationAgentFlowValidateCall<'a> {
+    pub fn locations_agents_flows_validate(&self, request: GoogleCloudDialogflowCxV3ValidateFlowRequest, name: &str) -> ProjectLocationAgentFlowValidateCall<'a, S> {
         ProjectLocationAgentFlowValidateCall {
             hub: self.hub,
             _request: request,
@@ -4574,7 +4579,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to create an intent for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_intents_create(&self, request: GoogleCloudDialogflowCxV3Intent, parent: &str) -> ProjectLocationAgentIntentCreateCall<'a> {
+    pub fn locations_agents_intents_create(&self, request: GoogleCloudDialogflowCxV3Intent, parent: &str) -> ProjectLocationAgentIntentCreateCall<'a, S> {
         ProjectLocationAgentIntentCreateCall {
             hub: self.hub,
             _request: request,
@@ -4593,7 +4598,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the intent to delete. Format: `projects//locations//agents//intents/`.
-    pub fn locations_agents_intents_delete(&self, name: &str) -> ProjectLocationAgentIntentDeleteCall<'a> {
+    pub fn locations_agents_intents_delete(&self, name: &str) -> ProjectLocationAgentIntentDeleteCall<'a, S> {
         ProjectLocationAgentIntentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4610,7 +4615,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the intent. Format: `projects//locations//agents//intents/`.
-    pub fn locations_agents_intents_get(&self, name: &str) -> ProjectLocationAgentIntentGetCall<'a> {
+    pub fn locations_agents_intents_get(&self, name: &str) -> ProjectLocationAgentIntentGetCall<'a, S> {
         ProjectLocationAgentIntentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4628,7 +4633,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The agent to list all intents for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_intents_list(&self, parent: &str) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn locations_agents_intents_list(&self, parent: &str) -> ProjectLocationAgentIntentListCall<'a, S> {
         ProjectLocationAgentIntentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4650,7 +4655,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the intent. Required for the Intents.UpdateIntent method. Intents.CreateIntent populates the name automatically. Format: `projects//locations//agents//intents/`.
-    pub fn locations_agents_intents_patch(&self, request: GoogleCloudDialogflowCxV3Intent, name: &str) -> ProjectLocationAgentIntentPatchCall<'a> {
+    pub fn locations_agents_intents_patch(&self, request: GoogleCloudDialogflowCxV3Intent, name: &str) -> ProjectLocationAgentIntentPatchCall<'a, S> {
         ProjectLocationAgentIntentPatchCall {
             hub: self.hub,
             _request: request,
@@ -4671,7 +4676,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The session to create a session entity type for. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_sessions_entity_types_create(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, parent: &str) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
+    pub fn locations_agents_sessions_entity_types_create(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, parent: &str) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S> {
         ProjectLocationAgentSessionEntityTypeCreateCall {
             hub: self.hub,
             _request: request,
@@ -4689,7 +4694,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the session entity type to delete. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_sessions_entity_types_delete(&self, name: &str) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
+    pub fn locations_agents_sessions_entity_types_delete(&self, name: &str) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S> {
         ProjectLocationAgentSessionEntityTypeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4706,7 +4711,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the session entity type. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_sessions_entity_types_get(&self, name: &str) -> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
+    pub fn locations_agents_sessions_entity_types_get(&self, name: &str) -> ProjectLocationAgentSessionEntityTypeGetCall<'a, S> {
         ProjectLocationAgentSessionEntityTypeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4723,7 +4728,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The session to list all session entity types from. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_sessions_entity_types_list(&self, parent: &str) -> ProjectLocationAgentSessionEntityTypeListCall<'a> {
+    pub fn locations_agents_sessions_entity_types_list(&self, parent: &str) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S> {
         ProjectLocationAgentSessionEntityTypeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4743,7 +4748,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The unique identifier of the session entity type. Format: `projects//locations//agents//sessions//entityTypes/` or `projects//locations//agents//environments//sessions//entityTypes/`. If `Environment ID` is not specified, we assume default 'draft' environment.
-    pub fn locations_agents_sessions_entity_types_patch(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, name: &str) -> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
+    pub fn locations_agents_sessions_entity_types_patch(&self, request: GoogleCloudDialogflowCxV3SessionEntityType, name: &str) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S> {
         ProjectLocationAgentSessionEntityTypePatchCall {
             hub: self.hub,
             _request: request,
@@ -4763,7 +4768,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version).
-    pub fn locations_agents_sessions_detect_intent(&self, request: GoogleCloudDialogflowCxV3DetectIntentRequest, session: &str) -> ProjectLocationAgentSessionDetectIntentCall<'a> {
+    pub fn locations_agents_sessions_detect_intent(&self, request: GoogleCloudDialogflowCxV3DetectIntentRequest, session: &str) -> ProjectLocationAgentSessionDetectIntentCall<'a, S> {
         ProjectLocationAgentSessionDetectIntentCall {
             hub: self.hub,
             _request: request,
@@ -4782,7 +4787,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session).
-    pub fn locations_agents_sessions_fulfill_intent(&self, request: GoogleCloudDialogflowCxV3FulfillIntentRequest, session: &str) -> ProjectLocationAgentSessionFulfillIntentCall<'a> {
+    pub fn locations_agents_sessions_fulfill_intent(&self, request: GoogleCloudDialogflowCxV3FulfillIntentRequest, session: &str) -> ProjectLocationAgentSessionFulfillIntentCall<'a, S> {
         ProjectLocationAgentSessionFulfillIntentCall {
             hub: self.hub,
             _request: request,
@@ -4801,7 +4806,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session).
-    pub fn locations_agents_sessions_match_intent(&self, request: GoogleCloudDialogflowCxV3MatchIntentRequest, session: &str) -> ProjectLocationAgentSessionMatchIntentCall<'a> {
+    pub fn locations_agents_sessions_match_intent(&self, request: GoogleCloudDialogflowCxV3MatchIntentRequest, session: &str) -> ProjectLocationAgentSessionMatchIntentCall<'a, S> {
         ProjectLocationAgentSessionMatchIntentCall {
             hub: self.hub,
             _request: request,
@@ -4819,7 +4824,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the testcase. Format: `projects//locations//agents//testCases//results/`.
-    pub fn locations_agents_test_cases_results_get(&self, name: &str) -> ProjectLocationAgentTestCaseResultGetCall<'a> {
+    pub fn locations_agents_test_cases_results_get(&self, name: &str) -> ProjectLocationAgentTestCaseResultGetCall<'a, S> {
         ProjectLocationAgentTestCaseResultGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4836,7 +4841,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The test case to list results for. Format: `projects//locations//agents// testCases/`. Specify a `-` as a wildcard for TestCase ID to list results across multiple test cases.
-    pub fn locations_agents_test_cases_results_list(&self, parent: &str) -> ProjectLocationAgentTestCaseResultListCall<'a> {
+    pub fn locations_agents_test_cases_results_list(&self, parent: &str) -> ProjectLocationAgentTestCaseResultListCall<'a, S> {
         ProjectLocationAgentTestCaseResultListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -4857,7 +4862,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to delete test cases from. Format: `projects//locations//agents/`.
-    pub fn locations_agents_test_cases_batch_delete(&self, request: GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
+    pub fn locations_agents_test_cases_batch_delete(&self, request: GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S> {
         ProjectLocationAgentTestCaseBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -4876,7 +4881,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Agent name. Format: `projects//locations//agents/ `.
-    pub fn locations_agents_test_cases_batch_run(&self, request: GoogleCloudDialogflowCxV3BatchRunTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseBatchRunCall<'a> {
+    pub fn locations_agents_test_cases_batch_run(&self, request: GoogleCloudDialogflowCxV3BatchRunTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseBatchRunCall<'a, S> {
         ProjectLocationAgentTestCaseBatchRunCall {
             hub: self.hub,
             _request: request,
@@ -4894,7 +4899,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `agent` - Required. The agent to calculate coverage for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_test_cases_calculate_coverage(&self, agent: &str) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
+    pub fn locations_agents_test_cases_calculate_coverage(&self, agent: &str) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S> {
         ProjectLocationAgentTestCaseCalculateCoverageCall {
             hub: self.hub,
             _agent: agent.to_string(),
@@ -4913,7 +4918,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to create the test case for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_test_cases_create(&self, request: GoogleCloudDialogflowCxV3TestCase, parent: &str) -> ProjectLocationAgentTestCaseCreateCall<'a> {
+    pub fn locations_agents_test_cases_create(&self, request: GoogleCloudDialogflowCxV3TestCase, parent: &str) -> ProjectLocationAgentTestCaseCreateCall<'a, S> {
         ProjectLocationAgentTestCaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -4932,7 +4937,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent where to export test cases from. Format: `projects//locations//agents/`.
-    pub fn locations_agents_test_cases_export(&self, request: GoogleCloudDialogflowCxV3ExportTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseExportCall<'a> {
+    pub fn locations_agents_test_cases_export(&self, request: GoogleCloudDialogflowCxV3ExportTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseExportCall<'a, S> {
         ProjectLocationAgentTestCaseExportCall {
             hub: self.hub,
             _request: request,
@@ -4950,7 +4955,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the testcase. Format: `projects//locations//agents//testCases/`.
-    pub fn locations_agents_test_cases_get(&self, name: &str) -> ProjectLocationAgentTestCaseGetCall<'a> {
+    pub fn locations_agents_test_cases_get(&self, name: &str) -> ProjectLocationAgentTestCaseGetCall<'a, S> {
         ProjectLocationAgentTestCaseGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -4968,7 +4973,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to import test cases to. Format: `projects//locations//agents/`.
-    pub fn locations_agents_test_cases_import(&self, request: GoogleCloudDialogflowCxV3ImportTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseImportCall<'a> {
+    pub fn locations_agents_test_cases_import(&self, request: GoogleCloudDialogflowCxV3ImportTestCasesRequest, parent: &str) -> ProjectLocationAgentTestCaseImportCall<'a, S> {
         ProjectLocationAgentTestCaseImportCall {
             hub: self.hub,
             _request: request,
@@ -4986,7 +4991,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The agent to list all pages for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_test_cases_list(&self, parent: &str) -> ProjectLocationAgentTestCaseListCall<'a> {
+    pub fn locations_agents_test_cases_list(&self, parent: &str) -> ProjectLocationAgentTestCaseListCall<'a, S> {
         ProjectLocationAgentTestCaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5007,7 +5012,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the test case. TestCases.CreateTestCase will populate the name automatically. Otherwise use format: `projects//locations//agents/ /testCases/`.
-    pub fn locations_agents_test_cases_patch(&self, request: GoogleCloudDialogflowCxV3TestCase, name: &str) -> ProjectLocationAgentTestCasePatchCall<'a> {
+    pub fn locations_agents_test_cases_patch(&self, request: GoogleCloudDialogflowCxV3TestCase, name: &str) -> ProjectLocationAgentTestCasePatchCall<'a, S> {
         ProjectLocationAgentTestCasePatchCall {
             hub: self.hub,
             _request: request,
@@ -5027,7 +5032,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Format of test case name to run: `projects//locations/ /agents//testCases/`.
-    pub fn locations_agents_test_cases_run(&self, request: GoogleCloudDialogflowCxV3RunTestCaseRequest, name: &str) -> ProjectLocationAgentTestCaseRunCall<'a> {
+    pub fn locations_agents_test_cases_run(&self, request: GoogleCloudDialogflowCxV3RunTestCaseRequest, name: &str) -> ProjectLocationAgentTestCaseRunCall<'a, S> {
         ProjectLocationAgentTestCaseRunCall {
             hub: self.hub,
             _request: request,
@@ -5046,7 +5051,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The agent to create a webhook for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_webhooks_create(&self, request: GoogleCloudDialogflowCxV3Webhook, parent: &str) -> ProjectLocationAgentWebhookCreateCall<'a> {
+    pub fn locations_agents_webhooks_create(&self, request: GoogleCloudDialogflowCxV3Webhook, parent: &str) -> ProjectLocationAgentWebhookCreateCall<'a, S> {
         ProjectLocationAgentWebhookCreateCall {
             hub: self.hub,
             _request: request,
@@ -5064,7 +5069,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the webhook to delete. Format: `projects//locations//agents//webhooks/`.
-    pub fn locations_agents_webhooks_delete(&self, name: &str) -> ProjectLocationAgentWebhookDeleteCall<'a> {
+    pub fn locations_agents_webhooks_delete(&self, name: &str) -> ProjectLocationAgentWebhookDeleteCall<'a, S> {
         ProjectLocationAgentWebhookDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5082,7 +5087,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the webhook. Format: `projects//locations//agents//webhooks/`.
-    pub fn locations_agents_webhooks_get(&self, name: &str) -> ProjectLocationAgentWebhookGetCall<'a> {
+    pub fn locations_agents_webhooks_get(&self, name: &str) -> ProjectLocationAgentWebhookGetCall<'a, S> {
         ProjectLocationAgentWebhookGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5099,7 +5104,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The agent to list all webhooks for. Format: `projects//locations//agents/`.
-    pub fn locations_agents_webhooks_list(&self, parent: &str) -> ProjectLocationAgentWebhookListCall<'a> {
+    pub fn locations_agents_webhooks_list(&self, parent: &str) -> ProjectLocationAgentWebhookListCall<'a, S> {
         ProjectLocationAgentWebhookListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5119,7 +5124,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the webhook. Required for the Webhooks.UpdateWebhook method. Webhooks.CreateWebhook populates the name automatically. Format: `projects//locations//agents//webhooks/`.
-    pub fn locations_agents_webhooks_patch(&self, request: GoogleCloudDialogflowCxV3Webhook, name: &str) -> ProjectLocationAgentWebhookPatchCall<'a> {
+    pub fn locations_agents_webhooks_patch(&self, request: GoogleCloudDialogflowCxV3Webhook, name: &str) -> ProjectLocationAgentWebhookPatchCall<'a, S> {
         ProjectLocationAgentWebhookPatchCall {
             hub: self.hub,
             _request: request,
@@ -5139,7 +5144,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The location to create a agent for. Format: `projects//locations/`.
-    pub fn locations_agents_create(&self, request: GoogleCloudDialogflowCxV3Agent, parent: &str) -> ProjectLocationAgentCreateCall<'a> {
+    pub fn locations_agents_create(&self, request: GoogleCloudDialogflowCxV3Agent, parent: &str) -> ProjectLocationAgentCreateCall<'a, S> {
         ProjectLocationAgentCreateCall {
             hub: self.hub,
             _request: request,
@@ -5157,7 +5162,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the agent to delete. Format: `projects//locations//agents/`.
-    pub fn locations_agents_delete(&self, name: &str) -> ProjectLocationAgentDeleteCall<'a> {
+    pub fn locations_agents_delete(&self, name: &str) -> ProjectLocationAgentDeleteCall<'a, S> {
         ProjectLocationAgentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5175,7 +5180,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the agent to export. Format: `projects//locations//agents/`.
-    pub fn locations_agents_export(&self, request: GoogleCloudDialogflowCxV3ExportAgentRequest, name: &str) -> ProjectLocationAgentExportCall<'a> {
+    pub fn locations_agents_export(&self, request: GoogleCloudDialogflowCxV3ExportAgentRequest, name: &str) -> ProjectLocationAgentExportCall<'a, S> {
         ProjectLocationAgentExportCall {
             hub: self.hub,
             _request: request,
@@ -5193,7 +5198,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the agent. Format: `projects//locations//agents/`.
-    pub fn locations_agents_get(&self, name: &str) -> ProjectLocationAgentGetCall<'a> {
+    pub fn locations_agents_get(&self, name: &str) -> ProjectLocationAgentGetCall<'a, S> {
         ProjectLocationAgentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5210,7 +5215,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The agent name. Format: `projects//locations//agents//validationResult`.
-    pub fn locations_agents_get_validation_result(&self, name: &str) -> ProjectLocationAgentGetValidationResultCall<'a> {
+    pub fn locations_agents_get_validation_result(&self, name: &str) -> ProjectLocationAgentGetValidationResultCall<'a, S> {
         ProjectLocationAgentGetValidationResultCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5228,7 +5233,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The location to list all agents for. Format: `projects//locations/`.
-    pub fn locations_agents_list(&self, parent: &str) -> ProjectLocationAgentListCall<'a> {
+    pub fn locations_agents_list(&self, parent: &str) -> ProjectLocationAgentListCall<'a, S> {
         ProjectLocationAgentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5248,7 +5253,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The unique identifier of the agent. Required for the Agents.UpdateAgent method. Agents.CreateAgent populates the name automatically. Format: `projects//locations//agents/`.
-    pub fn locations_agents_patch(&self, request: GoogleCloudDialogflowCxV3Agent, name: &str) -> ProjectLocationAgentPatchCall<'a> {
+    pub fn locations_agents_patch(&self, request: GoogleCloudDialogflowCxV3Agent, name: &str) -> ProjectLocationAgentPatchCall<'a, S> {
         ProjectLocationAgentPatchCall {
             hub: self.hub,
             _request: request,
@@ -5268,7 +5273,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the agent to restore into. Format: `projects//locations//agents/`.
-    pub fn locations_agents_restore(&self, request: GoogleCloudDialogflowCxV3RestoreAgentRequest, name: &str) -> ProjectLocationAgentRestoreCall<'a> {
+    pub fn locations_agents_restore(&self, request: GoogleCloudDialogflowCxV3RestoreAgentRequest, name: &str) -> ProjectLocationAgentRestoreCall<'a, S> {
         ProjectLocationAgentRestoreCall {
             hub: self.hub,
             _request: request,
@@ -5287,7 +5292,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The agent to validate. Format: `projects//locations//agents/`.
-    pub fn locations_agents_validate(&self, request: GoogleCloudDialogflowCxV3ValidateAgentRequest, name: &str) -> ProjectLocationAgentValidateCall<'a> {
+    pub fn locations_agents_validate(&self, request: GoogleCloudDialogflowCxV3ValidateAgentRequest, name: &str) -> ProjectLocationAgentValidateCall<'a, S> {
         ProjectLocationAgentValidateCall {
             hub: self.hub,
             _request: request,
@@ -5305,7 +5310,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn locations_operations_cancel(&self, name: &str) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn locations_operations_cancel(&self, name: &str) -> ProjectLocationOperationCancelCall<'a, S> {
         ProjectLocationOperationCancelCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5322,7 +5327,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, S> {
         ProjectLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5339,7 +5344,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_operations_list(&self, name: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn locations_operations_list(&self, name: &str) -> ProjectLocationOperationListCall<'a, S> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5360,7 +5365,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The location to create an SecuritySettings for. Format: `projects//locations/`.
-    pub fn locations_security_settings_create(&self, request: GoogleCloudDialogflowCxV3SecuritySettings, parent: &str) -> ProjectLocationSecuritySettingCreateCall<'a> {
+    pub fn locations_security_settings_create(&self, request: GoogleCloudDialogflowCxV3SecuritySettings, parent: &str) -> ProjectLocationSecuritySettingCreateCall<'a, S> {
         ProjectLocationSecuritySettingCreateCall {
             hub: self.hub,
             _request: request,
@@ -5378,7 +5383,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the SecuritySettings to delete. Format: `projects//locations//securitySettings/`.
-    pub fn locations_security_settings_delete(&self, name: &str) -> ProjectLocationSecuritySettingDeleteCall<'a> {
+    pub fn locations_security_settings_delete(&self, name: &str) -> ProjectLocationSecuritySettingDeleteCall<'a, S> {
         ProjectLocationSecuritySettingDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5395,7 +5400,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the settings. Format: `projects//locations//securitySettings/`.
-    pub fn locations_security_settings_get(&self, name: &str) -> ProjectLocationSecuritySettingGetCall<'a> {
+    pub fn locations_security_settings_get(&self, name: &str) -> ProjectLocationSecuritySettingGetCall<'a, S> {
         ProjectLocationSecuritySettingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5412,7 +5417,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The location to list all security settings for. Format: `projects//locations/`.
-    pub fn locations_security_settings_list(&self, parent: &str) -> ProjectLocationSecuritySettingListCall<'a> {
+    pub fn locations_security_settings_list(&self, parent: &str) -> ProjectLocationSecuritySettingListCall<'a, S> {
         ProjectLocationSecuritySettingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -5432,7 +5437,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Resource name of the settings. Required for the SecuritySettingsService.UpdateSecuritySettings method. SecuritySettingsService.CreateSecuritySettings populates the name automatically. Format: `projects//locations//securitySettings/`.
-    pub fn locations_security_settings_patch(&self, request: GoogleCloudDialogflowCxV3SecuritySettings, name: &str) -> ProjectLocationSecuritySettingPatchCall<'a> {
+    pub fn locations_security_settings_patch(&self, request: GoogleCloudDialogflowCxV3SecuritySettings, name: &str) -> ProjectLocationSecuritySettingPatchCall<'a, S> {
         ProjectLocationSecuritySettingPatchCall {
             hub: self.hub,
             _request: request,
@@ -5451,7 +5456,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, S> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5468,7 +5473,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, S> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5488,7 +5493,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn operations_cancel(&self, name: &str) -> ProjectOperationCancelCall<'a> {
+    pub fn operations_cancel(&self, name: &str) -> ProjectOperationCancelCall<'a, S> {
         ProjectOperationCancelCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5505,7 +5510,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, S> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5522,7 +5527,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a> {
+    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a, S> {
         ProjectOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -5566,7 +5571,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5574,19 +5579,25 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentChangelogGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentChangelogGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentChangelogGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentChangelogGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
+impl<'a, S> ProjectLocationAgentChangelogGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5733,7 +5744,7 @@ impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentChangelogGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentChangelogGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5743,7 +5754,7 @@ impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentChangelogGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentChangelogGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5768,7 +5779,7 @@ impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentChangelogGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentChangelogGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5788,9 +5799,9 @@ impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentChangelogGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentChangelogGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5822,7 +5833,7 @@ impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5833,10 +5844,10 @@ impl<'a> ProjectLocationAgentChangelogGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentChangelogListCall<'a>
-    where  {
+pub struct ProjectLocationAgentChangelogListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5846,9 +5857,15 @@ pub struct ProjectLocationAgentChangelogListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentChangelogListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentChangelogListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentChangelogListCall<'a> {
+impl<'a, S> ProjectLocationAgentChangelogListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6004,28 +6021,28 @@ impl<'a> ProjectLocationAgentChangelogListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentChangelogListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentChangelogListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentChangelogListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentChangelogListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentChangelogListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentChangelogListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter string. Supports filter by user_email, resource, type and create_time. Some examples: 1. By user email: user_email = "someone@google.com" 2. By resource name: resource = "projects/123/locations/global/agents/456/flows/789" 3. By resource display name: display_name = "my agent" 4. By action: action = "Create" 5. By type: type = "flows" 6. By create time. Currently predicates on `create_time` and `create_time_epoch_seconds` are supported: create_time_epoch_seconds > 1551790877 AND create_time <= 2017-01-15T01:30:15.01Z 7. Combination of above filters: resource = "projects/123/locations/global/agents/456/flows/789" AND user_email = "someone@google.com" AND create_time <= 2017-01-15T01:30:15.01Z
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationAgentChangelogListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationAgentChangelogListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6035,7 +6052,7 @@ impl<'a> ProjectLocationAgentChangelogListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentChangelogListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentChangelogListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6060,7 +6077,7 @@ impl<'a> ProjectLocationAgentChangelogListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentChangelogListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentChangelogListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6080,9 +6097,9 @@ impl<'a> ProjectLocationAgentChangelogListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentChangelogListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentChangelogListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6115,7 +6132,7 @@ impl<'a> ProjectLocationAgentChangelogListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6129,10 +6146,10 @@ impl<'a> ProjectLocationAgentChangelogListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEntityTypeCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentEntityTypeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3EntityType,
     _parent: String,
     _language_code: Option<String>,
@@ -6141,9 +6158,15 @@ pub struct ProjectLocationAgentEntityTypeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEntityTypeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypeCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentEntityTypeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6306,7 +6329,7 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3EntityType) -> ProjectLocationAgentEntityTypeCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3EntityType) -> ProjectLocationAgentEntityTypeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6316,14 +6339,14 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The language of the following fields in `entity_type`: * `EntityType.entities.value` * `EntityType.entities.synonyms` * `EntityType.excluded_phrases.value` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeCreateCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeCreateCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -6333,7 +6356,7 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6358,7 +6381,7 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6378,9 +6401,9 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEntityTypeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEntityTypeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6412,7 +6435,7 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6421,10 +6444,10 @@ impl<'a> ProjectLocationAgentEntityTypeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEntityTypeDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentEntityTypeDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6432,9 +6455,15 @@ pub struct ProjectLocationAgentEntityTypeDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEntityTypeDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypeDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentEntityTypeDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6584,14 +6613,14 @@ impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// This field has no effect for entity type not being used. For entity types that are used by intents or pages: * If `force` is set to false, an error will be returned with message indicating the referencing resources. * If `force` is set to true, Dialogflow will remove the entity type, as well as any references to the entity type (i.e. Page parameter of the entity type will be changed to '@sys.any' and intent parameter of the entity type will be removed).
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentEntityTypeDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentEntityTypeDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
@@ -6601,7 +6630,7 @@ impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6626,7 +6655,7 @@ impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6646,9 +6675,9 @@ impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEntityTypeDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEntityTypeDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6680,7 +6709,7 @@ impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6689,10 +6718,10 @@ impl<'a> ProjectLocationAgentEntityTypeDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEntityTypeGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentEntityTypeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6700,9 +6729,15 @@ pub struct ProjectLocationAgentEntityTypeGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEntityTypeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypeGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
+impl<'a, S> ProjectLocationAgentEntityTypeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6852,14 +6887,14 @@ impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The language to retrieve the entity type for. The following fields are language dependent: * `EntityType.entities.value` * `EntityType.entities.synonyms` * `EntityType.excluded_phrases.value` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeGetCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeGetCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -6869,7 +6904,7 @@ impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6894,7 +6929,7 @@ impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6914,9 +6949,9 @@ impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEntityTypeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEntityTypeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6948,7 +6983,7 @@ impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6959,10 +6994,10 @@ impl<'a> ProjectLocationAgentEntityTypeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEntityTypeListCall<'a>
-    where  {
+pub struct ProjectLocationAgentEntityTypeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6972,9 +7007,15 @@ pub struct ProjectLocationAgentEntityTypeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEntityTypeListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypeListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
+impl<'a, S> ProjectLocationAgentEntityTypeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7130,28 +7171,28 @@ impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEntityTypeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEntityTypeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The language to list entity types for. The following fields are language dependent: * `EntityType.entities.value` * `EntityType.entities.synonyms` * `EntityType.excluded_phrases.value` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -7161,7 +7202,7 @@ impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7186,7 +7227,7 @@ impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7206,9 +7247,9 @@ impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEntityTypeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEntityTypeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7241,7 +7282,7 @@ impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7256,10 +7297,10 @@ impl<'a> ProjectLocationAgentEntityTypeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEntityTypePatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentEntityTypePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3EntityType,
     _name: String,
     _update_mask: Option<String>,
@@ -7269,9 +7310,15 @@ pub struct ProjectLocationAgentEntityTypePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEntityTypePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
+impl<'a, S> ProjectLocationAgentEntityTypePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7437,7 +7484,7 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3EntityType) -> ProjectLocationAgentEntityTypePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3EntityType) -> ProjectLocationAgentEntityTypePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7447,21 +7494,21 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEntityTypePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEntityTypePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEntityTypePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEntityTypePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The language of the following fields in `entity_type`: * `EntityType.entities.value` * `EntityType.entities.synonyms` * `EntityType.excluded_phrases.value` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypePatchCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentEntityTypePatchCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -7471,7 +7518,7 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7496,7 +7543,7 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7516,9 +7563,9 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEntityTypePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEntityTypePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7550,7 +7597,7 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7560,10 +7607,10 @@ impl<'a> ProjectLocationAgentEntityTypePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7572,9 +7619,15 @@ pub struct ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7727,21 +7780,21 @@ impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -7751,7 +7804,7 @@ impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7776,7 +7829,7 @@ impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7796,9 +7849,9 @@ impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7830,7 +7883,7 @@ impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7838,19 +7891,25 @@ impl<'a> ProjectLocationAgentEnvironmentContinuousTestResultListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentDeploymentGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7997,7 +8056,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8007,7 +8066,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8032,7 +8091,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8052,9 +8111,9 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeploymentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8086,7 +8145,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8096,10 +8155,10 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentDeploymentListCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentDeploymentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8108,9 +8167,15 @@ pub struct ProjectLocationAgentEnvironmentDeploymentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentDeploymentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentDeploymentListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8263,21 +8328,21 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 20 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -8287,7 +8352,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8312,7 +8377,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8332,9 +8397,9 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeploymentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8367,7 +8432,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8380,10 +8445,10 @@ impl<'a> ProjectLocationAgentEnvironmentDeploymentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Experiment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8391,9 +8456,15 @@ pub struct ProjectLocationAgentEnvironmentExperimentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8553,7 +8624,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Experiment) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Experiment) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -8563,7 +8634,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -8573,7 +8644,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8598,7 +8669,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8618,9 +8689,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8652,7 +8723,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8660,19 +8731,25 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -8819,7 +8896,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -8829,7 +8906,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -8854,7 +8931,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8874,9 +8951,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -8908,7 +8985,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8916,19 +8993,25 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9075,7 +9158,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9085,7 +9168,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9110,7 +9193,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9130,9 +9213,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9164,7 +9247,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9174,10 +9257,10 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentListCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9186,9 +9269,15 @@ pub struct ProjectLocationAgentEnvironmentExperimentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9341,21 +9430,21 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 20 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -9365,7 +9454,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9390,7 +9479,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9410,9 +9499,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9445,7 +9534,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9459,10 +9548,10 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Experiment,
     _name: String,
     _update_mask: Option<String>,
@@ -9471,9 +9560,15 @@ pub struct ProjectLocationAgentEnvironmentExperimentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9636,7 +9731,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Experiment) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Experiment) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9646,14 +9741,14 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields get updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9663,7 +9758,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9688,7 +9783,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9708,9 +9803,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -9743,7 +9838,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9756,10 +9851,10 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentStartCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentStartCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3StartExperimentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9767,9 +9862,15 @@ pub struct ProjectLocationAgentEnvironmentExperimentStartCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentStartCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentStartCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -9929,7 +10030,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3StartExperimentRequest) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3StartExperimentRequest) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -9939,7 +10040,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -9949,7 +10050,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -9974,7 +10075,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9994,9 +10095,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentStartCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10029,7 +10130,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10042,10 +10143,10 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStartCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentExperimentStopCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentExperimentStopCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3StopExperimentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10053,9 +10154,15 @@ pub struct ProjectLocationAgentEnvironmentExperimentStopCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentStopCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentExperimentStopCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10215,7 +10322,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3StopExperimentRequest) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3StopExperimentRequest) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10225,7 +10332,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10235,7 +10342,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10260,7 +10367,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10280,9 +10387,9 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentExperimentStopCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10315,7 +10422,7 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10328,10 +10435,10 @@ impl<'a> ProjectLocationAgentEnvironmentExperimentStopCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3SessionEntityType,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10339,9 +10446,15 @@ pub struct ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10501,7 +10614,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -10511,7 +10624,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -10521,7 +10634,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10546,7 +10659,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10566,9 +10679,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10600,7 +10713,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10608,19 +10721,25 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -10767,7 +10886,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -10777,7 +10896,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -10802,7 +10921,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10822,9 +10941,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -10856,7 +10975,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10864,19 +10983,25 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11023,7 +11148,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -11033,7 +11158,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11058,7 +11183,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11078,9 +11203,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11112,7 +11237,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11122,10 +11247,10 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11134,9 +11259,15 @@ pub struct ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11289,21 +11420,21 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -11313,7 +11444,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11338,7 +11469,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11358,9 +11489,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11393,7 +11524,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11407,10 +11538,10 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3SessionEntityType,
     _name: String,
     _update_mask: Option<String>,
@@ -11419,9 +11550,15 @@ pub struct ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11584,7 +11721,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11594,14 +11731,14 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11611,7 +11748,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11636,7 +11773,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11656,9 +11793,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11691,7 +11828,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11704,10 +11841,10 @@ impl<'a> ProjectLocationAgentEnvironmentSessionEntityTypePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3DetectIntentRequest,
     _session: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11715,9 +11852,15 @@ pub struct ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -11877,7 +12020,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DetectIntentRequest) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DetectIntentRequest) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -11887,7 +12030,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S> {
         self._session = new_value.to_string();
         self
     }
@@ -11897,7 +12040,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -11922,7 +12065,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11942,9 +12085,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -11977,7 +12120,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11990,10 +12133,10 @@ impl<'a> ProjectLocationAgentEnvironmentSessionDetectIntentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3FulfillIntentRequest,
     _session: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12001,9 +12144,15 @@ pub struct ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12163,7 +12312,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3FulfillIntentRequest) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3FulfillIntentRequest) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12173,7 +12322,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S> {
         self._session = new_value.to_string();
         self
     }
@@ -12183,7 +12332,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12208,7 +12357,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12228,9 +12377,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12263,7 +12412,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12276,10 +12425,10 @@ impl<'a> ProjectLocationAgentEnvironmentSessionFulfillIntentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3MatchIntentRequest,
     _session: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12287,9 +12436,15 @@ pub struct ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12449,7 +12604,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3MatchIntentRequest) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3MatchIntentRequest) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12459,7 +12614,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S> {
         self._session = new_value.to_string();
         self
     }
@@ -12469,7 +12624,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12494,7 +12649,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12514,9 +12669,9 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12549,7 +12704,7 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12562,10 +12717,10 @@ impl<'a> ProjectLocationAgentEnvironmentSessionMatchIntentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Environment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12573,9 +12728,15 @@ pub struct ProjectLocationAgentEnvironmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -12735,7 +12896,7 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Environment) -> ProjectLocationAgentEnvironmentCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Environment) -> ProjectLocationAgentEnvironmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -12745,7 +12906,7 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -12755,7 +12916,7 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -12780,7 +12941,7 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12800,9 +12961,9 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -12834,7 +12995,7 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12842,19 +13003,25 @@ impl<'a> ProjectLocationAgentEnvironmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13001,7 +13168,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13011,7 +13178,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13036,7 +13203,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13056,9 +13223,9 @@ impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13091,7 +13258,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13104,10 +13271,10 @@ impl<'a> ProjectLocationAgentEnvironmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentDeployFlowCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentDeployFlowCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3DeployFlowRequest,
     _environment: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13115,9 +13282,15 @@ pub struct ProjectLocationAgentEnvironmentDeployFlowCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentDeployFlowCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentDeployFlowCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13277,7 +13450,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DeployFlowRequest) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DeployFlowRequest) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -13287,7 +13460,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
+    pub fn environment(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S> {
         self._environment = new_value.to_string();
         self
     }
@@ -13297,7 +13470,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13322,7 +13495,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13342,9 +13515,9 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentDeployFlowCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13376,7 +13549,7 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13384,19 +13557,25 @@ impl<'a> ProjectLocationAgentEnvironmentDeployFlowCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13543,7 +13722,7 @@ impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -13553,7 +13732,7 @@ impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13578,7 +13757,7 @@ impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13598,9 +13777,9 @@ impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13632,7 +13811,7 @@ impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13642,10 +13821,10 @@ impl<'a> ProjectLocationAgentEnvironmentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentListCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13654,9 +13833,15 @@ pub struct ProjectLocationAgentEnvironmentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -13809,21 +13994,21 @@ impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 20 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -13833,7 +14018,7 @@ impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -13858,7 +14043,7 @@ impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13878,9 +14063,9 @@ impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -13912,7 +14097,7 @@ impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13922,10 +14107,10 @@ impl<'a> ProjectLocationAgentEnvironmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13934,9 +14119,15 @@ pub struct ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14089,21 +14280,21 @@ impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -14113,7 +14304,7 @@ impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14138,7 +14329,7 @@ impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14158,9 +14349,9 @@ impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14193,7 +14384,7 @@ impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14207,10 +14398,10 @@ impl<'a> ProjectLocationAgentEnvironmentLookupEnvironmentHistoryCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Environment,
     _name: String,
     _update_mask: Option<String>,
@@ -14219,9 +14410,15 @@ pub struct ProjectLocationAgentEnvironmentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14384,7 +14581,7 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Environment) -> ProjectLocationAgentEnvironmentPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Environment) -> ProjectLocationAgentEnvironmentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14394,14 +14591,14 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields get updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -14411,7 +14608,7 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14436,7 +14633,7 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14456,9 +14653,9 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14491,7 +14688,7 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14504,10 +14701,10 @@ impl<'a> ProjectLocationAgentEnvironmentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentEnvironmentRunContinuousTestCall<'a>
-    where  {
+pub struct ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3RunContinuousTestRequest,
     _environment: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14515,9 +14712,15 @@ pub struct ProjectLocationAgentEnvironmentRunContinuousTestCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
+impl<'a, S> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14677,7 +14880,7 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3RunContinuousTestRequest) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3RunContinuousTestRequest) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14687,7 +14890,7 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
+    pub fn environment(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S> {
         self._environment = new_value.to_string();
         self
     }
@@ -14697,7 +14900,7 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -14722,7 +14925,7 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14742,9 +14945,9 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -14777,7 +14980,7 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14791,10 +14994,10 @@ impl<'a> ProjectLocationAgentEnvironmentRunContinuousTestCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowPageCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowPageCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Page,
     _parent: String,
     _language_code: Option<String>,
@@ -14803,9 +15006,15 @@ pub struct ProjectLocationAgentFlowPageCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowPageCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowPageCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowPageCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -14968,7 +15177,7 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Page) -> ProjectLocationAgentFlowPageCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Page) -> ProjectLocationAgentFlowPageCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -14978,14 +15187,14 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowPageCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowPageCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The language of the following fields in `page`: * `Page.entry_fulfillment.messages` * `Page.entry_fulfillment.conditional_cases` * `Page.event_handlers.trigger_fulfillment.messages` * `Page.event_handlers.trigger_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.messages` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.messages` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.conditional_cases` * `Page.transition_routes.trigger_fulfillment.messages` * `Page.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPageCreateCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPageCreateCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -14995,7 +15204,7 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15020,7 +15229,7 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15040,9 +15249,9 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowPageCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowPageCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15074,7 +15283,7 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15083,10 +15292,10 @@ impl<'a> ProjectLocationAgentFlowPageCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowPageDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowPageDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15094,9 +15303,15 @@ pub struct ProjectLocationAgentFlowPageDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowPageDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowPageDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowPageDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15246,14 +15461,14 @@ impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPageDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPageDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// This field has no effect for pages with no incoming transitions. For pages with incoming transitions: * If `force` is set to false, an error will be returned with message indicating the incoming transitions. * If `force` is set to true, Dialogflow will remove the page, as well as any transitions to the page (i.e. Target page in event handlers or Target page in transition routes that point to this page will be cleared).
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentFlowPageDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentFlowPageDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
@@ -15263,7 +15478,7 @@ impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15288,7 +15503,7 @@ impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15308,9 +15523,9 @@ impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowPageDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowPageDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15342,7 +15557,7 @@ impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15351,10 +15566,10 @@ impl<'a> ProjectLocationAgentFlowPageDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowPageGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowPageGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15362,9 +15577,15 @@ pub struct ProjectLocationAgentFlowPageGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowPageGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowPageGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowPageGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15514,14 +15735,14 @@ impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPageGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPageGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The language to retrieve the page for. The following fields are language dependent: * `Page.entry_fulfillment.messages` * `Page.entry_fulfillment.conditional_cases` * `Page.event_handlers.trigger_fulfillment.messages` * `Page.event_handlers.trigger_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.messages` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.messages` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.conditional_cases` * `Page.transition_routes.trigger_fulfillment.messages` * `Page.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPageGetCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPageGetCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -15531,7 +15752,7 @@ impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15556,7 +15777,7 @@ impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15576,9 +15797,9 @@ impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowPageGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowPageGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15610,7 +15831,7 @@ impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15621,10 +15842,10 @@ impl<'a> ProjectLocationAgentFlowPageGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowPageListCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowPageListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15634,9 +15855,15 @@ pub struct ProjectLocationAgentFlowPageListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowPageListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowPageListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowPageListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -15792,28 +16019,28 @@ impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowPageListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowPageListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowPageListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowPageListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowPageListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowPageListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The language to list pages for. The following fields are language dependent: * `Page.entry_fulfillment.messages` * `Page.entry_fulfillment.conditional_cases` * `Page.event_handlers.trigger_fulfillment.messages` * `Page.event_handlers.trigger_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.messages` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.messages` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.conditional_cases` * `Page.transition_routes.trigger_fulfillment.messages` * `Page.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPageListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPageListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -15823,7 +16050,7 @@ impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPageListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -15848,7 +16075,7 @@ impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPageListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15868,9 +16095,9 @@ impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowPageListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowPageListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -15903,7 +16130,7 @@ impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15918,10 +16145,10 @@ impl<'a> ProjectLocationAgentFlowPageListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowPagePatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowPagePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Page,
     _name: String,
     _update_mask: Option<String>,
@@ -15931,9 +16158,15 @@ pub struct ProjectLocationAgentFlowPagePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowPagePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowPagePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowPagePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16099,7 +16332,7 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Page) -> ProjectLocationAgentFlowPagePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Page) -> ProjectLocationAgentFlowPagePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16109,21 +16342,21 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPagePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPagePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowPagePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowPagePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The language of the following fields in `page`: * `Page.entry_fulfillment.messages` * `Page.entry_fulfillment.conditional_cases` * `Page.event_handlers.trigger_fulfillment.messages` * `Page.event_handlers.trigger_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.messages` * `Page.form.parameters.fill_behavior.initial_prompt_fulfillment.conditional_cases` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.messages` * `Page.form.parameters.fill_behavior.reprompt_event_handlers.conditional_cases` * `Page.transition_routes.trigger_fulfillment.messages` * `Page.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPagePatchCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPagePatchCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -16133,7 +16366,7 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPagePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPagePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16158,7 +16391,7 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPagePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPagePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16178,9 +16411,9 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowPagePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowPagePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16213,7 +16446,7 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16227,10 +16460,10 @@ impl<'a> ProjectLocationAgentFlowPagePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3TransitionRouteGroup,
     _parent: String,
     _language_code: Option<String>,
@@ -16239,9 +16472,15 @@ pub struct ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16404,7 +16643,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TransitionRouteGroup) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TransitionRouteGroup) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -16414,14 +16653,14 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The language of the following fields in `TransitionRouteGroup`: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -16431,7 +16670,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16456,7 +16695,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16476,9 +16715,9 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16510,7 +16749,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16519,10 +16758,10 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16530,9 +16769,15 @@ pub struct ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16682,14 +16927,14 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// This field has no effect for transition route group that no page is using. If the transition route group is referenced by any page: * If `force` is set to false, an error will be returned with message indicating pages that reference the transition route group. * If `force` is set to true, Dialogflow will remove the transition route group, as well as any reference to it.
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
@@ -16699,7 +16944,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16724,7 +16969,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16744,9 +16989,9 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -16778,7 +17023,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16787,10 +17032,10 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16798,9 +17043,15 @@ pub struct ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -16950,14 +17201,14 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The language to retrieve the transition route group for. The following fields are language dependent: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -16967,7 +17218,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -16992,7 +17243,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17012,9 +17263,9 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17046,7 +17297,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17057,10 +17308,10 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowTransitionRouteGroupListCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -17070,9 +17321,15 @@ pub struct ProjectLocationAgentFlowTransitionRouteGroupListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17228,28 +17485,28 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The language to list transition route groups for. The following fields are language dependent: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -17259,7 +17516,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17284,7 +17541,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17304,9 +17561,9 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17339,7 +17596,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17354,10 +17611,10 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3TransitionRouteGroup,
     _name: String,
     _update_mask: Option<String>,
@@ -17367,9 +17624,15 @@ pub struct ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17535,7 +17798,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TransitionRouteGroup) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TransitionRouteGroup) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17545,21 +17808,21 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The language of the following fields in `TransitionRouteGroup`: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -17569,7 +17832,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17594,7 +17857,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17614,9 +17877,9 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17649,7 +17912,7 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17662,10 +17925,10 @@ impl<'a> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionCompareVersionCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionCompareVersionCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3CompareVersionsRequest,
     _base_version: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17673,9 +17936,15 @@ pub struct ProjectLocationAgentFlowVersionCompareVersionCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionCompareVersionCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionCompareVersionCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -17835,7 +18104,7 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3CompareVersionsRequest) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3CompareVersionsRequest) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -17845,7 +18114,7 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn base_version(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
+    pub fn base_version(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S> {
         self._base_version = new_value.to_string();
         self
     }
@@ -17855,7 +18124,7 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -17880,7 +18149,7 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17900,9 +18169,9 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionCompareVersionCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -17935,7 +18204,7 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17948,10 +18217,10 @@ impl<'a> ProjectLocationAgentFlowVersionCompareVersionCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Version,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17959,9 +18228,15 @@ pub struct ProjectLocationAgentFlowVersionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18121,7 +18396,7 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Version) -> ProjectLocationAgentFlowVersionCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Version) -> ProjectLocationAgentFlowVersionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -18131,7 +18406,7 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -18141,7 +18416,7 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18166,7 +18441,7 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18186,9 +18461,9 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18220,7 +18495,7 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18228,19 +18503,25 @@ impl<'a> ProjectLocationAgentFlowVersionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18387,7 +18668,7 @@ impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18397,7 +18678,7 @@ impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18422,7 +18703,7 @@ impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18442,9 +18723,9 @@ impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18476,7 +18757,7 @@ impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18484,19 +18765,25 @@ impl<'a> ProjectLocationAgentFlowVersionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18643,7 +18930,7 @@ impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -18653,7 +18940,7 @@ impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18678,7 +18965,7 @@ impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18698,9 +18985,9 @@ impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -18732,7 +19019,7 @@ impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18742,10 +19029,10 @@ impl<'a> ProjectLocationAgentFlowVersionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionListCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18754,9 +19041,15 @@ pub struct ProjectLocationAgentFlowVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -18909,21 +19202,21 @@ impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 20 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowVersionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowVersionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -18933,7 +19226,7 @@ impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -18958,7 +19251,7 @@ impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18978,9 +19271,9 @@ impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19013,7 +19306,7 @@ impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19026,10 +19319,10 @@ impl<'a> ProjectLocationAgentFlowVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionLoadCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionLoadCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3LoadVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19037,9 +19330,15 @@ pub struct ProjectLocationAgentFlowVersionLoadCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionLoadCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionLoadCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionLoadCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19199,7 +19498,7 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3LoadVersionRequest) -> ProjectLocationAgentFlowVersionLoadCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3LoadVersionRequest) -> ProjectLocationAgentFlowVersionLoadCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19209,7 +19508,7 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionLoadCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionLoadCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -19219,7 +19518,7 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionLoadCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionLoadCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19244,7 +19543,7 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionLoadCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionLoadCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19264,9 +19563,9 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionLoadCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionLoadCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19299,7 +19598,7 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19313,10 +19612,10 @@ impl<'a> ProjectLocationAgentFlowVersionLoadCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowVersionPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowVersionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Version,
     _name: String,
     _update_mask: Option<String>,
@@ -19325,9 +19624,15 @@ pub struct ProjectLocationAgentFlowVersionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowVersionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowVersionPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowVersionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19490,7 +19795,7 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Version) -> ProjectLocationAgentFlowVersionPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Version) -> ProjectLocationAgentFlowVersionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19500,14 +19805,14 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields get updated. Currently only `description` and `display_name` can be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowVersionPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -19517,7 +19822,7 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowVersionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19542,7 +19847,7 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowVersionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19562,9 +19867,9 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowVersionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowVersionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19597,7 +19902,7 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19611,10 +19916,10 @@ impl<'a> ProjectLocationAgentFlowVersionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Flow,
     _parent: String,
     _language_code: Option<String>,
@@ -19623,9 +19928,15 @@ pub struct ProjectLocationAgentFlowCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -19788,7 +20099,7 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Flow) -> ProjectLocationAgentFlowCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Flow) -> ProjectLocationAgentFlowCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -19798,14 +20109,14 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The language of the following fields in `flow`: * `Flow.event_handlers.trigger_fulfillment.messages` * `Flow.event_handlers.trigger_fulfillment.conditional_cases` * `Flow.transition_routes.trigger_fulfillment.messages` * `Flow.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowCreateCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowCreateCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -19815,7 +20126,7 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -19840,7 +20151,7 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19860,9 +20171,9 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -19894,7 +20205,7 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19903,10 +20214,10 @@ impl<'a> ProjectLocationAgentFlowCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19914,9 +20225,15 @@ pub struct ProjectLocationAgentFlowDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20066,14 +20383,14 @@ impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// This field has no effect for flows with no incoming transitions. For flows with incoming transitions: * If `force` is set to false, an error will be returned with message indicating the incoming transitions. * If `force` is set to true, Dialogflow will remove the flow, as well as any transitions to the flow (i.e. Target flow in event handlers or Target flow in transition routes that point to this flow will be cleared).
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentFlowDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentFlowDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
@@ -20083,7 +20400,7 @@ impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20108,7 +20425,7 @@ impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20128,9 +20445,9 @@ impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20163,7 +20480,7 @@ impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20176,10 +20493,10 @@ impl<'a> ProjectLocationAgentFlowDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowExportCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ExportFlowRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20187,9 +20504,15 @@ pub struct ProjectLocationAgentFlowExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowExportCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowExportCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20349,7 +20672,7 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportFlowRequest) -> ProjectLocationAgentFlowExportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportFlowRequest) -> ProjectLocationAgentFlowExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -20359,7 +20682,7 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowExportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowExportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -20369,7 +20692,7 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20394,7 +20717,7 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20414,9 +20737,9 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20448,7 +20771,7 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20457,10 +20780,10 @@ impl<'a> ProjectLocationAgentFlowExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20468,9 +20791,15 @@ pub struct ProjectLocationAgentFlowGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowGetCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20620,14 +20949,14 @@ impl<'a> ProjectLocationAgentFlowGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The language to retrieve the flow for. The following fields are language dependent: * `Flow.event_handlers.trigger_fulfillment.messages` * `Flow.event_handlers.trigger_fulfillment.conditional_cases` * `Flow.transition_routes.trigger_fulfillment.messages` * `Flow.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowGetCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowGetCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -20637,7 +20966,7 @@ impl<'a> ProjectLocationAgentFlowGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20662,7 +20991,7 @@ impl<'a> ProjectLocationAgentFlowGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20682,9 +21011,9 @@ impl<'a> ProjectLocationAgentFlowGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20716,7 +21045,7 @@ impl<'a> ProjectLocationAgentFlowGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20725,10 +21054,10 @@ impl<'a> ProjectLocationAgentFlowGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowGetValidationResultCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowGetValidationResultCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20736,9 +21065,15 @@ pub struct ProjectLocationAgentFlowGetValidationResultCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowGetValidationResultCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowGetValidationResultCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowGetValidationResultCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -20888,14 +21223,14 @@ impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowGetValidationResultCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowGetValidationResultCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If not specified, the agent's default language is used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowGetValidationResultCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowGetValidationResultCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -20905,7 +21240,7 @@ impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowGetValidationResultCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowGetValidationResultCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -20930,7 +21265,7 @@ impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowGetValidationResultCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowGetValidationResultCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20950,9 +21285,9 @@ impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowGetValidationResultCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowGetValidationResultCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -20985,7 +21320,7 @@ impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20998,10 +21333,10 @@ impl<'a> ProjectLocationAgentFlowGetValidationResultCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowImportCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ImportFlowRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21009,9 +21344,15 @@ pub struct ProjectLocationAgentFlowImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowImportCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowImportCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21171,7 +21512,7 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ImportFlowRequest) -> ProjectLocationAgentFlowImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ImportFlowRequest) -> ProjectLocationAgentFlowImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21181,7 +21522,7 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -21191,7 +21532,7 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21216,7 +21557,7 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21236,9 +21577,9 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21270,7 +21611,7 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21281,10 +21622,10 @@ impl<'a> ProjectLocationAgentFlowImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowListCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -21294,9 +21635,15 @@ pub struct ProjectLocationAgentFlowListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowListCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21452,28 +21799,28 @@ impl<'a> ProjectLocationAgentFlowListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentFlowListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentFlowListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentFlowListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The language to list flows for. The following fields are language dependent: * `Flow.event_handlers.trigger_fulfillment.messages` * `Flow.event_handlers.trigger_fulfillment.conditional_cases` * `Flow.transition_routes.trigger_fulfillment.messages` * `Flow.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -21483,7 +21830,7 @@ impl<'a> ProjectLocationAgentFlowListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21508,7 +21855,7 @@ impl<'a> ProjectLocationAgentFlowListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21528,9 +21875,9 @@ impl<'a> ProjectLocationAgentFlowListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21563,7 +21910,7 @@ impl<'a> ProjectLocationAgentFlowListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21578,10 +21925,10 @@ impl<'a> ProjectLocationAgentFlowListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Flow,
     _name: String,
     _update_mask: Option<String>,
@@ -21591,9 +21938,15 @@ pub struct ProjectLocationAgentFlowPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -21759,7 +22112,7 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Flow) -> ProjectLocationAgentFlowPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Flow) -> ProjectLocationAgentFlowPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -21769,21 +22122,21 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentFlowPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The language of the following fields in `flow`: * `Flow.event_handlers.trigger_fulfillment.messages` * `Flow.event_handlers.trigger_fulfillment.conditional_cases` * `Flow.transition_routes.trigger_fulfillment.messages` * `Flow.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPatchCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentFlowPatchCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -21793,7 +22146,7 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -21818,7 +22171,7 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21838,9 +22191,9 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -21873,7 +22226,7 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21886,10 +22239,10 @@ impl<'a> ProjectLocationAgentFlowPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowTrainCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowTrainCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3TrainFlowRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21897,9 +22250,15 @@ pub struct ProjectLocationAgentFlowTrainCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowTrainCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowTrainCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowTrainCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22059,7 +22418,7 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TrainFlowRequest) -> ProjectLocationAgentFlowTrainCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TrainFlowRequest) -> ProjectLocationAgentFlowTrainCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22069,7 +22428,7 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTrainCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowTrainCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22079,7 +22438,7 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTrainCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowTrainCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22104,7 +22463,7 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTrainCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowTrainCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22124,9 +22483,9 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowTrainCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowTrainCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22159,7 +22518,7 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22172,10 +22531,10 @@ impl<'a> ProjectLocationAgentFlowTrainCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentFlowValidateCall<'a>
-    where  {
+pub struct ProjectLocationAgentFlowValidateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ValidateFlowRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22183,9 +22542,15 @@ pub struct ProjectLocationAgentFlowValidateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentFlowValidateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentFlowValidateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
+impl<'a, S> ProjectLocationAgentFlowValidateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22345,7 +22710,7 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ValidateFlowRequest) -> ProjectLocationAgentFlowValidateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ValidateFlowRequest) -> ProjectLocationAgentFlowValidateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22355,7 +22720,7 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowValidateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentFlowValidateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22365,7 +22730,7 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowValidateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentFlowValidateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22390,7 +22755,7 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowValidateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentFlowValidateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22410,9 +22775,9 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentFlowValidateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentFlowValidateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22445,7 +22810,7 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22459,10 +22824,10 @@ impl<'a> ProjectLocationAgentFlowValidateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentIntentCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentIntentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Intent,
     _parent: String,
     _language_code: Option<String>,
@@ -22471,9 +22836,15 @@ pub struct ProjectLocationAgentIntentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentIntentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentIntentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22636,7 +23007,7 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Intent) -> ProjectLocationAgentIntentCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Intent) -> ProjectLocationAgentIntentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -22646,14 +23017,14 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentIntentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentIntentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The language of the following fields in `intent`: * `Intent.training_phrases.parts.text` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentCreateCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentCreateCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -22663,7 +23034,7 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22688,7 +23059,7 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22708,9 +23079,9 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentIntentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentIntentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22742,7 +23113,7 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22750,19 +23121,25 @@ impl<'a> ProjectLocationAgentIntentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentIntentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentIntentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentIntentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentIntentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -22909,7 +23286,7 @@ impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentIntentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentIntentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -22919,7 +23296,7 @@ impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -22944,7 +23321,7 @@ impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22964,9 +23341,9 @@ impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentIntentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentIntentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -22998,7 +23375,7 @@ impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23007,10 +23384,10 @@ impl<'a> ProjectLocationAgentIntentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentIntentGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentIntentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23018,9 +23395,15 @@ pub struct ProjectLocationAgentIntentGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentIntentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentIntentGetCall<'a> {
+impl<'a, S> ProjectLocationAgentIntentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23170,14 +23553,14 @@ impl<'a> ProjectLocationAgentIntentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentIntentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentIntentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The language to retrieve the intent for. The following fields are language dependent: * `Intent.training_phrases.parts.text` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentGetCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentGetCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -23187,7 +23570,7 @@ impl<'a> ProjectLocationAgentIntentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23212,7 +23595,7 @@ impl<'a> ProjectLocationAgentIntentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23232,9 +23615,9 @@ impl<'a> ProjectLocationAgentIntentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentIntentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentIntentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23266,7 +23649,7 @@ impl<'a> ProjectLocationAgentIntentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23278,10 +23661,10 @@ impl<'a> ProjectLocationAgentIntentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentIntentListCall<'a>
-    where  {
+pub struct ProjectLocationAgentIntentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -23292,9 +23675,15 @@ pub struct ProjectLocationAgentIntentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentIntentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentIntentListCall<'a> {
+impl<'a, S> ProjectLocationAgentIntentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23453,35 +23842,35 @@ impl<'a> ProjectLocationAgentIntentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentIntentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The language to list intents for. The following fields are language dependent: * `Intent.training_phrases.parts.text` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// The resource view to apply to the returned intent.
     ///
     /// Sets the *intent view* query property to the given value.
-    pub fn intent_view(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn intent_view(mut self, new_value: &str) -> ProjectLocationAgentIntentListCall<'a, S> {
         self._intent_view = Some(new_value.to_string());
         self
     }
@@ -23491,7 +23880,7 @@ impl<'a> ProjectLocationAgentIntentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23516,7 +23905,7 @@ impl<'a> ProjectLocationAgentIntentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23536,9 +23925,9 @@ impl<'a> ProjectLocationAgentIntentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentIntentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentIntentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23571,7 +23960,7 @@ impl<'a> ProjectLocationAgentIntentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23586,10 +23975,10 @@ impl<'a> ProjectLocationAgentIntentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentIntentPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentIntentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Intent,
     _name: String,
     _update_mask: Option<String>,
@@ -23599,9 +23988,15 @@ pub struct ProjectLocationAgentIntentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentIntentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentIntentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -23767,7 +24162,7 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Intent) -> ProjectLocationAgentIntentPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Intent) -> ProjectLocationAgentIntentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -23777,21 +24172,21 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentIntentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentIntentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentIntentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentIntentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The language of the following fields in `intent`: * `Intent.training_phrases.parts.text` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentPatchCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentIntentPatchCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -23801,7 +24196,7 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -23826,7 +24221,7 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23846,9 +24241,9 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentIntentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentIntentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -23881,7 +24276,7 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23894,10 +24289,10 @@ impl<'a> ProjectLocationAgentIntentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionEntityTypeCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionEntityTypeCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3SessionEntityType,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23905,9 +24300,15 @@ pub struct ProjectLocationAgentSessionEntityTypeCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionEntityTypeCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionEntityTypeCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24067,7 +24468,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -24077,7 +24478,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -24087,7 +24488,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24112,7 +24513,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24132,9 +24533,9 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24166,7 +24567,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24174,19 +24575,25 @@ impl<'a> ProjectLocationAgentSessionEntityTypeCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionEntityTypeDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24333,7 +24740,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -24343,7 +24750,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24368,7 +24775,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24388,9 +24795,9 @@ impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24422,7 +24829,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24430,19 +24837,25 @@ impl<'a> ProjectLocationAgentSessionEntityTypeDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionEntityTypeGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionEntityTypeGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionEntityTypeGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionEntityTypeGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionEntityTypeGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24589,7 +25002,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -24599,7 +25012,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24624,7 +25037,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24644,9 +25057,9 @@ impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24678,7 +25091,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24688,10 +25101,10 @@ impl<'a> ProjectLocationAgentSessionEntityTypeGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionEntityTypeListCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionEntityTypeListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -24700,9 +25113,15 @@ pub struct ProjectLocationAgentSessionEntityTypeListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionEntityTypeListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionEntityTypeListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionEntityTypeListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -24855,21 +25274,21 @@ impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentSessionEntityTypeListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -24879,7 +25298,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -24904,7 +25323,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24924,9 +25343,9 @@ impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypeListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -24959,7 +25378,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24973,10 +25392,10 @@ impl<'a> ProjectLocationAgentSessionEntityTypeListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionEntityTypePatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionEntityTypePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3SessionEntityType,
     _name: String,
     _update_mask: Option<String>,
@@ -24985,9 +25404,15 @@ pub struct ProjectLocationAgentSessionEntityTypePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionEntityTypePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionEntityTypePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionEntityTypePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25150,7 +25575,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SessionEntityType) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25160,14 +25585,14 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -25177,7 +25602,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25202,7 +25627,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25222,9 +25647,9 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionEntityTypePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25257,7 +25682,7 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25270,10 +25695,10 @@ impl<'a> ProjectLocationAgentSessionEntityTypePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionDetectIntentCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionDetectIntentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3DetectIntentRequest,
     _session: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25281,9 +25706,15 @@ pub struct ProjectLocationAgentSessionDetectIntentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionDetectIntentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionDetectIntentCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionDetectIntentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25443,7 +25874,7 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DetectIntentRequest) -> ProjectLocationAgentSessionDetectIntentCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DetectIntentRequest) -> ProjectLocationAgentSessionDetectIntentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25453,7 +25884,7 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionDetectIntentCall<'a> {
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionDetectIntentCall<'a, S> {
         self._session = new_value.to_string();
         self
     }
@@ -25463,7 +25894,7 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionDetectIntentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionDetectIntentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25488,7 +25919,7 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionDetectIntentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionDetectIntentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25508,9 +25939,9 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionDetectIntentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionDetectIntentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25543,7 +25974,7 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25556,10 +25987,10 @@ impl<'a> ProjectLocationAgentSessionDetectIntentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionFulfillIntentCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionFulfillIntentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3FulfillIntentRequest,
     _session: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25567,9 +25998,15 @@ pub struct ProjectLocationAgentSessionFulfillIntentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionFulfillIntentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionFulfillIntentCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionFulfillIntentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -25729,7 +26166,7 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3FulfillIntentRequest) -> ProjectLocationAgentSessionFulfillIntentCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3FulfillIntentRequest) -> ProjectLocationAgentSessionFulfillIntentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -25739,7 +26176,7 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionFulfillIntentCall<'a> {
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionFulfillIntentCall<'a, S> {
         self._session = new_value.to_string();
         self
     }
@@ -25749,7 +26186,7 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionFulfillIntentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionFulfillIntentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -25774,7 +26211,7 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionFulfillIntentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionFulfillIntentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25794,9 +26231,9 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionFulfillIntentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionFulfillIntentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -25829,7 +26266,7 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25842,10 +26279,10 @@ impl<'a> ProjectLocationAgentSessionFulfillIntentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentSessionMatchIntentCall<'a>
-    where  {
+pub struct ProjectLocationAgentSessionMatchIntentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3MatchIntentRequest,
     _session: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25853,9 +26290,15 @@ pub struct ProjectLocationAgentSessionMatchIntentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentSessionMatchIntentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionMatchIntentCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
+impl<'a, S> ProjectLocationAgentSessionMatchIntentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26015,7 +26458,7 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3MatchIntentRequest) -> ProjectLocationAgentSessionMatchIntentCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3MatchIntentRequest) -> ProjectLocationAgentSessionMatchIntentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26025,7 +26468,7 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionMatchIntentCall<'a> {
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionMatchIntentCall<'a, S> {
         self._session = new_value.to_string();
         self
     }
@@ -26035,7 +26478,7 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionMatchIntentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionMatchIntentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26060,7 +26503,7 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionMatchIntentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionMatchIntentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26080,9 +26523,9 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentSessionMatchIntentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentSessionMatchIntentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26114,7 +26557,7 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26122,19 +26565,25 @@ impl<'a> ProjectLocationAgentSessionMatchIntentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseResultGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseResultGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseResultGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseResultGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseResultGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26281,7 +26730,7 @@ impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -26291,7 +26740,7 @@ impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseResultGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseResultGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26316,7 +26765,7 @@ impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseResultGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseResultGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26336,9 +26785,9 @@ impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseResultGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseResultGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26370,7 +26819,7 @@ impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26381,10 +26830,10 @@ impl<'a> ProjectLocationAgentTestCaseResultGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseResultListCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseResultListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -26394,9 +26843,15 @@ pub struct ProjectLocationAgentTestCaseResultListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseResultListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseResultListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseResultListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26552,28 +27007,28 @@ impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentTestCaseResultListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentTestCaseResultListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression used to filter test case results. See [API Filtering](https://aip.dev/160). The expression is case insensitive. Only 'AND' is supported for logical operators. The supported syntax is listed below in detail: [AND ] ... [AND latest] The supported fields and operators are: field operator `environment` `=`, `IN` (Use value `draft` for draft environment) `test_time` `>`, `<` `latest` only returns the latest test result in all results for each test case. Examples: * "environment=draft AND latest" matches the latest test result for each test case in the draft environment. * "environment IN (e1,e2)" matches any test case results with an environment resource name of either "e1" or "e2". * "test_time > 1602540713" matches any test case results with test time later than a unix timestamp in seconds 1602540713.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationAgentTestCaseResultListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -26583,7 +27038,7 @@ impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseResultListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseResultListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26608,7 +27063,7 @@ impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseResultListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseResultListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26628,9 +27083,9 @@ impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseResultListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseResultListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26663,7 +27118,7 @@ impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26676,10 +27131,10 @@ impl<'a> ProjectLocationAgentTestCaseResultListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseBatchDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -26687,9 +27142,15 @@ pub struct ProjectLocationAgentTestCaseBatchDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseBatchDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -26849,7 +27310,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -26859,7 +27320,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -26869,7 +27330,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -26894,7 +27355,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26914,9 +27375,9 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -26949,7 +27410,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26962,10 +27423,10 @@ impl<'a> ProjectLocationAgentTestCaseBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseBatchRunCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseBatchRunCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3BatchRunTestCasesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -26973,9 +27434,15 @@ pub struct ProjectLocationAgentTestCaseBatchRunCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseBatchRunCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseBatchRunCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseBatchRunCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27135,7 +27602,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3BatchRunTestCasesRequest) -> ProjectLocationAgentTestCaseBatchRunCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3BatchRunTestCasesRequest) -> ProjectLocationAgentTestCaseBatchRunCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27145,7 +27612,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseBatchRunCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseBatchRunCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -27155,7 +27622,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseBatchRunCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseBatchRunCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27180,7 +27647,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseBatchRunCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseBatchRunCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27200,9 +27667,9 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseBatchRunCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseBatchRunCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27234,7 +27701,7 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27243,10 +27710,10 @@ impl<'a> ProjectLocationAgentTestCaseBatchRunCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseCalculateCoverageCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _agent: String,
     _type_: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27254,9 +27721,15 @@ pub struct ProjectLocationAgentTestCaseCalculateCoverageCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27406,14 +27879,14 @@ impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn agent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
+    pub fn agent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S> {
         self._agent = new_value.to_string();
         self
     }
     /// Required. The type of coverage requested.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
+    pub fn type_(mut self, new_value: &str) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S> {
         self._type_ = Some(new_value.to_string());
         self
     }
@@ -27423,7 +27896,7 @@ impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27448,7 +27921,7 @@ impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27468,9 +27941,9 @@ impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseCalculateCoverageCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27503,7 +27976,7 @@ impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27516,10 +27989,10 @@ impl<'a> ProjectLocationAgentTestCaseCalculateCoverageCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3TestCase,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27527,9 +28000,15 @@ pub struct ProjectLocationAgentTestCaseCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27689,7 +28168,7 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TestCase) -> ProjectLocationAgentTestCaseCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TestCase) -> ProjectLocationAgentTestCaseCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27699,7 +28178,7 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -27709,7 +28188,7 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -27734,7 +28213,7 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27754,9 +28233,9 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -27789,7 +28268,7 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27802,10 +28281,10 @@ impl<'a> ProjectLocationAgentTestCaseCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseExportCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ExportTestCasesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27813,9 +28292,15 @@ pub struct ProjectLocationAgentTestCaseExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseExportCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -27975,7 +28460,7 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportTestCasesRequest) -> ProjectLocationAgentTestCaseExportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportTestCasesRequest) -> ProjectLocationAgentTestCaseExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -27985,7 +28470,7 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseExportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseExportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -27995,7 +28480,7 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28020,7 +28505,7 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28040,9 +28525,9 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28074,7 +28559,7 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28082,19 +28567,25 @@ impl<'a> ProjectLocationAgentTestCaseExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28241,7 +28732,7 @@ impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCaseGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCaseGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -28251,7 +28742,7 @@ impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28276,7 +28767,7 @@ impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28296,9 +28787,9 @@ impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28331,7 +28822,7 @@ impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28344,10 +28835,10 @@ impl<'a> ProjectLocationAgentTestCaseGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseImportCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseImportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ImportTestCasesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28355,9 +28846,15 @@ pub struct ProjectLocationAgentTestCaseImportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseImportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseImportCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseImportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28517,7 +29014,7 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ImportTestCasesRequest) -> ProjectLocationAgentTestCaseImportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ImportTestCasesRequest) -> ProjectLocationAgentTestCaseImportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -28527,7 +29024,7 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseImportCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseImportCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -28537,7 +29034,7 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseImportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseImportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28562,7 +29059,7 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseImportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseImportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28582,9 +29079,9 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseImportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseImportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28616,7 +29113,7 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28627,10 +29124,10 @@ impl<'a> ProjectLocationAgentTestCaseImportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseListCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -28640,9 +29137,15 @@ pub struct ProjectLocationAgentTestCaseListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -28798,28 +29301,28 @@ impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTestCaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Specifies whether response should include all fields or just the metadata.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> ProjectLocationAgentTestCaseListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> ProjectLocationAgentTestCaseListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentTestCaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentTestCaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 20. Note that when TestCaseView = FULL, the maximum page size allowed is 20. When TestCaseView = BASIC, the maximum page size allowed is 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentTestCaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentTestCaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -28829,7 +29332,7 @@ impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -28854,7 +29357,7 @@ impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28874,9 +29377,9 @@ impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -28909,7 +29412,7 @@ impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28923,10 +29426,10 @@ impl<'a> ProjectLocationAgentTestCaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCasePatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCasePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3TestCase,
     _name: String,
     _update_mask: Option<String>,
@@ -28935,9 +29438,15 @@ pub struct ProjectLocationAgentTestCasePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCasePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCasePatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCasePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29100,7 +29609,7 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TestCase) -> ProjectLocationAgentTestCasePatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TestCase) -> ProjectLocationAgentTestCasePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29110,14 +29619,14 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCasePatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCasePatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The mask to specify which fields should be updated. The `creationTime` and `lastTestResult` cannot be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentTestCasePatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentTestCasePatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -29127,7 +29636,7 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCasePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCasePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29152,7 +29661,7 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCasePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCasePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29172,9 +29681,9 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCasePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCasePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29207,7 +29716,7 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29220,10 +29729,10 @@ impl<'a> ProjectLocationAgentTestCasePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentTestCaseRunCall<'a>
-    where  {
+pub struct ProjectLocationAgentTestCaseRunCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3RunTestCaseRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29231,9 +29740,15 @@ pub struct ProjectLocationAgentTestCaseRunCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentTestCaseRunCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTestCaseRunCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
+impl<'a, S> ProjectLocationAgentTestCaseRunCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29393,7 +29908,7 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3RunTestCaseRequest) -> ProjectLocationAgentTestCaseRunCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3RunTestCaseRequest) -> ProjectLocationAgentTestCaseRunCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29403,7 +29918,7 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCaseRunCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTestCaseRunCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -29413,7 +29928,7 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseRunCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTestCaseRunCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29438,7 +29953,7 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseRunCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTestCaseRunCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29458,9 +29973,9 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentTestCaseRunCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentTestCaseRunCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29493,7 +30008,7 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29506,10 +30021,10 @@ impl<'a> ProjectLocationAgentTestCaseRunCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentWebhookCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentWebhookCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Webhook,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29517,9 +30032,15 @@ pub struct ProjectLocationAgentWebhookCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentWebhookCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentWebhookCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentWebhookCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29679,7 +30200,7 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Webhook) -> ProjectLocationAgentWebhookCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Webhook) -> ProjectLocationAgentWebhookCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -29689,7 +30210,7 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentWebhookCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentWebhookCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -29699,7 +30220,7 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29724,7 +30245,7 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29744,9 +30265,9 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentWebhookCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentWebhookCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -29778,7 +30299,7 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29787,10 +30308,10 @@ impl<'a> ProjectLocationAgentWebhookCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentWebhookDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentWebhookDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29798,9 +30319,15 @@ pub struct ProjectLocationAgentWebhookDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentWebhookDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentWebhookDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentWebhookDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -29950,14 +30477,14 @@ impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentWebhookDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentWebhookDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// This field has no effect for webhook not being used. For webhooks that are used by pages/flows/transition route groups: * If `force` is set to false, an error will be returned with message indicating the referenced resources. * If `force` is set to true, Dialogflow will remove the webhook, as well as any references to the webhook (i.e. Webhook and tagin fulfillments that point to this webhook will be removed).
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentWebhookDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentWebhookDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
@@ -29967,7 +30494,7 @@ impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -29992,7 +30519,7 @@ impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30012,9 +30539,9 @@ impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentWebhookDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentWebhookDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30046,7 +30573,7 @@ impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30054,19 +30581,25 @@ impl<'a> ProjectLocationAgentWebhookDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentWebhookGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentWebhookGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentWebhookGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentWebhookGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
+impl<'a, S> ProjectLocationAgentWebhookGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30213,7 +30746,7 @@ impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentWebhookGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentWebhookGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -30223,7 +30756,7 @@ impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30248,7 +30781,7 @@ impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30268,9 +30801,9 @@ impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentWebhookGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentWebhookGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30302,7 +30835,7 @@ impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30312,10 +30845,10 @@ impl<'a> ProjectLocationAgentWebhookGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentWebhookListCall<'a>
-    where  {
+pub struct ProjectLocationAgentWebhookListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -30324,9 +30857,15 @@ pub struct ProjectLocationAgentWebhookListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentWebhookListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentWebhookListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentWebhookListCall<'a> {
+impl<'a, S> ProjectLocationAgentWebhookListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30479,21 +31018,21 @@ impl<'a> ProjectLocationAgentWebhookListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentWebhookListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentWebhookListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentWebhookListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentWebhookListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentWebhookListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentWebhookListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -30503,7 +31042,7 @@ impl<'a> ProjectLocationAgentWebhookListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30528,7 +31067,7 @@ impl<'a> ProjectLocationAgentWebhookListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30548,9 +31087,9 @@ impl<'a> ProjectLocationAgentWebhookListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentWebhookListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentWebhookListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30583,7 +31122,7 @@ impl<'a> ProjectLocationAgentWebhookListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30597,10 +31136,10 @@ impl<'a> ProjectLocationAgentWebhookListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentWebhookPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentWebhookPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Webhook,
     _name: String,
     _update_mask: Option<String>,
@@ -30609,9 +31148,15 @@ pub struct ProjectLocationAgentWebhookPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentWebhookPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentWebhookPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentWebhookPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -30774,7 +31319,7 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Webhook) -> ProjectLocationAgentWebhookPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Webhook) -> ProjectLocationAgentWebhookPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -30784,14 +31329,14 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentWebhookPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentWebhookPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentWebhookPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentWebhookPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -30801,7 +31346,7 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentWebhookPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -30826,7 +31371,7 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentWebhookPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30846,9 +31391,9 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentWebhookPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentWebhookPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -30881,7 +31426,7 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30894,10 +31439,10 @@ impl<'a> ProjectLocationAgentWebhookPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentCreateCall<'a>
-    where  {
+pub struct ProjectLocationAgentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Agent,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -30905,9 +31450,15 @@ pub struct ProjectLocationAgentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentCreateCall<'a> {
+impl<'a, S> ProjectLocationAgentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31067,7 +31618,7 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Agent) -> ProjectLocationAgentCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Agent) -> ProjectLocationAgentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -31077,7 +31628,7 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -31087,7 +31638,7 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31112,7 +31663,7 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31132,9 +31683,9 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31166,7 +31717,7 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31174,19 +31725,25 @@ impl<'a> ProjectLocationAgentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationAgentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentDeleteCall<'a> {
+impl<'a, S> ProjectLocationAgentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31333,7 +31890,7 @@ impl<'a> ProjectLocationAgentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -31343,7 +31900,7 @@ impl<'a> ProjectLocationAgentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31368,7 +31925,7 @@ impl<'a> ProjectLocationAgentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31388,9 +31945,9 @@ impl<'a> ProjectLocationAgentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31423,7 +31980,7 @@ impl<'a> ProjectLocationAgentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -31436,10 +31993,10 @@ impl<'a> ProjectLocationAgentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentExportCall<'a>
-    where  {
+pub struct ProjectLocationAgentExportCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ExportAgentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -31447,9 +32004,15 @@ pub struct ProjectLocationAgentExportCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentExportCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentExportCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentExportCall<'a> {
+impl<'a, S> ProjectLocationAgentExportCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31609,7 +32172,7 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportAgentRequest) -> ProjectLocationAgentExportCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportAgentRequest) -> ProjectLocationAgentExportCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -31619,7 +32182,7 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentExportCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentExportCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -31629,7 +32192,7 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentExportCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentExportCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31654,7 +32217,7 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentExportCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentExportCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31674,9 +32237,9 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentExportCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentExportCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31708,7 +32271,7 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31716,19 +32279,25 @@ impl<'a> ProjectLocationAgentExportCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentGetCall<'a>
-    where  {
+pub struct ProjectLocationAgentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentGetCall<'a> {
+impl<'a, S> ProjectLocationAgentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -31875,7 +32444,7 @@ impl<'a> ProjectLocationAgentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -31885,7 +32454,7 @@ impl<'a> ProjectLocationAgentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -31910,7 +32479,7 @@ impl<'a> ProjectLocationAgentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31930,9 +32499,9 @@ impl<'a> ProjectLocationAgentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -31964,7 +32533,7 @@ impl<'a> ProjectLocationAgentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31973,10 +32542,10 @@ impl<'a> ProjectLocationAgentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentGetValidationResultCall<'a>
-    where  {
+pub struct ProjectLocationAgentGetValidationResultCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _language_code: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -31984,9 +32553,15 @@ pub struct ProjectLocationAgentGetValidationResultCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentGetValidationResultCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGetValidationResultCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
+impl<'a, S> ProjectLocationAgentGetValidationResultCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32136,14 +32711,14 @@ impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetValidationResultCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetValidationResultCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// If not specified, the agent's default language is used.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGetValidationResultCall<'a> {
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGetValidationResultCall<'a, S> {
         self._language_code = Some(new_value.to_string());
         self
     }
@@ -32153,7 +32728,7 @@ impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGetValidationResultCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGetValidationResultCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32178,7 +32753,7 @@ impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetValidationResultCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetValidationResultCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32198,9 +32773,9 @@ impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentGetValidationResultCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentGetValidationResultCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32232,7 +32807,7 @@ impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32242,10 +32817,10 @@ impl<'a> ProjectLocationAgentGetValidationResultCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentListCall<'a>
-    where  {
+pub struct ProjectLocationAgentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -32254,9 +32829,15 @@ pub struct ProjectLocationAgentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentListCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentListCall<'a> {
+impl<'a, S> ProjectLocationAgentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32409,21 +32990,21 @@ impl<'a> ProjectLocationAgentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 100 and at most 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -32433,7 +33014,7 @@ impl<'a> ProjectLocationAgentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32458,7 +33039,7 @@ impl<'a> ProjectLocationAgentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32478,9 +33059,9 @@ impl<'a> ProjectLocationAgentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32513,7 +33094,7 @@ impl<'a> ProjectLocationAgentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -32527,10 +33108,10 @@ impl<'a> ProjectLocationAgentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentPatchCall<'a>
-    where  {
+pub struct ProjectLocationAgentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3Agent,
     _name: String,
     _update_mask: Option<String>,
@@ -32539,9 +33120,15 @@ pub struct ProjectLocationAgentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentPatchCall<'a> {
+impl<'a, S> ProjectLocationAgentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32704,7 +33291,7 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Agent) -> ProjectLocationAgentPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Agent) -> ProjectLocationAgentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -32714,14 +33301,14 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The mask to control which fields get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationAgentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -32731,7 +33318,7 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -32756,7 +33343,7 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32776,9 +33363,9 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -32811,7 +33398,7 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -32824,10 +33411,10 @@ impl<'a> ProjectLocationAgentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentRestoreCall<'a>
-    where  {
+pub struct ProjectLocationAgentRestoreCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3RestoreAgentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -32835,9 +33422,15 @@ pub struct ProjectLocationAgentRestoreCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentRestoreCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentRestoreCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentRestoreCall<'a> {
+impl<'a, S> ProjectLocationAgentRestoreCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -32997,7 +33590,7 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3RestoreAgentRequest) -> ProjectLocationAgentRestoreCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3RestoreAgentRequest) -> ProjectLocationAgentRestoreCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -33007,7 +33600,7 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentRestoreCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentRestoreCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -33017,7 +33610,7 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentRestoreCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentRestoreCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33042,7 +33635,7 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentRestoreCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentRestoreCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33062,9 +33655,9 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentRestoreCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentRestoreCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33097,7 +33690,7 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -33110,10 +33703,10 @@ impl<'a> ProjectLocationAgentRestoreCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAgentValidateCall<'a>
-    where  {
+pub struct ProjectLocationAgentValidateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3ValidateAgentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -33121,9 +33714,15 @@ pub struct ProjectLocationAgentValidateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationAgentValidateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationAgentValidateCall<'a, S> {}
 
-impl<'a> ProjectLocationAgentValidateCall<'a> {
+impl<'a, S> ProjectLocationAgentValidateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33283,7 +33882,7 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ValidateAgentRequest) -> ProjectLocationAgentValidateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ValidateAgentRequest) -> ProjectLocationAgentValidateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -33293,7 +33892,7 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentValidateCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentValidateCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -33303,7 +33902,7 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentValidateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentValidateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33328,7 +33927,7 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentValidateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentValidateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33348,9 +33947,9 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAgentValidateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationAgentValidateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33382,7 +33981,7 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33390,19 +33989,25 @@ impl<'a> ProjectLocationAgentValidateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationCancelCall<'a>
-    where  {
+pub struct ProjectLocationOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationCancelCall<'a> {
+impl<'a, S> ProjectLocationOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33549,7 +34154,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -33559,7 +34164,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33584,7 +34189,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33604,9 +34209,9 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33638,7 +34243,7 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33646,19 +34251,25 @@ impl<'a> ProjectLocationOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationGetCall<'a>
-    where  {
+pub struct ProjectLocationOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationGetCall<'a> {
+impl<'a, S> ProjectLocationOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -33805,7 +34416,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -33815,7 +34426,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -33840,7 +34451,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33860,9 +34471,9 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -33894,7 +34505,7 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33905,10 +34516,10 @@ impl<'a> ProjectLocationOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationListCall<'a>
-    where  {
+pub struct ProjectLocationOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -33918,9 +34529,15 @@ pub struct ProjectLocationOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationOperationListCall<'a, S> {}
 
-impl<'a> ProjectLocationOperationListCall<'a> {
+impl<'a, S> ProjectLocationOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34076,28 +34693,28 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -34107,7 +34724,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34132,7 +34749,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34152,9 +34769,9 @@ impl<'a> ProjectLocationOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34187,7 +34804,7 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34200,10 +34817,10 @@ impl<'a> ProjectLocationOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSecuritySettingCreateCall<'a>
-    where  {
+pub struct ProjectLocationSecuritySettingCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3SecuritySettings,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -34211,9 +34828,15 @@ pub struct ProjectLocationSecuritySettingCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSecuritySettingCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSecuritySettingCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
+impl<'a, S> ProjectLocationSecuritySettingCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34373,7 +34996,7 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SecuritySettings) -> ProjectLocationSecuritySettingCreateCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SecuritySettings) -> ProjectLocationSecuritySettingCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -34383,7 +35006,7 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationSecuritySettingCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationSecuritySettingCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -34393,7 +35016,7 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34418,7 +35041,7 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34438,9 +35061,9 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSecuritySettingCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSecuritySettingCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34472,7 +35095,7 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -34480,19 +35103,25 @@ impl<'a> ProjectLocationSecuritySettingCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSecuritySettingDeleteCall<'a>
-    where  {
+pub struct ProjectLocationSecuritySettingDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSecuritySettingDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSecuritySettingDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
+impl<'a, S> ProjectLocationSecuritySettingDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34639,7 +35268,7 @@ impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationSecuritySettingDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationSecuritySettingDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -34649,7 +35278,7 @@ impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34674,7 +35303,7 @@ impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34694,9 +35323,9 @@ impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSecuritySettingDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSecuritySettingDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34728,7 +35357,7 @@ impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -34736,19 +35365,25 @@ impl<'a> ProjectLocationSecuritySettingDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSecuritySettingGetCall<'a>
-    where  {
+pub struct ProjectLocationSecuritySettingGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSecuritySettingGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSecuritySettingGetCall<'a, S> {}
 
-impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
+impl<'a, S> ProjectLocationSecuritySettingGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -34895,7 +35530,7 @@ impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationSecuritySettingGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationSecuritySettingGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -34905,7 +35540,7 @@ impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -34930,7 +35565,7 @@ impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34950,9 +35585,9 @@ impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSecuritySettingGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSecuritySettingGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -34984,7 +35619,7 @@ impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -34994,10 +35629,10 @@ impl<'a> ProjectLocationSecuritySettingGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSecuritySettingListCall<'a>
-    where  {
+pub struct ProjectLocationSecuritySettingListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -35006,9 +35641,15 @@ pub struct ProjectLocationSecuritySettingListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSecuritySettingListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSecuritySettingListCall<'a, S> {}
 
-impl<'a> ProjectLocationSecuritySettingListCall<'a> {
+impl<'a, S> ProjectLocationSecuritySettingListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35161,21 +35802,21 @@ impl<'a> ProjectLocationSecuritySettingListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationSecuritySettingListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationSecuritySettingListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationSecuritySettingListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationSecuritySettingListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return in a single page. By default 20 and at most 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationSecuritySettingListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationSecuritySettingListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -35185,7 +35826,7 @@ impl<'a> ProjectLocationSecuritySettingListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35210,7 +35851,7 @@ impl<'a> ProjectLocationSecuritySettingListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35230,9 +35871,9 @@ impl<'a> ProjectLocationSecuritySettingListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSecuritySettingListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSecuritySettingListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35265,7 +35906,7 @@ impl<'a> ProjectLocationSecuritySettingListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -35279,10 +35920,10 @@ impl<'a> ProjectLocationSecuritySettingListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSecuritySettingPatchCall<'a>
-    where  {
+pub struct ProjectLocationSecuritySettingPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _request: GoogleCloudDialogflowCxV3SecuritySettings,
     _name: String,
     _update_mask: Option<String>,
@@ -35291,9 +35932,15 @@ pub struct ProjectLocationSecuritySettingPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSecuritySettingPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSecuritySettingPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
+impl<'a, S> ProjectLocationSecuritySettingPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35456,7 +36103,7 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SecuritySettings) -> ProjectLocationSecuritySettingPatchCall<'a> {
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SecuritySettings) -> ProjectLocationSecuritySettingPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -35466,14 +36113,14 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationSecuritySettingPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationSecuritySettingPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields get updated. If the mask is not present, all fields will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationSecuritySettingPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationSecuritySettingPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -35483,7 +36130,7 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSecuritySettingPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35508,7 +36155,7 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSecuritySettingPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35528,9 +36175,9 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSecuritySettingPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSecuritySettingPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35562,7 +36209,7 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -35570,19 +36217,25 @@ impl<'a> ProjectLocationSecuritySettingPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a>
-    where  {
+pub struct ProjectLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationGetCall<'a> {
+impl<'a, S> ProjectLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -35729,7 +36382,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -35739,7 +36392,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -35764,7 +36417,7 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35784,9 +36437,9 @@ impl<'a> ProjectLocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -35818,7 +36471,7 @@ impl<'a> ProjectLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -35829,10 +36482,10 @@ impl<'a> ProjectLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a>
-    where  {
+pub struct ProjectLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -35842,9 +36495,15 @@ pub struct ProjectLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationListCall<'a, S> {}
 
-impl<'a> ProjectLocationListCall<'a> {
+impl<'a, S> ProjectLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36000,28 +36659,28 @@ impl<'a> ProjectLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service selects a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -36031,7 +36690,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36056,7 +36715,7 @@ impl<'a> ProjectLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36076,9 +36735,9 @@ impl<'a> ProjectLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -36110,7 +36769,7 @@ impl<'a> ProjectLocationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -36118,19 +36777,25 @@ impl<'a> ProjectLocationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationCancelCall<'a>
-    where  {
+pub struct ProjectOperationCancelCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationCancelCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationCancelCall<'a, S> {}
 
-impl<'a> ProjectOperationCancelCall<'a> {
+impl<'a, S> ProjectOperationCancelCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36277,7 +36942,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -36287,7 +36952,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36312,7 +36977,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36332,9 +36997,9 @@ impl<'a> ProjectOperationCancelCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationCancelCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationCancelCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -36366,7 +37031,7 @@ impl<'a> ProjectOperationCancelCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -36374,19 +37039,25 @@ impl<'a> ProjectOperationCancelCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a>
-    where  {
+pub struct ProjectOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationGetCall<'a, S> {}
 
-impl<'a> ProjectOperationGetCall<'a> {
+impl<'a, S> ProjectOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36533,7 +37204,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -36543,7 +37214,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36568,7 +37239,7 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36588,9 +37259,9 @@ impl<'a> ProjectOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -36622,7 +37293,7 @@ impl<'a> ProjectOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -36633,10 +37304,10 @@ impl<'a> ProjectOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationListCall<'a>
-    where  {
+pub struct ProjectOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Dialogflow<>,
+    hub: &'a Dialogflow<S>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -36646,9 +37317,15 @@ pub struct ProjectOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectOperationListCall<'a, S> {}
 
-impl<'a> ProjectOperationListCall<'a> {
+impl<'a, S> ProjectOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -36804,28 +37481,28 @@ impl<'a> ProjectOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -36835,7 +37512,7 @@ impl<'a> ProjectOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -36860,7 +37537,7 @@ impl<'a> ProjectOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36880,9 +37557,9 @@ impl<'a> ProjectOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

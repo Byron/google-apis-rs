@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -79,7 +84,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -111,34 +116,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Appengine<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct Appengine<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for Appengine<> {}
+impl<'a, S> client::Hub for Appengine<S> {}
 
-impl<'a, > Appengine<> {
+impl<'a, S> Appengine<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Appengine<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> Appengine<S> {
         Appengine {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://appengine.googleapis.com/".to_string(),
             _root_url: "https://appengine.googleapis.com/".to_string(),
         }
     }
 
-    pub fn apps(&'a self) -> AppMethods<'a> {
+    pub fn apps(&'a self) -> AppMethods<'a, S> {
         AppMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1196,22 +1201,22 @@ impl client::Part for Volume {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `get(...)`, `locations_get(...)`, `locations_list(...)`, `modules_delete(...)`, `modules_get(...)`, `modules_list(...)`, `modules_patch(...)`, `modules_versions_create(...)`, `modules_versions_delete(...)`, `modules_versions_get(...)`, `modules_versions_instances_debug(...)`, `modules_versions_instances_delete(...)`, `modules_versions_instances_get(...)`, `modules_versions_instances_list(...)`, `modules_versions_list(...)`, `modules_versions_patch(...)`, `operations_get(...)`, `operations_list(...)` and `patch(...)`
 /// // to build up your call.
 /// let rb = hub.apps();
 /// # }
 /// ```
-pub struct AppMethods<'a>
-    where  {
+pub struct AppMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
 }
 
-impl<'a> client::MethodsBuilder for AppMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AppMethods<'a, S> {}
 
-impl<'a> AppMethods<'a> {
+impl<'a, S> AppMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1221,7 +1226,7 @@ impl<'a> AppMethods<'a> {
     ///
     /// * `appsId` - Part of `name`. Resource name for the location.
     /// * `locationsId` - Part of `name`. See documentation of `appsId`.
-    pub fn locations_get(&self, apps_id: &str, locations_id: &str) -> AppLocationGetCall<'a> {
+    pub fn locations_get(&self, apps_id: &str, locations_id: &str) -> AppLocationGetCall<'a, S> {
         AppLocationGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1239,7 +1244,7 @@ impl<'a> AppMethods<'a> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, apps_id: &str) -> AppLocationListCall<'a> {
+    pub fn locations_list(&self, apps_id: &str) -> AppLocationListCall<'a, S> {
         AppLocationListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1263,7 +1268,7 @@ impl<'a> AppMethods<'a> {
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_debug(&self, request: DebugInstanceRequest, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn modules_versions_instances_debug(&self, request: DebugInstanceRequest, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDebugCall<'a, S> {
         AppModuleVersionInstanceDebugCall {
             hub: self.hub,
             _request: request,
@@ -1287,7 +1292,7 @@ impl<'a> AppMethods<'a> {
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
+    pub fn modules_versions_instances_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDeleteCall<'a, S> {
         AppModuleVersionInstanceDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1310,7 +1315,7 @@ impl<'a> AppMethods<'a> {
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_get(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceGetCall<'a> {
+    pub fn modules_versions_instances_get(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceGetCall<'a, S> {
         AppModuleVersionInstanceGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1332,7 +1337,7 @@ impl<'a> AppMethods<'a> {
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default/versions/v1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_list(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn modules_versions_instances_list(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionInstanceListCall<'a, S> {
         AppModuleVersionInstanceListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1355,7 +1360,7 @@ impl<'a> AppMethods<'a> {
     /// * `request` - No description provided.
     /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_create(&self, request: Version, apps_id: &str, modules_id: &str) -> AppModuleVersionCreateCall<'a> {
+    pub fn modules_versions_create(&self, request: Version, apps_id: &str, modules_id: &str) -> AppModuleVersionCreateCall<'a, S> {
         AppModuleVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1376,7 +1381,7 @@ impl<'a> AppMethods<'a> {
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default/versions/v1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionDeleteCall<'a> {
+    pub fn modules_versions_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionDeleteCall<'a, S> {
         AppModuleVersionDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1397,7 +1402,7 @@ impl<'a> AppMethods<'a> {
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default/versions/v1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_get(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionGetCall<'a> {
+    pub fn modules_versions_get(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionGetCall<'a, S> {
         AppModuleVersionGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1418,7 +1423,7 @@ impl<'a> AppMethods<'a> {
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_list(&self, apps_id: &str, modules_id: &str) -> AppModuleVersionListCall<'a> {
+    pub fn modules_versions_list(&self, apps_id: &str, modules_id: &str) -> AppModuleVersionListCall<'a, S> {
         AppModuleVersionListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1446,7 +1451,7 @@ impl<'a> AppMethods<'a> {
     /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/modules/default/versions/1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_patch(&self, request: Version, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionPatchCall<'a> {
+    pub fn modules_versions_patch(&self, request: Version, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionPatchCall<'a, S> {
         AppModuleVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1468,7 +1473,7 @@ impl<'a> AppMethods<'a> {
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_delete(&self, apps_id: &str, modules_id: &str) -> AppModuleDeleteCall<'a> {
+    pub fn modules_delete(&self, apps_id: &str, modules_id: &str) -> AppModuleDeleteCall<'a, S> {
         AppModuleDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1487,7 +1492,7 @@ impl<'a> AppMethods<'a> {
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_get(&self, apps_id: &str, modules_id: &str) -> AppModuleGetCall<'a> {
+    pub fn modules_get(&self, apps_id: &str, modules_id: &str) -> AppModuleGetCall<'a, S> {
         AppModuleGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1505,7 +1510,7 @@ impl<'a> AppMethods<'a> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp.
-    pub fn modules_list(&self, apps_id: &str) -> AppModuleListCall<'a> {
+    pub fn modules_list(&self, apps_id: &str) -> AppModuleListCall<'a, S> {
         AppModuleListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1526,7 +1531,7 @@ impl<'a> AppMethods<'a> {
     /// * `request` - No description provided.
     /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_patch(&self, request: Module, apps_id: &str, modules_id: &str) -> AppModulePatchCall<'a> {
+    pub fn modules_patch(&self, request: Module, apps_id: &str, modules_id: &str) -> AppModulePatchCall<'a, S> {
         AppModulePatchCall {
             hub: self.hub,
             _request: request,
@@ -1548,7 +1553,7 @@ impl<'a> AppMethods<'a> {
     ///
     /// * `appsId` - Part of `name`. The name of the operation resource.
     /// * `operationsId` - Part of `name`. See documentation of `appsId`.
-    pub fn operations_get(&self, apps_id: &str, operations_id: &str) -> AppOperationGetCall<'a> {
+    pub fn operations_get(&self, apps_id: &str, operations_id: &str) -> AppOperationGetCall<'a, S> {
         AppOperationGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1566,7 +1571,7 @@ impl<'a> AppMethods<'a> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. The name of the operation's parent resource.
-    pub fn operations_list(&self, apps_id: &str) -> AppOperationListCall<'a> {
+    pub fn operations_list(&self, apps_id: &str) -> AppOperationListCall<'a, S> {
         AppOperationListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1588,7 +1593,7 @@ impl<'a> AppMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Application) -> AppCreateCall<'a> {
+    pub fn create(&self, request: Application) -> AppCreateCall<'a, S> {
         AppCreateCall {
             hub: self.hub,
             _request: request,
@@ -1605,7 +1610,7 @@ impl<'a> AppMethods<'a> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. Name of the application to get. Example: apps/myapp.
-    pub fn get(&self, apps_id: &str) -> AppGetCall<'a> {
+    pub fn get(&self, apps_id: &str) -> AppGetCall<'a, S> {
         AppGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1626,7 +1631,7 @@ impl<'a> AppMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `appsId` - Part of `name`. Name of the Application resource to update. Example: apps/myapp.
-    pub fn patch(&self, request: Application, apps_id: &str) -> AppPatchCall<'a> {
+    pub fn patch(&self, request: Application, apps_id: &str) -> AppPatchCall<'a, S> {
         AppPatchCall {
             hub: self.hub,
             _request: request,
@@ -1669,7 +1674,7 @@ impl<'a> AppMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1677,10 +1682,10 @@ impl<'a> AppMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppLocationGetCall<'a>
-    where  {
+pub struct AppLocationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _locations_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1688,9 +1693,15 @@ pub struct AppLocationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppLocationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AppLocationGetCall<'a, S> {}
 
-impl<'a> AppLocationGetCall<'a> {
+impl<'a, S> AppLocationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1834,7 +1845,7 @@ impl<'a> AppLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppLocationGetCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppLocationGetCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -1844,7 +1855,7 @@ impl<'a> AppLocationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn locations_id(mut self, new_value: &str) -> AppLocationGetCall<'a> {
+    pub fn locations_id(mut self, new_value: &str) -> AppLocationGetCall<'a, S> {
         self._locations_id = new_value.to_string();
         self
     }
@@ -1854,7 +1865,7 @@ impl<'a> AppLocationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1879,7 +1890,7 @@ impl<'a> AppLocationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1899,9 +1910,9 @@ impl<'a> AppLocationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppLocationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1933,7 +1944,7 @@ impl<'a> AppLocationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1944,10 +1955,10 @@ impl<'a> AppLocationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppLocationListCall<'a>
-    where  {
+pub struct AppLocationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1957,9 +1968,15 @@ pub struct AppLocationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppLocationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AppLocationListCall<'a, S> {}
 
-impl<'a> AppLocationListCall<'a> {
+impl<'a, S> AppLocationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2111,28 +2128,28 @@ impl<'a> AppLocationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppLocationListCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppLocationListCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppLocationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AppLocationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppLocationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AppLocationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AppLocationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AppLocationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2142,7 +2159,7 @@ impl<'a> AppLocationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2167,7 +2184,7 @@ impl<'a> AppLocationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppLocationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppLocationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2187,9 +2204,9 @@ impl<'a> AppLocationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppLocationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2222,7 +2239,7 @@ impl<'a> AppLocationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2235,10 +2252,10 @@ impl<'a> AppLocationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceDebugCall<'a>
-    where  {
+pub struct AppModuleVersionInstanceDebugCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _request: DebugInstanceRequest,
     _apps_id: String,
     _modules_id: String,
@@ -2249,9 +2266,15 @@ pub struct AppModuleVersionInstanceDebugCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionInstanceDebugCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionInstanceDebugCall<'a, S> {}
 
-impl<'a> AppModuleVersionInstanceDebugCall<'a> {
+impl<'a, S> AppModuleVersionInstanceDebugCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2410,7 +2433,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DebugInstanceRequest) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn request(mut self, new_value: DebugInstanceRequest) -> AppModuleVersionInstanceDebugCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2420,7 +2443,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -2430,7 +2453,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -2440,7 +2463,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -2450,7 +2473,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, S> {
         self._instances_id = new_value.to_string();
         self
     }
@@ -2460,7 +2483,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDebugCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDebugCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2485,7 +2508,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDebugCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDebugCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2505,9 +2528,9 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceDebugCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionInstanceDebugCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2539,7 +2562,7 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2547,10 +2570,10 @@ impl<'a> AppModuleVersionInstanceDebugCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceDeleteCall<'a>
-    where  {
+pub struct AppModuleVersionInstanceDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -2560,9 +2583,15 @@ pub struct AppModuleVersionInstanceDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionInstanceDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionInstanceDeleteCall<'a, S> {}
 
-impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
+impl<'a, S> AppModuleVersionInstanceDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2708,7 +2737,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -2718,7 +2747,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -2728,7 +2757,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -2738,7 +2767,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
+    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, S> {
         self._instances_id = new_value.to_string();
         self
     }
@@ -2748,7 +2777,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2773,7 +2802,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2793,9 +2822,9 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionInstanceDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2827,7 +2856,7 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2835,10 +2864,10 @@ impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceGetCall<'a>
-    where  {
+pub struct AppModuleVersionInstanceGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -2848,9 +2877,15 @@ pub struct AppModuleVersionInstanceGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionInstanceGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionInstanceGetCall<'a, S> {}
 
-impl<'a> AppModuleVersionInstanceGetCall<'a> {
+impl<'a, S> AppModuleVersionInstanceGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2996,7 +3031,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3006,7 +3041,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3016,7 +3051,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -3026,7 +3061,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
+    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, S> {
         self._instances_id = new_value.to_string();
         self
     }
@@ -3036,7 +3071,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3061,7 +3096,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3081,9 +3116,9 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionInstanceGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3115,7 +3150,7 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3125,10 +3160,10 @@ impl<'a> AppModuleVersionInstanceGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceListCall<'a>
-    where  {
+pub struct AppModuleVersionInstanceListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -3139,9 +3174,15 @@ pub struct AppModuleVersionInstanceListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionInstanceListCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionInstanceListCall<'a, S> {}
 
-impl<'a> AppModuleVersionInstanceListCall<'a> {
+impl<'a, S> AppModuleVersionInstanceListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3292,7 +3333,7 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3302,7 +3343,7 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3312,21 +3353,21 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionInstanceListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3336,7 +3377,7 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3361,7 +3402,7 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3381,9 +3422,9 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionInstanceListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3416,7 +3457,7 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3429,10 +3470,10 @@ impl<'a> AppModuleVersionInstanceListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionCreateCall<'a>
-    where  {
+pub struct AppModuleVersionCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _request: Version,
     _apps_id: String,
     _modules_id: String,
@@ -3441,9 +3482,15 @@ pub struct AppModuleVersionCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionCreateCall<'a, S> {}
 
-impl<'a> AppModuleVersionCreateCall<'a> {
+impl<'a, S> AppModuleVersionCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3600,7 +3647,7 @@ impl<'a> AppModuleVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> AppModuleVersionCreateCall<'a> {
+    pub fn request(mut self, new_value: Version) -> AppModuleVersionCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3610,7 +3657,7 @@ impl<'a> AppModuleVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3620,7 +3667,7 @@ impl<'a> AppModuleVersionCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3630,7 +3677,7 @@ impl<'a> AppModuleVersionCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3655,7 +3702,7 @@ impl<'a> AppModuleVersionCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3675,9 +3722,9 @@ impl<'a> AppModuleVersionCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3709,7 +3756,7 @@ impl<'a> AppModuleVersionCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3717,10 +3764,10 @@ impl<'a> AppModuleVersionCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionDeleteCall<'a>
-    where  {
+pub struct AppModuleVersionDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -3729,9 +3776,15 @@ pub struct AppModuleVersionDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionDeleteCall<'a, S> {}
 
-impl<'a> AppModuleVersionDeleteCall<'a> {
+impl<'a, S> AppModuleVersionDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3876,7 +3929,7 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3886,7 +3939,7 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3896,7 +3949,7 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -3906,7 +3959,7 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3931,7 +3984,7 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3951,9 +4004,9 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3985,7 +4038,7 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3994,10 +4047,10 @@ impl<'a> AppModuleVersionDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionGetCall<'a>
-    where  {
+pub struct AppModuleVersionGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -4007,9 +4060,15 @@ pub struct AppModuleVersionGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionGetCall<'a, S> {}
 
-impl<'a> AppModuleVersionGetCall<'a> {
+impl<'a, S> AppModuleVersionGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4157,7 +4216,7 @@ impl<'a> AppModuleVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -4167,7 +4226,7 @@ impl<'a> AppModuleVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -4177,14 +4236,14 @@ impl<'a> AppModuleVersionGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
     /// Controls the set of fields returned in the Get response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
+    pub fn view(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -4194,7 +4253,7 @@ impl<'a> AppModuleVersionGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4219,7 +4278,7 @@ impl<'a> AppModuleVersionGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4239,9 +4298,9 @@ impl<'a> AppModuleVersionGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4273,7 +4332,7 @@ impl<'a> AppModuleVersionGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4284,10 +4343,10 @@ impl<'a> AppModuleVersionGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionListCall<'a>
-    where  {
+pub struct AppModuleVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _view: Option<String>,
@@ -4298,9 +4357,15 @@ pub struct AppModuleVersionListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionListCall<'a, S> {}
 
-impl<'a> AppModuleVersionListCall<'a> {
+impl<'a, S> AppModuleVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4453,7 +4518,7 @@ impl<'a> AppModuleVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -4463,28 +4528,28 @@ impl<'a> AppModuleVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
     /// Controls the set of fields returned in the List response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
+    pub fn view(mut self, new_value: &str) -> AppModuleVersionListCall<'a, S> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -4494,7 +4559,7 @@ impl<'a> AppModuleVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4519,7 +4584,7 @@ impl<'a> AppModuleVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4539,9 +4604,9 @@ impl<'a> AppModuleVersionListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4578,7 +4643,7 @@ impl<'a> AppModuleVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4592,10 +4657,10 @@ impl<'a> AppModuleVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionPatchCall<'a>
-    where  {
+pub struct AppModuleVersionPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _request: Version,
     _apps_id: String,
     _modules_id: String,
@@ -4606,9 +4671,15 @@ pub struct AppModuleVersionPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleVersionPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleVersionPatchCall<'a, S> {}
 
-impl<'a> AppModuleVersionPatchCall<'a> {
+impl<'a, S> AppModuleVersionPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4769,7 +4840,7 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> AppModuleVersionPatchCall<'a> {
+    pub fn request(mut self, new_value: Version) -> AppModuleVersionPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4779,7 +4850,7 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -4789,7 +4860,7 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -4799,14 +4870,14 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, S> {
         self._versions_id = new_value.to_string();
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *mask* query property to the given value.
-    pub fn mask(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
+    pub fn mask(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, S> {
         self._mask = Some(new_value.to_string());
         self
     }
@@ -4816,7 +4887,7 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4841,7 +4912,7 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4861,9 +4932,9 @@ impl<'a> AppModuleVersionPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleVersionPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4895,7 +4966,7 @@ impl<'a> AppModuleVersionPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4903,10 +4974,10 @@ impl<'a> AppModuleVersionPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleDeleteCall<'a>
-    where  {
+pub struct AppModuleDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4914,9 +4985,15 @@ pub struct AppModuleDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleDeleteCall<'a, S> {}
 
-impl<'a> AppModuleDeleteCall<'a> {
+impl<'a, S> AppModuleDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5060,7 +5137,7 @@ impl<'a> AppModuleDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -5070,7 +5147,7 @@ impl<'a> AppModuleDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -5080,7 +5157,7 @@ impl<'a> AppModuleDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5105,7 +5182,7 @@ impl<'a> AppModuleDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5125,9 +5202,9 @@ impl<'a> AppModuleDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5159,7 +5236,7 @@ impl<'a> AppModuleDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5167,10 +5244,10 @@ impl<'a> AppModuleDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleGetCall<'a>
-    where  {
+pub struct AppModuleGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _modules_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5178,9 +5255,15 @@ pub struct AppModuleGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleGetCall<'a, S> {}
 
-impl<'a> AppModuleGetCall<'a> {
+impl<'a, S> AppModuleGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5324,7 +5407,7 @@ impl<'a> AppModuleGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleGetCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleGetCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -5334,7 +5417,7 @@ impl<'a> AppModuleGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleGetCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleGetCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -5344,7 +5427,7 @@ impl<'a> AppModuleGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5369,7 +5452,7 @@ impl<'a> AppModuleGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5389,9 +5472,9 @@ impl<'a> AppModuleGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5423,7 +5506,7 @@ impl<'a> AppModuleGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5433,10 +5516,10 @@ impl<'a> AppModuleGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleListCall<'a>
-    where  {
+pub struct AppModuleListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5445,9 +5528,15 @@ pub struct AppModuleListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModuleListCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModuleListCall<'a, S> {}
 
-impl<'a> AppModuleListCall<'a> {
+impl<'a, S> AppModuleListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5596,21 +5685,21 @@ impl<'a> AppModuleListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleListCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleListCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppModuleListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AppModuleListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppModuleListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AppModuleListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5620,7 +5709,7 @@ impl<'a> AppModuleListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5645,7 +5734,7 @@ impl<'a> AppModuleListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5665,9 +5754,9 @@ impl<'a> AppModuleListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModuleListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5700,7 +5789,7 @@ impl<'a> AppModuleListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5715,10 +5804,10 @@ impl<'a> AppModuleListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModulePatchCall<'a>
-    where  {
+pub struct AppModulePatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _request: Module,
     _apps_id: String,
     _modules_id: String,
@@ -5729,9 +5818,15 @@ pub struct AppModulePatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppModulePatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AppModulePatchCall<'a, S> {}
 
-impl<'a> AppModulePatchCall<'a> {
+impl<'a, S> AppModulePatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5894,7 +5989,7 @@ impl<'a> AppModulePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Module) -> AppModulePatchCall<'a> {
+    pub fn request(mut self, new_value: Module) -> AppModulePatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5904,7 +5999,7 @@ impl<'a> AppModulePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModulePatchCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModulePatchCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -5914,21 +6009,21 @@ impl<'a> AppModulePatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModulePatchCall<'a> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModulePatchCall<'a, S> {
         self._modules_id = new_value.to_string();
         self
     }
     /// Set to true to gradually shift traffic to one or more versions that you specify. By default, traffic is shifted immediately. For gradual traffic migration, the target versions must be located within instances that are configured for both warmup requests (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#inboundservicetype) and automatic scaling (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#automaticscaling). You must specify the shardBy (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules#shardby) field in the Module resource. Gradual traffic migration is not supported in the App Engine flexible environment. For examples, see Migrating and Splitting Traffic (https://cloud.google.com/appengine/docs/admin-api/migrating-splitting-traffic).
     ///
     /// Sets the *migrate traffic* query property to the given value.
-    pub fn migrate_traffic(mut self, new_value: bool) -> AppModulePatchCall<'a> {
+    pub fn migrate_traffic(mut self, new_value: bool) -> AppModulePatchCall<'a, S> {
         self._migrate_traffic = Some(new_value);
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *mask* query property to the given value.
-    pub fn mask(mut self, new_value: &str) -> AppModulePatchCall<'a> {
+    pub fn mask(mut self, new_value: &str) -> AppModulePatchCall<'a, S> {
         self._mask = Some(new_value.to_string());
         self
     }
@@ -5938,7 +6033,7 @@ impl<'a> AppModulePatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModulePatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModulePatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5963,7 +6058,7 @@ impl<'a> AppModulePatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModulePatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModulePatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5983,9 +6078,9 @@ impl<'a> AppModulePatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModulePatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppModulePatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6017,7 +6112,7 @@ impl<'a> AppModulePatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6025,10 +6120,10 @@ impl<'a> AppModulePatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppOperationGetCall<'a>
-    where  {
+pub struct AppOperationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _operations_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6036,9 +6131,15 @@ pub struct AppOperationGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppOperationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AppOperationGetCall<'a, S> {}
 
-impl<'a> AppOperationGetCall<'a> {
+impl<'a, S> AppOperationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6182,7 +6283,7 @@ impl<'a> AppOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppOperationGetCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppOperationGetCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -6192,7 +6293,7 @@ impl<'a> AppOperationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operations_id(mut self, new_value: &str) -> AppOperationGetCall<'a> {
+    pub fn operations_id(mut self, new_value: &str) -> AppOperationGetCall<'a, S> {
         self._operations_id = new_value.to_string();
         self
     }
@@ -6202,7 +6303,7 @@ impl<'a> AppOperationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6227,7 +6328,7 @@ impl<'a> AppOperationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppOperationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppOperationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6247,9 +6348,9 @@ impl<'a> AppOperationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppOperationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6281,7 +6382,7 @@ impl<'a> AppOperationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6292,10 +6393,10 @@ impl<'a> AppOperationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppOperationListCall<'a>
-    where  {
+pub struct AppOperationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6305,9 +6406,15 @@ pub struct AppOperationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppOperationListCall<'a> {}
+impl<'a, S> client::CallBuilder for AppOperationListCall<'a, S> {}
 
-impl<'a> AppOperationListCall<'a> {
+impl<'a, S> AppOperationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6459,28 +6566,28 @@ impl<'a> AppOperationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppOperationListCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppOperationListCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppOperationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AppOperationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppOperationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AppOperationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AppOperationListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AppOperationListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6490,7 +6597,7 @@ impl<'a> AppOperationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6515,7 +6622,7 @@ impl<'a> AppOperationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppOperationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppOperationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6535,9 +6642,9 @@ impl<'a> AppOperationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppOperationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6572,7 +6679,7 @@ impl<'a> AppOperationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6585,19 +6692,25 @@ impl<'a> AppOperationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppCreateCall<'a>
-    where  {
+pub struct AppCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _request: Application,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AppCreateCall<'a, S> {}
 
-impl<'a> AppCreateCall<'a> {
+impl<'a, S> AppCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6731,7 +6844,7 @@ impl<'a> AppCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Application) -> AppCreateCall<'a> {
+    pub fn request(mut self, new_value: Application) -> AppCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6741,7 +6854,7 @@ impl<'a> AppCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6766,7 +6879,7 @@ impl<'a> AppCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6786,9 +6899,9 @@ impl<'a> AppCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6820,7 +6933,7 @@ impl<'a> AppCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6829,10 +6942,10 @@ impl<'a> AppCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppGetCall<'a>
-    where  {
+pub struct AppGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _apps_id: String,
     _ensure_resources_exist: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6840,9 +6953,15 @@ pub struct AppGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AppGetCall<'a, S> {}
 
-impl<'a> AppGetCall<'a> {
+impl<'a, S> AppGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6988,14 +7107,14 @@ impl<'a> AppGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppGetCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppGetCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
     /// Certain resources associated with an application are created on-demand. Controls whether these resources should be created when performing the GET operation. If specified and any resources could not be created, the request will fail with an error code. Additionally, this parameter can cause the request to take longer to complete.
     ///
     /// Sets the *ensure resources exist* query property to the given value.
-    pub fn ensure_resources_exist(mut self, new_value: bool) -> AppGetCall<'a> {
+    pub fn ensure_resources_exist(mut self, new_value: bool) -> AppGetCall<'a, S> {
         self._ensure_resources_exist = Some(new_value);
         self
     }
@@ -7005,7 +7124,7 @@ impl<'a> AppGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7030,7 +7149,7 @@ impl<'a> AppGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7050,9 +7169,9 @@ impl<'a> AppGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -7087,7 +7206,7 @@ impl<'a> AppGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = Appengine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7101,10 +7220,10 @@ impl<'a> AppGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppPatchCall<'a>
-    where  {
+pub struct AppPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a Appengine<>,
+    hub: &'a Appengine<S>,
     _request: Application,
     _apps_id: String,
     _mask: Option<String>,
@@ -7113,9 +7232,15 @@ pub struct AppPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AppPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AppPatchCall<'a, S> {}
 
-impl<'a> AppPatchCall<'a> {
+impl<'a, S> AppPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -7274,7 +7399,7 @@ impl<'a> AppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Application) -> AppPatchCall<'a> {
+    pub fn request(mut self, new_value: Application) -> AppPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -7284,14 +7409,14 @@ impl<'a> AppPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppPatchCall<'a> {
+    pub fn apps_id(mut self, new_value: &str) -> AppPatchCall<'a, S> {
         self._apps_id = new_value.to_string();
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *mask* query property to the given value.
-    pub fn mask(mut self, new_value: &str) -> AppPatchCall<'a> {
+    pub fn mask(mut self, new_value: &str) -> AppPatchCall<'a, S> {
         self._mask = Some(new_value.to_string());
         self
     }
@@ -7301,7 +7426,7 @@ impl<'a> AppPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -7326,7 +7451,7 @@ impl<'a> AppPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7346,9 +7471,9 @@ impl<'a> AppPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AppPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -48,7 +53,7 @@ use crate::client;
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -79,34 +84,34 @@ use crate::client;
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct VersionHistory<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct VersionHistory<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for VersionHistory<> {}
+impl<'a, S> client::Hub for VersionHistory<S> {}
 
-impl<'a, > VersionHistory<> {
+impl<'a, S> VersionHistory<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> VersionHistory<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> VersionHistory<S> {
         VersionHistory {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://versionhistory.googleapis.com/".to_string(),
             _root_url: "https://versionhistory.googleapis.com/".to_string(),
         }
     }
 
-    pub fn platforms(&'a self) -> PlatformMethods<'a> {
+    pub fn platforms(&'a self) -> PlatformMethods<'a, S> {
         PlatformMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -335,22 +340,22 @@ impl client::Part for Version {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `channels_list(...)`, `channels_versions_list(...)`, `channels_versions_releases_list(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.platforms();
 /// # }
 /// ```
-pub struct PlatformMethods<'a>
-    where  {
+pub struct PlatformMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a VersionHistory<>,
+    hub: &'a VersionHistory<S>,
 }
 
-impl<'a> client::MethodsBuilder for PlatformMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PlatformMethods<'a, S> {}
 
-impl<'a> PlatformMethods<'a> {
+impl<'a, S> PlatformMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -359,7 +364,7 @@ impl<'a> PlatformMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The version, which owns this collection of releases. Format: {product}/platforms/{platform}/channels/{channel}/versions/{version}
-    pub fn channels_versions_releases_list(&self, parent: &str) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn channels_versions_releases_list(&self, parent: &str) -> PlatformChannelVersionReleaseListCall<'a, S> {
         PlatformChannelVersionReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -379,7 +384,7 @@ impl<'a> PlatformMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The channel, which owns this collection of versions. Format: {product}/platforms/{platform}/channels/{channel}
-    pub fn channels_versions_list(&self, parent: &str) -> PlatformChannelVersionListCall<'a> {
+    pub fn channels_versions_list(&self, parent: &str) -> PlatformChannelVersionListCall<'a, S> {
         PlatformChannelVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -399,7 +404,7 @@ impl<'a> PlatformMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The platform, which owns this collection of channels. Format: {product}/platforms/{platform}
-    pub fn channels_list(&self, parent: &str) -> PlatformChannelListCall<'a> {
+    pub fn channels_list(&self, parent: &str) -> PlatformChannelListCall<'a, S> {
         PlatformChannelListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -417,7 +422,7 @@ impl<'a> PlatformMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The product, which owns this collection of platforms. Format: {product}
-    pub fn list(&self, parent: &str) -> PlatformListCall<'a> {
+    pub fn list(&self, parent: &str) -> PlatformListCall<'a, S> {
         PlatformListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -459,7 +464,7 @@ impl<'a> PlatformMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -471,10 +476,10 @@ impl<'a> PlatformMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformChannelVersionReleaseListCall<'a>
-    where  {
+pub struct PlatformChannelVersionReleaseListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a VersionHistory<>,
+    hub: &'a VersionHistory<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -484,9 +489,15 @@ pub struct PlatformChannelVersionReleaseListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformChannelVersionReleaseListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformChannelVersionReleaseListCall<'a, S> {}
 
-impl<'a> PlatformChannelVersionReleaseListCall<'a> {
+impl<'a, S> PlatformChannelVersionReleaseListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -639,35 +650,35 @@ impl<'a> PlatformChannelVersionReleaseListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListReleases` call. Provide this to retrieve the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of releases to include in the response. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlatformChannelVersionReleaseListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Ordering string. Valid order_by strings are "version", "name", "starttime", "endtime", "platform", "channel", and "fraction". Optionally, you can append "desc" or "asc" to specify the sorting order. Multiple order_by strings can be used in a comma separated list. Ordering by channel will sort by distance from the stable channel (not alphabetically). A list of channels sorted in this order is: stable, beta, dev, canary, and canary_asan. Sorting by name may cause unexpected behaviour as it is a naive string sort. For example, 1.0.0.8 will be before 1.0.0.10 in descending order. If order_by is not specified the response will be sorted by starttime in descending order. Ex) "...?order_by=starttime asc" Ex) "...?order_by=platform desc, channel, startime desc"
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Filter string. Format is a comma separated list of All comma separated filter clauses are conjoined with a logical "and". Valid field_names are "version", "name", "platform", "channel", "fraction" "starttime", and "endtime". Valid operators are "<", "<=", "=", ">=", and ">". Channel comparison is done by distance from stable. must be a valid channel when filtering by channel. Ex) stable < beta, beta < dev, canary < canary_asan. Version comparison is done numerically. Ex) 1.0.0.8 < 1.0.0.10. If version is not entirely written, the version will be appended with 0 for the missing fields. Ex) version > 80 becoms version > 80.0.0.0 When filtering by starttime or endtime, string must be in RFC 3339 date string format. Name and platform are filtered by string comparison. Ex) "...?filter=channel<=beta, version >= 80 Ex) "...?filter=version > 80, version < 81 Ex) "...?filter=starttime>2020-01-01T00:00:00Z
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> PlatformChannelVersionReleaseListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -677,7 +688,7 @@ impl<'a> PlatformChannelVersionReleaseListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformChannelVersionReleaseListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformChannelVersionReleaseListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -702,7 +713,7 @@ impl<'a> PlatformChannelVersionReleaseListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformChannelVersionReleaseListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformChannelVersionReleaseListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -733,7 +744,7 @@ impl<'a> PlatformChannelVersionReleaseListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -745,10 +756,10 @@ impl<'a> PlatformChannelVersionReleaseListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformChannelVersionListCall<'a>
-    where  {
+pub struct PlatformChannelVersionListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a VersionHistory<>,
+    hub: &'a VersionHistory<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -758,9 +769,15 @@ pub struct PlatformChannelVersionListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformChannelVersionListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformChannelVersionListCall<'a, S> {}
 
-impl<'a> PlatformChannelVersionListCall<'a> {
+impl<'a, S> PlatformChannelVersionListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -913,35 +930,35 @@ impl<'a> PlatformChannelVersionListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListVersions` call. Provide this to retrieve the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of versions to include in the response. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlatformChannelVersionListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlatformChannelVersionListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Ordering string. Valid order_by strings are "version", "name", "platform", and "channel". Optionally, you can append " desc" or " asc" to specify the sorting order. Multiple order_by strings can be used in a comma separated list. Ordering by channel will sort by distance from the stable channel (not alphabetically). A list of channels sorted in this order is: stable, beta, dev, canary, and canary_asan. Sorting by name may cause unexpected behaviour as it is a naive string sort. For example, 1.0.0.8 will be before 1.0.0.10 in descending order. If order_by is not specified the response will be sorted by version in descending order. Ex) "...?order_by=version asc" Ex) "...?order_by=platform desc, channel, version"
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Filter string. Format is a comma separated list of All comma separated filter clauses are conjoined with a logical "and". Valid field_names are "version", "name", "platform", and "channel". Valid operators are "<", "<=", "=", ">=", and ">". Channel comparison is done by distance from stable. Ex) stable < beta, beta < dev, canary < canary_asan. Version comparison is done numerically. If version is not entirely written, the version will be appended with 0 in missing fields. Ex) version > 80 becoms version > 80.0.0.0 Name and platform are filtered by string comparison. Ex) "...?filter=channel<=beta, version >= 80 Ex) "...?filter=version > 80, version < 81
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> PlatformChannelVersionListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -951,7 +968,7 @@ impl<'a> PlatformChannelVersionListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformChannelVersionListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformChannelVersionListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -976,7 +993,7 @@ impl<'a> PlatformChannelVersionListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformChannelVersionListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformChannelVersionListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1007,7 +1024,7 @@ impl<'a> PlatformChannelVersionListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1017,10 +1034,10 @@ impl<'a> PlatformChannelVersionListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformChannelListCall<'a>
-    where  {
+pub struct PlatformChannelListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a VersionHistory<>,
+    hub: &'a VersionHistory<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1028,9 +1045,15 @@ pub struct PlatformChannelListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformChannelListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformChannelListCall<'a, S> {}
 
-impl<'a> PlatformChannelListCall<'a> {
+impl<'a, S> PlatformChannelListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1177,21 +1200,21 @@ impl<'a> PlatformChannelListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformChannelListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformChannelListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListChannels` call. Provide this to retrieve the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlatformChannelListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlatformChannelListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of channels to include in the response. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlatformChannelListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlatformChannelListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1201,7 +1224,7 @@ impl<'a> PlatformChannelListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformChannelListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformChannelListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1226,7 +1249,7 @@ impl<'a> PlatformChannelListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformChannelListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformChannelListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1257,7 +1280,7 @@ impl<'a> PlatformChannelListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = VersionHistory::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1267,10 +1290,10 @@ impl<'a> PlatformChannelListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlatformListCall<'a>
-    where  {
+pub struct PlatformListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a VersionHistory<>,
+    hub: &'a VersionHistory<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1278,9 +1301,15 @@ pub struct PlatformListCall<'a>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a> client::CallBuilder for PlatformListCall<'a> {}
+impl<'a, S> client::CallBuilder for PlatformListCall<'a, S> {}
 
-impl<'a> PlatformListCall<'a> {
+impl<'a, S> PlatformListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1427,21 +1456,21 @@ impl<'a> PlatformListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PlatformListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> PlatformListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListChannels` call. Provide this to retrieve the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlatformListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> PlatformListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Optional limit on the number of channels to include in the response. If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PlatformListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> PlatformListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -1451,7 +1480,7 @@ impl<'a> PlatformListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlatformListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1476,7 +1505,7 @@ impl<'a> PlatformListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlatformListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlatformListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

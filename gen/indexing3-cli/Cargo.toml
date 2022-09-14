@@ -1,10 +1,10 @@
 # DO NOT EDIT !
-# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
 # DO NOT EDIT !
 [package]
 
 name = "google-indexing3-cli"
-version = "3.1.0+20220126"
+version = "4.0.1+20220126"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Indexing (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/indexing3-cli"
@@ -25,16 +25,18 @@ mime = "^ 0.2.0"
 serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
-yup-oauth2 = "^ 6.6"
+yup-oauth2 = "^ 7.0"
 itertools = "^ 0.10"
 strsim = "^0.5"
 clap = "^2.0"
+http = "^0.2"
 hyper = { version = "0.14", features = ["full"] }
 tokio = { version = "^ 1.0", features = ["full"] }
+tower-service = "^0.3.1"
 
 
 
 
 [dependencies.google-indexing3]
 path = "../indexing3"
-version = "3.1.0+20220126"
+version = "4.0.1+20220126"

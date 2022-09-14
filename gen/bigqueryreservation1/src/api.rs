@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -75,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -109,34 +114,34 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct BigQueryReservation<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct BigQueryReservation<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for BigQueryReservation<> {}
+impl<'a, S> client::Hub for BigQueryReservation<S> {}
 
-impl<'a, > BigQueryReservation<> {
+impl<'a, S> BigQueryReservation<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> BigQueryReservation<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> BigQueryReservation<S> {
         BigQueryReservation {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://bigqueryreservation.googleapis.com/".to_string(),
             _root_url: "https://bigqueryreservation.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a> {
+    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -541,22 +546,22 @@ impl client::Part for Status {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_capacity_commitments_create(...)`, `locations_capacity_commitments_delete(...)`, `locations_capacity_commitments_get(...)`, `locations_capacity_commitments_list(...)`, `locations_capacity_commitments_merge(...)`, `locations_capacity_commitments_patch(...)`, `locations_capacity_commitments_split(...)`, `locations_get_bi_reservation(...)`, `locations_reservations_assignments_create(...)`, `locations_reservations_assignments_delete(...)`, `locations_reservations_assignments_list(...)`, `locations_reservations_assignments_move(...)`, `locations_reservations_create(...)`, `locations_reservations_delete(...)`, `locations_reservations_get(...)`, `locations_reservations_list(...)`, `locations_reservations_patch(...)`, `locations_search_all_assignments(...)`, `locations_search_assignments(...)` and `locations_update_bi_reservation(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a>
-    where  {
+pub struct ProjectMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
 }
 
-impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
-impl<'a> ProjectMethods<'a> {
+impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -566,7 +571,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Resource name of the parent reservation. E.g., `projects/myproject/locations/US`
-    pub fn locations_capacity_commitments_create(&self, request: CapacityCommitment, parent: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+    pub fn locations_capacity_commitments_create(&self, request: CapacityCommitment, parent: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a, S> {
         ProjectLocationCapacityCommitmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -586,7 +591,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the capacity commitment to delete. E.g., `projects/myproject/locations/US/capacityCommitments/123`
-    pub fn locations_capacity_commitments_delete(&self, name: &str) -> ProjectLocationCapacityCommitmentDeleteCall<'a> {
+    pub fn locations_capacity_commitments_delete(&self, name: &str) -> ProjectLocationCapacityCommitmentDeleteCall<'a, S> {
         ProjectLocationCapacityCommitmentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -604,7 +609,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the capacity commitment to retrieve. E.g., `projects/myproject/locations/US/capacityCommitments/123`
-    pub fn locations_capacity_commitments_get(&self, name: &str) -> ProjectLocationCapacityCommitmentGetCall<'a> {
+    pub fn locations_capacity_commitments_get(&self, name: &str) -> ProjectLocationCapacityCommitmentGetCall<'a, S> {
         ProjectLocationCapacityCommitmentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -621,7 +626,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. Resource name of the parent reservation. E.g., `projects/myproject/locations/US`
-    pub fn locations_capacity_commitments_list(&self, parent: &str) -> ProjectLocationCapacityCommitmentListCall<'a> {
+    pub fn locations_capacity_commitments_list(&self, parent: &str) -> ProjectLocationCapacityCommitmentListCall<'a, S> {
         ProjectLocationCapacityCommitmentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -641,7 +646,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Parent resource that identifies admin project and location e.g., `projects/myproject/locations/us`
-    pub fn locations_capacity_commitments_merge(&self, request: MergeCapacityCommitmentsRequest, parent: &str) -> ProjectLocationCapacityCommitmentMergeCall<'a> {
+    pub fn locations_capacity_commitments_merge(&self, request: MergeCapacityCommitmentsRequest, parent: &str) -> ProjectLocationCapacityCommitmentMergeCall<'a, S> {
         ProjectLocationCapacityCommitmentMergeCall {
             hub: self.hub,
             _request: request,
@@ -660,7 +665,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the capacity commitment, e.g., `projects/myproject/locations/US/capacityCommitments/123` For the commitment id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
-    pub fn locations_capacity_commitments_patch(&self, request: CapacityCommitment, name: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a> {
+    pub fn locations_capacity_commitments_patch(&self, request: CapacityCommitment, name: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a, S> {
         ProjectLocationCapacityCommitmentPatchCall {
             hub: self.hub,
             _request: request,
@@ -680,7 +685,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name e.g.,: `projects/myproject/locations/US/capacityCommitments/123`
-    pub fn locations_capacity_commitments_split(&self, request: SplitCapacityCommitmentRequest, name: &str) -> ProjectLocationCapacityCommitmentSplitCall<'a> {
+    pub fn locations_capacity_commitments_split(&self, request: SplitCapacityCommitmentRequest, name: &str) -> ProjectLocationCapacityCommitmentSplitCall<'a, S> {
         ProjectLocationCapacityCommitmentSplitCall {
             hub: self.hub,
             _request: request,
@@ -699,7 +704,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name of the assignment E.g. `projects/myproject/locations/US/reservations/team1-prod`
-    pub fn locations_reservations_assignments_create(&self, request: Assignment, parent: &str) -> ProjectLocationReservationAssignmentCreateCall<'a> {
+    pub fn locations_reservations_assignments_create(&self, request: Assignment, parent: &str) -> ProjectLocationReservationAssignmentCreateCall<'a, S> {
         ProjectLocationReservationAssignmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -718,7 +723,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the resource, e.g. `projects/myproject/locations/US/reservations/team1-prod/assignments/123`
-    pub fn locations_reservations_assignments_delete(&self, name: &str) -> ProjectLocationReservationAssignmentDeleteCall<'a> {
+    pub fn locations_reservations_assignments_delete(&self, name: &str) -> ProjectLocationReservationAssignmentDeleteCall<'a, S> {
         ProjectLocationReservationAssignmentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -735,7 +740,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name e.g.: `projects/myproject/locations/US/reservations/team1-prod` Or: `projects/myproject/locations/US/reservations/-`
-    pub fn locations_reservations_assignments_list(&self, parent: &str) -> ProjectLocationReservationAssignmentListCall<'a> {
+    pub fn locations_reservations_assignments_list(&self, parent: &str) -> ProjectLocationReservationAssignmentListCall<'a, S> {
         ProjectLocationReservationAssignmentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -755,7 +760,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the assignment, e.g. `projects/myproject/locations/US/reservations/team1-prod/assignments/123`
-    pub fn locations_reservations_assignments_move(&self, request: MoveAssignmentRequest, name: &str) -> ProjectLocationReservationAssignmentMoveCall<'a> {
+    pub fn locations_reservations_assignments_move(&self, request: MoveAssignmentRequest, name: &str) -> ProjectLocationReservationAssignmentMoveCall<'a, S> {
         ProjectLocationReservationAssignmentMoveCall {
             hub: self.hub,
             _request: request,
@@ -774,7 +779,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Project, location. E.g., `projects/myproject/locations/US`
-    pub fn locations_reservations_create(&self, request: Reservation, parent: &str) -> ProjectLocationReservationCreateCall<'a> {
+    pub fn locations_reservations_create(&self, request: Reservation, parent: &str) -> ProjectLocationReservationCreateCall<'a, S> {
         ProjectLocationReservationCreateCall {
             hub: self.hub,
             _request: request,
@@ -793,7 +798,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the reservation to retrieve. E.g., `projects/myproject/locations/US/reservations/team1-prod`
-    pub fn locations_reservations_delete(&self, name: &str) -> ProjectLocationReservationDeleteCall<'a> {
+    pub fn locations_reservations_delete(&self, name: &str) -> ProjectLocationReservationDeleteCall<'a, S> {
         ProjectLocationReservationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -810,7 +815,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the reservation to retrieve. E.g., `projects/myproject/locations/US/reservations/team1-prod`
-    pub fn locations_reservations_get(&self, name: &str) -> ProjectLocationReservationGetCall<'a> {
+    pub fn locations_reservations_get(&self, name: &str) -> ProjectLocationReservationGetCall<'a, S> {
         ProjectLocationReservationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -827,7 +832,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name containing project and location, e.g.: `projects/myproject/locations/US`
-    pub fn locations_reservations_list(&self, parent: &str) -> ProjectLocationReservationListCall<'a> {
+    pub fn locations_reservations_list(&self, parent: &str) -> ProjectLocationReservationListCall<'a, S> {
         ProjectLocationReservationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -847,7 +852,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the reservation, e.g., `projects/*/locations/*/reservations/team1-prod`. For the reservation id, it must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
-    pub fn locations_reservations_patch(&self, request: Reservation, name: &str) -> ProjectLocationReservationPatchCall<'a> {
+    pub fn locations_reservations_patch(&self, request: Reservation, name: &str) -> ProjectLocationReservationPatchCall<'a, S> {
         ProjectLocationReservationPatchCall {
             hub: self.hub,
             _request: request,
@@ -866,7 +871,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the requested reservation, for example: `projects/{project_id}/locations/{location_id}/biReservation`
-    pub fn locations_get_bi_reservation(&self, name: &str) -> ProjectLocationGetBiReservationCall<'a> {
+    pub fn locations_get_bi_reservation(&self, name: &str) -> ProjectLocationGetBiReservationCall<'a, S> {
         ProjectLocationGetBiReservationCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -883,7 +888,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name with location (project name could be the wildcard '-'), e.g.: `projects/-/locations/US`.
-    pub fn locations_search_all_assignments(&self, parent: &str) -> ProjectLocationSearchAllAssignmentCall<'a> {
+    pub fn locations_search_all_assignments(&self, parent: &str) -> ProjectLocationSearchAllAssignmentCall<'a, S> {
         ProjectLocationSearchAllAssignmentCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -903,7 +908,7 @@ impl<'a> ProjectMethods<'a> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the admin project(containing project and location), e.g.: `projects/myproject/locations/US`.
-    pub fn locations_search_assignments(&self, parent: &str) -> ProjectLocationSearchAssignmentCall<'a> {
+    pub fn locations_search_assignments(&self, parent: &str) -> ProjectLocationSearchAssignmentCall<'a, S> {
         ProjectLocationSearchAssignmentCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -924,7 +929,7 @@ impl<'a> ProjectMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the singleton BI reservation. Reservation names have the form `projects/{project_id}/locations/{location_id}/biReservation`.
-    pub fn locations_update_bi_reservation(&self, request: BiReservation, name: &str) -> ProjectLocationUpdateBiReservationCall<'a> {
+    pub fn locations_update_bi_reservation(&self, request: BiReservation, name: &str) -> ProjectLocationUpdateBiReservationCall<'a, S> {
         ProjectLocationUpdateBiReservationCall {
             hub: self.hub,
             _request: request,
@@ -968,7 +973,7 @@ impl<'a> ProjectMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -983,10 +988,10 @@ impl<'a> ProjectMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentCreateCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: CapacityCommitment,
     _parent: String,
     _enforce_single_admin_project_per_org: Option<bool>,
@@ -996,9 +1001,15 @@ pub struct ProjectLocationCapacityCommitmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1164,7 +1175,7 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CapacityCommitment) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+    pub fn request(mut self, new_value: CapacityCommitment) -> ProjectLocationCapacityCommitmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1174,21 +1185,21 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// If true, fail the request if another project in the organization has a capacity commitment.
     ///
     /// Sets the *enforce single admin project per org* query property to the given value.
-    pub fn enforce_single_admin_project_per_org(mut self, new_value: bool) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+    pub fn enforce_single_admin_project_per_org(mut self, new_value: bool) -> ProjectLocationCapacityCommitmentCreateCall<'a, S> {
         self._enforce_single_admin_project_per_org = Some(new_value);
         self
     }
     /// The optional capacity commitment ID. Capacity commitment name will be generated automatically if this field is empty. This field must only contain lower case alphanumeric characters or dashes. The first and last character cannot be a dash. Max length is 64 characters. NOTE: this ID won't be kept if the capacity commitment is split or merged.
     ///
     /// Sets the *capacity commitment id* query property to the given value.
-    pub fn capacity_commitment_id(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+    pub fn capacity_commitment_id(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentCreateCall<'a, S> {
         self._capacity_commitment_id = Some(new_value.to_string());
         self
     }
@@ -1198,7 +1209,7 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1223,7 +1234,7 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1243,9 +1254,9 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1277,7 +1288,7 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1286,10 +1297,10 @@ impl<'a> ProjectLocationCapacityCommitmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1297,9 +1308,15 @@ pub struct ProjectLocationCapacityCommitmentDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1449,14 +1466,14 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Can be used to force delete commitments even if assignments exist. Deleting commitments with assignments may cause queries to fail if they no longer have access to slots.
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> ProjectLocationCapacityCommitmentDeleteCall<'a> {
+    pub fn force(mut self, new_value: bool) -> ProjectLocationCapacityCommitmentDeleteCall<'a, S> {
         self._force = Some(new_value);
         self
     }
@@ -1466,7 +1483,7 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1491,7 +1508,7 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1511,9 +1528,9 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1545,7 +1562,7 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1553,19 +1570,25 @@ impl<'a> ProjectLocationCapacityCommitmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentGetCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentGetCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1712,7 +1735,7 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -1722,7 +1745,7 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1747,7 +1770,7 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1767,9 +1790,9 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1801,7 +1824,7 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1811,10 +1834,10 @@ impl<'a> ProjectLocationCapacityCommitmentGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentListCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1823,9 +1846,15 @@ pub struct ProjectLocationCapacityCommitmentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentListCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1978,21 +2007,21 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCapacityCommitmentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationCapacityCommitmentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -2002,7 +2031,7 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2027,7 +2056,7 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2047,9 +2076,9 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2082,7 +2111,7 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2095,10 +2124,10 @@ impl<'a> ProjectLocationCapacityCommitmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentMergeCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentMergeCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: MergeCapacityCommitmentsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2106,9 +2135,15 @@ pub struct ProjectLocationCapacityCommitmentMergeCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentMergeCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentMergeCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentMergeCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2268,7 +2303,7 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MergeCapacityCommitmentsRequest) -> ProjectLocationCapacityCommitmentMergeCall<'a> {
+    pub fn request(mut self, new_value: MergeCapacityCommitmentsRequest) -> ProjectLocationCapacityCommitmentMergeCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2278,7 +2313,7 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentMergeCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentMergeCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
@@ -2288,7 +2323,7 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentMergeCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentMergeCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2313,7 +2348,7 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentMergeCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentMergeCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2333,9 +2368,9 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentMergeCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentMergeCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2368,7 +2403,7 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2382,10 +2417,10 @@ impl<'a> ProjectLocationCapacityCommitmentMergeCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentPatchCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: CapacityCommitment,
     _name: String,
     _update_mask: Option<String>,
@@ -2394,9 +2429,15 @@ pub struct ProjectLocationCapacityCommitmentPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2559,7 +2600,7 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CapacityCommitment) -> ProjectLocationCapacityCommitmentPatchCall<'a> {
+    pub fn request(mut self, new_value: CapacityCommitment) -> ProjectLocationCapacityCommitmentPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2569,14 +2610,14 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2586,7 +2627,7 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2611,7 +2652,7 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2631,9 +2672,9 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2666,7 +2707,7 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2679,10 +2720,10 @@ impl<'a> ProjectLocationCapacityCommitmentPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationCapacityCommitmentSplitCall<'a>
-    where  {
+pub struct ProjectLocationCapacityCommitmentSplitCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: SplitCapacityCommitmentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2690,9 +2731,15 @@ pub struct ProjectLocationCapacityCommitmentSplitCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationCapacityCommitmentSplitCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationCapacityCommitmentSplitCall<'a, S> {}
 
-impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
+impl<'a, S> ProjectLocationCapacityCommitmentSplitCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2852,7 +2899,7 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SplitCapacityCommitmentRequest) -> ProjectLocationCapacityCommitmentSplitCall<'a> {
+    pub fn request(mut self, new_value: SplitCapacityCommitmentRequest) -> ProjectLocationCapacityCommitmentSplitCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2862,7 +2909,7 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentSplitCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationCapacityCommitmentSplitCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -2872,7 +2919,7 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentSplitCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationCapacityCommitmentSplitCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2897,7 +2944,7 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentSplitCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationCapacityCommitmentSplitCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2917,9 +2964,9 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationCapacityCommitmentSplitCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationCapacityCommitmentSplitCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2952,7 +2999,7 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2966,10 +3013,10 @@ impl<'a> ProjectLocationCapacityCommitmentSplitCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationAssignmentCreateCall<'a>
-    where  {
+pub struct ProjectLocationReservationAssignmentCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: Assignment,
     _parent: String,
     _assignment_id: Option<String>,
@@ -2978,9 +3025,15 @@ pub struct ProjectLocationReservationAssignmentCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationAssignmentCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationAssignmentCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
+impl<'a, S> ProjectLocationReservationAssignmentCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3143,7 +3196,7 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Assignment) -> ProjectLocationReservationAssignmentCreateCall<'a> {
+    pub fn request(mut self, new_value: Assignment) -> ProjectLocationReservationAssignmentCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3153,14 +3206,14 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationAssignmentCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationAssignmentCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The optional assignment ID. Assignment name will be generated automatically if this field is empty. This field must only contain lower case alphanumeric characters or dashes. Max length is 64 characters.
     ///
     /// Sets the *assignment id* query property to the given value.
-    pub fn assignment_id(mut self, new_value: &str) -> ProjectLocationReservationAssignmentCreateCall<'a> {
+    pub fn assignment_id(mut self, new_value: &str) -> ProjectLocationReservationAssignmentCreateCall<'a, S> {
         self._assignment_id = Some(new_value.to_string());
         self
     }
@@ -3170,7 +3223,7 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3195,7 +3248,7 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3215,9 +3268,9 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationAssignmentCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationAssignmentCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3249,7 +3302,7 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3257,19 +3310,25 @@ impl<'a> ProjectLocationReservationAssignmentCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationAssignmentDeleteCall<'a>
-    where  {
+pub struct ProjectLocationReservationAssignmentDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationAssignmentDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationAssignmentDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
+impl<'a, S> ProjectLocationReservationAssignmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3416,7 +3475,7 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationAssignmentDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationAssignmentDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3426,7 +3485,7 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3451,7 +3510,7 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3471,9 +3530,9 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationAssignmentDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationAssignmentDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3505,7 +3564,7 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3515,10 +3574,10 @@ impl<'a> ProjectLocationReservationAssignmentDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationAssignmentListCall<'a>
-    where  {
+pub struct ProjectLocationReservationAssignmentListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3527,9 +3586,15 @@ pub struct ProjectLocationReservationAssignmentListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationAssignmentListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationAssignmentListCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
+impl<'a, S> ProjectLocationReservationAssignmentListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3682,21 +3747,21 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationAssignmentListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationAssignmentListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationReservationAssignmentListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationReservationAssignmentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationReservationAssignmentListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationReservationAssignmentListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -3706,7 +3771,7 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3731,7 +3796,7 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3751,9 +3816,9 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationAssignmentListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationAssignmentListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3786,7 +3851,7 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3799,10 +3864,10 @@ impl<'a> ProjectLocationReservationAssignmentListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationAssignmentMoveCall<'a>
-    where  {
+pub struct ProjectLocationReservationAssignmentMoveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: MoveAssignmentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3810,9 +3875,15 @@ pub struct ProjectLocationReservationAssignmentMoveCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationAssignmentMoveCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationAssignmentMoveCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
+impl<'a, S> ProjectLocationReservationAssignmentMoveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3972,7 +4043,7 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MoveAssignmentRequest) -> ProjectLocationReservationAssignmentMoveCall<'a> {
+    pub fn request(mut self, new_value: MoveAssignmentRequest) -> ProjectLocationReservationAssignmentMoveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3982,7 +4053,7 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationAssignmentMoveCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationAssignmentMoveCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -3992,7 +4063,7 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentMoveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationAssignmentMoveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4017,7 +4088,7 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentMoveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationAssignmentMoveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4037,9 +4108,9 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationAssignmentMoveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationAssignmentMoveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4072,7 +4143,7 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4086,10 +4157,10 @@ impl<'a> ProjectLocationReservationAssignmentMoveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationCreateCall<'a>
-    where  {
+pub struct ProjectLocationReservationCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: Reservation,
     _parent: String,
     _reservation_id: Option<String>,
@@ -4098,9 +4169,15 @@ pub struct ProjectLocationReservationCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationCreateCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationCreateCall<'a> {
+impl<'a, S> ProjectLocationReservationCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4263,7 +4340,7 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reservation) -> ProjectLocationReservationCreateCall<'a> {
+    pub fn request(mut self, new_value: Reservation) -> ProjectLocationReservationCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4273,14 +4350,14 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationCreateCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationCreateCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The reservation ID. It must only contain lower case alphanumeric characters or dashes.It must start with a letter and must not end with a dash. Its maximum length is 64 characters.
     ///
     /// Sets the *reservation id* query property to the given value.
-    pub fn reservation_id(mut self, new_value: &str) -> ProjectLocationReservationCreateCall<'a> {
+    pub fn reservation_id(mut self, new_value: &str) -> ProjectLocationReservationCreateCall<'a, S> {
         self._reservation_id = Some(new_value.to_string());
         self
     }
@@ -4290,7 +4367,7 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4315,7 +4392,7 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4335,9 +4412,9 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4369,7 +4446,7 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4377,19 +4454,25 @@ impl<'a> ProjectLocationReservationCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationDeleteCall<'a>
-    where  {
+pub struct ProjectLocationReservationDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationDeleteCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationDeleteCall<'a> {
+impl<'a, S> ProjectLocationReservationDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4536,7 +4619,7 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationDeleteCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationDeleteCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4546,7 +4629,7 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4571,7 +4654,7 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4591,9 +4674,9 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4625,7 +4708,7 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4633,19 +4716,25 @@ impl<'a> ProjectLocationReservationDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationGetCall<'a>
-    where  {
+pub struct ProjectLocationReservationGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationGetCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationGetCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationGetCall<'a> {
+impl<'a, S> ProjectLocationReservationGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4792,7 +4881,7 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationGetCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationGetCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -4802,7 +4891,7 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4827,7 +4916,7 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4847,9 +4936,9 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4881,7 +4970,7 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4891,10 +4980,10 @@ impl<'a> ProjectLocationReservationGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationListCall<'a>
-    where  {
+pub struct ProjectLocationReservationListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4903,9 +4992,15 @@ pub struct ProjectLocationReservationListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationListCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationListCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationListCall<'a> {
+impl<'a, S> ProjectLocationReservationListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5058,21 +5153,21 @@ impl<'a> ProjectLocationReservationListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationListCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationReservationListCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationReservationListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationReservationListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationReservationListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationReservationListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5082,7 +5177,7 @@ impl<'a> ProjectLocationReservationListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5107,7 +5202,7 @@ impl<'a> ProjectLocationReservationListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5127,9 +5222,9 @@ impl<'a> ProjectLocationReservationListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5162,7 +5257,7 @@ impl<'a> ProjectLocationReservationListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5176,10 +5271,10 @@ impl<'a> ProjectLocationReservationListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationReservationPatchCall<'a>
-    where  {
+pub struct ProjectLocationReservationPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: Reservation,
     _name: String,
     _update_mask: Option<String>,
@@ -5188,9 +5283,15 @@ pub struct ProjectLocationReservationPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationReservationPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationReservationPatchCall<'a, S> {}
 
-impl<'a> ProjectLocationReservationPatchCall<'a> {
+impl<'a, S> ProjectLocationReservationPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5353,7 +5454,7 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reservation) -> ProjectLocationReservationPatchCall<'a> {
+    pub fn request(mut self, new_value: Reservation) -> ProjectLocationReservationPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5363,14 +5464,14 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationPatchCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationReservationPatchCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationReservationPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationReservationPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5380,7 +5481,7 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationReservationPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5405,7 +5506,7 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationReservationPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5425,9 +5526,9 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationReservationPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationReservationPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5459,7 +5560,7 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5467,19 +5568,25 @@ impl<'a> ProjectLocationReservationPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetBiReservationCall<'a>
-    where  {
+pub struct ProjectLocationGetBiReservationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationGetBiReservationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationGetBiReservationCall<'a, S> {}
 
-impl<'a> ProjectLocationGetBiReservationCall<'a> {
+impl<'a, S> ProjectLocationGetBiReservationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5626,7 +5733,7 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetBiReservationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetBiReservationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
@@ -5636,7 +5743,7 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetBiReservationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetBiReservationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5661,7 +5768,7 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetBiReservationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetBiReservationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5681,9 +5788,9 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetBiReservationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationGetBiReservationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5715,7 +5822,7 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5726,10 +5833,10 @@ impl<'a> ProjectLocationGetBiReservationCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSearchAllAssignmentCall<'a>
-    where  {
+pub struct ProjectLocationSearchAllAssignmentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _parent: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -5739,9 +5846,15 @@ pub struct ProjectLocationSearchAllAssignmentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSearchAllAssignmentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSearchAllAssignmentCall<'a, S> {}
 
-impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
+impl<'a, S> ProjectLocationSearchAllAssignmentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5897,28 +6010,28 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationSearchAllAssignmentCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationSearchAllAssignmentCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Please specify resource name as assignee in the query. Examples: * `assignee=projects/myproject` * `assignee=folders/123` * `assignee=organizations/456`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectLocationSearchAllAssignmentCall<'a> {
+    pub fn query(mut self, new_value: &str) -> ProjectLocationSearchAllAssignmentCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationSearchAllAssignmentCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationSearchAllAssignmentCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationSearchAllAssignmentCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationSearchAllAssignmentCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5928,7 +6041,7 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSearchAllAssignmentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSearchAllAssignmentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5953,7 +6066,7 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSearchAllAssignmentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSearchAllAssignmentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5973,9 +6086,9 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSearchAllAssignmentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSearchAllAssignmentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6007,7 +6120,7 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6018,10 +6131,10 @@ impl<'a> ProjectLocationSearchAllAssignmentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationSearchAssignmentCall<'a>
-    where  {
+pub struct ProjectLocationSearchAssignmentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _parent: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -6031,9 +6144,15 @@ pub struct ProjectLocationSearchAssignmentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationSearchAssignmentCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationSearchAssignmentCall<'a, S> {}
 
-impl<'a> ProjectLocationSearchAssignmentCall<'a> {
+impl<'a, S> ProjectLocationSearchAssignmentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6189,28 +6308,28 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationSearchAssignmentCall<'a> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationSearchAssignmentCall<'a, S> {
         self._parent = new_value.to_string();
         self
     }
     /// Please specify resource name as assignee in the query. Examples: * `assignee=projects/myproject` * `assignee=folders/123` * `assignee=organizations/456`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectLocationSearchAssignmentCall<'a> {
+    pub fn query(mut self, new_value: &str) -> ProjectLocationSearchAssignmentCall<'a, S> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationSearchAssignmentCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationSearchAssignmentCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of items to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationSearchAssignmentCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationSearchAssignmentCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -6220,7 +6339,7 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSearchAssignmentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationSearchAssignmentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6245,7 +6364,7 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSearchAssignmentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationSearchAssignmentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6265,9 +6384,9 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationSearchAssignmentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationSearchAssignmentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6300,7 +6419,7 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6314,10 +6433,10 @@ impl<'a> ProjectLocationSearchAssignmentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationUpdateBiReservationCall<'a>
-    where  {
+pub struct ProjectLocationUpdateBiReservationCall<'a, S>
+    where S: 'a {
 
-    hub: &'a BigQueryReservation<>,
+    hub: &'a BigQueryReservation<S>,
     _request: BiReservation,
     _name: String,
     _update_mask: Option<String>,
@@ -6326,9 +6445,15 @@ pub struct ProjectLocationUpdateBiReservationCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ProjectLocationUpdateBiReservationCall<'a> {}
+impl<'a, S> client::CallBuilder for ProjectLocationUpdateBiReservationCall<'a, S> {}
 
-impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
+impl<'a, S> ProjectLocationUpdateBiReservationCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6491,7 +6616,7 @@ impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BiReservation) -> ProjectLocationUpdateBiReservationCall<'a> {
+    pub fn request(mut self, new_value: BiReservation) -> ProjectLocationUpdateBiReservationCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6501,14 +6626,14 @@ impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationUpdateBiReservationCall<'a> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationUpdateBiReservationCall<'a, S> {
         self._name = new_value.to_string();
         self
     }
     /// A list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationUpdateBiReservationCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationUpdateBiReservationCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6518,7 +6643,7 @@ impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationUpdateBiReservationCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationUpdateBiReservationCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6543,7 +6668,7 @@ impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationUpdateBiReservationCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationUpdateBiReservationCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6563,9 +6688,9 @@ impl<'a> ProjectLocationUpdateBiReservationCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationUpdateBiReservationCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ProjectLocationUpdateBiReservationCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

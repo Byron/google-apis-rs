@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -90,7 +95,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -120,40 +125,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct PhotosLibrary<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct PhotosLibrary<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for PhotosLibrary<> {}
+impl<'a, S> client::Hub for PhotosLibrary<S> {}
 
-impl<'a, > PhotosLibrary<> {
+impl<'a, S> PhotosLibrary<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PhotosLibrary<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> PhotosLibrary<S> {
         PhotosLibrary {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://photoslibrary.googleapis.com/".to_string(),
             _root_url: "https://photoslibrary.googleapis.com/".to_string(),
         }
     }
 
-    pub fn albums(&'a self) -> AlbumMethods<'a> {
+    pub fn albums(&'a self) -> AlbumMethods<'a, S> {
         AlbumMethods { hub: &self }
     }
-    pub fn media_items(&'a self) -> MediaItemMethods<'a> {
+    pub fn media_items(&'a self) -> MediaItemMethods<'a, S> {
         MediaItemMethods { hub: &self }
     }
-    pub fn shared_albums(&'a self) -> SharedAlbumMethods<'a> {
+    pub fn shared_albums(&'a self) -> SharedAlbumMethods<'a, S> {
         SharedAlbumMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1213,22 +1218,22 @@ impl client::Part for Video {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `add_enrichment(...)`, `batch_add_media_items(...)`, `batch_remove_media_items(...)`, `create(...)`, `get(...)`, `list(...)`, `patch(...)`, `share(...)` and `unshare(...)`
 /// // to build up your call.
 /// let rb = hub.albums();
 /// # }
 /// ```
-pub struct AlbumMethods<'a>
-    where  {
+pub struct AlbumMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
 }
 
-impl<'a> client::MethodsBuilder for AlbumMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AlbumMethods<'a, S> {}
 
-impl<'a> AlbumMethods<'a> {
+impl<'a, S> AlbumMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1238,7 +1243,7 @@ impl<'a> AlbumMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the album where the enrichment is to be added.
-    pub fn add_enrichment(&self, request: AddEnrichmentToAlbumRequest, album_id: &str) -> AlbumAddEnrichmentCall<'a> {
+    pub fn add_enrichment(&self, request: AddEnrichmentToAlbumRequest, album_id: &str) -> AlbumAddEnrichmentCall<'a, S> {
         AlbumAddEnrichmentCall {
             hub: self.hub,
             _request: request,
@@ -1257,7 +1262,7 @@ impl<'a> AlbumMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the Album that the media items are added to.
-    pub fn batch_add_media_items(&self, request: BatchAddMediaItemsToAlbumRequest, album_id: &str) -> AlbumBatchAddMediaItemCall<'a> {
+    pub fn batch_add_media_items(&self, request: BatchAddMediaItemsToAlbumRequest, album_id: &str) -> AlbumBatchAddMediaItemCall<'a, S> {
         AlbumBatchAddMediaItemCall {
             hub: self.hub,
             _request: request,
@@ -1276,7 +1281,7 @@ impl<'a> AlbumMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the Album that the media items are to be removed from.
-    pub fn batch_remove_media_items(&self, request: BatchRemoveMediaItemsFromAlbumRequest, album_id: &str) -> AlbumBatchRemoveMediaItemCall<'a> {
+    pub fn batch_remove_media_items(&self, request: BatchRemoveMediaItemsFromAlbumRequest, album_id: &str) -> AlbumBatchRemoveMediaItemCall<'a, S> {
         AlbumBatchRemoveMediaItemCall {
             hub: self.hub,
             _request: request,
@@ -1294,7 +1299,7 @@ impl<'a> AlbumMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateAlbumRequest) -> AlbumCreateCall<'a> {
+    pub fn create(&self, request: CreateAlbumRequest) -> AlbumCreateCall<'a, S> {
         AlbumCreateCall {
             hub: self.hub,
             _request: request,
@@ -1311,7 +1316,7 @@ impl<'a> AlbumMethods<'a> {
     /// # Arguments
     ///
     /// * `albumId` - Required. Identifier of the album to be requested.
-    pub fn get(&self, album_id: &str) -> AlbumGetCall<'a> {
+    pub fn get(&self, album_id: &str) -> AlbumGetCall<'a, S> {
         AlbumGetCall {
             hub: self.hub,
             _album_id: album_id.to_string(),
@@ -1324,7 +1329,7 @@ impl<'a> AlbumMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all albums shown to a user in the Albums tab of the Google Photos app.
-    pub fn list(&self) -> AlbumListCall<'a> {
+    pub fn list(&self) -> AlbumListCall<'a, S> {
         AlbumListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1344,7 +1349,7 @@ impl<'a> AlbumMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - Identifier for the album. This is a persistent identifier that can be used between sessions to identify this album.
-    pub fn patch(&self, request: Album, id: &str) -> AlbumPatchCall<'a> {
+    pub fn patch(&self, request: Album, id: &str) -> AlbumPatchCall<'a, S> {
         AlbumPatchCall {
             hub: self.hub,
             _request: request,
@@ -1364,7 +1369,7 @@ impl<'a> AlbumMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the album to be shared. This `albumId` must belong to an album created by the developer.
-    pub fn share(&self, request: ShareAlbumRequest, album_id: &str) -> AlbumShareCall<'a> {
+    pub fn share(&self, request: ShareAlbumRequest, album_id: &str) -> AlbumShareCall<'a, S> {
         AlbumShareCall {
             hub: self.hub,
             _request: request,
@@ -1383,7 +1388,7 @@ impl<'a> AlbumMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the album to be unshared. This album id must belong to an album created by the developer.
-    pub fn unshare(&self, request: UnshareAlbumRequest, album_id: &str) -> AlbumUnshareCall<'a> {
+    pub fn unshare(&self, request: UnshareAlbumRequest, album_id: &str) -> AlbumUnshareCall<'a, S> {
         AlbumUnshareCall {
             hub: self.hub,
             _request: request,
@@ -1418,22 +1423,22 @@ impl<'a> AlbumMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_create(...)`, `batch_get(...)`, `get(...)`, `list(...)`, `patch(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.media_items();
 /// # }
 /// ```
-pub struct MediaItemMethods<'a>
-    where  {
+pub struct MediaItemMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
 }
 
-impl<'a> client::MethodsBuilder for MediaItemMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MediaItemMethods<'a, S> {}
 
-impl<'a> MediaItemMethods<'a> {
+impl<'a, S> MediaItemMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1442,7 +1447,7 @@ impl<'a> MediaItemMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_create(&self, request: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a> {
+    pub fn batch_create(&self, request: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a, S> {
         MediaItemBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -1455,7 +1460,7 @@ impl<'a> MediaItemMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the list of media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.
-    pub fn batch_get(&self) -> MediaItemBatchGetCall<'a> {
+    pub fn batch_get(&self) -> MediaItemBatchGetCall<'a, S> {
         MediaItemBatchGetCall {
             hub: self.hub,
             _media_item_ids: Default::default(),
@@ -1472,7 +1477,7 @@ impl<'a> MediaItemMethods<'a> {
     /// # Arguments
     ///
     /// * `mediaItemId` - Required. Identifier of the media item to be requested.
-    pub fn get(&self, media_item_id: &str) -> MediaItemGetCall<'a> {
+    pub fn get(&self, media_item_id: &str) -> MediaItemGetCall<'a, S> {
         MediaItemGetCall {
             hub: self.hub,
             _media_item_id: media_item_id.to_string(),
@@ -1485,7 +1490,7 @@ impl<'a> MediaItemMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all media items from a user's Google Photos library.
-    pub fn list(&self) -> MediaItemListCall<'a> {
+    pub fn list(&self) -> MediaItemListCall<'a, S> {
         MediaItemListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1504,7 +1509,7 @@ impl<'a> MediaItemMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `id` - Identifier for the media item. This is a persistent identifier that can be used between sessions to identify this media item.
-    pub fn patch(&self, request: MediaItem, id: &str) -> MediaItemPatchCall<'a> {
+    pub fn patch(&self, request: MediaItem, id: &str) -> MediaItemPatchCall<'a, S> {
         MediaItemPatchCall {
             hub: self.hub,
             _request: request,
@@ -1523,7 +1528,7 @@ impl<'a> MediaItemMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: SearchMediaItemsRequest) -> MediaItemSearchCall<'a> {
+    pub fn search(&self, request: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, S> {
         MediaItemSearchCall {
             hub: self.hub,
             _request: request,
@@ -1557,22 +1562,22 @@ impl<'a> MediaItemMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `join(...)`, `leave(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.shared_albums();
 /// # }
 /// ```
-pub struct SharedAlbumMethods<'a>
-    where  {
+pub struct SharedAlbumMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
 }
 
-impl<'a> client::MethodsBuilder for SharedAlbumMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for SharedAlbumMethods<'a, S> {}
 
-impl<'a> SharedAlbumMethods<'a> {
+impl<'a, S> SharedAlbumMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1581,7 +1586,7 @@ impl<'a> SharedAlbumMethods<'a> {
     /// # Arguments
     ///
     /// * `shareToken` - Required. Share token of the album to be requested.
-    pub fn get(&self, share_token: &str) -> SharedAlbumGetCall<'a> {
+    pub fn get(&self, share_token: &str) -> SharedAlbumGetCall<'a, S> {
         SharedAlbumGetCall {
             hub: self.hub,
             _share_token: share_token.to_string(),
@@ -1598,7 +1603,7 @@ impl<'a> SharedAlbumMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn join(&self, request: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a> {
+    pub fn join(&self, request: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, S> {
         SharedAlbumJoinCall {
             hub: self.hub,
             _request: request,
@@ -1615,7 +1620,7 @@ impl<'a> SharedAlbumMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn leave(&self, request: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a> {
+    pub fn leave(&self, request: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a, S> {
         SharedAlbumLeaveCall {
             hub: self.hub,
             _request: request,
@@ -1628,7 +1633,7 @@ impl<'a> SharedAlbumMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all shared albums available in the Sharing tab of the user's Google Photos app.
-    pub fn list(&self) -> SharedAlbumListCall<'a> {
+    pub fn list(&self) -> SharedAlbumListCall<'a, S> {
         SharedAlbumListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1672,7 +1677,7 @@ impl<'a> SharedAlbumMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1685,10 +1690,10 @@ impl<'a> SharedAlbumMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumAddEnrichmentCall<'a>
-    where  {
+pub struct AlbumAddEnrichmentCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: AddEnrichmentToAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1696,9 +1701,15 @@ pub struct AlbumAddEnrichmentCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumAddEnrichmentCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumAddEnrichmentCall<'a, S> {}
 
-impl<'a> AlbumAddEnrichmentCall<'a> {
+impl<'a, S> AlbumAddEnrichmentCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1858,7 +1869,7 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddEnrichmentToAlbumRequest) -> AlbumAddEnrichmentCall<'a> {
+    pub fn request(mut self, new_value: AddEnrichmentToAlbumRequest) -> AlbumAddEnrichmentCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1868,7 +1879,7 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumAddEnrichmentCall<'a> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumAddEnrichmentCall<'a, S> {
         self._album_id = new_value.to_string();
         self
     }
@@ -1878,7 +1889,7 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumAddEnrichmentCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumAddEnrichmentCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1903,7 +1914,7 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumAddEnrichmentCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumAddEnrichmentCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1923,9 +1934,9 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumAddEnrichmentCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumAddEnrichmentCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1958,7 +1969,7 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1971,10 +1982,10 @@ impl<'a> AlbumAddEnrichmentCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumBatchAddMediaItemCall<'a>
-    where  {
+pub struct AlbumBatchAddMediaItemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: BatchAddMediaItemsToAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1982,9 +1993,15 @@ pub struct AlbumBatchAddMediaItemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumBatchAddMediaItemCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumBatchAddMediaItemCall<'a, S> {}
 
-impl<'a> AlbumBatchAddMediaItemCall<'a> {
+impl<'a, S> AlbumBatchAddMediaItemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2144,7 +2161,7 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchAddMediaItemsToAlbumRequest) -> AlbumBatchAddMediaItemCall<'a> {
+    pub fn request(mut self, new_value: BatchAddMediaItemsToAlbumRequest) -> AlbumBatchAddMediaItemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2154,7 +2171,7 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumBatchAddMediaItemCall<'a> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumBatchAddMediaItemCall<'a, S> {
         self._album_id = new_value.to_string();
         self
     }
@@ -2164,7 +2181,7 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchAddMediaItemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchAddMediaItemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2189,7 +2206,7 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchAddMediaItemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchAddMediaItemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2209,9 +2226,9 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumBatchAddMediaItemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumBatchAddMediaItemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2244,7 +2261,7 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2257,10 +2274,10 @@ impl<'a> AlbumBatchAddMediaItemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumBatchRemoveMediaItemCall<'a>
-    where  {
+pub struct AlbumBatchRemoveMediaItemCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: BatchRemoveMediaItemsFromAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2268,9 +2285,15 @@ pub struct AlbumBatchRemoveMediaItemCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumBatchRemoveMediaItemCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumBatchRemoveMediaItemCall<'a, S> {}
 
-impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
+impl<'a, S> AlbumBatchRemoveMediaItemCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2430,7 +2453,7 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchRemoveMediaItemsFromAlbumRequest) -> AlbumBatchRemoveMediaItemCall<'a> {
+    pub fn request(mut self, new_value: BatchRemoveMediaItemsFromAlbumRequest) -> AlbumBatchRemoveMediaItemCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2440,7 +2463,7 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumBatchRemoveMediaItemCall<'a> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumBatchRemoveMediaItemCall<'a, S> {
         self._album_id = new_value.to_string();
         self
     }
@@ -2450,7 +2473,7 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchRemoveMediaItemCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchRemoveMediaItemCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2475,7 +2498,7 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchRemoveMediaItemCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchRemoveMediaItemCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2495,9 +2518,9 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumBatchRemoveMediaItemCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumBatchRemoveMediaItemCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2530,7 +2553,7 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2543,19 +2566,25 @@ impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumCreateCall<'a>
-    where  {
+pub struct AlbumCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: CreateAlbumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumCreateCall<'a, S> {}
 
-impl<'a> AlbumCreateCall<'a> {
+impl<'a, S> AlbumCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2689,7 +2718,7 @@ impl<'a> AlbumCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAlbumRequest) -> AlbumCreateCall<'a> {
+    pub fn request(mut self, new_value: CreateAlbumRequest) -> AlbumCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2699,7 +2728,7 @@ impl<'a> AlbumCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2724,7 +2753,7 @@ impl<'a> AlbumCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2744,9 +2773,9 @@ impl<'a> AlbumCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2778,7 +2807,7 @@ impl<'a> AlbumCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2786,19 +2815,25 @@ impl<'a> AlbumCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumGetCall<'a>
-    where  {
+pub struct AlbumGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumGetCall<'a, S> {}
 
-impl<'a> AlbumGetCall<'a> {
+impl<'a, S> AlbumGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2945,7 +2980,7 @@ impl<'a> AlbumGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumGetCall<'a> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumGetCall<'a, S> {
         self._album_id = new_value.to_string();
         self
     }
@@ -2955,7 +2990,7 @@ impl<'a> AlbumGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2980,7 +3015,7 @@ impl<'a> AlbumGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3000,9 +3035,9 @@ impl<'a> AlbumGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3034,7 +3069,7 @@ impl<'a> AlbumGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3045,10 +3080,10 @@ impl<'a> AlbumGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumListCall<'a>
-    where  {
+pub struct AlbumListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _exclude_non_app_created_data: Option<bool>,
@@ -3057,9 +3092,15 @@ pub struct AlbumListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumListCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumListCall<'a, S> {}
 
-impl<'a> AlbumListCall<'a> {
+impl<'a, S> AlbumListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3186,21 +3227,21 @@ impl<'a> AlbumListCall<'a> {
     /// A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listAlbums` request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AlbumListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AlbumListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of albums to return in the response. Fewer albums might be returned than the specified number. The default `pageSize` is 20, the maximum is 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// If set, the results exclude media items that were not created by this app. Defaults to false (all albums are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.
     ///
     /// Sets the *exclude non app created data* query property to the given value.
-    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> AlbumListCall<'a> {
+    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> AlbumListCall<'a, S> {
         self._exclude_non_app_created_data = Some(new_value);
         self
     }
@@ -3210,7 +3251,7 @@ impl<'a> AlbumListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3235,7 +3276,7 @@ impl<'a> AlbumListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3255,9 +3296,9 @@ impl<'a> AlbumListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3290,7 +3331,7 @@ impl<'a> AlbumListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3304,10 +3345,10 @@ impl<'a> AlbumListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumPatchCall<'a>
-    where  {
+pub struct AlbumPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: Album,
     _id: String,
     _update_mask: Option<String>,
@@ -3316,9 +3357,15 @@ pub struct AlbumPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumPatchCall<'a, S> {}
 
-impl<'a> AlbumPatchCall<'a> {
+impl<'a, S> AlbumPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3481,7 +3528,7 @@ impl<'a> AlbumPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Album) -> AlbumPatchCall<'a> {
+    pub fn request(mut self, new_value: Album) -> AlbumPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3491,14 +3538,14 @@ impl<'a> AlbumPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> AlbumPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> AlbumPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Required. Indicate what fields in the provided album to update. The only valid values are `title` and `cover_photo_media_item_id`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AlbumPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> AlbumPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3508,7 +3555,7 @@ impl<'a> AlbumPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3533,7 +3580,7 @@ impl<'a> AlbumPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3553,9 +3600,9 @@ impl<'a> AlbumPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3588,7 +3635,7 @@ impl<'a> AlbumPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3601,10 +3648,10 @@ impl<'a> AlbumPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumShareCall<'a>
-    where  {
+pub struct AlbumShareCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: ShareAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3612,9 +3659,15 @@ pub struct AlbumShareCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumShareCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumShareCall<'a, S> {}
 
-impl<'a> AlbumShareCall<'a> {
+impl<'a, S> AlbumShareCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3774,7 +3827,7 @@ impl<'a> AlbumShareCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShareAlbumRequest) -> AlbumShareCall<'a> {
+    pub fn request(mut self, new_value: ShareAlbumRequest) -> AlbumShareCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3784,7 +3837,7 @@ impl<'a> AlbumShareCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumShareCall<'a> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumShareCall<'a, S> {
         self._album_id = new_value.to_string();
         self
     }
@@ -3794,7 +3847,7 @@ impl<'a> AlbumShareCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumShareCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumShareCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3819,7 +3872,7 @@ impl<'a> AlbumShareCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumShareCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumShareCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3839,9 +3892,9 @@ impl<'a> AlbumShareCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumShareCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumShareCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3874,7 +3927,7 @@ impl<'a> AlbumShareCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3887,10 +3940,10 @@ impl<'a> AlbumShareCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumUnshareCall<'a>
-    where  {
+pub struct AlbumUnshareCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: UnshareAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3898,9 +3951,15 @@ pub struct AlbumUnshareCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlbumUnshareCall<'a> {}
+impl<'a, S> client::CallBuilder for AlbumUnshareCall<'a, S> {}
 
-impl<'a> AlbumUnshareCall<'a> {
+impl<'a, S> AlbumUnshareCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4060,7 +4119,7 @@ impl<'a> AlbumUnshareCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnshareAlbumRequest) -> AlbumUnshareCall<'a> {
+    pub fn request(mut self, new_value: UnshareAlbumRequest) -> AlbumUnshareCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4070,7 +4129,7 @@ impl<'a> AlbumUnshareCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumUnshareCall<'a> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumUnshareCall<'a, S> {
         self._album_id = new_value.to_string();
         self
     }
@@ -4080,7 +4139,7 @@ impl<'a> AlbumUnshareCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumUnshareCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumUnshareCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4105,7 +4164,7 @@ impl<'a> AlbumUnshareCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumUnshareCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumUnshareCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4125,9 +4184,9 @@ impl<'a> AlbumUnshareCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumUnshareCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlbumUnshareCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4160,7 +4219,7 @@ impl<'a> AlbumUnshareCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4173,19 +4232,25 @@ impl<'a> AlbumUnshareCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemBatchCreateCall<'a>
-    where  {
+pub struct MediaItemBatchCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: BatchCreateMediaItemsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaItemBatchCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaItemBatchCreateCall<'a, S> {}
 
-impl<'a> MediaItemBatchCreateCall<'a> {
+impl<'a, S> MediaItemBatchCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4319,7 +4384,7 @@ impl<'a> MediaItemBatchCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a> {
+    pub fn request(mut self, new_value: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -4329,7 +4394,7 @@ impl<'a> MediaItemBatchCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4354,7 +4419,7 @@ impl<'a> MediaItemBatchCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4374,9 +4439,9 @@ impl<'a> MediaItemBatchCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaItemBatchCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4408,7 +4473,7 @@ impl<'a> MediaItemBatchCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4417,19 +4482,25 @@ impl<'a> MediaItemBatchCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemBatchGetCall<'a>
-    where  {
+pub struct MediaItemBatchGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _media_item_ids: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaItemBatchGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaItemBatchGetCall<'a, S> {}
 
-impl<'a> MediaItemBatchGetCall<'a> {
+impl<'a, S> MediaItemBatchGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4553,7 +4624,7 @@ impl<'a> MediaItemBatchGetCall<'a> {
     ///
     /// Append the given value to the *media item ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_media_item_ids(mut self, new_value: &str) -> MediaItemBatchGetCall<'a> {
+    pub fn add_media_item_ids(mut self, new_value: &str) -> MediaItemBatchGetCall<'a, S> {
         self._media_item_ids.push(new_value.to_string());
         self
     }
@@ -4563,7 +4634,7 @@ impl<'a> MediaItemBatchGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4588,7 +4659,7 @@ impl<'a> MediaItemBatchGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4608,9 +4679,9 @@ impl<'a> MediaItemBatchGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaItemBatchGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4642,7 +4713,7 @@ impl<'a> MediaItemBatchGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4650,19 +4721,25 @@ impl<'a> MediaItemBatchGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemGetCall<'a>
-    where  {
+pub struct MediaItemGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _media_item_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaItemGetCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaItemGetCall<'a, S> {}
 
-impl<'a> MediaItemGetCall<'a> {
+impl<'a, S> MediaItemGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4809,7 +4886,7 @@ impl<'a> MediaItemGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn media_item_id(mut self, new_value: &str) -> MediaItemGetCall<'a> {
+    pub fn media_item_id(mut self, new_value: &str) -> MediaItemGetCall<'a, S> {
         self._media_item_id = new_value.to_string();
         self
     }
@@ -4819,7 +4896,7 @@ impl<'a> MediaItemGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4844,7 +4921,7 @@ impl<'a> MediaItemGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4864,9 +4941,9 @@ impl<'a> MediaItemGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaItemGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4898,7 +4975,7 @@ impl<'a> MediaItemGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4908,10 +4985,10 @@ impl<'a> MediaItemGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemListCall<'a>
-    where  {
+pub struct MediaItemListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4919,9 +4996,15 @@ pub struct MediaItemListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaItemListCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaItemListCall<'a, S> {}
 
-impl<'a> MediaItemListCall<'a> {
+impl<'a, S> MediaItemListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5045,14 +5128,14 @@ impl<'a> MediaItemListCall<'a> {
     /// A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listMediaItems` request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MediaItemListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> MediaItemListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of media items to return in the response. Fewer media items might be returned than the specified number. The default `pageSize` is 25, the maximum is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MediaItemListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> MediaItemListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
@@ -5062,7 +5145,7 @@ impl<'a> MediaItemListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5087,7 +5170,7 @@ impl<'a> MediaItemListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5107,9 +5190,9 @@ impl<'a> MediaItemListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaItemListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5142,7 +5225,7 @@ impl<'a> MediaItemListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5156,10 +5239,10 @@ impl<'a> MediaItemListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemPatchCall<'a>
-    where  {
+pub struct MediaItemPatchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: MediaItem,
     _id: String,
     _update_mask: Option<String>,
@@ -5168,9 +5251,15 @@ pub struct MediaItemPatchCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaItemPatchCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaItemPatchCall<'a, S> {}
 
-impl<'a> MediaItemPatchCall<'a> {
+impl<'a, S> MediaItemPatchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5333,7 +5422,7 @@ impl<'a> MediaItemPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MediaItem) -> MediaItemPatchCall<'a> {
+    pub fn request(mut self, new_value: MediaItem) -> MediaItemPatchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5343,14 +5432,14 @@ impl<'a> MediaItemPatchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> MediaItemPatchCall<'a> {
+    pub fn id(mut self, new_value: &str) -> MediaItemPatchCall<'a, S> {
         self._id = new_value.to_string();
         self
     }
     /// Required. Indicate what fields in the provided media item to update. The only valid value is `description`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> MediaItemPatchCall<'a> {
+    pub fn update_mask(mut self, new_value: &str) -> MediaItemPatchCall<'a, S> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5360,7 +5449,7 @@ impl<'a> MediaItemPatchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemPatchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemPatchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5385,7 +5474,7 @@ impl<'a> MediaItemPatchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemPatchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemPatchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5405,9 +5494,9 @@ impl<'a> MediaItemPatchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemPatchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaItemPatchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5440,7 +5529,7 @@ impl<'a> MediaItemPatchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5453,19 +5542,25 @@ impl<'a> MediaItemPatchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemSearchCall<'a>
-    where  {
+pub struct MediaItemSearchCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: SearchMediaItemsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MediaItemSearchCall<'a> {}
+impl<'a, S> client::CallBuilder for MediaItemSearchCall<'a, S> {}
 
-impl<'a> MediaItemSearchCall<'a> {
+impl<'a, S> MediaItemSearchCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5599,7 +5694,7 @@ impl<'a> MediaItemSearchCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchMediaItemsRequest) -> MediaItemSearchCall<'a> {
+    pub fn request(mut self, new_value: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5609,7 +5704,7 @@ impl<'a> MediaItemSearchCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemSearchCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemSearchCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5634,7 +5729,7 @@ impl<'a> MediaItemSearchCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemSearchCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemSearchCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5654,9 +5749,9 @@ impl<'a> MediaItemSearchCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemSearchCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MediaItemSearchCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5688,7 +5783,7 @@ impl<'a> MediaItemSearchCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5696,19 +5791,25 @@ impl<'a> MediaItemSearchCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumGetCall<'a>
-    where  {
+pub struct SharedAlbumGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _share_token: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SharedAlbumGetCall<'a> {}
+impl<'a, S> client::CallBuilder for SharedAlbumGetCall<'a, S> {}
 
-impl<'a> SharedAlbumGetCall<'a> {
+impl<'a, S> SharedAlbumGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5855,7 +5956,7 @@ impl<'a> SharedAlbumGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn share_token(mut self, new_value: &str) -> SharedAlbumGetCall<'a> {
+    pub fn share_token(mut self, new_value: &str) -> SharedAlbumGetCall<'a, S> {
         self._share_token = new_value.to_string();
         self
     }
@@ -5865,7 +5966,7 @@ impl<'a> SharedAlbumGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5890,7 +5991,7 @@ impl<'a> SharedAlbumGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5910,9 +6011,9 @@ impl<'a> SharedAlbumGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SharedAlbumGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -5945,7 +6046,7 @@ impl<'a> SharedAlbumGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5958,19 +6059,25 @@ impl<'a> SharedAlbumGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumJoinCall<'a>
-    where  {
+pub struct SharedAlbumJoinCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: JoinSharedAlbumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SharedAlbumJoinCall<'a> {}
+impl<'a, S> client::CallBuilder for SharedAlbumJoinCall<'a, S> {}
 
-impl<'a> SharedAlbumJoinCall<'a> {
+impl<'a, S> SharedAlbumJoinCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6104,7 +6211,7 @@ impl<'a> SharedAlbumJoinCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a> {
+    pub fn request(mut self, new_value: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6114,7 +6221,7 @@ impl<'a> SharedAlbumJoinCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumJoinCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumJoinCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6139,7 +6246,7 @@ impl<'a> SharedAlbumJoinCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumJoinCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumJoinCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6159,9 +6266,9 @@ impl<'a> SharedAlbumJoinCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumJoinCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SharedAlbumJoinCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6194,7 +6301,7 @@ impl<'a> SharedAlbumJoinCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6207,19 +6314,25 @@ impl<'a> SharedAlbumJoinCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumLeaveCall<'a>
-    where  {
+pub struct SharedAlbumLeaveCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _request: LeaveSharedAlbumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SharedAlbumLeaveCall<'a> {}
+impl<'a, S> client::CallBuilder for SharedAlbumLeaveCall<'a, S> {}
 
-impl<'a> SharedAlbumLeaveCall<'a> {
+impl<'a, S> SharedAlbumLeaveCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6353,7 +6466,7 @@ impl<'a> SharedAlbumLeaveCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a> {
+    pub fn request(mut self, new_value: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -6363,7 +6476,7 @@ impl<'a> SharedAlbumLeaveCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumLeaveCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumLeaveCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6388,7 +6501,7 @@ impl<'a> SharedAlbumLeaveCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumLeaveCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumLeaveCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6408,9 +6521,9 @@ impl<'a> SharedAlbumLeaveCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumLeaveCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SharedAlbumLeaveCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -6442,7 +6555,7 @@ impl<'a> SharedAlbumLeaveCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = PhotosLibrary::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6453,10 +6566,10 @@ impl<'a> SharedAlbumLeaveCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumListCall<'a>
-    where  {
+pub struct SharedAlbumListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a PhotosLibrary<>,
+    hub: &'a PhotosLibrary<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _exclude_non_app_created_data: Option<bool>,
@@ -6465,9 +6578,15 @@ pub struct SharedAlbumListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for SharedAlbumListCall<'a> {}
+impl<'a, S> client::CallBuilder for SharedAlbumListCall<'a, S> {}
 
-impl<'a> SharedAlbumListCall<'a> {
+impl<'a, S> SharedAlbumListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -6594,21 +6713,21 @@ impl<'a> SharedAlbumListCall<'a> {
     /// A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listSharedAlbums` request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SharedAlbumListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> SharedAlbumListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of albums to return in the response. Fewer albums might be returned than the specified number. The default `pageSize` is 20, the maximum is 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// If set, the results exclude media items that were not created by this app. Defaults to false (all albums are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.
     ///
     /// Sets the *exclude non app created data* query property to the given value.
-    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> SharedAlbumListCall<'a> {
+    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> SharedAlbumListCall<'a, S> {
         self._exclude_non_app_created_data = Some(new_value);
         self
     }
@@ -6618,7 +6737,7 @@ impl<'a> SharedAlbumListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -6643,7 +6762,7 @@ impl<'a> SharedAlbumListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6663,9 +6782,9 @@ impl<'a> SharedAlbumListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> SharedAlbumListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

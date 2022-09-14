@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -102,37 +107,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AlertCenter<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct AlertCenter<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for AlertCenter<> {}
+impl<'a, S> client::Hub for AlertCenter<S> {}
 
-impl<'a, > AlertCenter<> {
+impl<'a, S> AlertCenter<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AlertCenter<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> AlertCenter<S> {
         AlertCenter {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://alertcenter.googleapis.com/".to_string(),
             _root_url: "https://alertcenter.googleapis.com/".to_string(),
         }
     }
 
-    pub fn alerts(&'a self) -> AlertMethods<'a> {
+    pub fn alerts(&'a self) -> AlertMethods<'a, S> {
         AlertMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a> {
+    pub fn methods(&'a self) -> MethodMethods<'a, S> {
         MethodMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -541,22 +546,22 @@ impl client::RequestValue for UndeleteAlertRequest {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_delete(...)`, `batch_undelete(...)`, `delete(...)`, `feedback_create(...)`, `feedback_list(...)`, `get(...)`, `get_metadata(...)`, `list(...)` and `undelete(...)`
 /// // to build up your call.
 /// let rb = hub.alerts();
 /// # }
 /// ```
-pub struct AlertMethods<'a>
-    where  {
+pub struct AlertMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
 }
 
-impl<'a> client::MethodsBuilder for AlertMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AlertMethods<'a, S> {}
 
-impl<'a> AlertMethods<'a> {
+impl<'a, S> AlertMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -566,7 +571,7 @@ impl<'a> AlertMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `alertId` - Required. The identifier of the alert this feedback belongs to.
-    pub fn feedback_create(&self, request: AlertFeedback, alert_id: &str) -> AlertFeedbackCreateCall<'a> {
+    pub fn feedback_create(&self, request: AlertFeedback, alert_id: &str) -> AlertFeedbackCreateCall<'a, S> {
         AlertFeedbackCreateCall {
             hub: self.hub,
             _request: request,
@@ -585,7 +590,7 @@ impl<'a> AlertMethods<'a> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The alert identifier. The "-" wildcard could be used to represent all alerts.
-    pub fn feedback_list(&self, alert_id: &str) -> AlertFeedbackListCall<'a> {
+    pub fn feedback_list(&self, alert_id: &str) -> AlertFeedbackListCall<'a, S> {
         AlertFeedbackListCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -604,7 +609,7 @@ impl<'a> AlertMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a> {
+    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, S> {
         AlertBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -621,7 +626,7 @@ impl<'a> AlertMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_undelete(&self, request: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a> {
+    pub fn batch_undelete(&self, request: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, S> {
         AlertBatchUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -638,7 +643,7 @@ impl<'a> AlertMethods<'a> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert to delete.
-    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a> {
+    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a, S> {
         AlertDeleteCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -656,7 +661,7 @@ impl<'a> AlertMethods<'a> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert to retrieve.
-    pub fn get(&self, alert_id: &str) -> AlertGetCall<'a> {
+    pub fn get(&self, alert_id: &str) -> AlertGetCall<'a, S> {
         AlertGetCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -674,7 +679,7 @@ impl<'a> AlertMethods<'a> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert this metadata belongs to.
-    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a> {
+    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a, S> {
         AlertGetMetadataCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -688,7 +693,7 @@ impl<'a> AlertMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the alerts.
-    pub fn list(&self) -> AlertListCall<'a> {
+    pub fn list(&self) -> AlertListCall<'a, S> {
         AlertListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -710,7 +715,7 @@ impl<'a> AlertMethods<'a> {
     ///
     /// * `request` - No description provided.
     /// * `alertId` - Required. The identifier of the alert to undelete.
-    pub fn undelete(&self, request: UndeleteAlertRequest, alert_id: &str) -> AlertUndeleteCall<'a> {
+    pub fn undelete(&self, request: UndeleteAlertRequest, alert_id: &str) -> AlertUndeleteCall<'a, S> {
         AlertUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -745,27 +750,27 @@ impl<'a> AlertMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_settings(...)` and `update_settings(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a>
-    where  {
+pub struct MethodMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
 }
 
-impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
 
-impl<'a> MethodMethods<'a> {
+impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns customer-level settings.
-    pub fn get_settings(&self) -> MethodGetSettingCall<'a> {
+    pub fn get_settings(&self) -> MethodGetSettingCall<'a, S> {
         MethodGetSettingCall {
             hub: self.hub,
             _customer_id: Default::default(),
@@ -782,7 +787,7 @@ impl<'a> MethodMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a> {
+    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a, S> {
         MethodUpdateSettingCall {
             hub: self.hub,
             _request: request,
@@ -825,7 +830,7 @@ impl<'a> MethodMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -839,10 +844,10 @@ impl<'a> MethodMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertFeedbackCreateCall<'a>
-    where  {
+pub struct AlertFeedbackCreateCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _request: AlertFeedback,
     _alert_id: String,
     _customer_id: Option<String>,
@@ -851,9 +856,15 @@ pub struct AlertFeedbackCreateCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertFeedbackCreateCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertFeedbackCreateCall<'a, S> {}
 
-impl<'a> AlertFeedbackCreateCall<'a> {
+impl<'a, S> AlertFeedbackCreateCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1012,7 +1023,7 @@ impl<'a> AlertFeedbackCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AlertFeedback) -> AlertFeedbackCreateCall<'a> {
+    pub fn request(mut self, new_value: AlertFeedback) -> AlertFeedbackCreateCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1022,14 +1033,14 @@ impl<'a> AlertFeedbackCreateCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, S> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -1039,7 +1050,7 @@ impl<'a> AlertFeedbackCreateCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackCreateCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackCreateCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1064,7 +1075,7 @@ impl<'a> AlertFeedbackCreateCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackCreateCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackCreateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1084,9 +1095,9 @@ impl<'a> AlertFeedbackCreateCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertFeedbackCreateCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertFeedbackCreateCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1118,7 +1129,7 @@ impl<'a> AlertFeedbackCreateCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1128,10 +1139,10 @@ impl<'a> AlertFeedbackCreateCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertFeedbackListCall<'a>
-    where  {
+pub struct AlertFeedbackListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _alert_id: String,
     _filter: Option<String>,
     _customer_id: Option<String>,
@@ -1140,9 +1151,15 @@ pub struct AlertFeedbackListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertFeedbackListCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertFeedbackListCall<'a, S> {}
 
-impl<'a> AlertFeedbackListCall<'a> {
+impl<'a, S> AlertFeedbackListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1291,21 +1308,21 @@ impl<'a> AlertFeedbackListCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, S> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. A query string for filtering alert feedback results. For more details, see [Query filters](https://developers.google.com/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](https://developers.google.com/admin-sdk/alertcenter/reference/filter-fields#alerts.feedback.list).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AlertFeedbackListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AlertFeedbackListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert feedback are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -1315,7 +1332,7 @@ impl<'a> AlertFeedbackListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1340,7 +1357,7 @@ impl<'a> AlertFeedbackListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1360,9 +1377,9 @@ impl<'a> AlertFeedbackListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertFeedbackListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertFeedbackListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1395,7 +1412,7 @@ impl<'a> AlertFeedbackListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1408,19 +1425,25 @@ impl<'a> AlertFeedbackListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertBatchDeleteCall<'a>
-    where  {
+pub struct AlertBatchDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _request: BatchDeleteAlertsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertBatchDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertBatchDeleteCall<'a, S> {}
 
-impl<'a> AlertBatchDeleteCall<'a> {
+impl<'a, S> AlertBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1554,7 +1577,7 @@ impl<'a> AlertBatchDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a> {
+    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1564,7 +1587,7 @@ impl<'a> AlertBatchDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1589,7 +1612,7 @@ impl<'a> AlertBatchDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1609,9 +1632,9 @@ impl<'a> AlertBatchDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertBatchDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1644,7 +1667,7 @@ impl<'a> AlertBatchDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1657,19 +1680,25 @@ impl<'a> AlertBatchDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertBatchUndeleteCall<'a>
-    where  {
+pub struct AlertBatchUndeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _request: BatchUndeleteAlertsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertBatchUndeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertBatchUndeleteCall<'a, S> {}
 
-impl<'a> AlertBatchUndeleteCall<'a> {
+impl<'a, S> AlertBatchUndeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1803,7 +1832,7 @@ impl<'a> AlertBatchUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a> {
+    pub fn request(mut self, new_value: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -1813,7 +1842,7 @@ impl<'a> AlertBatchUndeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchUndeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchUndeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1838,7 +1867,7 @@ impl<'a> AlertBatchUndeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1858,9 +1887,9 @@ impl<'a> AlertBatchUndeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchUndeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertBatchUndeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1892,7 +1921,7 @@ impl<'a> AlertBatchUndeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1901,10 +1930,10 @@ impl<'a> AlertBatchUndeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertDeleteCall<'a>
-    where  {
+pub struct AlertDeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _alert_id: String,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1912,9 +1941,15 @@ pub struct AlertDeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertDeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertDeleteCall<'a, S> {}
 
-impl<'a> AlertDeleteCall<'a> {
+impl<'a, S> AlertDeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2060,14 +2095,14 @@ impl<'a> AlertDeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, S> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertDeleteCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertDeleteCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2077,7 +2112,7 @@ impl<'a> AlertDeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertDeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertDeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2102,7 +2137,7 @@ impl<'a> AlertDeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2122,9 +2157,9 @@ impl<'a> AlertDeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertDeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertDeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2156,7 +2191,7 @@ impl<'a> AlertDeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2165,10 +2200,10 @@ impl<'a> AlertDeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertGetCall<'a>
-    where  {
+pub struct AlertGetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _alert_id: String,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2176,9 +2211,15 @@ pub struct AlertGetCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertGetCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertGetCall<'a, S> {}
 
-impl<'a> AlertGetCall<'a> {
+impl<'a, S> AlertGetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2324,14 +2365,14 @@ impl<'a> AlertGetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertGetCall<'a> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetCall<'a, S> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertGetCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2341,7 +2382,7 @@ impl<'a> AlertGetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2366,7 +2407,7 @@ impl<'a> AlertGetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertGetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2386,9 +2427,9 @@ impl<'a> AlertGetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertGetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2420,7 +2461,7 @@ impl<'a> AlertGetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2429,10 +2470,10 @@ impl<'a> AlertGetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertGetMetadataCall<'a>
-    where  {
+pub struct AlertGetMetadataCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _alert_id: String,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2440,9 +2481,15 @@ pub struct AlertGetMetadataCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertGetMetadataCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertGetMetadataCall<'a, S> {}
 
-impl<'a> AlertGetMetadataCall<'a> {
+impl<'a, S> AlertGetMetadataCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2588,14 +2635,14 @@ impl<'a> AlertGetMetadataCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, S> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert metadata is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2605,7 +2652,7 @@ impl<'a> AlertGetMetadataCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetMetadataCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetMetadataCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2630,7 +2677,7 @@ impl<'a> AlertGetMetadataCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2650,9 +2697,9 @@ impl<'a> AlertGetMetadataCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetMetadataCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertGetMetadataCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2684,7 +2731,7 @@ impl<'a> AlertGetMetadataCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2697,10 +2744,10 @@ impl<'a> AlertGetMetadataCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertListCall<'a>
-    where  {
+pub struct AlertListCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
@@ -2711,9 +2758,15 @@ pub struct AlertListCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertListCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertListCall<'a, S> {}
 
-impl<'a> AlertListCall<'a> {
+impl<'a, S> AlertListCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2846,35 +2899,35 @@ impl<'a> AlertListCall<'a> {
     /// Optional. A token identifying a page of results the server should return. If empty, a new iteration is started. To continue an iteration, pass in the value from the previous ListAlertsResponse's next_page_token field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AlertListCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> AlertListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The requested page size. Server may return fewer items than requested. If unspecified, server picks an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AlertListCall<'a> {
+    pub fn page_size(mut self, new_value: i32) -> AlertListCall<'a, S> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The sort order of the list results. If not specified results may be returned in arbitrary order. You can sort the results in descending order based on the creation timestamp using `order_by="create_time desc"`. Currently, supported sorting are `create_time asc`, `create_time desc`, `update_time desc`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a> {
+    pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a, S> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. A query string for filtering alert results. For more details, see [Query filters](https://developers.google.com/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](https://developers.google.com/admin-sdk/alertcenter/reference/filter-fields#alerts.list).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AlertListCall<'a> {
+    pub fn filter(mut self, new_value: &str) -> AlertListCall<'a, S> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alerts are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertListCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertListCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2884,7 +2937,7 @@ impl<'a> AlertListCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertListCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertListCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2909,7 +2962,7 @@ impl<'a> AlertListCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2929,9 +2982,9 @@ impl<'a> AlertListCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertListCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertListCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2964,7 +3017,7 @@ impl<'a> AlertListCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2977,10 +3030,10 @@ impl<'a> AlertListCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertUndeleteCall<'a>
-    where  {
+pub struct AlertUndeleteCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _request: UndeleteAlertRequest,
     _alert_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2988,9 +3041,15 @@ pub struct AlertUndeleteCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AlertUndeleteCall<'a> {}
+impl<'a, S> client::CallBuilder for AlertUndeleteCall<'a, S> {}
 
-impl<'a> AlertUndeleteCall<'a> {
+impl<'a, S> AlertUndeleteCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3146,7 +3205,7 @@ impl<'a> AlertUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteAlertRequest) -> AlertUndeleteCall<'a> {
+    pub fn request(mut self, new_value: UndeleteAlertRequest) -> AlertUndeleteCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3156,7 +3215,7 @@ impl<'a> AlertUndeleteCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertUndeleteCall<'a> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertUndeleteCall<'a, S> {
         self._alert_id = new_value.to_string();
         self
     }
@@ -3166,7 +3225,7 @@ impl<'a> AlertUndeleteCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertUndeleteCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertUndeleteCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3191,7 +3250,7 @@ impl<'a> AlertUndeleteCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertUndeleteCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertUndeleteCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3211,9 +3270,9 @@ impl<'a> AlertUndeleteCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertUndeleteCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AlertUndeleteCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3245,7 +3304,7 @@ impl<'a> AlertUndeleteCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3254,19 +3313,25 @@ impl<'a> AlertUndeleteCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetSettingCall<'a>
-    where  {
+pub struct MethodGetSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodGetSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodGetSettingCall<'a, S> {}
 
-impl<'a> MethodGetSettingCall<'a> {
+impl<'a, S> MethodGetSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3387,7 +3452,7 @@ impl<'a> MethodGetSettingCall<'a> {
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert settings are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -3397,7 +3462,7 @@ impl<'a> MethodGetSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3422,7 +3487,7 @@ impl<'a> MethodGetSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3442,9 +3507,9 @@ impl<'a> MethodGetSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodGetSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3477,7 +3542,7 @@ impl<'a> MethodGetSettingCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3491,10 +3556,10 @@ impl<'a> MethodGetSettingCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodUpdateSettingCall<'a>
-    where  {
+pub struct MethodUpdateSettingCall<'a, S>
+    where S: 'a {
 
-    hub: &'a AlertCenter<>,
+    hub: &'a AlertCenter<S>,
     _request: Settings,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3502,9 +3567,15 @@ pub struct MethodUpdateSettingCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for MethodUpdateSettingCall<'a> {}
+impl<'a, S> client::CallBuilder for MethodUpdateSettingCall<'a, S> {}
 
-impl<'a> MethodUpdateSettingCall<'a> {
+impl<'a, S> MethodUpdateSettingCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3641,14 +3712,14 @@ impl<'a> MethodUpdateSettingCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Settings) -> MethodUpdateSettingCall<'a> {
+    pub fn request(mut self, new_value: Settings) -> MethodUpdateSettingCall<'a, S> {
         self._request = new_value;
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert settings are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodUpdateSettingCall<'a> {
+    pub fn customer_id(mut self, new_value: &str) -> MethodUpdateSettingCall<'a, S> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -3658,7 +3729,7 @@ impl<'a> MethodUpdateSettingCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateSettingCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateSettingCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3683,7 +3754,7 @@ impl<'a> MethodUpdateSettingCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateSettingCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateSettingCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3703,9 +3774,9 @@ impl<'a> MethodUpdateSettingCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodUpdateSettingCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> MethodUpdateSettingCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,

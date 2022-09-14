@@ -2,12 +2,17 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 use std::thread::sleep;
 
+use http::Uri;
+use hyper::client::connect;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tower_service;
 use crate::client;
 
 // ##############
@@ -70,7 +75,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -97,46 +102,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct GamesManagement<> {
-    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+pub struct GamesManagement<S> {
+    pub client: hyper::Client<S, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<S>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, > client::Hub for GamesManagement<> {}
+impl<'a, S> client::Hub for GamesManagement<S> {}
 
-impl<'a, > GamesManagement<> {
+impl<'a, S> GamesManagement<S> {
 
-    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GamesManagement<> {
+    pub fn new(client: hyper::Client<S, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<S>) -> GamesManagement<S> {
         GamesManagement {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/3.1.0".to_string(),
+            _user_agent: "google-api-rust-client/4.0.1".to_string(),
             _base_url: "https://gamesmanagement.googleapis.com/".to_string(),
             _root_url: "https://gamesmanagement.googleapis.com/".to_string(),
         }
     }
 
-    pub fn achievements(&'a self) -> AchievementMethods<'a> {
+    pub fn achievements(&'a self) -> AchievementMethods<'a, S> {
         AchievementMethods { hub: &self }
     }
-    pub fn applications(&'a self) -> ApplicationMethods<'a> {
+    pub fn applications(&'a self) -> ApplicationMethods<'a, S> {
         ApplicationMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a> {
+    pub fn events(&'a self) -> EventMethods<'a, S> {
         EventMethods { hub: &self }
     }
-    pub fn players(&'a self) -> PlayerMethods<'a> {
+    pub fn players(&'a self) -> PlayerMethods<'a, S> {
         PlayerMethods { hub: &self }
     }
-    pub fn scores(&'a self) -> ScoreMethods<'a> {
+    pub fn scores(&'a self) -> ScoreMethods<'a, S> {
         ScoreMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/3.1.0`.
+    /// It defaults to `google-api-rust-client/4.0.1`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -505,22 +510,22 @@ impl client::Part for PlayerName {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `reset(...)`, `reset_all(...)`, `reset_all_for_all_players(...)`, `reset_for_all_players(...)` and `reset_multiple_for_all_players(...)`
 /// // to build up your call.
 /// let rb = hub.achievements();
 /// # }
 /// ```
-pub struct AchievementMethods<'a>
-    where  {
+pub struct AchievementMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for AchievementMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for AchievementMethods<'a, S> {}
 
-impl<'a> AchievementMethods<'a> {
+impl<'a, S> AchievementMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -529,7 +534,7 @@ impl<'a> AchievementMethods<'a> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a> {
+    pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a, S> {
         AchievementResetCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -542,7 +547,7 @@ impl<'a> AchievementMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> AchievementResetAllCall<'a> {
+    pub fn reset_all(&self) -> AchievementResetAllCall<'a, S> {
         AchievementResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -554,7 +559,7 @@ impl<'a> AchievementMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft achievements for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a> {
+    pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a, S> {
         AchievementResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -570,7 +575,7 @@ impl<'a> AchievementMethods<'a> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a> {
+    pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a, S> {
         AchievementResetForAllPlayerCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -587,7 +592,7 @@ impl<'a> AchievementMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a> {
+    pub fn reset_multiple_for_all_players(&self, request: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, S> {
         AchievementResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request,
@@ -621,22 +626,22 @@ impl<'a> AchievementMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list_hidden(...)`
 /// // to build up your call.
 /// let rb = hub.applications();
 /// # }
 /// ```
-pub struct ApplicationMethods<'a>
-    where  {
+pub struct ApplicationMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for ApplicationMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ApplicationMethods<'a, S> {}
 
-impl<'a> ApplicationMethods<'a> {
+impl<'a, S> ApplicationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -645,7 +650,7 @@ impl<'a> ApplicationMethods<'a> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a> {
+    pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a, S> {
         ApplicationListHiddenCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -681,22 +686,22 @@ impl<'a> ApplicationMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `reset(...)`, `reset_all(...)`, `reset_all_for_all_players(...)`, `reset_for_all_players(...)` and `reset_multiple_for_all_players(...)`
 /// // to build up your call.
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a>
-    where  {
+pub struct EventMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for EventMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for EventMethods<'a, S> {}
 
-impl<'a> EventMethods<'a> {
+impl<'a, S> EventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -705,7 +710,7 @@ impl<'a> EventMethods<'a> {
     /// # Arguments
     ///
     /// * `eventId` - The ID of the event.
-    pub fn reset(&self, event_id: &str) -> EventResetCall<'a> {
+    pub fn reset(&self, event_id: &str) -> EventResetCall<'a, S> {
         EventResetCall {
             hub: self.hub,
             _event_id: event_id.to_string(),
@@ -718,7 +723,7 @@ impl<'a> EventMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> EventResetAllCall<'a> {
+    pub fn reset_all(&self) -> EventResetAllCall<'a, S> {
         EventResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -730,7 +735,7 @@ impl<'a> EventMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft events for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a> {
+    pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a, S> {
         EventResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -746,7 +751,7 @@ impl<'a> EventMethods<'a> {
     /// # Arguments
     ///
     /// * `eventId` - The ID of the event.
-    pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a> {
+    pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a, S> {
         EventResetForAllPlayerCall {
             hub: self.hub,
             _event_id: event_id.to_string(),
@@ -763,7 +768,7 @@ impl<'a> EventMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a> {
+    pub fn reset_multiple_for_all_players(&self, request: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, S> {
         EventResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request,
@@ -797,22 +802,22 @@ impl<'a> EventMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `hide(...)` and `unhide(...)`
 /// // to build up your call.
 /// let rb = hub.players();
 /// # }
 /// ```
-pub struct PlayerMethods<'a>
-    where  {
+pub struct PlayerMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for PlayerMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for PlayerMethods<'a, S> {}
 
-impl<'a> PlayerMethods<'a> {
+impl<'a, S> PlayerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -822,7 +827,7 @@ impl<'a> PlayerMethods<'a> {
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a> {
+    pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a, S> {
         PlayerHideCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -841,7 +846,7 @@ impl<'a> PlayerMethods<'a> {
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a> {
+    pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a, S> {
         PlayerUnhideCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -876,22 +881,22 @@ impl<'a> PlayerMethods<'a> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `reset(...)`, `reset_all(...)`, `reset_all_for_all_players(...)`, `reset_for_all_players(...)` and `reset_multiple_for_all_players(...)`
 /// // to build up your call.
 /// let rb = hub.scores();
 /// # }
 /// ```
-pub struct ScoreMethods<'a>
-    where  {
+pub struct ScoreMethods<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
 }
 
-impl<'a> client::MethodsBuilder for ScoreMethods<'a> {}
+impl<'a, S> client::MethodsBuilder for ScoreMethods<'a, S> {}
 
-impl<'a> ScoreMethods<'a> {
+impl<'a, S> ScoreMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -900,7 +905,7 @@ impl<'a> ScoreMethods<'a> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a> {
+    pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a, S> {
         ScoreResetCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -913,7 +918,7 @@ impl<'a> ScoreMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> ScoreResetAllCall<'a> {
+    pub fn reset_all(&self) -> ScoreResetAllCall<'a, S> {
         ScoreResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -925,7 +930,7 @@ impl<'a> ScoreMethods<'a> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a> {
+    pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a, S> {
         ScoreResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -941,7 +946,7 @@ impl<'a> ScoreMethods<'a> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a> {
+    pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a, S> {
         ScoreResetForAllPlayerCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -958,7 +963,7 @@ impl<'a> ScoreMethods<'a> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a> {
+    pub fn reset_multiple_for_all_players(&self, request: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, S> {
         ScoreResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request,
@@ -999,7 +1004,7 @@ impl<'a> ScoreMethods<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1007,19 +1012,25 @@ impl<'a> ScoreMethods<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetCall<'a>
-    where  {
+pub struct AchievementResetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementResetCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementResetCall<'a, S> {}
 
-impl<'a> AchievementResetCall<'a> {
+impl<'a, S> AchievementResetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1162,7 +1173,7 @@ impl<'a> AchievementResetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a, S> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1172,7 +1183,7 @@ impl<'a> AchievementResetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1197,7 +1208,7 @@ impl<'a> AchievementResetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1217,9 +1228,9 @@ impl<'a> AchievementResetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementResetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1251,7 +1262,7 @@ impl<'a> AchievementResetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1259,18 +1270,24 @@ impl<'a> AchievementResetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetAllCall<'a>
-    where  {
+pub struct AchievementResetAllCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementResetAllCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementResetAllCall<'a, S> {}
 
-impl<'a> AchievementResetAllCall<'a> {
+impl<'a, S> AchievementResetAllCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1391,7 +1408,7 @@ impl<'a> AchievementResetAllCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1416,7 +1433,7 @@ impl<'a> AchievementResetAllCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1436,9 +1453,9 @@ impl<'a> AchievementResetAllCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetAllCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementResetAllCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1470,7 +1487,7 @@ impl<'a> AchievementResetAllCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1478,18 +1495,24 @@ impl<'a> AchievementResetAllCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetAllForAllPlayerCall<'a>
-    where  {
+pub struct AchievementResetAllForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementResetAllForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementResetAllForAllPlayerCall<'a, S> {}
 
-impl<'a> AchievementResetAllForAllPlayerCall<'a> {
+impl<'a, S> AchievementResetAllForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1599,7 +1622,7 @@ impl<'a> AchievementResetAllForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1624,7 +1647,7 @@ impl<'a> AchievementResetAllForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1644,9 +1667,9 @@ impl<'a> AchievementResetAllForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetAllForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementResetAllForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1678,7 +1701,7 @@ impl<'a> AchievementResetAllForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1686,19 +1709,25 @@ impl<'a> AchievementResetAllForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetForAllPlayerCall<'a>
-    where  {
+pub struct AchievementResetForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementResetForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementResetForAllPlayerCall<'a, S> {}
 
-impl<'a> AchievementResetForAllPlayerCall<'a> {
+impl<'a, S> AchievementResetForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -1830,7 +1859,7 @@ impl<'a> AchievementResetForAllPlayerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a, S> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1840,7 +1869,7 @@ impl<'a> AchievementResetForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -1865,7 +1894,7 @@ impl<'a> AchievementResetForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1885,9 +1914,9 @@ impl<'a> AchievementResetForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementResetForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -1920,7 +1949,7 @@ impl<'a> AchievementResetForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1933,19 +1962,25 @@ impl<'a> AchievementResetForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetMultipleForAllPlayerCall<'a>
-    where  {
+pub struct AchievementResetMultipleForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _request: AchievementResetMultipleForAllRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for AchievementResetMultipleForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for AchievementResetMultipleForAllPlayerCall<'a, S> {}
 
-impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
+impl<'a, S> AchievementResetMultipleForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2068,7 +2103,7 @@ impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a> {
+    pub fn request(mut self, new_value: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -2078,7 +2113,7 @@ impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetMultipleForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetMultipleForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2103,7 +2138,7 @@ impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetMultipleForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetMultipleForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2123,9 +2158,9 @@ impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetMultipleForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> AchievementResetMultipleForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2157,7 +2192,7 @@ impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2167,10 +2202,10 @@ impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationListHiddenCall<'a>
-    where  {
+pub struct ApplicationListHiddenCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2179,9 +2214,15 @@ pub struct ApplicationListHiddenCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ApplicationListHiddenCall<'a> {}
+impl<'a, S> client::CallBuilder for ApplicationListHiddenCall<'a, S> {}
 
-impl<'a> ApplicationListHiddenCall<'a> {
+impl<'a, S> ApplicationListHiddenCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2330,21 +2371,21 @@ impl<'a> ApplicationListHiddenCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a> {
+    pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a> {
+    pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a, S> {
         self._max_results = Some(new_value);
         self
     }
@@ -2354,7 +2395,7 @@ impl<'a> ApplicationListHiddenCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationListHiddenCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationListHiddenCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2379,7 +2420,7 @@ impl<'a> ApplicationListHiddenCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationListHiddenCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationListHiddenCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2399,9 +2440,9 @@ impl<'a> ApplicationListHiddenCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationListHiddenCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ApplicationListHiddenCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2433,7 +2474,7 @@ impl<'a> ApplicationListHiddenCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2441,19 +2482,25 @@ impl<'a> ApplicationListHiddenCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetCall<'a>
-    where  {
+pub struct EventResetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _event_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventResetCall<'a> {}
+impl<'a, S> client::CallBuilder for EventResetCall<'a, S> {}
 
-impl<'a> EventResetCall<'a> {
+impl<'a, S> EventResetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2585,7 +2632,7 @@ impl<'a> EventResetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
@@ -2595,7 +2642,7 @@ impl<'a> EventResetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2620,7 +2667,7 @@ impl<'a> EventResetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2640,9 +2687,9 @@ impl<'a> EventResetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventResetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2674,7 +2721,7 @@ impl<'a> EventResetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2682,18 +2729,24 @@ impl<'a> EventResetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetAllCall<'a>
-    where  {
+pub struct EventResetAllCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventResetAllCall<'a> {}
+impl<'a, S> client::CallBuilder for EventResetAllCall<'a, S> {}
 
-impl<'a> EventResetAllCall<'a> {
+impl<'a, S> EventResetAllCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -2803,7 +2856,7 @@ impl<'a> EventResetAllCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -2828,7 +2881,7 @@ impl<'a> EventResetAllCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2848,9 +2901,9 @@ impl<'a> EventResetAllCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetAllCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventResetAllCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -2882,7 +2935,7 @@ impl<'a> EventResetAllCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2890,18 +2943,24 @@ impl<'a> EventResetAllCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetAllForAllPlayerCall<'a>
-    where  {
+pub struct EventResetAllForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventResetAllForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for EventResetAllForAllPlayerCall<'a, S> {}
 
-impl<'a> EventResetAllForAllPlayerCall<'a> {
+impl<'a, S> EventResetAllForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3011,7 +3070,7 @@ impl<'a> EventResetAllForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3036,7 +3095,7 @@ impl<'a> EventResetAllForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3056,9 +3115,9 @@ impl<'a> EventResetAllForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetAllForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventResetAllForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3090,7 +3149,7 @@ impl<'a> EventResetAllForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3098,19 +3157,25 @@ impl<'a> EventResetAllForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetForAllPlayerCall<'a>
-    where  {
+pub struct EventResetForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _event_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventResetForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for EventResetForAllPlayerCall<'a, S> {}
 
-impl<'a> EventResetForAllPlayerCall<'a> {
+impl<'a, S> EventResetForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3242,7 +3307,7 @@ impl<'a> EventResetForAllPlayerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a> {
+    pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a, S> {
         self._event_id = new_value.to_string();
         self
     }
@@ -3252,7 +3317,7 @@ impl<'a> EventResetForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3277,7 +3342,7 @@ impl<'a> EventResetForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3297,9 +3362,9 @@ impl<'a> EventResetForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventResetForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3332,7 +3397,7 @@ impl<'a> EventResetForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3345,19 +3410,25 @@ impl<'a> EventResetForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetMultipleForAllPlayerCall<'a>
-    where  {
+pub struct EventResetMultipleForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _request: EventsResetMultipleForAllRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for EventResetMultipleForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for EventResetMultipleForAllPlayerCall<'a, S> {}
 
-impl<'a> EventResetMultipleForAllPlayerCall<'a> {
+impl<'a, S> EventResetMultipleForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3480,7 +3551,7 @@ impl<'a> EventResetMultipleForAllPlayerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a> {
+    pub fn request(mut self, new_value: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -3490,7 +3561,7 @@ impl<'a> EventResetMultipleForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetMultipleForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetMultipleForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3515,7 +3586,7 @@ impl<'a> EventResetMultipleForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetMultipleForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetMultipleForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3535,9 +3606,9 @@ impl<'a> EventResetMultipleForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetMultipleForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> EventResetMultipleForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3569,7 +3640,7 @@ impl<'a> EventResetMultipleForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3577,10 +3648,10 @@ impl<'a> EventResetMultipleForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlayerHideCall<'a>
-    where  {
+pub struct PlayerHideCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _application_id: String,
     _player_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3588,9 +3659,15 @@ pub struct PlayerHideCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlayerHideCall<'a> {}
+impl<'a, S> client::CallBuilder for PlayerHideCall<'a, S> {}
 
-impl<'a> PlayerHideCall<'a> {
+impl<'a, S> PlayerHideCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3723,7 +3800,7 @@ impl<'a> PlayerHideCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
@@ -3733,7 +3810,7 @@ impl<'a> PlayerHideCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a, S> {
         self._player_id = new_value.to_string();
         self
     }
@@ -3743,7 +3820,7 @@ impl<'a> PlayerHideCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerHideCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerHideCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -3768,7 +3845,7 @@ impl<'a> PlayerHideCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerHideCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerHideCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3788,9 +3865,9 @@ impl<'a> PlayerHideCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerHideCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlayerHideCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -3822,7 +3899,7 @@ impl<'a> PlayerHideCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3830,10 +3907,10 @@ impl<'a> PlayerHideCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlayerUnhideCall<'a>
-    where  {
+pub struct PlayerUnhideCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _application_id: String,
     _player_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3841,9 +3918,15 @@ pub struct PlayerUnhideCall<'a>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for PlayerUnhideCall<'a> {}
+impl<'a, S> client::CallBuilder for PlayerUnhideCall<'a, S> {}
 
-impl<'a> PlayerUnhideCall<'a> {
+impl<'a, S> PlayerUnhideCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -3976,7 +4059,7 @@ impl<'a> PlayerUnhideCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a> {
+    pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, S> {
         self._application_id = new_value.to_string();
         self
     }
@@ -3986,7 +4069,7 @@ impl<'a> PlayerUnhideCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, S> {
         self._player_id = new_value.to_string();
         self
     }
@@ -3996,7 +4079,7 @@ impl<'a> PlayerUnhideCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerUnhideCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerUnhideCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4021,7 +4104,7 @@ impl<'a> PlayerUnhideCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerUnhideCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerUnhideCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4041,9 +4124,9 @@ impl<'a> PlayerUnhideCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerUnhideCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> PlayerUnhideCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4075,7 +4158,7 @@ impl<'a> PlayerUnhideCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4083,19 +4166,25 @@ impl<'a> PlayerUnhideCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetCall<'a>
-    where  {
+pub struct ScoreResetCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ScoreResetCall<'a> {}
+impl<'a, S> client::CallBuilder for ScoreResetCall<'a, S> {}
 
-impl<'a> ScoreResetCall<'a> {
+impl<'a, S> ScoreResetCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4238,7 +4327,7 @@ impl<'a> ScoreResetCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a, S> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -4248,7 +4337,7 @@ impl<'a> ScoreResetCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4273,7 +4362,7 @@ impl<'a> ScoreResetCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4293,9 +4382,9 @@ impl<'a> ScoreResetCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ScoreResetCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4327,7 +4416,7 @@ impl<'a> ScoreResetCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4335,18 +4424,24 @@ impl<'a> ScoreResetCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetAllCall<'a>
-    where  {
+pub struct ScoreResetAllCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ScoreResetAllCall<'a> {}
+impl<'a, S> client::CallBuilder for ScoreResetAllCall<'a, S> {}
 
-impl<'a> ScoreResetAllCall<'a> {
+impl<'a, S> ScoreResetAllCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4467,7 +4562,7 @@ impl<'a> ScoreResetAllCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4492,7 +4587,7 @@ impl<'a> ScoreResetAllCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4512,9 +4607,9 @@ impl<'a> ScoreResetAllCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetAllCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ScoreResetAllCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4546,7 +4641,7 @@ impl<'a> ScoreResetAllCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4554,18 +4649,24 @@ impl<'a> ScoreResetAllCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetAllForAllPlayerCall<'a>
-    where  {
+pub struct ScoreResetAllForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ScoreResetAllForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for ScoreResetAllForAllPlayerCall<'a, S> {}
 
-impl<'a> ScoreResetAllForAllPlayerCall<'a> {
+impl<'a, S> ScoreResetAllForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4675,7 +4776,7 @@ impl<'a> ScoreResetAllForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4700,7 +4801,7 @@ impl<'a> ScoreResetAllForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4720,9 +4821,9 @@ impl<'a> ScoreResetAllForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetAllForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ScoreResetAllForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4754,7 +4855,7 @@ impl<'a> ScoreResetAllForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4762,19 +4863,25 @@ impl<'a> ScoreResetAllForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetForAllPlayerCall<'a>
-    where  {
+pub struct ScoreResetForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ScoreResetForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for ScoreResetForAllPlayerCall<'a, S> {}
 
-impl<'a> ScoreResetForAllPlayerCall<'a> {
+impl<'a, S> ScoreResetForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -4906,7 +5013,7 @@ impl<'a> ScoreResetForAllPlayerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a, S> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -4916,7 +5023,7 @@ impl<'a> ScoreResetForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -4941,7 +5048,7 @@ impl<'a> ScoreResetForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4961,9 +5068,9 @@ impl<'a> ScoreResetForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ScoreResetForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
@@ -4996,7 +5103,7 @@ impl<'a> ScoreResetForAllPlayerCall<'a> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
+/// # let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().enable_http2().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5009,19 +5116,25 @@ impl<'a> ScoreResetForAllPlayerCall<'a> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetMultipleForAllPlayerCall<'a>
-    where  {
+pub struct ScoreResetMultipleForAllPlayerCall<'a, S>
+    where S: 'a {
 
-    hub: &'a GamesManagement<>,
+    hub: &'a GamesManagement<S>,
     _request: ScoresResetMultipleForAllRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a> client::CallBuilder for ScoreResetMultipleForAllPlayerCall<'a> {}
+impl<'a, S> client::CallBuilder for ScoreResetMultipleForAllPlayerCall<'a, S> {}
 
-impl<'a> ScoreResetMultipleForAllPlayerCall<'a> {
+impl<'a, S> ScoreResetMultipleForAllPlayerCall<'a, S>
+where
+    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
 
 
     /// Perform the operation you have build so far.
@@ -5144,7 +5257,7 @@ impl<'a> ScoreResetMultipleForAllPlayerCall<'a> {
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a> {
+    pub fn request(mut self, new_value: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, S> {
         self._request = new_value;
         self
     }
@@ -5154,7 +5267,7 @@ impl<'a> ScoreResetMultipleForAllPlayerCall<'a> {
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetMultipleForAllPlayerCall<'a> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetMultipleForAllPlayerCall<'a, S> {
         self._delegate = Some(new_value);
         self
     }
@@ -5179,7 +5292,7 @@ impl<'a> ScoreResetMultipleForAllPlayerCall<'a> {
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetMultipleForAllPlayerCall<'a>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetMultipleForAllPlayerCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5199,9 +5312,9 @@ impl<'a> ScoreResetMultipleForAllPlayerCall<'a> {
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetMultipleForAllPlayerCall<'a>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
+    pub fn add_scope<T, St>(mut self, scope: T) -> ScoreResetMultipleForAllPlayerCall<'a, S>
+                                                        where T: Into<Option<St>>,
+                                                              St: AsRef<str> {
         match scope.into() {
           Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
           None => None,
